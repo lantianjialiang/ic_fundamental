@@ -1,3 +1,5 @@
+import { useLocale } from '../../../i18n/LocaleContext'
+import { ui } from '../../../i18n/ui'
 import { ATE_BODY, atePose, CHANNEL_COUNT, channelX, layerY, type TestFlow } from '../data/layout'
 import { SceneLabel } from './SceneLabel'
 
@@ -9,6 +11,7 @@ type ATEProps = {
 }
 
 export function ATE({ progress, flow, selectedChannel, onSelect }: ATEProps) {
+  const { t } = useLocale()
   const pose = atePose(flow)
   const y = layerY(pose, progress)
   const { w, h, d } = ATE_BODY
@@ -64,7 +67,7 @@ export function ATE({ progress, flow, selectedChannel, onSelect }: ATEProps) {
       <SceneLabel
         position={[0, channelsOnTop ? -h / 2 - 0.22 : h / 2 + 0.22, 0]}
         title="ATE"
-        subtitle="Automatic Test Equipment"
+        subtitle={t(ui.scene.ateSub)}
       />
       <SceneLabel
         position={[
@@ -73,7 +76,7 @@ export function ATE({ progress, flow, selectedChannel, onSelect }: ATEProps) {
           ATE_BODY.channelZ + 0.22,
         ]}
         title="CH1 … CH16"
-        subtitle="Tester Channels"
+        subtitle={t(ui.scene.chSub)}
       />
     </group>
   )

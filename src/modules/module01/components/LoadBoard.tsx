@@ -1,3 +1,5 @@
+import { useLocale } from '../../../i18n/LocaleContext'
+import { ui } from '../../../i18n/ui'
 import { CHANNEL_COUNT, DUT, LOAD_BOARD, SOCKET, bgaXZ, channelX, layerY } from '../data/layout'
 import { ftBoardRoute } from '../data/pcbRouting'
 import { PcbCopper } from './PcbCopper'
@@ -10,6 +12,7 @@ type LoadBoardProps = {
 }
 
 export function LoadBoard({ progress, selectedChannel, onSelect }: LoadBoardProps) {
+  const { t } = useLocale()
   const y = layerY(LOAD_BOARD, progress)
   const { w, h, d } = LOAD_BOARD.body
   const holeR = 0.07
@@ -98,10 +101,10 @@ export function LoadBoard({ progress, selectedChannel, onSelect }: LoadBoardProp
       <SceneLabel
         position={[0, h / 2 + 0.28, -d / 2 + 0.15]}
         title="LOAD BOARD"
-        subtitle="4-layer: Top / Inner / Bottom + Via"
+        subtitle={t(ui.scene.lbSub)}
       />
-      <SceneLabel position={[0, -0.28, LOAD_BOARD.connectorZ + 0.28]} title="Bottom · ATE" />
-      <SceneLabel position={[0, 0.22, 0]} title="Top · Socket Pads" />
+      <SceneLabel position={[0, -0.28, LOAD_BOARD.connectorZ + 0.28]} title={t(ui.scene.lbBottom)} />
+      <SceneLabel position={[0, 0.22, 0]} title={t(ui.scene.lbTop)} />
     </group>
   )
 }

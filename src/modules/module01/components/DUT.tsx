@@ -1,3 +1,5 @@
+import { useLocale } from '../../../i18n/LocaleContext'
+import { ui } from '../../../i18n/ui'
 import { BGA_COLS, DUT as DUT_LAYOUT, bgaXZ, layerY } from '../data/layout'
 import { channelForBall } from '../data/paths'
 import { SceneLabel } from './SceneLabel'
@@ -9,6 +11,7 @@ type DUTProps = {
 }
 
 export function DUT({ progress, selectedChannel, onSelect }: DUTProps) {
+  const { t } = useLocale()
   const y = layerY(DUT_LAYOUT, progress)
   const { w, h, d } = DUT_LAYOUT.body
   const ballY = -h / 2 - DUT_LAYOUT.ballRadius * 0.85
@@ -54,7 +57,7 @@ export function DUT({ progress, selectedChannel, onSelect }: DUTProps) {
       <SceneLabel
         position={[0, h / 2 + 0.2, 0]}
         title="DUT"
-        subtitle="Device Under Test · BGA Package · 100 balls"
+        subtitle={t(ui.scene.dutSub)}
       />
     </group>
   )

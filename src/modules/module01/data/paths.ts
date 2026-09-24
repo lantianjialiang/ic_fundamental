@@ -20,10 +20,26 @@ import { cpBoardRoute, ftBoardRoute, pcbLayerY, type PcbNode } from './pcbRoutin
 
 export type Vec3 = [number, number, number]
 
+export type PathHopId =
+  | 'ateCh'
+  | 'lbBottom'
+  | 'via1'
+  | 'inner'
+  | 'via2'
+  | 'lbTop'
+  | 'socketPin'
+  | 'socketContact'
+  | 'dutBall'
+  | 'pcTop'
+  | 'pcBottom'
+  | 'needleContact'
+  | 'needleTip'
+  | 'diePad'
+
 export type SignalPath = {
   channel: number
   hops: Vec3[]
-  hopNames: string[]
+  hopIds: PathHopId[]
   endpoint: string
   /** 组件之间的空隙连线，不含板内 copper（由 PCB 自己画） */
   airHops: Vec3[][]
@@ -71,16 +87,16 @@ export function buildSignalPath(flow: TestFlow, channel: number, progress: numbe
       channel,
       endpoint: name,
       pcbNodes,
-      hopNames: [
-        `ATE CH${channel + 1}`,
-        'Load Board 底层焊盘 (Bottom)',
-        'Via-1 过孔',
-        'Inner 层 Track',
-        'Via-2 过孔',
-        `Load Board 顶层焊盘 (Top) ${name}`,
-        'Socket Pin',
-        'Socket Contact',
-        `DUT Ball ${name}`,
+      hopIds: [
+        'ateCh',
+        'lbBottom',
+        'via1',
+        'inner',
+        'via2',
+        'lbTop',
+        'socketPin',
+        'socketContact',
+        'dutBall',
       ],
       hops: [ate, ...pcbWorld, socketPin, socketContact, dutBall],
       airHops: [
@@ -107,16 +123,16 @@ export function buildSignalPath(flow: TestFlow, channel: number, progress: numbe
     channel,
     endpoint: `Die pad ${channel + 1}`,
     pcbNodes,
-    hopNames: [
-      `ATE CH${channel + 1}`,
-      'Probe Card 顶层焊盘 (Top)',
-      'Via-1 过孔',
-      'Inner 层 Track',
-      'Via-2 过孔',
-      'Probe Card 底层焊盘 (Bottom)',
-      'Needle Contact',
-      'Needle Tip',
-      'Wafer Die Pad',
+    hopIds: [
+      'ateCh',
+      'pcTop',
+      'via1',
+      'inner',
+      'via2',
+      'pcBottom',
+      'needleContact',
+      'needleTip',
+      'diePad',
     ],
     hops: [ate, ...pcbWorld, needleContact, needleTip, diePad],
     airHops: [

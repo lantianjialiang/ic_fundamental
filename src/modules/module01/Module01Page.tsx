@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useLocale } from '../../i18n/LocaleContext'
+import { ui } from '../../i18n/ui'
 import { LabShell } from '../../lab/LabShell'
 import { type ModuleId } from '../catalog'
 import { LegendPanel } from './components/LegendPanel'
@@ -7,17 +9,13 @@ import { LabelsContext } from './context/LabelsContext'
 import { type TestFlow } from './data/layout'
 import { useAssembly } from './hooks/useAssembly'
 
-const GOALS: Record<TestFlow, string> = {
-  FT: 'FT：DUT 在上、ATE 在下。路径：封装 DUT → Socket → Load Board → ATE Channel。',
-  CP: 'CP：ATE 在上、Wafer 在下。路径：ATE Channel → Probe Card → Needles → Die Pad。',
-}
-
 type Module01PageProps = {
   moduleId: ModuleId
   onModuleChange: (id: ModuleId) => void
 }
 
 export function Module01Page({ moduleId, onModuleChange }: Module01PageProps) {
+  const { t } = useLocale()
   const { progress, explode, assemble } = useAssembly()
   const [flow, setFlow] = useState<TestFlow>('FT')
   const [showLabels, setShowLabels] = useState(false)
@@ -34,8 +32,8 @@ export function Module01Page({ moduleId, onModuleChange }: Module01PageProps) {
       <LabShell
         moduleId={moduleId}
         onModuleChange={onModuleChange}
-        title="Module 02 — How is a DUT connected to an ATE?"
-        goal={GOALS[flow]}
+        title={t(ui.m02.title)}
+        goal={t(flow === 'FT' ? ui.m02.goalFt : ui.m02.goalCp)}
         footer={
           <footer className="lab__toolbar">
             <div className="lab__modes" role="group" aria-label="Test flow">
@@ -44,14 +42,14 @@ export function Module01Page({ moduleId, onModuleChange }: Module01PageProps) {
                 className={`lab__mode${flow === 'FT' ? ' is-active' : ''}`}
                 onClick={() => switchFlow('FT')}
               >
-                FT 成品测试
+                {t(ui.m02.ft)}
               </button>
               <button
                 type="button"
                 className={`lab__mode${flow === 'CP' ? ' is-active' : ''}`}
                 onClick={() => switchFlow('CP')}
               >
-                CP 晶圆测试
+                {t(ui.m02.cp)}
               </button>
             </div>
             <button type="button" className="lab__btn lab__btn--primary" onClick={explode} disabled={exploded && progress > 0.99}>
@@ -66,11 +64,14 @@ export function Module01Page({ moduleId, onModuleChange }: Module01PageProps) {
                 checked={showLabels}
                 onChange={(event) => setShowLabels(event.target.checked)}
               />
-              3D 标注
+              {t(ui.m02.labels)}
             </label>
             <span className="lab__hint">
-              左键旋转 · 滚轮缩放 · 右键平移 · 点通道或 PCB 走线高亮路径
+              {t(ui.m02.hint)}
             </span>
+            <button type="button" className="lab__btn lab__btn--primary" onClick={() => onModuleChange('ate')}>
+              {t(ui.m02.next)}
+            </button>
           </footer>
         }
       >

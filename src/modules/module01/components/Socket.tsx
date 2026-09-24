@@ -1,3 +1,5 @@
+import { useLocale } from '../../../i18n/LocaleContext'
+import { ui } from '../../../i18n/ui'
 import { DUT, SOCKET, bgaXZ, layerY } from '../data/layout'
 import { SceneLabel } from './SceneLabel'
 
@@ -6,6 +8,7 @@ type SocketProps = {
 }
 
 export function Socket({ progress }: SocketProps) {
+  const { t } = useLocale()
   const y = layerY(SOCKET, progress)
   const { w, h, d } = SOCKET.body
   const boardPinY = -h / 2 - SOCKET.boardPinLength / 2
@@ -50,7 +53,7 @@ export function Socket({ progress }: SocketProps) {
       <SceneLabel
         position={[w / 2 + 0.42, 0.16, 0]}
         title="SOCKET"
-        subtitle="Top → DUT · Bottom pins → Load Board"
+        subtitle={t(ui.scene.socketSub)}
       />
     </group>
   )

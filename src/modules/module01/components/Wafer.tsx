@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
 import { ExtrudeGeometry, Shape } from 'three'
+import { useLocale } from '../../../i18n/LocaleContext'
+import { ui } from '../../../i18n/ui'
 import { CHANNEL_COUNT, WAFER, dieCells, layerY, needleXZ } from '../data/layout'
 import { SceneLabel } from './SceneLabel'
 
@@ -32,6 +34,7 @@ function createWaferGeometry(): ExtrudeGeometry {
 }
 
 export function Wafer({ progress }: WaferProps) {
+  const { t } = useLocale()
   const y = layerY(WAFER, progress)
   const dies = useMemo(() => dieCells(), [])
   const geometry = useMemo(() => createWaferGeometry(), [WAFER.radius, WAFER.flatDepth, WAFER.thickness])
@@ -88,12 +91,12 @@ export function Wafer({ progress }: WaferProps) {
       <SceneLabel
         position={[0, -0.34, 0]}
         title="WAFER (DUT)"
-        subtitle="Die array · primary flat for alignment"
+        subtitle={t(ui.scene.waferSub)}
       />
       <SceneLabel
         position={[flatWorldX + 0.22, 0.16, 0]}
-        title="PRIMARY FLAT"
-        subtitle="Straight alignment edge"
+        title={t(ui.scene.flat)}
+        subtitle={t(ui.scene.flatSub)}
       />
     </group>
   )

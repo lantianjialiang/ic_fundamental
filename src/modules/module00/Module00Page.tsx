@@ -1,4 +1,7 @@
 import { useState, type ReactNode } from 'react'
+import { useLocale } from '../../i18n/LocaleContext'
+import { type LText } from '../../i18n/locale'
+import { ui } from '../../i18n/ui'
 import { LabShell } from '../../lab/LabShell'
 import { type ModuleId } from '../catalog'
 import {
@@ -25,29 +28,26 @@ type Focus =
 
 export function Module00Page({ moduleId, onModuleChange, onOpenConnection }: Module00PageProps) {
   const [focus, setFocus] = useState<Focus>({ kind: 'chain', id: 'cp' })
-
-  const detail = resolveDetail(focus)
+  const { t } = useLocale()
+  const detail = resolveDetail(focus, t)
 
   return (
     <LabShell
       moduleId={moduleId}
       onModuleChange={onModuleChange}
-      title="Module 01 — What is semiconductor test?"
-      goal="先建立产业链和测试概念。现在不讲 Timing、Strobe 和仪器细节。"
+      title={t(ui.m01.title)}
+      goal={t(ui.m01.goal)}
       scroll
     >
       <div className="lab__body intro">
         <main className="intro__main">
           <section className="intro__section">
-            <h2>半导体测试到底在干什么？</h2>
-            <p>
-              芯片从晶圆到出货，每一步都可能做出失效器件。测试不是把芯片修好，而是用 ATE
-              自动判断每一颗 DUT 能不能进入下一道工序或出货。不同芯片（数字、模拟、Memory、RF）要测的参数不同，后面要学的理论也不同。
-            </p>
+            <h2>{t(ui.m01.whatTitle)}</h2>
+            <p>{t(ui.m01.whatBody)}</p>
           </section>
 
           <section className="intro__section">
-            <h2>产业链里的测试位置</h2>
+            <h2>{t(ui.m01.chainTitle)}</h2>
             <div className="chain">
               {CHAIN.map((step, index) => (
                 <div key={step.id} className="chain__item">
@@ -58,7 +58,7 @@ export function Module00Page({ moduleId, onModuleChange, onOpenConnection }: Mod
                     onClick={() => setFocus({ kind: 'chain', id: step.id })}
                   >
                     <strong>{step.title}</strong>
-                    <span>{step.subtitle}</span>
+                    <span>{t(step.subtitle)}</span>
                   </button>
                 </div>
               ))}
@@ -66,7 +66,7 @@ export function Module00Page({ moduleId, onModuleChange, onOpenConnection }: Mod
           </section>
 
           <section className="intro__section">
-            <h2>不同芯片，测试不一样</h2>
+            <h2>{t(ui.m01.chipsTitle)}</h2>
             <div className="chips">
               {CHIP_TYPES.map((chip) => (
                 <button
@@ -76,15 +76,15 @@ export function Module00Page({ moduleId, onModuleChange, onOpenConnection }: Mod
                   onClick={() => setFocus({ kind: 'chip', id: chip.id })}
                 >
                   <span className="chips__en">{chip.name}</span>
-                  <strong>{chip.title}</strong>
-                  <span className="chips__ex">{chip.examples}</span>
+                  <strong>{t(chip.title)}</strong>
+                  <span className="chips__ex">{t(chip.examples)}</span>
                 </button>
               ))}
             </div>
           </section>
 
           <section className="intro__section">
-            <h2>必须先认识的词</h2>
+            <h2>{t(ui.m01.termsTitle)}</h2>
             <div className="terms">
               {TERMS.map((term) => (
                 <button
@@ -101,8 +101,8 @@ export function Module00Page({ moduleId, onModuleChange, onOpenConnection }: Mod
           </section>
 
           <section className="intro__section">
-            <h2>最重要的一张图</h2>
-            <p className="intro__note">点击方块看一句话。Pin Electronics / PMU 只放位置，不讲原理。</p>
+            <h2>{t(ui.m01.diagramTitle)}</h2>
+            <p className="intro__note">{t(ui.m01.diagramNote)}</p>
             <div className="sys">
               <DiagramBox id="program" focus={focus} onFocus={setFocus} />
               <div className="sys__arrow">↓</div>
@@ -134,7 +134,7 @@ export function Module00Page({ moduleId, onModuleChange, onOpenConnection }: Mod
           <p className="legend__hint">{detail.text}</p>
           {detail.extra}
           <button type="button" className="lab__btn lab__btn--primary" onClick={onOpenConnection}>
-            下一课：DUT 如何接到 ATE
+            {t(ui.m01.next)}
           </button>
         </aside>
       </div>
@@ -164,7 +164,10 @@ function DiagramBox({
   )
 }
 
-function resolveDetail(focus: Focus): {
+function resolveDetail(
+  focus: Focus,
+  t: (text: LText | string) => string,
+): {
   kicker: string
   title: string
   text: string
@@ -172,20 +175,20 @@ function resolveDetail(focus: Focus): {
 } {
   if (focus.kind === 'chain') {
     const step = CHAIN.find((item) => item.id === focus.id)
-    return { kicker: '产业链', title: step?.title ?? '', text: step?.text ?? '' }
+    return { kicker: t(ui.m01.kickerChain), title: step?.title ?? '', text: step ? t(step.text) : '' }
   }
   if (focus.kind === 'term') {
     const term = TERMS.find((item) => item.id === focus.id)
     return {
-      kicker: '术语',
-      title: term ? `${term.name} · ${term.full}` : '',
-      text: term?.text ?? '',
+      kicker: t(ui.m01.kickerTerm),
+      title: term ? `${term.name} · ${t(term.full)}` : '',
+      text: term ? t(term.text) : '',
       extra: term ? (
         <figure className="glossary-fig">
-          <img src={term.image} alt={term.caption} />
+          <img src={term.image} alt={t(term.caption)} />
           <figcaption>
-            {term.caption}
-            <span>{term.credit}</span>
+            {t(term.caption)}
+            <span>{t(term.credit)}</span>
           </figcaption>
         </figure>
       ) : null,
@@ -193,17 +196,17 @@ function resolveDetail(focus: Focus): {
   }
   if (focus.kind === 'chip') {
     const chip = CHIP_TYPES.find((item) => item.id === focus.id)
-    if (!chip) return { kicker: '芯片类型', title: '', text: '' }
+    if (!chip) return { kicker: t(ui.m01.kickerChip), title: '', text: '' }
     return {
-      kicker: '芯片类型',
-      title: `${chip.name} · ${chip.title}`,
-      text: chip.theory,
+      kicker: t(ui.m01.kickerChip),
+      title: `${chip.name} · ${t(chip.title)}`,
+      text: t(chip.theory),
       extra: (
         <div>
-          <p className="legend__hint">典型参数（先混个脸熟）：</p>
+          <p className="legend__hint">{t(ui.m01.chipParams)}</p>
           <ul>
             {chip.params.map((param) => (
-              <li key={param}>{param}</li>
+              <li key={t(param)}>{t(param)}</li>
             ))}
           </ul>
         </div>
@@ -211,5 +214,9 @@ function resolveDetail(focus: Focus): {
     }
   }
   const node = DIAGRAM.find((item) => item.id === focus.id)
-  return { kicker: '系统框图', title: node?.title ?? '', text: node?.text ?? '' }
+  return {
+    kicker: t(ui.m01.kickerDiagram),
+    title: node?.title ?? '',
+    text: node ? t(node.text) : '',
+  }
 }

@@ -1,3 +1,5 @@
+import { useLocale } from '../../../i18n/LocaleContext'
+import { ui } from '../../../i18n/ui'
 import { CHANNEL_COUNT, PROBE_CARD, channelX, layerY } from '../data/layout'
 import { cpBoardRoute } from '../data/pcbRouting'
 import { PcbCopper } from './PcbCopper'
@@ -10,6 +12,7 @@ type ProbeCardProps = {
 }
 
 export function ProbeCard({ progress, selectedChannel, onSelect }: ProbeCardProps) {
+  const { t } = useLocale()
   const y = layerY(PROBE_CARD, progress)
   const h = PROBE_CARD.thickness
   const r = PROBE_CARD.radius
@@ -84,9 +87,9 @@ export function ProbeCard({ progress, selectedChannel, onSelect }: ProbeCardProp
       <SceneLabel
         position={[0, h / 2 + 0.28, -r + 0.25]}
         title="PROBE CARD"
-        subtitle="Top / Inner / Bottom + Via"
+        subtitle={t(ui.scene.pcSub)}
       />
-      <SceneLabel position={[0, 0.22, PROBE_CARD.connectorZ + 0.28]} title="Top · ATE Connector" />
+      <SceneLabel position={[0, 0.22, PROBE_CARD.connectorZ + 0.28]} title={t(ui.scene.pcTop)} />
     </group>
   )
 }

@@ -1,3 +1,5 @@
+import { useLocale } from '../../../i18n/LocaleContext'
+import { ui } from '../../../i18n/ui'
 import { CHANNEL_COUNT, NEEDLES, layerY, needleXZ } from '../data/layout'
 import { SceneLabel } from './SceneLabel'
 
@@ -6,6 +8,7 @@ type ProbeNeedlesProps = {
 }
 
 export function ProbeNeedles({ progress }: ProbeNeedlesProps) {
+  const { t } = useLocale()
   const y = layerY(NEEDLES, progress)
   const headH = 0.05
   const contactY = headH / 2 + NEEDLES.contactLength / 2
@@ -40,7 +43,7 @@ export function ProbeNeedles({ progress }: ProbeNeedlesProps) {
       <SceneLabel
         position={[0.72, 0.06, 0]}
         title="PROBE NEEDLES"
-        subtitle="Top contacts → card · Tips → die pads"
+        subtitle={t(ui.scene.needlesSub)}
       />
     </group>
   )
