@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" role="img" aria-label="Test Program">
+  <rect width="800" height="480" fill="#14181d"/>
+  <text x="28" y="32" fill="#8b949e" font-family="Segoe UI, sans-serif" font-size="16">Test Program</text>
+  <rect x="24" y="48" width="752" height="408" rx="6" fill="#0d1117" stroke="#3d444d"/>
+  <rect x="24" y="48" width="752" height="36" rx="6" fill="#252b33"/>
+  <rect x="24" y="72" width="752" height="12" fill="#252b33"/>
+  <text x="40" y="72" fill="#d8dee6" font-family="Segoe UI, sans-serif" font-size="14">ATE Executive  ·  device_ft.tp</text>
+  <circle cx="740" cy="66" r="5" fill="#f85149"/><circle cx="722" cy="66" r="5" fill="#e8c45a"/><circle cx="704" cy="66" r="5" fill="#3fb950"/>
+  <rect x="40" y="100" width="180" height="332" rx="4" fill="#161b22" stroke="#3d444d"/>
+  <text x="52" y="124" fill="#8b949e" font-family="Segoe UI, sans-serif" font-size="12">Flow</text>
+  <g font-family="Consolas, monospace" font-size="13">
+    <text x="52" y="152" fill="#d8dee6">1  Continuity</text>
+    <text x="52" y="176" fill="#d8dee6">2  Leakage</text>
+    <text x="52" y="200" fill="#e8c45a">3  Functional</text>
+    <text x="52" y="224" fill="#d8dee6">4  IDDQ</text>
+    <text x="52" y="248" fill="#d8dee6">5  Binning</text>
+  </g>
+  <rect x="236" y="100" width="360" height="332" rx="4" fill="#161b22" stroke="#3d444d"/>
+  <text x="252" y="124" fill="#8b949e" font-family="Segoe UI, sans-serif" font-size="12">Limits</text>
+  <g font-family="Consolas, monospace" font-size="13">
+    <text x="252" y="152" fill="#8b949e">Test          Min     Max     Meas    R</text>
+    <text x="252" y="180" fill="#3fb950">Cont_PIN1    -1.0    -0.2    -0.41   P</text>
+    <text x="252" y="208" fill="#3fb950">Ileak        -1u     1u      12n     P</text>
+    <text x="252" y="236" fill="#f85149">Func_scan     --      --      mismatch F</text>
+    <text x="252" y="264" fill="#8b949e">IDDQ          0      2mA     --      --</text>
+  </g>
+  <rect x="612" y="100" width="148" height="200" rx="4" fill="#161b22" stroke="#3d444d"/>
+  <text x="628" y="124" fill="#8b949e" font-family="Segoe UI, sans-serif" font-size="12">Soft Bin</text>
+  <g font-family="Segoe UI, sans-serif" font-size="13">
+    <text x="628" y="156" fill="#3fb950">1  PASS</text>
+    <text x="628" y="184" fill="#f85149">2  FUNC</text>
+    <text x="628" y="212" fill="#e8c45a">6  DC</text>
+    <text x="628" y="248" fill="#d8dee6">this DUT → Bin 2</text>
+  </g>
+  <rect x="612" y="316" width="148" height="116" rx="4" fill="#1f3d2a" stroke="#3fb950"/>
+  <text x="686" y="360" text-anchor="middle" fill="#9be9a8" font-family="Segoe UI, sans-serif" font-size="14">No program</text>
+  <text x="686" y="384" text-anchor="middle" fill="#8b949e" font-family="Segoe UI, sans-serif" font-size="12">ATE does nothing</text>
+  <text x="686" y="406" text-anchor="middle" fill="#8b949e" font-family="Segoe UI, sans-serif" font-size="12">Runs on the PC</text>
+</svg>

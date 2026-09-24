@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" role="img" aria-label="Test Pattern">
+  <rect width="800" height="480" fill="#14181d"/>
+  <text x="28" y="36" fill="#8b949e" font-family="Segoe UI, sans-serif" font-size="16">Test Pattern · vectors per cycle</text>
+  <text x="28" y="56" fill="#6e7681" font-family="Segoe UI, sans-serif" font-size="12">Each row is one cycle. 1/0 = drive. H/L = expect. X = mask. Pattern is data, not a machine.</text>
+  <rect x="28" y="76" width="520" height="360" rx="4" fill="#0d1117" stroke="#3d444d"/>
+  <g font-family="Consolas, monospace" font-size="18" fill="#d8dee6">
+    <text x="52" y="116" fill="#8b949e">cyc     CLK   SI    SE    SO</text>
+    <text x="52" y="164" fill="#e8c45a">000     1     0     1     X</text>
+    <text x="52" y="212">001     0     1     1     L</text>
+    <text x="52" y="260">002     1     1     1     L</text>
+    <text x="52" y="308">003     0     0     0     H</text>
+    <text x="52" y="356">004     1     0     0     H</text>
+  </g>
+  <rect x="568" y="76" width="204" height="360" rx="4" fill="#161b22" stroke="#3d444d"/>
+  <g font-family="Segoe UI, sans-serif" font-size="14">
+    <text x="588" y="112" fill="#e8c45a">1 / 0</text>
+    <text x="588" y="134" fill="#8b949e">drive DUT</text>
+    <text x="588" y="180" fill="#3fb950">H / L</text>
+    <text x="588" y="202" fill="#8b949e">compare output</text>
+    <text x="588" y="248" fill="#8b949e">X</text>
+    <text x="588" y="270" fill="#8b949e">do not compare</text>
+    <text x="588" y="324" fill="#d8dee6">Real files are longer.</text>
+    <text x="588" y="346" fill="#8b949e">Logic is the same.</text>
+  </g>
+</svg>

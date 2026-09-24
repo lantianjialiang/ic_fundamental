@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" role="img" aria-label="Final Test">
+  <rect width="800" height="480" fill="#14181d"/>
+  <text x="28" y="36" fill="#8b949e" font-family="Segoe UI, sans-serif" font-size="16">FT · Final Test</text>
+  <text x="28" y="56" fill="#6e7681" font-family="Segoe UI, sans-serif" font-size="12">Packaged device. DUT on top, ATE below. Contact is Socket, not probes.</text>
+  <rect x="300" y="80" width="120" height="44" rx="4" fill="#1c2128" stroke="#e8c45a" stroke-width="2"/>
+  <text x="360" y="107" text-anchor="middle" fill="#e8c45a" font-family="Segoe UI, sans-serif" font-size="14">DUT package</text>
+  <g fill="#c9a24a">
+    <rect x="308" y="120" width="8" height="10"/><rect x="322" y="120" width="8" height="10"/><rect x="336" y="120" width="8" height="10"/><rect x="350" y="120" width="8" height="10"/>
+    <rect x="364" y="120" width="8" height="10"/><rect x="378" y="120" width="8" height="10"/><rect x="392" y="120" width="8" height="10"/><rect x="406" y="120" width="8" height="10"/>
+  </g>
+  <text x="460" y="108" fill="#e8c45a" font-family="Segoe UI, sans-serif" font-size="12">pins / balls</text>
+  <rect x="270" y="140" width="180" height="50" rx="4" fill="#2a2e34" stroke="#8b949e"/>
+  <text x="360" y="170" text-anchor="middle" fill="#d8dee6" font-family="Segoe UI, sans-serif" font-size="14">Socket</text>
+  <text x="460" y="170" fill="#8b949e" font-family="Segoe UI, sans-serif" font-size="12">repeatable insert</text>
+  <rect x="200" y="204" width="320" height="36" rx="3" fill="#2f6b3a" stroke="#1e4626"/>
+  <text x="360" y="227" text-anchor="middle" fill="#d8dee6" font-family="Segoe UI, sans-serif" font-size="14">Load Board</text>
+  <rect x="160" y="260" width="400" height="90" rx="5" fill="#5a616a" stroke="#2f343b"/>
+  <text x="360" y="300" text-anchor="middle" fill="#9be9a8" font-family="Segoe UI, sans-serif" font-size="16">ATE</text>
+  <text x="360" y="324" text-anchor="middle" fill="#8b949e" font-family="Segoe UI, sans-serif" font-size="12">CH1 … CH16 · test head under the board</text>
+  <rect x="160" y="372" width="400" height="56" rx="4" fill="#252b33" stroke="#3d444d"/>
+  <text x="360" y="396" text-anchor="middle" fill="#d8dee6" font-family="Segoe UI, sans-serif" font-size="13">Handler nearby: load, press, sort by Bin</text>
+  <text x="360" y="416" text-anchor="middle" fill="#8b949e" font-family="Segoe UI, sans-serif" font-size="12">No wafer. No Probe Card.</text>
+</svg>

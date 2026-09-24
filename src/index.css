@@ -1,0 +1,428 @@
+:root {
+  font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+  color: #e6edf3;
+  background: #12151a;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+.lab {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+  background: #12151a;
+}
+
+.lab__body {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  min-height: 0;
+}
+
+.lab__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  padding: 12px 20px 10px;
+  border-bottom: 1px solid #2d333b;
+  background: #1c2128;
+}
+
+.lab__eyebrow {
+  margin: 0 0 2px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8b949e;
+}
+
+.lab--scroll {
+  overflow: hidden;
+}
+
+.lab--scroll .intro {
+  min-height: 0;
+}
+
+.lab__header h1 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.lab__nav {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.lab__nav-item {
+  appearance: none;
+  border: 1px solid #3d444d;
+  background: #252b33;
+  color: #c8d0d8;
+  padding: 3px 10px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.lab__nav-item.is-active {
+  border-color: #3d6d9c;
+  background: #2a4660;
+  color: #e6edf3;
+}
+
+.lab__goal {
+  margin: 0;
+  max-width: 420px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #9aa4b2;
+}
+
+.lab__stage {
+  min-height: 0;
+}
+
+.lab__stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.lab__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-top: 1px solid #2d333b;
+  background: #1c2128;
+}
+
+.lab__modes {
+  display: inline-flex;
+  margin-right: 6px;
+  border: 1px solid #3d444d;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.lab__mode {
+  appearance: none;
+  border: 0;
+  background: #252b33;
+  color: #c8d0d8;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.lab__mode + .lab__mode {
+  border-left: 1px solid #3d444d;
+}
+
+.lab__mode.is-active {
+  background: #2a4660;
+  color: #e6edf3;
+}
+
+.lab__btn {
+  appearance: none;
+  border: 1px solid #3d444d;
+  background: #252b33;
+  color: #e6edf3;
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.lab__btn:hover:not(:disabled) {
+  border-color: #5a6570;
+  background: #2d343d;
+}
+
+.lab__btn--primary {
+  border-color: #3d6d9c;
+  background: #2a4660;
+}
+
+.lab__btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.lab__hint {
+  margin-left: 8px;
+  font-size: 12px;
+  color: #8b949e;
+}
+
+.lab__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  font-size: 13px;
+  color: #c8d0d8;
+  cursor: pointer;
+}
+
+.legend {
+  overflow: auto;
+  padding: 14px 16px;
+  border-left: 1px solid #2d333b;
+  background: #191e24;
+}
+
+.legend h2 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #9aa4b2;
+}
+
+.legend__hint {
+  margin: 0 0 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #8b949e;
+}
+
+.legend__layers,
+.legend ul,
+.legend__path ol {
+  margin: 0 0 18px;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.legend__path-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e8c45a;
+}
+
+.scene-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #d8dee6;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.scene-label__title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.scene-label__sub {
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 400;
+  color: #9aa4b2;
+}
+
+.intro {
+  overflow: hidden;
+}
+
+.intro__main {
+  overflow: auto;
+  padding: 18px 22px 28px;
+}
+
+.intro__section {
+  margin-bottom: 28px;
+}
+
+.intro__section h2 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+.intro__section p,
+.intro__note {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #c4ccd6;
+}
+
+.chain {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  max-width: 420px;
+}
+
+.chain__arrow {
+  text-align: center;
+  color: #8b949e;
+  padding: 2px 0;
+}
+
+.chain__node {
+  width: 100%;
+  text-align: left;
+  border: 1px solid #3d444d;
+  background: #252b33;
+  color: inherit;
+  padding: 10px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.chain__node strong,
+.chips__card strong {
+  display: block;
+}
+
+.chain__node span,
+.chips__ex,
+.chips__en {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: #8b949e;
+}
+
+.chain__node.is-test {
+  border-color: #3d6d9c;
+}
+
+.chain__node.is-active,
+.chips__card.is-active,
+.terms__item.is-active,
+.sys__box.is-active {
+  border-color: #c9a24a;
+  background: #3a3420;
+}
+
+.chips {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.chips__card,
+.terms__item,
+.sys__box {
+  appearance: none;
+  border: 1px solid #3d444d;
+  background: #252b33;
+  color: inherit;
+  cursor: pointer;
+}
+
+.chips__card {
+  text-align: left;
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.terms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.terms__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.terms__thumb {
+  width: 36px;
+  height: 28px;
+  object-fit: contain;
+  border-radius: 2px;
+  background: #0d1117;
+}
+
+.glossary-fig {
+  margin: 0 0 12px;
+}
+
+.glossary-fig img {
+  display: block;
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+  border-radius: 4px;
+  background: #0d1117;
+}
+
+.glossary-fig figcaption {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #9aa4b2;
+}
+
+.glossary-fig figcaption span {
+  display: block;
+  margin-top: 4px;
+  color: #6e7681;
+  font-size: 11px;
+}
+
+.sys {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  max-width: 520px;
+}
+
+.sys__arrow,
+.sys__link {
+  color: #8b949e;
+}
+
+.sys__row,
+.sys__split {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sys__box {
+  min-width: 140px;
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.intro__aside .lab__btn {
+  margin-top: 12px;
+}
