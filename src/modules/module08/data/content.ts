@@ -1,4 +1,4 @@
-import { loc, type LText } from '../../../i18n/locale'
+import { loc } from '../../../i18n/locale'
 import { type QuizQuestion } from '../../../lab/QuizList'
 
 export const PERIOD = 10
@@ -13,43 +13,8 @@ export function strobeKind(ns: number): StrobeKind {
   return 'window'
 }
 
-export type TermId = 'drive' | 'strobe' | 'period' | 'setup' | 'hold' | 'tpd'
-
-export const TERMS: Array<{ id: TermId; title: string; text: LText }> = [
-  {
-    id: 'drive',
-    title: 'Drive Edge',
-    text: loc('输入在这一拍什么时候被驱动。太晚，Setup 可能不够。'),
-  },
-  {
-    id: 'strobe',
-    title: 'Strobe',
-    text: loc('输出在这一拍什么时候被采样。也叫 Receive / Compare。太早看到旧值。'),
-  },
-  {
-    id: 'period',
-    title: 'Period',
-    text: loc('一拍有多长。缩短它就是提高频率，后面 AC / fMAX 会用。'),
-  },
-  {
-    id: 'setup',
-    title: 'Setup',
-    text: loc('数据相对时钟要提前多久稳定。不够，触发器采到亚稳态或错值。'),
-  },
-  {
-    id: 'hold',
-    title: 'Hold',
-    text: loc('时钟沿之后数据还要保持多久。太早变，这一拍会错。'),
-  },
-  {
-    id: 'tpd',
-    title: 'Propagation Delay',
-    text: loc('输入变了，输出要过一会儿才变。这就是 Strobe 不能贴着 Drive 的原因。'),
-  },
-]
-
 export const TAKEAWAY = loc(
-  'DUT 输出不是立即发生的。Strobe 太早：好芯片也会 Fail。太晚：可能采到下一拍。',
+  'DUT 输出不是立即发生的。Strobe 太早：好芯片也会 Fail。太晚：可能采到下一拍。下一课仍用这张 CLK / DATA / OUT。',
 )
 
 export const QUIZ: QuizQuestion[] = [
@@ -75,13 +40,13 @@ export const QUIZ: QuizQuestion[] = [
       { id: 'pass', text: loc('反而更容易 Pass') },
     ],
     answer: 'ok',
-    explain: loc('输出还在 Propagation Delay 里。不是 DUT 坏了，是采样时刻不对。'),
+    explain: loc('输出还在 tPD 里。不是 DUT 坏了，是采样时刻不对。'),
   },
   {
     id: 'q3',
     prompt: loc('Period 指什么？'),
     options: [
-      { id: 'len', text: loc('一拍有多长') },
+      { id: 'len', text: loc('一拍有多长，两个 CLK 上升沿之间') },
       { id: 'voh', text: loc('输出高电平') },
       { id: 'scan', text: loc('扫描链条数') },
       { id: 'bin', text: loc('每天测多少颗') },
@@ -91,7 +56,7 @@ export const QUIZ: QuizQuestion[] = [
   },
   {
     id: 'q4',
-    prompt: loc('Setup / Hold 相对谁说？'),
+    prompt: loc('Setup Time / Hold Time 相对谁说？'),
     options: [
       { id: 'vdd', text: loc('只相对 VDD') },
       { id: 'clk', text: loc('数据相对时钟要提前 / 保持多久') },
@@ -99,6 +64,6 @@ export const QUIZ: QuizQuestion[] = [
       { id: 'bin', text: loc('相对 Bin 号') },
     ],
     answer: 'clk',
-    explain: loc('下一课会把这两段标回波形。这一课先立住名字。'),
+    explain: loc('tSU 在 CLK 沿之前，tH 在 CLK 沿之后。下一课仍标在同一张图上，并加上 tPD / tCQ / tr。'),
   },
 ]

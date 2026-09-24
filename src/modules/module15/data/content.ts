@@ -115,11 +115,10 @@ export const STEPS: Array<{ id: number; title: LText; text: LText }> = [
   { id: 1, title: loc('读 Datasheet'), text: loc('点规格。后面每一步都要能指回这里。') },
   { id: 2, title: loc('列出 Test Items'), text: loc('漏测移位或进位要判错：那是这颗 ALU 的教学要点。') },
   { id: 3, title: loc('设计 Test Vector'), text: loc('六种 OP 各至少一条；ADD 含进位；移位含移出位。') },
-  { id: 4, title: loc('设计 Timing'), text: loc('Period、Drive、Strobe。Strobe 必须晚于 tpd。') },
+  { id: 4, title: loc('设计 Timing'), text: loc('拧 Period / Drive / Strobe，图和数字一起变。Strobe 必须晚于 Drive+tpd。') },
   { id: 5, title: loc('设计 DC'), text: loc('VIH 或 VOH@IOH 做一项即可，条件要写清。') },
-  { id: 6, title: loc('运行 Functional'), text: loc('看哪一条 vector Fail。') },
-  { id: 7, title: loc('注入 Fault'), text: loc('某 OP 错、某 bit 粘 0、Strobe 过早、移位方向反了。') },
-  { id: 8, title: loc('分析根因'), text: loc('对照失败向量选原因。') },
+  { id: 6, title: loc('运行 Functional'), text: loc('无故障时应全 Pass。下面一步会把故障和结果放在同一屏。') },
+  { id: 7, title: loc('注入并看结果'), text: loc('选一种故障，第 3 步勾过的向量立刻重跑。对照失败行再选根因。') },
 ]
 
 export const DC_CHOICES: Array<{ id: string; title: LText }> = [
@@ -132,7 +131,7 @@ export function hex4(n: number): string {
 }
 
 export const TAKEAWAY = loc(
-  '闭环是：规格 → 项目 → 向量 → Timing / DC → 跑起来 → 注入故障 → 对失败向量说话。不必手写某家 API。',
+  '闭环是：规格 → 项目 → 向量 → Timing / DC → 跑起来 → 注入故障并对照失败行。不必手写某家 API。',
 )
 
 export const QUIZ: QuizQuestion[] = [
@@ -209,12 +208,19 @@ export function judgeVectors(selected: VecId[]): { ok: boolean; text: LText } {
   return { ok: false, text: loc(`还缺：${miss.join('、')}。`) }
 }
 
-export function judgeTiming(period: number, strobe: number): { ok: boolean; text: LText } {
-  if (strobe < TPD) {
-    return { ok: false, text: loc('Strobe 早于 tpd，好芯片也会 Fail。往后拖。') }
+export function judgeTiming(period: number, strobe: number, drive = 0): { ok: boolean; text: LText } {
+  const settle = drive + TPD
+  if (strobe < settle) {
+    return {
+      ok: false,
+      text: loc(`Strobe ${strobe} ns 早于 Drive+tpd=${settle} ns，好芯片也会 Fail。往后拖。`),
+    }
   }
   if (strobe >= period) {
     return { ok: false, text: loc('Strobe 落到下一拍去了。Period 要长过采样点。') }
   }
-  return { ok: true, text: loc('窗口成立：Drive 在拍首，Strobe 在 tpd 之后、Period 之前。') }
+  return {
+    ok: true,
+    text: loc(`窗口成立：Drive ${drive} → 稳定 ${settle} → Strobe ${strobe} → Period ${period}。`),
+  }
 }

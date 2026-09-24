@@ -4,19 +4,22 @@ import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
 import { type ModuleId } from '../catalog'
-import { MARKS, QUIZ, TAKEAWAY, TPD, acPass, freqOf, type MarkId } from './data/content'
+import { TimingScope } from '../timing/TimingScope'
+import { M09_MARKS, TIMING, type TimingMark } from '../timing/glossary'
+import { QUIZ, TAKEAWAY, acPass, freqOf } from './data/content'
 
 type Module09PageProps = {
   moduleId: ModuleId
   onModuleChange: (id: ModuleId) => void
 }
 
-type Focus = { kind: 'mark'; id: MarkId } | { kind: 'fmax' } | { kind: 'takeaway' }
+type Focus = { kind: 'mark'; id: TimingMark } | { kind: 'takeaway' }
 
 export function Module09Page({ moduleId, onModuleChange }: Module09PageProps) {
   const { t } = useLocale()
   const [period, setPeriod] = useState(16)
   const [focus, setFocus] = useState<Focus>({ kind: 'mark', id: 'tpd' })
+  const mark = focus.kind === 'mark' ? focus.id : 'fmax'
   const pass = acPass(period)
   const freq = freqOf(period)
   const detail = resolveDetail(focus, t)
@@ -39,33 +42,19 @@ export function Module09Page({ moduleId, onModuleChange }: Module09PageProps) {
       </Section>
 
       <Section title={t(ui.m09.marksTitle)} note={t(ui.m09.marksNote)}>
-        <div className="wave wave--marks">
-          <div className="wave__row">
-            <span>IN</span>
-            <div className="wave__bar">
-              <i style={{ marginLeft: '8%', width: '30%' }} />
-            </div>
-          </div>
-          <div className="wave__row">
-            <span>OUT</span>
-            <div className="wave__bar">
-              <i style={{ marginLeft: `${8 + TPD * 2}%`, width: '30%' }} />
-            </div>
-          </div>
-          <p className="wave__cap">tpd ≈ {TPD} ns</p>
-        </div>
         <div className="pick pick--3">
-          {MARKS.map((item) => (
+          {M09_MARKS.map((id) => (
             <button
-              key={item.id}
+              key={id}
               type="button"
-              className={`pick__card${focus.kind === 'mark' && focus.id === item.id ? ' is-active' : ''}`}
-              onClick={() => setFocus({ kind: 'mark', id: item.id })}
+              className={`pick__card${mark === id ? ' is-active' : ''}`}
+              onClick={() => setFocus({ kind: 'mark', id })}
             >
-              {item.title}
+              {TIMING[id].title}
             </button>
           ))}
         </div>
+        <TimingScope mark={mark} t={t} replayLabel={t(ui.timing.replay)} />
       </Section>
 
       <Section title={t(ui.m09.fmaxTitle)} note={t(ui.m09.fmaxNote)}>
@@ -82,7 +71,7 @@ export function Module09Page({ moduleId, onModuleChange }: Module09PageProps) {
               value={period}
               onChange={(event) => {
                 setPeriod(Number(event.target.value))
-                setFocus({ kind: 'fmax' })
+                setFocus({ kind: 'mark', id: 'fmax' })
               }}
             />
           </label>
@@ -90,7 +79,7 @@ export function Module09Page({ moduleId, onModuleChange }: Module09PageProps) {
             <b className={pass ? 'is-ok' : 'is-bad'}>{pass ? 'PASS' : 'FAIL'}</b>
             {pass
               ? `  ${freq.toFixed(0)} MHz ${t({ zh: '仍来得及' })}`
-              : `  ${t({ zh: 'Period 已短过 tpd + 余量，功能向量 Fail' })}`}
+              : `  ${t({ zh: 'Period 已短过 tPD + 余量，功能向量 Fail' })}`}
           </p>
         </div>
       </Section>
@@ -116,13 +105,6 @@ function resolveDetail(focus: Focus, t: (text: import('../../i18n/locale').LText
   if (focus.kind === 'takeaway') {
     return { kicker: t(ui.m09.kickerTakeaway), title: t(ui.m09.kickerOne), text: t(TAKEAWAY) }
   }
-  if (focus.kind === 'fmax') {
-    return {
-      kicker: t(ui.m09.kickerFmax),
-      title: 'fMAX',
-      text: t({ zh: '教学门槛约 100 MHz（Period 10 ns）。再短，同一套向量也会 Fail。' }),
-    }
-  }
-  const item = MARKS.find((node) => node.id === focus.id)
-  return { kicker: t(ui.m09.kickerMark), title: item?.title ?? '', text: item ? t(item.text) : '' }
+  const item = TIMING[focus.id]
+  return { kicker: t(ui.m09.kickerMark), title: item.title, text: t(item.text) }
 }

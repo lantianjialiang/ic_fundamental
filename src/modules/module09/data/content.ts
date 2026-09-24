@@ -1,4 +1,4 @@
-import { loc, type LText } from '../../../i18n/locale'
+import { loc } from '../../../i18n/locale'
 import { type QuizQuestion } from '../../../lab/QuizList'
 
 export const TPD = 8
@@ -12,42 +12,7 @@ export function freqOf(periodNs: number): number {
   return 1000 / periodNs
 }
 
-export type MarkId = 'tpd' | 'edge' | 'setup' | 'hold' | 'ctq' | 'fmax'
-
-export const MARKS: Array<{ id: MarkId; title: string; text: LText }> = [
-  {
-    id: 'tpd',
-    title: 'Propagation Delay',
-    text: loc('输入沿到输出沿的时间。Strobe 必须晚于它。'),
-  },
-  {
-    id: 'edge',
-    title: 'Rise / Fall Time',
-    text: loc('沿自己爬升 / 下降要花的时间。沿太慢，有效窗口更窄。'),
-  },
-  {
-    id: 'setup',
-    title: 'Setup Time',
-    text: loc('数据要在时钟沿之前稳定多久。Period 缩短时它最先被吃掉。'),
-  },
-  {
-    id: 'hold',
-    title: 'Hold Time',
-    text: loc('时钟沿之后数据还要保持。和 Setup 一前一后。'),
-  },
-  {
-    id: 'ctq',
-    title: 'Clock-to-Q',
-    text: loc('时钟沿到 Q 输出有效的时间。寄存器链用它代替组合 tpd。'),
-  },
-  {
-    id: 'fmax',
-    title: 'Maximum Frequency',
-    text: loc('功能仍对的最高时钟。Period 再短，向量就开始 Fail。对接 M05 的 100 MHz。'),
-  },
-]
-
-export const TAKEAWAY = loc('DC Test 解决“对不对”；AC Test 解决“来不来得及”。')
+export const TAKEAWAY = loc('DC Test 解决“对不对”；AC Test 解决“来不来得及”。时间都标在 M08 同一张 CLK / DATA / OUT 上。')
 
 export const QUIZ: QuizQuestion[] = [
   {
@@ -84,18 +49,18 @@ export const QUIZ: QuizQuestion[] = [
       { id: 'xor', text: loc('XOR 真值表反了') },
     ],
     answer: 'win',
-    explain: loc('AC 参数都是时间窗口。先回到波形，不要先改功能期望。'),
+    explain: loc('tSU / tH / tPD 都是同一张波形上的时间段。先回到图，不要先改功能期望。'),
   },
   {
     id: 'q4',
-    prompt: loc('这一课为什么不新画一套图？'),
+    prompt: loc('tPD 和 Clock-to-Q 有什么不同？'),
     options: [
-      { id: 'lazy', text: loc('图不够用') },
-      { id: 'same', text: loc('AC 就是标在 Timing 波形上的那些时间段') },
-      { id: '3d', text: loc('必须用 3D') },
-      { id: 'api', text: loc('要先写 Tester API') },
+      { id: 'same', text: loc('完全同一个时间，只是两个名字') },
+      { id: 'ok', text: loc('tPD 是组合：DATA→OUT；tCQ 是寄存器：CLK→Q') },
+      { id: 'edge', text: loc('都是 Rise Time') },
+      { id: 'strobe', text: loc('都是 Strobe 的别名') },
     ],
-    answer: 'same',
-    explain: loc('Drive、Strobe、Period 已经在上一课。AC 只是给各段时间起规格名。'),
+    answer: 'ok',
+    explain: loc('同一张图：DATA 变到 OUT 变是 tPD；CLK 沿到 Q 有效是 tCQ。不要混。'),
   },
 ]

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { useLocale } from '../i18n/LocaleContext'
 import { ui } from '../i18n/ui'
 import { MODULES, type ModuleId } from '../modules/catalog'
+import { useLabNav } from './LabNavContext'
 
 type LabShellProps = {
   moduleId: ModuleId
@@ -23,6 +24,10 @@ export function LabShell({
   children,
 }: LabShellProps) {
   const { locale, setLocale, t } = useLocale()
+  const labNav = useLabNav()
+  const navItems = labNav
+    ? MODULES.filter((item) => labNav.navIds.includes(item.id))
+    : MODULES
 
   return (
     <div className={`lab${scroll ? ' lab--scroll' : ''}`}>
@@ -31,7 +36,17 @@ export function LabShell({
           <p className="lab__eyebrow">{t(ui.labName)}</p>
           <h1>{title}</h1>
           <nav className="lab__nav" aria-label="Modules">
-            {MODULES.map((item) => (
+            {labNav ? (
+              <>
+                <button type="button" className="lab__nav-item" onClick={labNav.goHome}>
+                  {t(ui.home.home)}
+                </button>
+                <button type="button" className="lab__nav-item" onClick={labNav.goTrack}>
+                  {t(ui.home.backTrack)}
+                </button>
+              </>
+            ) : null}
+            {navItems.map((item) => (
               <button
                 key={item.id}
                 type="button"

@@ -1,4 +1,7 @@
-import { useState, type ComponentType } from 'react'
+import { useMemo, useState, type ComponentType } from 'react'
+import { HomePage } from './home/HomePage'
+import { TrackPage } from './home/TrackPage'
+import { LabNavProvider } from './lab/LabNavContext'
 import { Module00Page } from './modules/module00/Module00Page'
 import { Module01Page } from './modules/module01/Module01Page'
 import { Module03Page } from './modules/module03/Module03Page'
@@ -15,7 +18,9 @@ import { Module13Page } from './modules/module13/Module13Page'
 import { Module14Page } from './modules/module14/Module14Page'
 import { Module15Page } from './modules/module15/Module15Page'
 import { Module16Page } from './modules/module16/Module16Page'
+import { Module17Page } from './modules/module17/Module17Page'
 import { type ModuleId } from './modules/catalog'
+import { type TrackId, trackById, trackOfLesson } from './tracks/catalog'
 
 type LessonProps = {
   moduleId: ModuleId
@@ -37,25 +42,66 @@ const LESSONS: Partial<Record<ModuleId, ComponentType<LessonProps>>> = {
   shmoo: Module14Page,
   alu: Module15Page,
   latch: Module16Page,
+  bench: Module17Page,
 }
 
-export default function App() {
-  const [moduleId, setModuleId] = useState<ModuleId>('intro')
+type Screen =
+  | { kind: 'home' }
+  | { kind: 'track'; track: TrackId }
+  | { kind: 'lesson'; track: TrackId; moduleId: ModuleId }
 
-  if (moduleId === 'intro') {
+export default function App() {
+  const [screen, setScreen] = useState<Screen>({ kind: 'home' })
+
+  const openLesson = (moduleId: ModuleId, track?: TrackId) => {
+    setScreen({ kind: 'lesson', track: trackOfLesson(moduleId, track), moduleId })
+  }
+
+  const navValue = useMemo(() => {
+    if (screen.kind !== 'lesson') return null
+    const track = trackById(screen.track)
+    const current = screen.track
+    return {
+      track: current,
+      navIds: track?.lessons ?? [],
+      goHome: () => setScreen({ kind: 'home' }),
+      goTrack: () => setScreen({ kind: 'track', track: current }),
+      openLesson: (id: ModuleId) => openLesson(id, current),
+    }
+  }, [screen])
+
+  if (screen.kind === 'home') {
+    return <HomePage onOpenTrack={(track) => setScreen({ kind: 'track', track })} />
+  }
+
+  if (screen.kind === 'track') {
     return (
-      <Module00Page
-        moduleId={moduleId}
-        onModuleChange={setModuleId}
-        onOpenConnection={() => setModuleId('connection')}
+      <TrackPage
+        trackId={screen.track}
+        onHome={() => setScreen({ kind: 'home' })}
+        onOpenLesson={(id) => openLesson(id, screen.track)}
       />
     )
   }
 
-  const Lesson = LESSONS[moduleId]
-  if (Lesson) {
-    return <Lesson moduleId={moduleId} onModuleChange={setModuleId} />
+  const onModuleChange = (id: ModuleId) => openLesson(id, screen.track)
+  let page
+  if (screen.moduleId === 'intro') {
+    page = (
+      <Module00Page
+        moduleId={screen.moduleId}
+        onModuleChange={onModuleChange}
+        onOpenConnection={() => openLesson('connection', screen.track)}
+      />
+    )
+  } else {
+    const Lesson = LESSONS[screen.moduleId]
+    page = Lesson ? (
+      <Lesson moduleId={screen.moduleId} onModuleChange={onModuleChange} />
+    ) : (
+      <Module01Page moduleId={screen.moduleId} onModuleChange={onModuleChange} />
+    )
   }
 
-  return <Module01Page moduleId={moduleId} onModuleChange={setModuleId} />
+  return navValue ? <LabNavProvider value={navValue}>{page}</LabNavProvider> : page
 }

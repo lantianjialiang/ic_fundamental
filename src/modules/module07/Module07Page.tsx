@@ -11,7 +11,7 @@ type Module07PageProps = {
   onModuleChange: (id: ModuleId) => void
 }
 
-type Focus = { kind: 'vec'; id: VecId } | { kind: 'pattern' } | { kind: 'takeaway' }
+type Focus = { kind: 'xor' } | { kind: 'vec'; id: VecId } | { kind: 'pattern' } | { kind: 'takeaway' }
 
 export function Module07Page({ moduleId, onModuleChange }: Module07PageProps) {
   const { t } = useLocale()
@@ -61,6 +61,33 @@ export function Module07Page({ moduleId, onModuleChange }: Module07PageProps) {
     >
       <Section title={t(ui.m07.introTitle)}>
         <p>{t(ui.m07.introBody)}</p>
+      </Section>
+
+      <Section title={t(ui.m07.xorTitle)} note={t(ui.m07.xorNote)}>
+        <button
+          type="button"
+          className={`takeaway${focus.kind === 'xor' ? ' is-active' : ''}`}
+          onClick={() => setFocus({ kind: 'xor' })}
+        >
+          {t(ui.m07.xorBody)}
+        </button>
+        <div className="truth truth--spec">
+          <div className="truth__head">
+            <span>A</span>
+            <span>B</span>
+            <span>Y</span>
+            <span>{t(ui.m07.xorMeaning)}</span>
+          </div>
+          {VECTORS.map((row) => (
+            <div key={row.id} className="truth__row truth__row--static">
+              <span>{row.a}</span>
+              <span>{row.b}</span>
+              <span>{row.y}</span>
+              <span>{row.a === row.b ? t(ui.m07.xorSame) : t(ui.m07.xorDiff)}</span>
+            </div>
+          ))}
+        </div>
+        <p>{t(ui.m07.xorVsOr)}</p>
       </Section>
 
       <Section title={t(ui.m07.tableTitle)} note={t(ui.m07.tableNote)}>
@@ -156,6 +183,9 @@ function resolveDetail(
   t: (text: import('../../i18n/locale').LText | string) => string,
   fails: VecId[],
 ) {
+  if (focus.kind === 'xor') {
+    return { kicker: t(ui.m07.kickerXor), title: t(ui.m07.xorTitle), text: t(ui.m07.xorVsOr) }
+  }
   if (focus.kind === 'takeaway') {
     return { kicker: t(ui.m07.kickerTakeaway), title: t(ui.m07.kickerOne), text: t(TAKEAWAY) }
   }

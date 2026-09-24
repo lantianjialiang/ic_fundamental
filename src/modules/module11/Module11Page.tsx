@@ -4,20 +4,38 @@ import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
 import { type ModuleId } from '../catalog'
-import { CHAINS, QUIZ, STEPS, TAKEAWAY, type ChainId, type StepId } from './data/content'
+import {
+  ADVANCED,
+  CHAINS,
+  FF_EXPLAIN,
+  QUIZ,
+  STEPS,
+  TAKEAWAY,
+  type AdvId,
+  type ChainId,
+  type StepId,
+} from './data/content'
+import { FfFig, ScanFfFig } from './FfFig'
+import { ScanKindFig } from './ScanKindFig'
 
 type Module11PageProps = {
   moduleId: ModuleId
   onModuleChange: (id: ModuleId) => void
 }
 
-type Focus = { kind: 'chain'; id: ChainId } | { kind: 'step'; id: StepId } | { kind: 'takeaway' }
+type Focus =
+  | { kind: 'ff' }
+  | { kind: 'chain'; id: ChainId }
+  | { kind: 'step'; id: StepId }
+  | { kind: 'adv'; id: AdvId }
+  | { kind: 'takeaway' }
 
 const ORDER: StepId[] = ['shift1', 'capture', 'shift2', 'compare']
 
 export function Module11Page({ moduleId, onModuleChange }: Module11PageProps) {
   const { t } = useLocale()
-  const [focus, setFocus] = useState<Focus>({ kind: 'chain', id: 'scan' })
+  const [focus, setFocus] = useState<Focus>({ kind: 'ff' })
+  const [advId, setAdvId] = useState<AdvId>('mux')
   const [playing, setPlaying] = useState(false)
   const [pulse, setPulse] = useState<StepId | null>(null)
 
@@ -42,6 +60,7 @@ export function Module11Page({ moduleId, onModuleChange }: Module11PageProps) {
   }, [playing])
 
   const activeStep = focus.kind === 'step' ? focus.id : pulse
+  const adv = ADVANCED.find((item) => item.id === advId)
   const detail = resolveDetail(focus, t)
 
   return (
@@ -59,6 +78,23 @@ export function Module11Page({ moduleId, onModuleChange }: Module11PageProps) {
     >
       <Section title={t(ui.m11.introTitle)}>
         <p>{t(ui.m11.introBody)}</p>
+      </Section>
+
+      <Section title={t(ui.m11.ffTitle)} note={t(ui.m11.ffNote)}>
+        <button
+          type="button"
+          className={`takeaway${focus.kind === 'ff' ? ' is-active' : ''}`}
+          onClick={() => setFocus({ kind: 'ff' })}
+        >
+          {t(ui.m11.ffLead)}
+        </button>
+        <FfFig t={t} />
+        <ScanFfFig t={t} />
+        <div className="term-explain">
+          {FF_EXPLAIN.map((para) => (
+            <p key={para.zh}>{t(para)}</p>
+          ))}
+        </div>
       </Section>
 
       <Section title={t(ui.m11.chainTitle)} note={t(ui.m11.chainNote)}>
@@ -100,6 +136,32 @@ export function Module11Page({ moduleId, onModuleChange }: Module11PageProps) {
         </button>
       </Section>
 
+      <Section title={t(ui.m11.advTitle)} note={t(ui.m11.advNote)}>
+        <div className="pick pick--3">
+          {ADVANCED.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={`pick__card${focus.kind === 'adv' && focus.id === item.id ? ' is-active' : ''}`}
+              onClick={() => {
+                setAdvId(item.id)
+                setFocus({ kind: 'adv', id: item.id })
+              }}
+            >
+              {item.title}
+            </button>
+          ))}
+        </div>
+        <ScanKindFig id={advId} t={t} />
+        {adv ? (
+          <div className="term-explain">
+            {adv.explain.map((para) => (
+              <p key={para.zh}>{t(para)}</p>
+            ))}
+          </div>
+        ) : null}
+      </Section>
+
       <Section title={t(ui.m11.takeawayTitle)}>
         <button
           type="button"
@@ -120,6 +182,13 @@ export function Module11Page({ moduleId, onModuleChange }: Module11PageProps) {
 function resolveDetail(focus: Focus, t: (text: import('../../i18n/locale').LText | string) => string) {
   if (focus.kind === 'takeaway') {
     return { kicker: t(ui.m11.kickerTakeaway), title: t(ui.m11.kickerOne), text: t(TAKEAWAY) }
+  }
+  if (focus.kind === 'ff') {
+    return { kicker: t(ui.m11.kickerFf), title: 'FF', text: t(FF_EXPLAIN[0]) }
+  }
+  if (focus.kind === 'adv') {
+    const item = ADVANCED.find((node) => node.id === focus.id)
+    return { kicker: t(ui.m11.kickerAdv), title: item?.title ?? '', text: item ? t(item.text) : '' }
   }
   if (focus.kind === 'step') {
     const item = STEPS.find((node) => node.id === focus.id)

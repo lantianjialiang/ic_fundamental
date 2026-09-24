@@ -74,4 +74,16 @@ export const QUIZ: QuizQuestion[] = [
     answer: 'one',
     explain: loc('这就是 Debug 的入口：先定位哪一拍、哪一根脚，再问为什么。'),
   },
+  {
+    id: 'q5',
+    prompt: loc('XOR 的真值表里，A=1、B=1 时 Y 是什么？为什么不是 1？'),
+    options: [
+      { id: 'one', text: loc('1，因为两个输入都是高') },
+      { id: 'zero', text: loc('0，相同就不为 1；那是 OR 才会出 1') },
+      { id: 'x', text: loc('不确定，要看 Strobe') },
+      { id: 'skip', text: loc('这一行不用测') },
+    ],
+    answer: 'zero',
+    explain: loc('XOR 是“不同才为 1”。1 和 1 相同，所以 Y=0。OR 才会 1∨1=1。'),
+  },
 ]

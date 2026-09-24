@@ -4,6 +4,7 @@ import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
 import { type ModuleId } from '../catalog'
+import { CompareFig, ConceptFig } from './ConceptFig'
 import { CONCEPTS, POW2, QUIZ, TAKEAWAY, type ConceptId } from './data/content'
 
 type Module10PageProps = {
@@ -11,11 +12,13 @@ type Module10PageProps = {
   onModuleChange: (id: ModuleId) => void
 }
 
-type Focus = { kind: 'exp'; bits: number } | { kind: 'concept'; id: ConceptId } | { kind: 'takeaway' }
+type Focus = { kind: 'exp'; bits: number } | { kind: 'concept'; id: ConceptId } | { kind: 'vs' } | { kind: 'takeaway' }
 
 export function Module10Page({ moduleId, onModuleChange }: Module10PageProps) {
   const { t } = useLocale()
-  const [focus, setFocus] = useState<Focus>({ kind: 'exp', bits: 32 })
+  const [focus, setFocus] = useState<Focus>({ kind: 'concept', id: 'func' })
+  const [conceptId, setConceptId] = useState<ConceptId>('func')
+  const active = CONCEPTS.find((item) => item.id === conceptId)
   const detail = resolveDetail(focus, t)
 
   return (
@@ -58,12 +61,34 @@ export function Module10Page({ moduleId, onModuleChange }: Module10PageProps) {
               key={item.id}
               type="button"
               className={`pick__card${focus.kind === 'concept' && focus.id === item.id ? ' is-active' : ''}`}
-              onClick={() => setFocus({ kind: 'concept', id: item.id })}
+              onClick={() => {
+                setConceptId(item.id)
+                setFocus({ kind: 'concept', id: item.id })
+              }}
             >
               {item.title}
             </button>
           ))}
         </div>
+        <ConceptFig id={conceptId} t={t} />
+        {active ? (
+          <div className="term-explain">
+            {active.explain.map((para) => (
+              <p key={para.zh}>{t(para)}</p>
+            ))}
+          </div>
+        ) : null}
+      </Section>
+
+      <Section title={t(ui.m10.vsTitle)} note={t(ui.m10.vsNote)}>
+        <button
+          type="button"
+          className={`takeaway${focus.kind === 'vs' ? ' is-active' : ''}`}
+          onClick={() => setFocus({ kind: 'vs' })}
+        >
+          {t(ui.m10.vsLead)}
+        </button>
+        <CompareFig t={t} />
       </Section>
 
       <Section title={t(ui.m10.takeawayTitle)}>
@@ -86,6 +111,9 @@ export function Module10Page({ moduleId, onModuleChange }: Module10PageProps) {
 function resolveDetail(focus: Focus, t: (text: import('../../i18n/locale').LText | string) => string) {
   if (focus.kind === 'takeaway') {
     return { kicker: t(ui.m10.kickerTakeaway), title: t(ui.m10.kickerOne), text: t(TAKEAWAY) }
+  }
+  if (focus.kind === 'vs') {
+    return { kicker: t(ui.m10.kickerVs), title: t(ui.m10.vsTitle), text: t(ui.m10.vsLead) }
   }
   if (focus.kind === 'concept') {
     const item = CONCEPTS.find((node) => node.id === focus.id)

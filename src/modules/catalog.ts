@@ -15,6 +15,7 @@ export type ModuleId =
   | 'shmoo'
   | 'alu'
   | 'latch'
+  | 'bench'
 
 export const MODULES: Array<{
   id: ModuleId
@@ -37,4 +38,5 @@ export const MODULES: Array<{
   { id: 'shmoo', code: '14', title: 'Yield, characterization, Shmoo' },
   { id: 'alu', code: '15', title: '4-bit ALU test program' },
   { id: 'latch', code: '16', title: 'Latch-up entry' },
+  { id: 'bench', code: '17', title: 'Interactive bench' },
 ]
