@@ -10,7 +10,7 @@ export const WORDS: Card[] = [
     text: loc('在有电压、有电流的时候切换继电器。'),
     explain: [
       loc('继电器触点在带电时断开或闭合，会拉电弧、产生电压尖峰。轻则触点寿命变短，重则尖峰超过芯片的绝对最大额定值。'),
-      loc('规矩：先把源设到 0 V / 0 A（或关闭），切好继电器，再把源加上去；测完反过来。IOS 测试最容易犯这个错。'),
+      loc('规矩：继电器动作之前，先让它两端处于同一电压（没有电流）。IOS 测试最容易犯这个错。'),
     ],
   },
   {
@@ -19,7 +19,7 @@ export const WORDS: Card[] = [
     sub: loc('闩锁'),
     text: loc('寄生 PNPN 被触发，VDD 到地形成低阻通路。'),
     explain: [
-      loc('DC 测试会往管脚上强加电压电流。如果强加的电压高于 VDD 或低于地超过一个二极管压降，就可能把寄生晶闸管点着（M16）。'),
+      loc('DC 测试会往管脚上强加电压电流。如果强加的电压高于 VDD 或低于地超过一个二极管压降，就可能把寄生晶闸管点着（{@latch}）。'),
       loc('表现：IDD 突然变得很大，并且改输入也降不下来。只能掉电。所以 PMU 要设好钳位和电流限。'),
     ],
   },
@@ -29,8 +29,9 @@ export const WORDS: Card[] = [
     sub: loc('硬 Bin / 软 Bin'),
     text: loc('测完把芯片分到不同的“箱子”。'),
     explain: [
-      loc('硬 Bin（Hard bin）是物理的：分选机把芯片放进不同料盒，数量少，通常 8 个以内。'),
-      loc('软 Bin（Soft bin）是记录的：具体哪一项失败。多个软 Bin 可以归到同一个硬 Bin，例如 VOH、VOL 失败都进“DC 失败”料盒。'),
+      loc('分 Bin 的目的：把测完的芯片按结果分类——良品（可能还分速度等级）和各类失败品，分别放好、分别计数。'),
+      loc('硬 Bin（Hard bin）是物理的：测试程序在测试结束时给分选机一个 Bin 信号，分选机据此把芯片放进对应的料盒或料管。数量受分选机限制，至少 2 个（好 / 坏）。'),
+      loc('软 Bin（Soft bin）是软件计数器：具体哪一项失败，数量基本不受限制。多个软 Bin 可以归到同一个硬 Bin，例如 VOH、VOL 失败都进“DC 失败”料盒。'),
     ],
   },
   {
@@ -41,6 +42,7 @@ export const WORDS: Card[] = [
     explain: [
       loc('粗功能（Gross functional）放在 DC 前：DC 测试要靠功能向量做预处理，如果芯片连基本功能都不对，DC 量到的也没意义。'),
       loc('量产时会按失败率重排：最常失败、又最快的项提前，坏片越早停下，平均测试时间越短。但有依赖关系的项不能乱排。'),
+      loc('流程对量产程序最重要：量产最看重吞吐量（每小时测多少颗）。规划流程时还要考虑要收集多少数据、要不要分速度等级（不止一个良品 Bin），并把 Pass / Fail 分支和 Bin 一起画进流程图。'),
     ],
   },
 ]
@@ -54,6 +56,11 @@ export const BINS: Array<{ soft: string; item: LText; hard: string; note: LText 
   { soft: 'SB6', item: loc('IDD'), hard: 'HB3', note: loc('电流失败') },
   { soft: 'SB7', item: loc('全功能'), hard: 'HB5', note: loc('功能失败') },
   { soft: 'SB8', item: loc('AC 速度'), hard: 'HB2', note: loc('降速等级出货') },
+]
+
+export const SUMMARY: LText[] = [
+  loc('测试总结（Test Summary）是一批测完后的统计报表：表头写测试温度、批号、日期；正文列出测试总数、各良品 Bin 的数量、失败总数，以及每一项测试（开短路、Gross IDD、各电压下的功能、VOL/VOH、IDD、IIL/IIH、IOZ……）各挂了多少颗，有时还有平均静态 IDD 这类统计值。'),
+  loc('谁用、用来干什么：产品 / 良率工程师和工艺人员拿它分析良率问题，看哪一项失败最多；测试工程师拿它优化流程——量产一段时间后，把最常失败的项往前挪、很少失败的项往后放。量产中常常需要在不清零计数器的情况下随时导出一份中间总结。'),
 ]
 
 export type FlowItem = { id: string; name: LText; ms: number; fail: number }
@@ -137,6 +144,7 @@ export const IDD_KINDS: Card[] = [
     explain: [
       loc('它是保护性的：电流明显过大，立即停测，免得烧芯片、烧针卡，也不浪费后面几百毫秒。'),
       loc('电源要设电流限，确保短路时电流也不会超过安全值。'),
+      loc('极限怎么定：规格书不直接给 Gross IDD。通常取 IDD 规格的 2–3 倍；如果规格里 IDD 还写着 TBD（To Be Determined，待定），就先测一批样片，取平均读数的 2–3 倍。'),
     ],
   },
   {
@@ -146,6 +154,7 @@ export const IDD_KINDS: Card[] = [
     text: loc('输入固定在 0 V / VDD，输出开路，芯片不翻转，量电源电流。'),
     explain: [
       loc('理想 CMOS 静止时几乎不耗电，只有 µA 级漏电。输入电平要给到真正的 0 V 和 VDD，给在中间电平会让输入管半开，电流虚高。'),
+      loc('预处理要把芯片放到电流最小的状态，在 VDDmax 下量。单一正电源的芯片，电流总是从电源流进 VDD 脚，读数是正的。'),
     ],
   },
   {
@@ -189,7 +198,7 @@ export const IN_METHODS: Array<{ id: InMethod; label: LText; text: LText }> = [
   {
     id: 'gang',
     label: loc('并联（Ganged）'),
-    text: loc('所有输入脚并在一起接到一个 PMU，量一次总电流。最快，但不知道是哪只脚漏，单只坏脚还可能被平均掉。'),
+    text: loc('所有输入脚并在一起接到一个 PMU，量一次总电流。最快，也不需要每脚一个 PMU，但不知道是哪只脚漏。教材的做法是并联极限直接用单脚极限（10 µA），超限就改用串行法复测定位；下面按 12 × 10 µA 判，是为了演示极限放宽后单只坏脚会被淹没。只适合高阻 CMOS 输入，带上拉 / 下拉的脚不能并联测。'),
   },
 ]
 
@@ -206,7 +215,8 @@ export const OTHER: Card[] = [
     text: loc('有的输入内部接了上拉或下拉电阻，IIL 或 IIH 天然就大。'),
     explain: [
       loc('例：内部 50 kΩ 上拉，输入拉到 0 V 时 IIL ≈ −5 V / 50 kΩ = −100 µA。这不是漏电，是设计如此。'),
-      loc('规格书会给这类脚单独的极限；用普通 ±10 µA 去判，会把好芯片全判死。'),
+      loc('规格书会给这类脚单独的极限（常是一个范围，如 80–120 µA）；用普通 ±10 µA 去判，会把好芯片全判死。'),
+      loc('这类脚必须逐脚测（串行或并行都行），不能并联测：每只脚本来就有约 100 µA，加起来一定超过单脚极限。'),
     ],
   },
   {
@@ -252,13 +262,15 @@ export const OTHER: Card[] = [
 ]
 
 export const IOS_STEPS: LText[] = [
-  loc('VDD = VDDmax，跑预处理向量，把被测输出置为高电平。'),
-  loc('PMU 先设成强加 0 V、电流钳位约 100 mA——此时继电器还断开。'),
-  loc('闭合 PMU 继电器：输出被短到 0 V。源本来就在 0 V，所以切换瞬间不是“热切换”。'),
-  loc('等几百微秒稳定，读电流，和极限比。'),
-  loc('先断开 PMU 继电器，再把源复位。'),
+  loc('VDD = VDDmax，跑预处理向量，把被测输出置为高电平（此时引脚约在 VOH 与 VDD 之间）。'),
+  loc('PMU 设成强加 0 A（相当于电压表），闭合继电器，量出这只脚的 VOH 并记下来。'),
+  loc('断开继电器，把 PMU 改成强加刚才量到的 VOH 电压，再闭合继电器：两端电压相同，没有热切换。'),
+  loc('把 PMU 改成强加 0 V：输出被短到地。读电流，和极限比（例如 −85 ~ −30 mA）。短路时间不超过规格允许值（如 1 s）。'),
+  loc('把 PMU 改回强加 VOH，再断开继电器。'),
   loc('换下一个输出。绝不同时短多个输出。'),
 ]
+
+export const IOS_WHY = loc('为什么不能直接“PMU 设 0 V 再闭合继电器”？因为输出此刻正在输出高电平，继电器一闭合，两端就是 VOH 对 0 V，大电流瞬间流过触点——这正是热切换。')
 
 export const TAKEAWAY: LText[] = [
   loc('DC 测试 = 静态地强加电压/电流，量另一个量。每条规格都可以换算成一个电阻。'),
@@ -266,7 +278,7 @@ export const TAKEAWAY: LText[] = [
   loc('读 VOH/VOL 的 Datalog：刚好超限是驱动弱；跑到另一条电源轨附近是状态错。'),
   loc('IDD 分 Gross / Static / IDDQ / Dynamic，各抓不同的问题。'),
   loc('IIL/IIH 并联测最快，但会漏掉单只坏脚。'),
-  loc('切继电器前先把源归零：避免热切换。'),
+  loc('切继电器前先让两端电压相同：避免热切换。'),
 ]
 
 export const QUIZ: QuizQuestion[] = [
@@ -323,17 +335,216 @@ export const QUIZ: QuizQuestion[] = [
       { id: 'c', text: loc('无法测量') },
     ],
     answer: 'a',
-    explain: loc('并联测量只看总和，单脚超限可能被淹没，这是它快的代价。'),
+    explain: loc('并联测量只看总和，极限一放宽，单脚超限就可能被淹没。所以教材的做法是并联极限仍用单脚的 10 µA：36 µA 会判 Fail，再用串行法复测找出 A5。'),
   },
   {
     id: 'q6',
     prompt: loc('IOS 测试中，正确避免热切换的做法是？'),
     options: [
-      { id: 'a', text: loc('PMU 先设 0 V 再闭合继电器；测完先断继电器再复位源') },
-      { id: 'b', text: loc('先闭合继电器，再把 PMU 从 5 V 降到 0 V') },
+      { id: 'a', text: loc('PMU 先设 0 V，再闭合继电器') },
+      { id: 'b', text: loc('先用 0 A 量出 VOH，PMU 改为强加这个 VOH 后再闭合继电器，然后才改成 0 V') },
       { id: 'c', text: loc('所有输出一起短到地，省时间') },
     ],
+    answer: 'b',
+    explain: loc('输出此刻是高电平。PMU 设 0 V 直接闭合，继电器两端就是 VOH 对 0 V，一闭合就有大电流——这就是热切换。先让 PMU 和引脚处于同一电压再动继电器，测完也先回到 VOH 再断开。'),
+  },
+  {
+    id: 'b1',
+    prompt: loc('测试流程（Program flow）对哪一类测试最重要？'),
+    options: [
+      { id: 'a', text: loc('表征测试') },
+      { id: 'b', text: loc('工程评估') },
+      { id: 'c', text: loc('量产测试') },
+    ],
+    answer: 'c',
+    explain: loc('量产最看重吞吐量：先测什么、后测什么、失败了跳到哪个 Bin，直接决定平均每颗的测试时间。表征和工程评估要的是完整数据，通常每项都测完，顺序不那么关键。'),
+  },
+  {
+    id: 'b2',
+    prompt: loc('分 Bin（Binning）的目的是？'),
+    options: [
+      { id: 'a', text: loc('把测完的芯片按结果分类：良品（及速度等级）和各类失败品分开放、分别计数') },
+      { id: 'b', text: loc('把芯片按批号排序') },
+      { id: 'c', text: loc('决定测试机用哪块 Load board') },
+      { id: 'd', text: loc('只是给操作员看的指示灯，没有实际作用') },
+    ],
     answer: 'a',
-    explain: loc('继电器切换时两端压差为零、没有电流，就不会拉弧或产生尖峰。'),
+    explain: loc('硬 Bin 控制分选机把芯片放进哪个料盒（数量受分选机限制，至少好 / 坏两个）；软 Bin 是软件计数器，记录具体挂在哪一项（数量基本不受限）。测试结束时程序设置 Bin 信号，分选机读到后把芯片放到对应位置。'),
+  },
+  {
+    id: 'b3',
+    prompt: loc('测试总结（Test Summary）上一般有哪些内容？'),
+    options: [
+      { id: 'a', text: loc('只有一个良率百分比') },
+      { id: 'b', text: loc('测试总数、良品数（按 Bin）、失败总数、每一项测试的失败数，以及温度、批号、日期等') },
+      { id: 'c', text: loc('每颗芯片的全部测量读数') },
+      { id: 'd', text: loc('测试程序的源代码') },
+    ],
+    answer: 'b',
+    explain: loc('测试总结是统计报表：表头有温度、批号、日期，正文有总数、各良品 Bin 数、失败数，以及开短路、Gross IDD、各电压下功能、VOL/VOH、IDD、IIL/IIH、IOZ 等每一项的失败数，还可以有平均静态 IDD 之类的统计值。每颗的全部读数属于 Datalog，不是总结。'),
+  },
+  {
+    id: 'b4',
+    prompt: loc('测试总结的信息用来做什么、给谁用？'),
+    options: [
+      { id: 'a', text: loc('只给客户看') },
+      { id: 'b', text: loc('良率 / 产品 / 工艺工程师分析良率问题；测试工程师据此调整测试流程') },
+      { id: 'c', text: loc('用来给每颗芯片打标') },
+      { id: 'd', text: loc('没什么用，测完就删') },
+    ],
+    answer: 'b',
+    explain: loc('哪一项挂得最多，指向工艺或设计的问题，所以良率相关的工程师要看它；测试工程师根据它把最常失败的项往前挪、很少失败的项往后放，缩短平均测试时间。所以总结里信息越全越好。'),
+  },
+  {
+    id: 'b5',
+    prompt: loc('测试规格里写着“TBD”，是什么意思？'),
+    options: [
+      { id: 'a', text: loc('To Be Determined：待定，数值还没确定') },
+      { id: 'b', text: loc('这一项不用测') },
+      { id: 'c', text: loc('按测试机默认值') },
+      { id: 'd', text: loc('Test By Design：由设计保证') },
+    ],
+    answer: 'a',
+    explain: loc('TBD = To Be Determined。例如早期规格里 IDD 极限写 TBD，做法是先测一批样片看读数，再定极限；Gross IDD 常取平均读数的 2–3 倍。'),
+  },
+  {
+    id: 'b6',
+    prompt: loc('静态 IDD 测试的电流通常是？'),
+    options: [
+      { id: 'a', text: loc('正电流') },
+      { id: 'b', text: loc('负电流') },
+      { id: 'c', text: loc('正负都可能') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'a',
+    explain: loc('单一正电源的芯片，电流总是从电源流进 VDD 脚，按测试机的约定（流进芯片为正）就是正电流。'),
+  },
+  {
+    id: 'b7',
+    prompt: loc('大多数情况下，动态电流测试的读数会？'),
+    options: [
+      { id: 'a', text: loc('比静态 IDD 小') },
+      { id: 'b', text: loc('比静态 IDD 大') },
+      { id: 'c', text: loc('和静态 IDD 一样') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'b',
+    explain: loc('静态 IDD 是芯片停在电流最小的状态，CMOS 只有 µA 级漏电；动态 IDD 在 fMAX 下跑向量，内部节点不停翻转，给电容充放电，电流是 mA 级。本课的例子：静态 22 µA，动态 18 mA。'),
+  },
+  {
+    id: 'b8',
+    prompt: loc('做静态 IOL 测试前，要先把输出预处理成逻辑 1。'),
+    options: [
+      { id: 'a', text: loc('对') },
+      { id: 'b', text: loc('错') },
+    ],
+    answer: 'b',
+    explain: loc('IOL / VOL 测的是输出为低时的吸电流能力，必须先预处理成逻辑 0。预处理成 1 再灌 IOL，读数会被上面的保护二极管钳在 VDD + 0.7 V 附近，这是状态错，不是驱动弱。'),
+  },
+  {
+    id: 'b9',
+    prompt: loc('做 IOH 测量时，电流是？'),
+    options: [
+      { id: 'a', text: loc('正电流') },
+      { id: 'b', text: loc('负电流') },
+      { id: 'c', text: loc('正负都可能') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'b',
+    explain: loc('输出为高时芯片向外供电流（Source），电流流出芯片，所以 IOH 是负的，例如 IOH = −5.2 mA。IOL 流进芯片，是正的。'),
+  },
+  {
+    id: 'b10',
+    prompt: loc('VOL / IOL 测试：IOL = 4 mA，VOL ≤ 0.4 V。输出最多能有多大电阻还能通过？'),
+    options: [
+      { id: 'a', text: loc('50 Ω') },
+      { id: 'b', text: loc('100 Ω') },
+      { id: 'c', text: loc('取决于 VDD') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'b',
+    explain: loc('R = V / I = 0.4 V ÷ 4 mA = 100 Ω。VOL 的电压就是下拉管上的压降（输出对地），和 VDD 无关。50 Ω 是本课 8 mA 时的答案。'),
+  },
+  {
+    id: 'b11',
+    prompt: loc('输入漏电测试（IIL / IIH）验证的是？'),
+    options: [
+      { id: 'a', text: loc('输入电容') },
+      { id: 'b', text: loc('输入门槛电平') },
+      { id: 'c', text: loc('输入电阻') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'c',
+    explain: loc('强加电压、量电流，本质是在量输入脚到 VDD / VSS 的电阻：5.25 V ÷ 10 µA，电阻至少 525 kΩ。门槛电平（VIL / VIH）要靠功能测试验证；电容量产不测。'),
+  },
+  {
+    id: 'b12',
+    prompt: loc('IIL / IIH 用并行（Per-pin PMU）测量，好处是？'),
+    options: [
+      { id: 'a', text: loc('所有脚同时量，速度快，而且每只脚的电流都单独知道') },
+      { id: 'b', text: loc('更容易发现脚与脚之间的漏电') },
+      { id: 'c', text: loc('只需要一个 PMU') },
+      { id: 'd', text: loc('可以用于任何测试机') },
+    ],
+    answer: 'a',
+    explain: loc('并行法用每脚一个 PMU 同时量：像并联法一样快，又像串行法一样能定位到脚。代价是测试机要有 Per-pin PMU；而且所有输入同时加同一电压，脚间漏电反而不容易发现（串行法能发现）。'),
+  },
+  {
+    id: 'b13',
+    prompt: loc('对带上拉 / 下拉的输入脚测 IIL / IIH，不能用哪种方法？'),
+    options: [
+      { id: 'a', text: loc('串行法') },
+      { id: 'b', text: loc('并联（Ganged）法') },
+    ],
+    answer: 'b',
+    explain: loc('并联法把所有脚接到一个 PMU 量总电流，极限用单脚的值。高阻 CMOS 输入每脚几乎 0 电流，总和也接近 0；但带上拉 / 下拉的脚每只都有约 100 µA，总和必然超过单脚极限，好芯片也会判 Fail。'),
+  },
+  {
+    id: 'b14',
+    prompt: loc('IOZ（高阻漏电）测试应在哪些脚上做？'),
+    options: [
+      { id: 'a', text: loc('纯输入脚') },
+      { id: 'b', text: loc('所有纯输出脚') },
+      { id: 'c', text: loc('三态输出脚、双向脚，以及规格书 IOZ 项下列出的脚') },
+      { id: 'd', text: loc('电源脚') },
+    ],
+    answer: 'c',
+    explain: loc('IOZ 是“输出关断时”的漏电，只有能关断（进入高阻）的脚才有：三态输出和双向脚。具体哪些脚，以规格书 IOZ 项为准。纯输入测 IIL / IIH；不能关断的纯输出没有高阻状态。（原题是多选，正确项为三态、双向、规格指定的脚。）'),
+  },
+  {
+    id: 'b15',
+    prompt: loc('做 IOZ 之前，被测脚必须先预处理成？'),
+    options: [
+      { id: 'a', text: loc('逻辑 1') },
+      { id: 'b', text: loc('逻辑 0') },
+      { id: 'c', text: loc('关断状态（高阻）') },
+      { id: 'd', text: loc('双向状态') },
+    ],
+    answer: 'c',
+    explain: loc('例如让 OE = 1 或片选无效。如果预处理没做对，输出还在驱动 0 或 1，PMU 一加电压就会有大电流，读数往往满量程——这是预处理问题，不是漏电。'),
+  },
+  {
+    id: 'b16',
+    prompt: loc('做 VI（输入钳位）测试时：'),
+    options: [
+      { id: 'a', text: loc('强加负电压') },
+      { id: 'b', text: loc('强加正电压') },
+      { id: 'c', text: loc('量负电流') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'd',
+    explain: loc('VI 是强加负电流（约 −18 mA，从输入脚抽出）、量电压，读数不能比 −1.5 V 更负。三个选项都把“强加”和“测量”的对象说反了。这项只对 TTL 输入做。'),
+  },
+  {
+    id: 'b17',
+    prompt: loc('做 IOS（输出短路电流）测试，需要什么预处理？'),
+    options: [
+      { id: 'a', text: loc('把被测输出预处理成逻辑 1（输出高电平）') },
+      { id: 'b', text: loc('把被测输出预处理成逻辑 0') },
+      { id: 'c', text: loc('把输出关成高阻') },
+      { id: 'd', text: loc('不需要预处理') },
+    ],
+    answer: 'a',
+    explain: loc('IOS 是输出为高时被短到 0 V 的电流。如果输出其实是 0，PMU 强加 0 V 时两边同电位，读到约 0 mA，这是预处理错了。另外要按“先量 VOH、PMU 设成 VOH 再接上、再降到 0 V”的顺序，避免热切换；一次只短一个输出，VDD 用 VDDmax。'),
   },
 ]

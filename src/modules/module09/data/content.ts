@@ -12,7 +12,7 @@ export function freqOf(periodNs: number): number {
   return 1000 / periodNs
 }
 
-export const TAKEAWAY = loc('DC Test 解决“对不对”；AC Test 解决“来不来得及”。时间都标在 M08 同一张 CLK / DATA / OUT 上。')
+export const TAKEAWAY = loc('DC Test 解决“对不对”；AC Test 解决“来不来得及”。时间都标在 {@timing} 同一张 CLK / DATA / OUT 上。')
 
 export const QUIZ: QuizQuestion[] = [
   {
@@ -37,7 +37,7 @@ export const QUIZ: QuizQuestion[] = [
       { id: 'open', text: loc('开路') },
     ],
     answer: 'fmax',
-    explain: loc('同一套 Functional 向量，只改周期。这是 M05 那行 100 MHz 的测法。'),
+    explain: loc('同一套 Functional 向量，只改周期。这是 {@spec} 那行 100 MHz 的测法。'),
   },
   {
     id: 'q3',

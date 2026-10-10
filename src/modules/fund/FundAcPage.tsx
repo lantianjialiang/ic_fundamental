@@ -57,7 +57,7 @@ const S = {
   write: loc('写周期（WE 控制）'),
   read: loc('读周期（OE 控制）'),
   kicker: loc('AC 参数'),
-  later: loc('这是本单元最后一课。回到「基础 / 数字」轨道的 M12–M14，可以看完整的程序流程和 Shmoo。'),
+  later: loc('能测出 Pass / Fail，就能搜出边界。下一课把搜索和 Shmoo 用到所有参数上。'),
 }
 
 type Run = { strobe: number; pass: boolean; lo: number; hi: number }
@@ -118,6 +118,8 @@ export function FundAcPage({ moduleId, onModuleChange }: Props) {
       asideTitle={t(note.title)}
       asideText={t(note.text)}
       asideLater={t(S.later)}
+      nextId="fChar"
+      nextLabel={t(ui.fund.next) + t(ui.fChar.title)}
     >
       <Section title={t(S.approachTitle)}>
         <Cards
@@ -142,8 +144,8 @@ export function FundAcPage({ moduleId, onModuleChange }: Props) {
             period={10}
             rows={[
               { name: 'CH A', segs: chA },
-              { name: 'CH B', segs: chB, color: '#d2a8ff' },
-              { name: 'PIN', segs: pin, color: '#3fb950' },
+              { name: 'CH B', segs: chB, color: 'var(--purple)' },
+              { name: 'PIN', segs: pin, color: 'var(--green)' },
             ]}
             ariaLabel="multiplex"
           />

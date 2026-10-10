@@ -1,0 +1,137 @@
+/* 测试向量开发课专用样式 */
+
+.vector-sub {
+  margin: 22px 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.vector-code__line {
+  display: block;
+  padding: 0 6px;
+  margin: 0 -6px;
+  border-radius: 4px;
+  white-space: pre;
+}
+
+.vector-code__line.is-pc {
+  background: var(--gold-bg);
+  color: var(--text);
+}
+
+.vector-code__line.is-done {
+  color: var(--muted);
+}
+
+.vector-code__cmt {
+  color: var(--dim);
+}
+
+.vector-code__ch {
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.vector-code__ch:hover {
+  background: var(--blue-bg);
+}
+
+.vector-code__ch.is-sel {
+  outline: 1px solid var(--gold);
+  background: var(--gold-bg);
+  color: var(--gold);
+}
+
+.vector-code__ch.is-col {
+  background: var(--blue-bg);
+}
+
+.vector-out {
+  max-height: 260px;
+  margin: 8px 0;
+}
+
+.vector-out__lost {
+  color: var(--red-2);
+}
+
+.vector-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.vector-cols h4 {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.vector-rules {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.vector-rules button {
+  appearance: none;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 8px 10px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vector-rules button b {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--blue-bg);
+  color: var(--blue);
+  font-size: 12px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.vector-rules button.is-active {
+  border-color: var(--gold-line);
+  background: var(--gold-bg);
+  color: var(--text);
+}
+
+.vector-viol {
+  margin: 10px 0;
+  padding: 10px 14px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-l);
+  background: var(--panel-2);
+}
+
+.vector-viol p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.vector-viol .intro__note {
+  margin: 8px 0 0;
+}
+
+@media (max-width: 720px) {
+  .vector-cols,
+  .vector-rules {
+    grid-template-columns: 1fr;
+  }
+}

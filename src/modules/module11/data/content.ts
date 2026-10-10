@@ -30,7 +30,7 @@ export const STEPS: Array<{ id: StepId; title: string; text: LText }> = [
 export const FF_EXPLAIN: LText[] = [
   loc('FF = Flip-Flop，边沿触发的 1 位寄存器。CLK 沿到来时，Q 变成当时的 D；平时 Q 保持。芯片里的“状态”就住在这些 FF 里。'),
   loc('常见脚：D（数据）、CLK（时钟）、Q（输出）。有的还有复位、Qn。它不是组合门：同一组输入，Q 还取决于上一拍存了什么。'),
-  loc('它也不是 Latch。Latch 是电平透明（使能有效时 D 直通）；FF 只在沿上采样。M16 的 Latch-up 是闩锁效应，和这种寄存器不是一回事。'),
+  loc('它也不是 Latch。Latch 是电平透明（使能有效时 D 直通）；FF 只在沿上采样。{@latch} 的 Latch-up 是闩锁效应，和这种寄存器不是一回事。'),
   loc('Scan FF = 普通 FF 前面加 2 选 1。SE=0 走功能 D，SE=1 走 SI。串起来以后，ATE 才能把内部状态移进、移出。'),
 ]
 
@@ -119,7 +119,7 @@ export const QUIZ: QuizQuestion[] = [
     options: [
       { id: 'gate', text: loc('和 AND 一样的组合门') },
       { id: 'reg', text: loc('边沿触发的 1 位寄存器，芯片的状态住在这里') },
-      { id: 'lock', text: loc('就是 M16 的 Latch-up') },
+      { id: 'lock', text: loc('就是 {@latch} 的 Latch-up') },
       { id: 'pin', text: loc('ATE 的一根电源脚') },
     ],
     answer: 'reg',

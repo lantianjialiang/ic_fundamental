@@ -23,9 +23,9 @@ export function LatchupFig({ word, t }: { word: WordId; t: T }) {
   return (
     <figure className="term-fig">
       <svg viewBox="0 0 680 280" className="term-fig__svg" role="img" aria-label={t(CAPTION[word])}>
-        <rect width="680" height="280" rx="6" fill="#0d1117" />
-        <rect x="40" y="28" width="400" height="28" fill="#3a2118" stroke="#f85149" />
-        <text x="240" y="47" textAnchor="middle" fill="#f85149" fontSize="13">
+        <rect width="680" height="280" rx="6" fill="var(--well)" />
+        <rect x="40" y="28" width="400" height="28" fill="var(--red-bg)" stroke="var(--red)" />
+        <text x="240" y="47" textAnchor="middle" fill="var(--red)" fontSize="13">
           VDD
         </text>
         <rect
@@ -33,10 +33,10 @@ export function LatchupFig({ word, t }: { word: WordId; t: T }) {
           y="56"
           width="120"
           height="40"
-          fill={pOn || pnpOn ? '#6e3b2a' : '#252b33'}
-          stroke="#e8c45a"
+          fill={pOn || pnpOn ? 'var(--red-line)' : 'var(--fig-box-2)'}
+          stroke="var(--gold)"
         />
-        <text x="100" y="81" textAnchor="middle" fill="#e6edf3" fontSize="12">
+        <text x="100" y="81" textAnchor="middle" fill="var(--text)" fontSize="12">
           P+
         </text>
         <rect
@@ -44,10 +44,10 @@ export function LatchupFig({ word, t }: { word: WordId; t: T }) {
           y="96"
           width="400"
           height="56"
-          fill={nOn || pnpOn ? '#1f3a56' : '#252b33'}
-          stroke="#58a6ff"
+          fill={nOn || pnpOn ? 'var(--blue-bg)' : 'var(--fig-box-2)'}
+          stroke="var(--blue)"
         />
-        <text x="160" y="129" textAnchor="middle" fill="#79c0ff" fontSize="13">
+        <text x="160" y="129" textAnchor="middle" fill="var(--sky)" fontSize="13">
           N 阱
         </text>
         <rect
@@ -55,10 +55,10 @@ export function LatchupFig({ word, t }: { word: WordId; t: T }) {
           y="152"
           width="400"
           height="56"
-          fill={pOn || npnOn ? '#5a3d1c' : '#252b33'}
-          stroke="#e8c45a"
+          fill={pOn || npnOn ? 'var(--orange-bg)' : 'var(--fig-box-2)'}
+          stroke="var(--gold)"
         />
-        <text x="160" y="185" textAnchor="middle" fill="#e8c45a" fontSize="13">
+        <text x="160" y="185" textAnchor="middle" fill="var(--gold)" fontSize="13">
           P 衬底
         </text>
         <rect
@@ -66,42 +66,42 @@ export function LatchupFig({ word, t }: { word: WordId; t: T }) {
           y="208"
           width="120"
           height="36"
-          fill={nOn || npnOn ? '#1f3a56' : '#252b33'}
-          stroke="#58a6ff"
+          fill={nOn || npnOn ? 'var(--blue-bg)' : 'var(--fig-box-2)'}
+          stroke="var(--blue)"
         />
-        <text x="380" y="231" textAnchor="middle" fill="#e6edf3" fontSize="12">
+        <text x="380" y="231" textAnchor="middle" fill="var(--text)" fontSize="12">
           N+
         </text>
-        <rect x="40" y="244" width="400" height="22" fill="#191e24" stroke="#8b949e" />
-        <text x="240" y="260" textAnchor="middle" fill="#8b949e" fontSize="12">
+        <rect x="40" y="244" width="400" height="22" fill="var(--fig-box)" stroke="var(--muted)" />
+        <text x="240" y="260" textAnchor="middle" fill="var(--muted)" fontSize="12">
           GND
         </text>
-        <text x="470" y="80" fill={pnpOn ? '#e8c45a' : '#6e7681'} fontSize="13">
+        <text x="470" y="80" fill={pnpOn ? 'var(--gold)' : 'var(--dim)'} fontSize="13">
           PNP
         </text>
         <path
           d="M 160 76 C 500 70 500 170 200 180"
           fill="none"
-          stroke={pnpOn ? '#e8c45a' : '#30363d'}
+          stroke={pnpOn ? 'var(--gold)' : 'var(--line)'}
           strokeWidth="1.8"
         />
-        <text x="470" y="210" fill={npnOn ? '#79c0ff' : '#6e7681'} fontSize="13">
+        <text x="470" y="210" fill={npnOn ? 'var(--sky)' : 'var(--dim)'} fontSize="13">
           NPN
         </text>
         <path
           d="M 380 226 C 560 220 560 120 240 124"
           fill="none"
-          stroke={npnOn ? '#79c0ff' : '#30363d'}
+          stroke={npnOn ? 'var(--sky)' : 'var(--line)'}
           strokeWidth="1.8"
         />
-        <text x="520" y="140" fill="#8b949e" fontSize="12">
+        <text x="520" y="140" fill="var(--muted)" fontSize="12">
           Rwell
         </text>
-        <text x="520" y="168" fill="#8b949e" fontSize="12">
+        <text x="520" y="168" fill="var(--muted)" fontSize="12">
           Rsub
         </text>
         {word === 'fb' || word === 'hold' || word === 'scr' ? (
-          <text x="560" y="40" fill="#f85149" fontSize="12">
+          <text x="560" y="40" fill="var(--red)" fontSize="12">
             {t(loc('正反馈锁住'))}
           </text>
         ) : null}

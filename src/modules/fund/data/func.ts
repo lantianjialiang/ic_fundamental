@@ -39,7 +39,7 @@ export const SOURCES: Card[] = [
     sub: loc('Structural · ATPG'),
     text: loc('不管芯片“用来干什么”，只按电路结构，用 ATPG 自动生成，目标是故障覆盖率。'),
     explain: [
-      loc('借助 Scan 链把内部触发器变成可直接读写的节点，组合逻辑就能被逐块测试（M10、M11）。'),
+      loc('借助 Scan 链把内部触发器变成可直接读写的节点，组合逻辑就能被逐块测试（{@vector}、{@scan}）。'),
     ],
   },
 ]
@@ -182,7 +182,9 @@ export const WORST = loc('最坏情况测试：所有输入的时序同时放在
 
 export const RELAX = loc('放松（Relaxed）参数：不是本次要考的参数，就给宽松的值，避免它先挂掉干扰判断。比如测 VIH 时用慢周期，测时序时用标准电平。')
 
-export const GROSS = loc('粗功能（Gross functional）：用最宽松的条件跑一遍——慢周期（如 500 ns）、全部 NRZ、标准电平。只问“基本逻辑活着吗”，放在开短路之后、DC 之前。')
+export const GROSS = loc('粗功能（Gross functional）：用最宽松的条件跑一遍——慢周期（如 500 ns）、全部 NRZ、放松的电平和时序。只问“基本逻辑活着吗”，放在开短路之后、DC 之前。它同时把整套向量（包括 DC 测试要用的预处理向量）都验证一遍，后面的测试才能放心使用；量产中它的结果也是很有用的良率信息。')
+
+export const EQUATION = loc('基于公式的时序（Equation based timing）：所有边沿都写成“规格值 × SCALE”这样的公式。改一个变量，整套时序就按比例一起收紧或放松，边沿之间的相对位置保持不变——粗功能用慢时序、全速测试用规格时序、不同速度等级的芯片，都只需改这一个数。调试时也最方便。')
 
 export const INVERTER_PROGRAM = loc(`// 时钟反相器：10 MHz 功能测试
 SET VDD        = 4.75 V          // 先 VDDmin
@@ -206,6 +208,8 @@ export const WALK_POINTS: LText[] = [
   loc('开路：没有电流通路，负载把引脚拉到 VREF = 3 V，高于 VOH → 读成 H → Fail。'),
   loc('短路：引脚被别的 0 V 管脚或地拉住，低于 VOL → 读成 L → Fail。'),
   loc('Strobe 放得很晚（如 900 ns），给负载对引脚电容充电留足时间。'),
+  loc('对 VSS 的二极管：VDD 二极管全部通过就说明没有短路，再加一拍让所有脚同时为 Z、负载改为抽电流，一拍就查完所有对地二极管有没有开路。'),
+  loc('优点是快：比 PMU 逐脚量快得多。缺点是 Datalog 只有 Pass / Fail，不如电压读数直观。常见做法：功能化开短路失败时，再跑一次 PMU 串行法，把失败脚的电压记下来。'),
 ]
 
 export const WALK_PINS = ['A0', 'A1', 'A2', 'A3', 'D0', 'D1']
@@ -240,17 +244,6 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'a',
     explain: loc('NRZ 数据不变就不翻转。换成 RZ 就是 5 个正脉冲、10 个边沿。'),
-  },
-  {
-    id: 'q2',
-    prompt: loc('想让每一拍都同时考 Setup 和 Hold，选哪种格式？'),
-    options: [
-      { id: 'a', text: loc('SBC') },
-      { id: 'b', text: loc('NRZ') },
-      { id: 'c', text: loc('RZ') },
-    ],
-    answer: 'a',
-    explain: loc('SBC 在数据前后都是反码，数据只在边沿 1 到边沿 2 之间有效，每拍都有两个边沿。'),
   },
   {
     id: 'q3',
@@ -295,5 +288,251 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'a',
     explain: loc('边界扫描单元可以直接控制每个 I/O 的状态。'),
+  },
+  {
+    id: 'b1',
+    prompt: loc('规格写 VDD = 5.0 V ± 10%，VDDmin 是多少？'),
+    options: [
+      { id: 'a', text: loc('4.75 V') },
+      { id: 'b', text: loc('4.5 V') },
+      { id: 'c', text: loc('4.9 V') },
+      { id: 'd', text: loc('5.5 V') },
+    ],
+    answer: 'b',
+    explain: loc('5.0 × (1 − 10%) = 4.5 V；VDDmax = 5.5 V。4.75 V 是 ± 5% 的下限。'),
+  },
+  {
+    id: 'b2',
+    prompt: loc('规格写 VDD = 5.0 V ± 5%，功能测试应在哪些电压下跑？'),
+    options: [
+      { id: 'a', text: loc('5.00 V') },
+      { id: 'b', text: loc('4.75 V 和 5.52 V') },
+      { id: 'c', text: loc('4.50 V 和 5.50 V') },
+      { id: 'd', text: loc('4.57 V 和 5.25 V') },
+      { id: 'e', text: loc('以上都不对') },
+    ],
+    answer: 'e',
+    explain: loc('正确答案是 4.75 V 和 5.25 V，各跑一遍：功能必须在整个电压范围内成立，只跑 5.00 V 不够。B 和 D 各写错了一个数（5.52、4.57），C 是 ± 10% 的范围，所以选“以上都不对”。'),
+  },
+  {
+    id: 'b3',
+    prompt: loc('AC 输出负载的作用，是模拟输出在实际系统里接到一个或多个器件输入时的环境。'),
+    options: [
+      { id: 'a', text: loc('对') },
+      { id: 'b', text: loc('错') },
+    ],
+    answer: 'a',
+    explain: loc('规格书常要求 AC 测试时输出接一个电阻 / 二极管 / 电容网络，用来模拟芯片装进最终产品（电脑、手机）后，输出要驱动的那些电路。时序参数要在这种负载下测才有意义。'),
+  },
+  {
+    id: 'b4',
+    prompt: loc('VIL / VIH 规格靠什么测试来验证？'),
+    options: [
+      { id: 'a', text: loc('DC 测试') },
+      { id: 'b', text: loc('功能测试') },
+      { id: 'c', text: loc('AC 时序测试') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'b',
+    explain: loc('虽然 VIL / VIH 列在 DC 特性表里，但没法用 PMU 量出来。做法是把驱动电平设成 VIL / VIH 跑功能向量，全对就说明芯片在规格门槛上能正确识别 0 和 1。VDDmin、VDDmax 各跑一次。'),
+  },
+  {
+    id: 'b5',
+    prompt: loc('VIL / VIH 测试失败时，失败 Datalog 上显示的失败管脚是？'),
+    options: [
+      { id: 'a', text: loc('输入脚') },
+      { id: 'b', text: loc('输出脚') },
+      { id: 'c', text: loc('电源脚') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'b',
+    explain: loc('功能测试只比较输出。某个输入把 1 认成了 0，芯片的逻辑就走错，表现为某些输出的值不对。所以 Datalog 上失败的是输出脚，要找是哪个输入的问题，得逐脚放松电平去排查。'),
+  },
+  {
+    id: 'b6',
+    prompt: loc('VIH 设为 2.0 V 时测试失败。调试时怎样改电压能让测试通过？'),
+    options: [
+      { id: 'a', text: loc('把 VIH 降低 0.4 V') },
+      { id: 'b', text: loc('把 VIH 提高到 VDD') },
+      { id: 'c', text: loc('把 VDD 提高 0.4 V') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'b',
+    explain: loc('放松 VIH 是把它往上提，VDD 是最松的 VIH；放松 VIL 是往下降，0 V 最松。芯片已经过了粗功能，放松后应该能通过，以此确认问题出在输入门槛上。降低 VIH 只会更难过；改 VDD 改的是工作条件，不是输入电平。注意：这是调试手段，芯片在规格值上仍然算失败。'),
+  },
+  {
+    id: 'b7',
+    prompt: loc('功能化测 VOL/IOL、VOH/IOH：比较器设为规格的 VOL / VOH，动态（或电阻）负载提供 IOL / IOH。测试通过，就说明这四个参数都满足规格。'),
+    options: [
+      { id: 'a', text: loc('对') },
+      { id: 'b', text: loc('错') },
+    ],
+    answer: 'a',
+    explain: loc('负载让输出在跑向量时真的吸 / 吐 IOL、IOH，比较器同时检查电压不越过 VOL / VOH。两者同时成立，四个参数就都被验证了，而且比 PMU 逐脚量快得多。'),
+  },
+  {
+    id: 'b8',
+    prompt: loc('调试时功能化 VOL/IOL、VOH/IOH 测试失败，可能需要加长测试周期（降低频率）再跑，来确认 VOL、VOH 本身是否正常。'),
+    options: [
+      { id: 'a', text: loc('对') },
+      { id: 'b', text: loc('错') },
+    ],
+    answer: 'a',
+    explain: loc('输出带满负载时翻转变慢；很多输出同时带大电流翻转还会产生噪声。降低频率、把 Strobe 往后挪，给输出足够时间稳定，就能区分“电平不够”和“来不及”。也可以分批给少量管脚加负载。'),
+  },
+  {
+    id: 'b9',
+    prompt: loc('功能化测高阻（Z）时，要用负载把引脚拉到一个中间电平，让比较器判断。合适的中间电平是？（VOL = 0.4 V，VOH = 2.4 V）'),
+    options: [
+      { id: 'a', text: loc('5.0 V') },
+      { id: 'b', text: loc('2.0 V') },
+      { id: 'c', text: loc('3.0 V') },
+      { id: 'd', text: loc('0.4 V') },
+      { id: 'e', text: loc('以上都对') },
+    ],
+    answer: 'b',
+    explain: loc('高阻的判据是电压在 VOL 和 VOH 之间，所以 VREF 必须落在 0.4–2.4 V 中间，常用 1.5 V 或 2.0 V。5.0 V、3.0 V 高于 VOH 会被判成 H；0.4 V 等于 VOL 会被判成 L。'),
+  },
+  {
+    id: 'b10',
+    prompt: loc('做粗功能测试（Gross functional）的目的是？'),
+    options: [
+      { id: 'a', text: loc('在最严的条件下证明芯片满足全部规格') },
+      { id: 'b', text: loc('用放松的条件确认芯片功能“活着”，并验证整套向量（包括预处理向量）能正确运行') },
+      { id: 'c', text: loc('测出芯片的最高频率') },
+      { id: 'd', text: loc('代替开短路测试') },
+    ],
+    answer: 'b',
+    explain: loc('粗功能放松频率、时序、电平和负载，给芯片最好的机会通过。它放在 DC 之前，确认后面 DC 测试要用的预处理向量都能跑对；量产中它也提供有用的良率信息。'),
+  },
+  {
+    id: 'b11',
+    prompt: loc('基于公式的时序（Equation based timing）有什么好处？'),
+    options: [
+      { id: 'a', text: loc('改一个变量（如 SCALE），整套时序按比例收紧或放松，边沿相对位置不变') },
+      { id: 'b', text: loc('让测试机跑得更快') },
+      { id: 'c', text: loc('不需要看规格书') },
+      { id: 'd', text: loc('能自动修正芯片的时序错误') },
+    ],
+    answer: 'a',
+    explain: loc('把每个边沿写成“规格值 × SCALE”。SCALE = 1 就是规格时序；调大就是粗功能的慢时序。不同测试、不同速度等级只需改一个数，调试也方便。'),
+  },
+  {
+    id: 'b12',
+    prompt: loc('开漏（Open drain）输出不能做什么？（选最完整的答案）'),
+    options: [
+      { id: 'a', text: loc('驱动逻辑 0') },
+      { id: 'b', text: loc('驱动逻辑 1') },
+      { id: 'c', text: loc('向外提供电流（Source）') },
+      { id: 'd', text: loc('B 和 C') },
+    ],
+    answer: 'd',
+    explain: loc('开漏输出内部没有上拉管，只能拉低、只能吸电流。它既不能自己驱动出 1，也不能往外供电流；高电平必须靠外部上拉电阻或动态负载。'),
+  },
+  {
+    id: 'b13',
+    prompt: loc('“输入控制信号是 RO 格式”，RO 是什么意思？'),
+    options: [
+      { id: 'a', text: loc('Return to One（归一）：平时为 1，数据为 0 时在边沿 1 到边沿 2 之间出一个低脉冲') },
+      { id: 'b', text: loc('Read Only：只读') },
+      { id: 'c', text: loc('Return to Zero：数据为 1 时出一个高脉冲') },
+      { id: 'd', text: loc('数据只在 T0 变化') },
+    ],
+    answer: 'a',
+    explain: loc('RO = Return to One。数据为 1 时整拍保持 1，没有脉冲；数据为 0 时出一个负脉冲。适合低有效的控制信号，例如 OE、CS1。C 是 RZ，D 是 NRZ。'),
+  },
+  {
+    id: 'b14',
+    prompt: loc('要一次跑向量就同时保证 Setup 和 Hold 时间，必须用哪种信号格式？'),
+    options: [
+      { id: 'a', text: loc('NRZ') },
+      { id: 'b', text: loc('RZ') },
+      { id: 'c', text: loc('SBC（补码包围）') },
+      { id: 'd', text: loc('DNRZ') },
+    ],
+    answer: 'c',
+    explain: loc('SBC 在数据前后都是数据的反码：边沿 1 前是反码（考 Setup），边沿 2 后又回到反码（考 Hold）。不管数据是 0 还是 1，每拍都有翻转，所以它是唯一能一次同时保证两者的格式。不支持 SBC 的测试机，可以用 RZ 跑一遍（考数据为 1 的拍）、RO 再跑一遍（考数据为 0 的拍）。'),
+  },
+  {
+    id: 'b15',
+    prompt: loc('数据只在 T0 变化的信号格式叫什么？'),
+    options: [
+      { id: 'a', text: loc('DNRZ') },
+      { id: 'b', text: loc('RZ') },
+      { id: 'c', text: loc('RO') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'd',
+    explain: loc('答案是 NRZ（不归零）：数据在周期起点 T0 变化，整拍保持。DNRZ 是把变化时刻推迟到 T0 之后的某个边沿；RZ、RO 是脉冲格式。'),
+  },
+  {
+    id: 'b16',
+    prompt: loc('SBC（XOR）格式下，数据为 0 时这一拍的波形是？'),
+    options: [
+      { id: 'a', text: loc('整拍为 0') },
+      { id: 'b', text: loc('T0 到边沿 1 为 1，边沿 1 到边沿 2 为 0，边沿 2 到周期结束为 1') },
+      { id: 'c', text: loc('T0 到边沿 1 为 0，边沿 1 到边沿 2 为 1，之后为 0') },
+      { id: 'd', text: loc('整拍为高阻') },
+    ],
+    answer: 'b',
+    explain: loc('SBC：周期开始先输出数据的反码（1），等到边沿 1 才给出真正的数据（0），边沿 2 之后又回到反码（1）。形状就是一个低脉冲。C 是数据为 1 时的 SBC 波形。可以在上面“信号格式”区块选 SBC、把某一位设成 0 看看。'),
+  },
+  {
+    id: 'b17',
+    prompt: loc('哪种信号格式在高阻和驱动之间切换（控制驱动器的开关）？'),
+    options: [
+      { id: 'a', text: loc('ZD（Z 窗口驱动，也叫 Drive / Inhibit）') },
+      { id: 'b', text: loc('NRZ') },
+      { id: 'c', text: loc('SBC') },
+      { id: 'd', text: loc('RO') },
+    ],
+    answer: 'a',
+    explain: loc('ZD 只在边沿 1 到边沿 2 之间打开驱动器、驱动数据，其余时间驱动器关断，测试机通道呈高阻。用于双向管脚：不驱动时把总线让给芯片。'),
+  },
+  {
+    id: 'b18',
+    prompt: loc('已知工作频率，怎么算测试周期？'),
+    options: [
+      { id: 'a', text: loc('周期 = 1 / 频率') },
+      { id: 'b', text: loc('周期 = 频率 × 2') },
+      { id: 'c', text: loc('周期 = 1 / (2 × 频率)') },
+      { id: 'd', text: loc('周期 = 频率 / 1000') },
+    ],
+    answer: 'a',
+    explain: loc('cycle_time = 1 / frequency。10 MHz → 100 ns；66 MHz → 约 15 ns。'),
+  },
+  {
+    id: 'b19',
+    prompt: loc('功能化开短路比 DC（PMU）开短路好在哪？'),
+    options: [
+      { id: 'a', text: loc('速度快得多') },
+      { id: 'b', text: loc('Datalog 能看到每只脚的电压') },
+      { id: 'c', text: loc('不需要任何负载') },
+      { id: 'd', text: loc('能测出电源脚的电流') },
+    ],
+    answer: 'a',
+    explain: loc('功能化方法用向量逐拍扫过所有管脚，比 PMU 逐脚强加电流、等稳定、再量电压快得多。代价是 Datalog 只有 Pass / Fail，不如电压读数直观，所以常在失败时再补跑一次 PMU 法。'),
+  },
+  {
+    id: 'b20',
+    prompt: loc('功能化开短路测试中，电流由什么强加？'),
+    options: [
+      { id: 'a', text: loc('PMU') },
+      { id: 'b', text: loc('可编程（动态）电流负载') },
+      { id: 'c', text: loc('强加的是电压，不是电流') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'b',
+    explain: loc('被测脚的驱动器关断后，动态电流负载从 VREF = 3 V 往引脚灌约 400 µA，让对 VDD 的保护二极管正偏。PMU 不参与，这也是它快的原因。'),
+  },
+  {
+    id: 'b21',
+    prompt: loc('功能化开短路测试用 Pin Electronics 里的比较器来判断开路 / 短路。'),
+    options: [
+      { id: 'a', text: loc('对') },
+      { id: 'b', text: loc('错') },
+    ],
+    answer: 'a',
+    explain: loc('比较器设成中间带（Z 模式）：VOL = 0.2 V、VOH = 1.5 V。正常二极管约 0.65 V，落在中间判 Pass；短路约 0 V 低于 VOL，开路被拉到 3 V 高于 VOH，都判 Fail。'),
   },
 ]

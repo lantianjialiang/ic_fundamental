@@ -1,0 +1,52 @@
+/* 测试入门课专用样式 */
+
+.intro-sub {
+  margin: 22px 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.intro-pins {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  max-width: 100%;
+}
+
+.intro-pins .pick__card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.intro-pin__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 4px;
+}
+
+.intro-sys__blk {
+  cursor: pointer;
+}
+
+.intro-sys__blk:hover rect:first-child {
+  stroke: var(--gold-line);
+}
+
+.intro-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.intro-case {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-2);
+}

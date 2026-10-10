@@ -24,8 +24,8 @@ export function DriverFig({
   volt: number
 }) {
   const { t } = useLocale()
-  const hot = '#e8c45a'
-  const off = '#3d4756'
+  const hot = 'var(--gold)'
+  const off = 'var(--line-2)'
   const pOn = high
   const nOn = !high
   const sink = test === 'vol'
@@ -40,40 +40,40 @@ export function DriverFig({
   return (
     <figure className="term-fig">
       <svg viewBox="0 0 680 250" className="term-fig__svg" role="img" aria-label={t(L.cap)}>
-        <rect width="680" height="250" rx="10" fill="#0d1117" />
-        <text x="200" y="28" textAnchor="middle" fill="#79c0ff" fontSize="13">
+        <rect width="680" height="250" rx="10" fill="var(--well)" />
+        <text x="200" y="28" textAnchor="middle" fill="var(--sky)" fontSize="13">
           VDD = 4.75 V
         </text>
-        <line x1="140" y1="36" x2="260" y2="36" stroke="#79c0ff" strokeWidth="2" />
+        <line x1="140" y1="36" x2="260" y2="36" stroke="var(--sky)" strokeWidth="2" />
         <line x1="200" y1="36" x2="200" y2="60" stroke={pOn ? hot : off} strokeWidth="2.5" />
         {res(200, 60, pOn)}
-        <text x="222" y="95" fill={pOn ? '#e6edf3' : '#6e7681'} fontSize="13">
+        <text x="222" y="95" fill={pOn ? 'var(--text)' : 'var(--dim)'} fontSize="13">
           {`Rp = ${rp} Ω ${pOn ? 'ON' : 'OFF'}`}
         </text>
         <line x1="200" y1="110" x2="200" y2="125" stroke={pOn || nOn ? hot : off} strokeWidth="2.5" />
-        <circle cx="200" cy="125" r="5" fill="#e6edf3" />
+        <circle cx="200" cy="125" r="5" fill="var(--text)" />
         <line x1="200" y1="125" x2="200" y2="140" stroke={nOn ? hot : off} strokeWidth="2.5" />
         {res(200, 140, nOn)}
-        <text x="222" y="175" fill={nOn ? '#e6edf3' : '#6e7681'} fontSize="13">
+        <text x="222" y="175" fill={nOn ? 'var(--text)' : 'var(--dim)'} fontSize="13">
           {`Rn = ${rn} Ω ${nOn ? 'ON' : 'OFF'}`}
         </text>
         <line x1="200" y1="190" x2="200" y2="214" stroke={nOn ? hot : off} strokeWidth="2.5" />
-        <line x1="170" y1="214" x2="230" y2="214" stroke="#8b949e" strokeWidth="2" />
-        <line x1="182" y1="221" x2="218" y2="221" stroke="#8b949e" strokeWidth="2" />
-        <line x1="194" y1="228" x2="206" y2="228" stroke="#8b949e" strokeWidth="2" />
+        <line x1="170" y1="214" x2="230" y2="214" stroke="var(--muted)" strokeWidth="2" />
+        <line x1="182" y1="221" x2="218" y2="221" stroke="var(--muted)" strokeWidth="2" />
+        <line x1="194" y1="228" x2="206" y2="228" stroke="var(--muted)" strokeWidth="2" />
         {/* 输出脚 → PMU */}
         <line x1="200" y1="125" x2="470" y2="125" stroke={hot} strokeWidth="2.5" />
         <text x="335" y="115" textAnchor="middle" fill={hot} fontSize="13">
           {sink ? `← ${t(L.in)} IOL = 8 mA` : `${t(L.outI)} IOH = 5.2 mA →`}
         </text>
-        <text x="215" y="145" fill="#8b949e" fontSize="12">
+        <text x="215" y="145" fill="var(--muted)" fontSize="12">
           {t(L.out)}
         </text>
-        <rect x="470" y="95" width="160" height="60" rx="8" fill="#1b3350" stroke="#58a6ff" />
-        <text x="550" y="119" textAnchor="middle" fill="#e6edf3" fontSize="14">
+        <rect x="470" y="95" width="160" height="60" rx="8" fill="var(--blue-bg)" stroke="var(--blue)" />
+        <text x="550" y="119" textAnchor="middle" fill="var(--text)" fontSize="14">
           {t(L.pmu)}
         </text>
-        <text x="550" y="141" textAnchor="middle" fill="#e8c45a" fontSize="14" fontFamily="monospace">
+        <text x="550" y="141" textAnchor="middle" fill="var(--gold)" fontSize="14" fontFamily="monospace">
           {`${volt >= 0 ? '+' : ''}${volt.toFixed(2)} V`}
         </text>
       </svg>

@@ -23,12 +23,12 @@ export function SramTimingFig({
 
   return (
     <svg viewBox={`0 0 680 ${height}`} className="term-fig__svg" role="img" aria-label={ariaLabel}>
-      <rect width="680" height={height} rx="10" fill="#0d1117" />
+      <rect width="680" height={height} rx="10" fill="var(--well)" />
       {ticks.map((ns) => (
         <g key={ns}>
-          <line x1={x(ns)} y1={22} x2={x(ns)} y2={height - 6} stroke="#1f262f" />
+          <line x1={x(ns)} y1={22} x2={x(ns)} y2={height - 6} stroke="var(--fig-box)" />
           {ns % 5 === 0 || ns === 2 || ns === 13 ? (
-            <text x={x(ns)} y={15} textAnchor="middle" fill="#6e7681" fontSize="10">
+            <text x={x(ns)} y={15} textAnchor="middle" fill="var(--dim)" fontSize="10">
               {ns}
             </text>
           ) : null}
@@ -41,7 +41,7 @@ export function SramTimingFig({
         const mid = (hi + lo) / 2
         return (
           <g key={row.name}>
-            <text x={12} y={mid + 4} fill="#c3cbd5" fontSize="12" fontFamily="monospace">
+            <text x={12} y={mid + 4} fill="var(--text-2)" fontSize="12" fontFamily="monospace">
               {row.name}
             </text>
             {row.segs.map((seg, i) => {
@@ -53,13 +53,13 @@ export function SramTimingFig({
                 const py = prev ? (prev.kind === 'hi' ? hi : lo) : y
                 return (
                   <g key={i}>
-                    {prev ? <line x1={a} y1={py} x2={a} y2={y} stroke="#79c0ff" strokeWidth="2" /> : null}
-                    <line x1={a} y1={y} x2={b} y2={y} stroke="#79c0ff" strokeWidth="2" />
+                    {prev ? <line x1={a} y1={py} x2={a} y2={y} stroke="var(--sky)" strokeWidth="2" /> : null}
+                    <line x1={a} y1={y} x2={b} y2={y} stroke="var(--sky)" strokeWidth="2" />
                   </g>
                 )
               }
               if (seg.kind === 'z') {
-                return <line key={i} x1={a} y1={mid} x2={b} y2={mid} stroke="#8b949e" strokeWidth="2" strokeDasharray="4 4" />
+                return <line key={i} x1={a} y1={mid} x2={b} y2={mid} stroke="var(--muted)" strokeWidth="2" strokeDasharray="4 4" />
               }
               const s = 4
               const path = `M${a} ${mid} L${a + s} ${hi} L${b - s} ${hi} L${b} ${mid} L${b - s} ${lo} L${a + s} ${lo} Z`
@@ -67,12 +67,12 @@ export function SramTimingFig({
                 <g key={i}>
                   <path
                     d={path}
-                    fill={seg.kind === 'x' ? 'url(#sram-hatch)' : '#17301f'}
-                    stroke={seg.kind === 'x' ? '#6e7681' : '#3fb950'}
+                    fill={seg.kind === 'x' ? 'url(#sram-hatch)' : 'var(--green-bg)'}
+                    stroke={seg.kind === 'x' ? 'var(--dim)' : 'var(--green)'}
                     strokeWidth="1.5"
                   />
                   {seg.label ? (
-                    <text x={(a + b) / 2} y={mid + 4} textAnchor="middle" fill="#7ee787" fontSize="12">
+                    <text x={(a + b) / 2} y={mid + 4} textAnchor="middle" fill="var(--green-2)" fontSize="12">
                       {seg.label}
                     </text>
                   ) : null}
@@ -84,7 +84,7 @@ export function SramTimingFig({
       })}
       <defs>
         <pattern id="sram-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <line x1="0" y1="0" x2="0" y2="6" stroke="#3d4756" strokeWidth="2" />
+          <line x1="0" y1="0" x2="0" y2="6" stroke="var(--line-2)" strokeWidth="2" />
         </pattern>
       </defs>
       {spans.filter((span) => span.id === active).map((span) => {
@@ -93,7 +93,7 @@ export function SramTimingFig({
         const y = top + 48
         const a = x(span.from)
         const b = x(span.to)
-        const color = on ? '#e8c45a' : '#58a6ff'
+        const color = on ? 'var(--gold)' : 'var(--blue)'
         if (span.from === span.to) {
           return (
             <g key={span.id} style={{ cursor: 'pointer' }} onClick={() => onPick(span.id)}>

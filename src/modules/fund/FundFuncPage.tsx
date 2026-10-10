@@ -10,6 +10,7 @@ import {
   COVERAGE_LEAD,
   DFT,
   DFT_ATE,
+  EQUATION,
   EXEC_STEPS,
   FORMATS,
   GROSS,
@@ -43,7 +44,7 @@ const S = {
   covTitle: loc('故障覆盖率'),
   covDetected: loc('检测到的故障数（共 10 000 个）'),
   covValue: loc('覆盖率'),
-  covNote: loc('漏掉的那部分缺陷会变成出货后的失效（DPPM）。量产常要求 Stuck-at 覆盖率 95% 以上；自己注入故障试试看，见 M17 的 Pattern / Stuck 台子。'),
+  covNote: loc('漏掉的那部分缺陷会变成出货后的失效（DPPM）。量产常要求 Stuck-at 覆盖率 95% 以上；自己注入故障试试看，见 {@bench} 的 Pattern / Stuck 台子。'),
   dftTitle: loc('DFT：为了好测而改设计'),
   ctrTitle: loc('Ad-hoc 例子：30 位计数器'),
   ctrSeg: loc('拆成几段'),
@@ -300,7 +301,7 @@ export function FundFuncPage({ moduleId, onModuleChange }: Props) {
             period={PERIOD}
             edges={[e1, t2]}
             rows={[
-              { name: fmt, segs: fmtSegs, color: '#e8c45a' },
+              { name: fmt, segs: fmtSegs, color: 'var(--gold)' },
               { name: 'NRZ', segs: nrzSegs },
             ]}
             ariaLabel={fmt}
@@ -392,6 +393,7 @@ export function FundFuncPage({ moduleId, onModuleChange }: Props) {
         <Callout>{t(WORST)}</Callout>
         <Callout>{t(RELAX)}</Callout>
         <Callout tone="warn">{t(GROSS)}</Callout>
+        <Callout>{t(EQUATION)}</Callout>
       </Section>
 
       <Section title={t(S.execTitle)}>
@@ -410,7 +412,7 @@ export function FundFuncPage({ moduleId, onModuleChange }: Props) {
               {
                 name: 'OUT',
                 segs: invOut,
-                color: '#3fb950',
+                color: 'var(--green)',
                 labels: inBits.map((bit, i) => ({ t: i * PERIOD + 83, text: bit ? 'L' : 'H' })),
               },
             ]}

@@ -19,10 +19,12 @@ import {
   IN_METHODS,
   IN_PINS,
   IOS_STEPS,
+  IOS_WHY,
   OHMS,
   OHM_LEAD,
   OTHER,
   QUIZ,
+  SUMMARY,
   TAKEAWAY,
   VOX_DIAG,
   VOX_STEPS,
@@ -44,6 +46,7 @@ const S = {
   colItem: loc('失败项'),
   colHard: loc('硬 Bin'),
   colMeaning: loc('含义'),
+  summaryTitle: loc('测试总结（Test Summary）'),
   flowTitle: loc('测试顺序影响平均测试时间'),
   flowNote: loc('遇到第一项 Fail 就停。坏片越早停下，平均时间越短；良品永远要跑完全程。'),
   flowBook: loc('教科书顺序'),
@@ -174,6 +177,10 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
             ))}
           </tbody>
         </table>
+        <h3>{t(S.summaryTitle)}</h3>
+        {SUMMARY.map((para) => (
+          <p key={para.zh}>{t(para)}</p>
+        ))}
       </Section>
 
       <Section title={t(S.flowTitle)} note={t(S.flowNote)}>
@@ -383,6 +390,7 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
         <Explain paras={OTHER.find((item) => item.id === other)?.explain} />
         <h3>{t(S.iosTitle)}</h3>
         <Steps items={IOS_STEPS} />
+        <Callout tone="warn">{t(IOS_WHY)}</Callout>
       </Section>
 
       <Section title={t(ui.fund.takeawayTitle)}>

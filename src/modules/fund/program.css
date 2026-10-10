@@ -1,0 +1,172 @@
+/* 测试程序开发要点课专用样式 */
+
+.prog-sub {
+  margin: 22px 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dtable td.prog-col.is-active,
+.dtable th.prog-col.is-active {
+  background: var(--gold-bg);
+  color: var(--text);
+}
+
+.prog-menu {
+  margin: 12px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-l);
+  background: var(--panel-2);
+}
+
+.prog-menu__title {
+  margin: 0 0 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--gold);
+}
+
+.prog-menu__row {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 8px 12px;
+  align-items: center;
+  margin: 6px 0;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.prog-menu__row .seg {
+  margin: 0;
+}
+
+.prog-menu__fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.prog-menu__fields label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prog-menu__fields input {
+  width: 110px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.prog-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.prog-status.is-pass {
+  border-color: var(--green-line);
+  background: var(--green-bg);
+  color: var(--green-2);
+}
+
+.prog-status.is-fail {
+  border-color: var(--red-line);
+  background: var(--red-bg);
+  color: var(--red-2);
+}
+
+.prog-log {
+  margin: 10px 0 0;
+  padding: 10px 14px;
+  min-height: 3em;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-l);
+  background: var(--well);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.prog-log p {
+  margin: 0;
+  color: var(--text-2);
+}
+
+.prog-log p.is-ok {
+  color: var(--green-2);
+}
+
+.prog-log p.is-bad {
+  color: var(--red-2);
+}
+
+.prog-seq {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 10px 0;
+}
+
+.prog-seq__box {
+  padding: 10px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-l);
+  background: var(--panel-2);
+}
+
+.prog-seq__box h4 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.prog-seq__box .lab__btn {
+  display: block;
+  width: 100%;
+  margin: 0 0 6px;
+  text-align: left;
+}
+
+.prog-seq__box ol {
+  margin: 0;
+  padding-left: 1.4em;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.prog-seq__box ol li.is-bad {
+  color: var(--red-2);
+}
+
+.prog-seq__empty {
+  margin: 0;
+  font-size: 12px;
+  color: var(--dim);
+}
+
+@media (max-width: 720px) {
+  .prog-seq {
+    grid-template-columns: 1fr;
+  }
+
+  .prog-menu__row {
+    grid-template-columns: 1fr;
+  }
+}

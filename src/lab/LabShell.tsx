@@ -1,7 +1,9 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { useLocale } from '../i18n/LocaleContext'
 import { ui } from '../i18n/ui'
-import { MODULES, type ModuleId } from '../modules/catalog'
+import { MODULE_IDS, type ModuleId } from '../modules/catalog'
+import { LESSON_TITLE } from '../modules/titles'
+import { lessonCode } from '../tracks/catalog'
 import { LabHeader } from './LabHeader'
 import { useLabNav } from './LabNavContext'
 
@@ -26,11 +28,12 @@ export function LabShell({
 }: LabShellProps) {
   const { t } = useLocale()
   const labNav = useLabNav()
-  const navItems = labNav
-    ? labNav.navIds
-        .map((id) => MODULES.find((item) => item.id === id))
-        .filter((item): item is (typeof MODULES)[number] => Boolean(item))
-    : MODULES
+  const navIds: readonly ModuleId[] = labNav ? labNav.navIds : MODULE_IDS
+  const activeRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  }, [moduleId])
 
   const nav = (
     <>
@@ -45,14 +48,16 @@ export function LabShell({
           <span className="lab__nav-sep" aria-hidden="true" />
         </>
       ) : null}
-      {navItems.map((item) => (
+      {navIds.map((id) => (
         <button
-          key={item.id}
+          key={id}
+          ref={moduleId === id ? activeRef : undefined}
           type="button"
-          className={`lab__nav-item${moduleId === item.id ? ' is-active' : ''}`}
-          onClick={() => onModuleChange(item.id)}
+          title={t(LESSON_TITLE[id])}
+          className={`lab__nav-item${moduleId === id ? ' is-active' : ''}`}
+          onClick={() => onModuleChange(id)}
         >
-          M{item.code}
+          {lessonCode(id)}
         </button>
       ))}
     </>
@@ -60,7 +65,7 @@ export function LabShell({
 
   return (
     <div className={`lab${scroll ? ' lab--scroll' : ''}`}>
-      <LabHeader title={title} goal={goal} nav={nav} />
+      <LabHeader title={`${lessonCode(moduleId)} · ${title}`} goal={goal} nav={nav} />
       {children}
       {footer}
     </div>

@@ -59,7 +59,7 @@ export const QUIZ: QuizQuestion[] = [
     options: [
       { id: 'ok', text: loc('Bin 是固定条件的判定；Shmoo 解释条件一变为什么翻盘') },
       { id: 'swap', text: loc('Shmoo 替代 Bin') },
-      { id: 'm01', text: loc('和 M01 的 Yield 无关') },
+      { id: 'm01', text: loc('和 {@intro} 的 Yield 无关') },
       { id: 'alu', text: loc('只有 ALU 才有 Bin') },
     ],
     answer: 'ok',

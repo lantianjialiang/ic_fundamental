@@ -16,8 +16,8 @@ const L = {
 
 export function OpensFig({ fault, pos, volt }: { fault: Fault; pos: boolean; volt: number }) {
   const { t } = useLocale()
-  const hot = '#e8c45a'
-  const dim = '#3d4756'
+  const hot = 'var(--gold)'
+  const dim = 'var(--line-2)'
   const diodeOn = fault === 'good' || (fault === 'res' && Math.abs(volt) >= 0.6)
   const lowOn = !pos && diodeOn
   const highOn = pos && diodeOn
@@ -27,13 +27,13 @@ export function OpensFig({ fault, pos, volt }: { fault: Fault; pos: boolean; vol
   return (
     <figure className="term-fig">
       <svg viewBox="0 0 680 260" className="term-fig__svg" role="img" aria-label={t(L.cap)}>
-        <rect width="680" height="260" rx="10" fill="#0d1117" />
+        <rect width="680" height="260" rx="10" fill="var(--well)" />
         {/* PMU */}
-        <rect x="30" y="100" width="110" height="60" rx="8" fill="#1b3350" stroke="#58a6ff" />
-        <text x="85" y="125" textAnchor="middle" fill="#e6edf3" fontSize="14">
+        <rect x="30" y="100" width="110" height="60" rx="8" fill="var(--blue-bg)" stroke="var(--blue)" />
+        <text x="85" y="125" textAnchor="middle" fill="var(--text)" fontSize="14">
           {t(L.pmu)}
         </text>
-        <text x="85" y="146" textAnchor="middle" fill="#e8c45a" fontSize="13" fontFamily="monospace">
+        <text x="85" y="146" textAnchor="middle" fill="var(--gold)" fontSize="13" fontFamily="monospace">
           {`${volt >= 0 ? '+' : ''}${volt.toFixed(2)} V`}
         </text>
         {/* PMU → 管脚 */}
@@ -41,45 +41,45 @@ export function OpensFig({ fault, pos, volt }: { fault: Fault; pos: boolean; vol
         {open ? (
           <>
             <line x1="225" y1="130" x2="260" y2="130" stroke={dim} strokeWidth="3" />
-            <text x="215" y="137" textAnchor="middle" fill="#f85149" fontSize="20">
+            <text x="215" y="137" textAnchor="middle" fill="var(--red)" fontSize="20">
               ✕
             </text>
           </>
         ) : null}
-        <text x="200" y="118" textAnchor="middle" fill="#8b949e" fontSize="12">
+        <text x="200" y="118" textAnchor="middle" fill="var(--muted)" fontSize="12">
           {pos ? '+I →' : '← −I'}
         </text>
         {/* 芯片外框 */}
-        <rect x="250" y="20" width="400" height="220" rx="12" fill="none" stroke="#303844" strokeDasharray="6 5" />
-        <text x="640" y="40" textAnchor="end" fill="#8b949e" fontSize="12">
+        <rect x="250" y="20" width="400" height="220" rx="12" fill="none" stroke="var(--line)" strokeDasharray="6 5" />
+        <text x="640" y="40" textAnchor="end" fill="var(--muted)" fontSize="12">
           {t(L.chip)}
         </text>
-        <circle cx="270" cy="130" r="7" fill="#1c222b" stroke="#e6edf3" />
-        <text x="270" y="158" textAnchor="middle" fill="#8b949e" fontSize="12">
+        <circle cx="270" cy="130" r="7" fill="var(--card)" stroke="var(--text)" />
+        <text x="270" y="158" textAnchor="middle" fill="var(--muted)" fontSize="12">
           {t(L.pin)}
         </text>
         {/* 节点到二极管 */}
-        <line x1="277" y1="130" x2="380" y2="130" stroke={lowOn || highOn ? hot : '#8b949e'} strokeWidth="2" />
-        <line x1="380" y1="130" x2="380" y2="90" stroke={highOn ? hot : '#8b949e'} strokeWidth="2" />
-        <line x1="380" y1="130" x2="380" y2="170" stroke={lowOn ? hot : '#8b949e'} strokeWidth="2" />
+        <line x1="277" y1="130" x2="380" y2="130" stroke={lowOn || highOn ? hot : 'var(--muted)'} strokeWidth="2" />
+        <line x1="380" y1="130" x2="380" y2="90" stroke={highOn ? hot : 'var(--muted)'} strokeWidth="2" />
+        <line x1="380" y1="130" x2="380" y2="170" stroke={lowOn ? hot : 'var(--muted)'} strokeWidth="2" />
         {/* 上二极管：阳极在下（管脚），阴极在上（VDD） */}
-        <path d="M368 90 L392 90 L380 72 Z" fill={highOn ? hot : '#1c222b'} stroke={highOn ? hot : '#8b949e'} />
-        <line x1="366" y1="70" x2="394" y2="70" stroke={highOn ? hot : '#8b949e'} strokeWidth="2" />
-        <line x1="380" y1="70" x2="380" y2="50" stroke={highOn ? hot : '#8b949e'} strokeWidth="2" />
-        <text x="380" y="42" textAnchor="middle" fill="#79c0ff" fontSize="12">
+        <path d="M368 90 L392 90 L380 72 Z" fill={highOn ? hot : 'var(--card)'} stroke={highOn ? hot : 'var(--muted)'} />
+        <line x1="366" y1="70" x2="394" y2="70" stroke={highOn ? hot : 'var(--muted)'} strokeWidth="2" />
+        <line x1="380" y1="70" x2="380" y2="50" stroke={highOn ? hot : 'var(--muted)'} strokeWidth="2" />
+        <text x="380" y="42" textAnchor="middle" fill="var(--sky)" fontSize="12">
           {t(L.vdd)}
         </text>
         {/* 下二极管：阳极在下（VSS），阴极在上（管脚） */}
-        <path d="M368 192 L392 192 L380 174 Z" fill={lowOn ? hot : '#1c222b'} stroke={lowOn ? hot : '#8b949e'} />
-        <line x1="366" y1="172" x2="394" y2="172" stroke={lowOn ? hot : '#8b949e'} strokeWidth="2" />
-        <line x1="380" y1="192" x2="380" y2="212" stroke={lowOn ? hot : '#8b949e'} strokeWidth="2" />
-        <text x="380" y="228" textAnchor="middle" fill="#79c0ff" fontSize="12">
+        <path d="M368 192 L392 192 L380 174 Z" fill={lowOn ? hot : 'var(--card)'} stroke={lowOn ? hot : 'var(--muted)'} />
+        <line x1="366" y1="172" x2="394" y2="172" stroke={lowOn ? hot : 'var(--muted)'} strokeWidth="2" />
+        <line x1="380" y1="192" x2="380" y2="212" stroke={lowOn ? hot : 'var(--muted)'} strokeWidth="2" />
+        <text x="380" y="228" textAnchor="middle" fill="var(--sky)" fontSize="12">
           {t(L.vss)}
         </text>
         {/* 内部电路 */}
-        <line x1="380" y1="130" x2="500" y2="130" stroke="#8b949e" strokeWidth="2" />
-        <rect x="500" y="105" width="120" height="50" rx="8" fill="#1c222b" stroke="#303844" />
-        <text x="560" y="135" textAnchor="middle" fill="#8b949e" fontSize="12">
+        <line x1="380" y1="130" x2="500" y2="130" stroke="var(--muted)" strokeWidth="2" />
+        <rect x="500" y="105" width="120" height="50" rx="8" fill="var(--card)" stroke="var(--line)" />
+        <text x="560" y="135" textAnchor="middle" fill="var(--muted)" fontSize="12">
           {t(L.core)}
         </text>
         {/* 短路 / 相邻脚 */}
@@ -94,16 +94,16 @@ export function OpensFig({ fault, pos, volt }: { fault: Fault; pos: boolean; vol
             {fault === 'res' ? (
               <path d="M300 160 l8 4 l-16 8 l16 8 l-16 8 l8 4" fill="none" stroke={hot} strokeWidth="2" />
             ) : null}
-            <text x="292" y="228" textAnchor="end" fill="#f85149" fontSize="12">
+            <text x="292" y="228" textAnchor="end" fill="var(--red)" fontSize="12">
               {fault === 'res' ? '1 kΩ → 0 V' : t(L.short)}
             </text>
           </>
         ) : null}
         {nbOn ? (
           <>
-            <circle cx="270" cy="200" r="7" fill="#1c222b" stroke="#e6edf3" />
+            <circle cx="270" cy="200" r="7" fill="var(--card)" stroke="var(--text)" />
             <path d="M270 137 L270 193" stroke={hot} strokeWidth="2.5" strokeDasharray="6 4" />
-            <text x="282" y="222" fill="#f85149" fontSize="12">
+            <text x="282" y="222" fill="var(--red)" fontSize="12">
               {t(L.nb)}
             </text>
           </>

@@ -4,6 +4,8 @@ export const ui = {
   labName: loc('半导体测试实验室', 'Semiconductor Test Laboratory'),
   langZh: loc('中文', '中文'),
   langEn: loc('EN', 'EN'),
+  themeDark: loc('深色'),
+  themeLight: loc('浅色'),
 
   timing: {
     replay: loc('再播一次'),
@@ -28,7 +30,7 @@ export const ui = {
   },
 
   m01: {
-    title: loc('第 01 课 — 什么是半导体测试？', 'Module 01 — What is semiconductor test?'),
+    title: loc('什么是半导体测试？', 'What is semiconductor test?'),
     goal: loc(
       '先建立产业链和测试概念。现在不讲 Timing、Strobe 和仪器细节。',
       'Build the industry map and test vocabulary first. No Timing, Strobe, or instrument theory yet.',
@@ -55,7 +57,7 @@ export const ui = {
   },
 
   m02: {
-    title: loc('第 02 课 — DUT 如何接到 ATE？', 'Module 02 — How is a DUT connected to an ATE?'),
+    title: loc('DUT 如何接到 ATE？', 'How is a DUT connected to an ATE?'),
     goalFt: loc(
       'FT：DUT 在上、ATE 在下。路径：封装 DUT → Socket → Load Board → ATE Channel。',
       'FT: DUT on top, ATE below. Path: packaged DUT → Socket → Load Board → ATE Channel.',
@@ -92,7 +94,7 @@ export const ui = {
   },
 
   m03: {
-    title: loc('第 03 课 — ATE 里面有什么？', 'Module 03 — What is inside an ATE?'),
+    title: loc('ATE 里面有什么？', 'What is inside an ATE?'),
     goal: loc(
       '先看 ATE 的抽象结构。不讲某一家 Tester 的指令，也不讲 Timing 公式。',
       'See the abstract ATE first. No vendor commands and no Timing equations yet.',
@@ -136,7 +138,7 @@ export const ui = {
   },
 
   m04: {
-    title: loc('第 04 课 — 为什么测试不只是 0 和 1'),
+    title: loc('为什么测试不只是 0 和 1'),
     goal: loc('PMU 测电压和电流。先混脸熟，不要求会设仪器。'),
     introTitle: loc('同一根 Pin，两种看法'),
     introBody: loc(
@@ -179,7 +181,7 @@ export const ui = {
   },
 
   m05: {
-    title: loc('第 05 课 — 从 Datasheet 到 Test Specification'),
+    title: loc('从 Datasheet 到 Test Specification'),
     goal: loc('Test Engineer 的日常经常不是写代码，而是把 Datasheet 变成机器可执行的测试。'),
     introTitle: loc('先翻译规格，再写程序'),
     introBody: loc(
@@ -214,7 +216,7 @@ export const ui = {
   },
 
   m06: {
-    title: loc('第 06 课 — DC Test'),
+    title: loc('DC Test'),
     goal: loc('把基本量测立住。不讲四线补偿、钳位内部和多站点。'),
     introTitle: loc('DC 先问电压电流合不合格'),
     introBody: loc(
@@ -237,7 +239,7 @@ export const ui = {
     takeawayTitle: loc('带走这一句'),
     quizTitle: loc('先确认这几句'),
     quizNote: loc('选完立刻出对错和解释。不用交作业。'),
-    latchEntry: loc('电源电流突然飙高？可能是 Latch-up，见 M16。'),
+    latchEntry: loc('电源电流突然飙高？可能是 Latch-up，见 {@latch}。'),
     kickerGroup: loc('参数组'),
     kickerIo: loc('电流方向'),
     kickerVoh: loc('VOH @ IOH'),
@@ -250,7 +252,7 @@ export const ui = {
   },
 
   m07: {
-    title: loc('第 07 课 — Functional Test'),
+    title: loc('Functional Test'),
     goal: loc('按真值表给输入、比输出。Pattern 就是这些向量的高速重复。'),
     introTitle: loc('功能对不对，先看真值表'),
     introBody: loc(
@@ -294,7 +296,7 @@ export const ui = {
   },
 
   m08: {
-    title: loc('第 08 课 — Timing'),
+    title: loc('Timing'),
     goal: loc('立住：什么时候 Drive、什么时候 Strobe。太早太晚，好芯片也会 Fail。'),
     introTitle: loc('输出不是立刻变的'),
     introBody: loc(
@@ -319,9 +321,9 @@ export const ui = {
   },
 
   m09: {
-    title: loc('第 09 课 — AC Parameters'),
+    title: loc('AC Parameters'),
     goal: loc('DC 解决“对不对”；AC 解决“来不来得及”。'),
-    introTitle: loc('还是 M08 那张 CLK / DATA / OUT'),
+    introTitle: loc('还是 {@timing} 那张 CLK / DATA / OUT'),
     introBody: loc(
       '不是另一张新图。轨道、边沿位置和上一课相同。上一课标 Tester 的 Drive / Strobe / Period；这一课在同一张图上标 datasheet：tPD、tr/tf、tSU、tH、tCQ、fMAX。',
     ),
@@ -344,7 +346,7 @@ export const ui = {
   },
 
   m10: {
-    title: loc('第 10 课 — Test Vector Development'),
+    title: loc('Test Vector Development'),
     goal: loc('穷举会爆。再分清 Functional、Algorithmic、ATPG，以及 DFT 让后两者做得成。'),
     introTitle: loc('两个输入可以穷举，三十二个不行'),
     introBody: loc(
@@ -372,7 +374,7 @@ export const ui = {
   },
 
   m11: {
-    title: loc('第 11 课 — Scan Test'),
+    title: loc('Scan Test'),
     goal: loc('内部触发器串成链，才能测到外部 Pin 够不到的状态。'),
     introTitle: loc('几十亿晶体管测不到每一级'),
     introBody: loc(
@@ -405,7 +407,7 @@ export const ui = {
   },
 
   m12: {
-    title: loc('第 12 课 — Test Program Development'),
+    title: loc('Test Program Development'),
     goal: loc('Test Program 把测试意图译成 Tester 能执行的流程。不写某家 API。'),
     introTitle: loc('先有 Flow，再有一条 Item'),
     introBody: loc(
@@ -429,7 +431,7 @@ export const ui = {
   },
 
   m13: {
-    title: loc('第 13 课 — 为什么程序“不工作”'),
+    title: loc('为什么程序“不工作”'),
     goal: loc('三个案例。先选原因，立刻判定，再看为什么这条更优先。'),
     introTitle: loc('先查共同路径，不要先骂芯片'),
     introBody: loc(
@@ -439,7 +441,7 @@ export const ui = {
     takeawayTitle: loc('带走这一句'),
     quizTitle: loc('再确认这几句'),
     quizNote: loc('选完立刻出对错和解释。不用交作业。'),
-    latchEntry: loc('电流突然飙高、掉电才恢复？可能是 Latch-up，见 M16。'),
+    latchEntry: loc('电流突然飙高、掉电才恢复？可能是 Latch-up，见 {@latch}。'),
     kickerCase: loc('案例'),
     kickerTakeaway: loc('本课要点'),
     kickerOne: loc('一句话'),
@@ -450,7 +452,7 @@ export const ui = {
   },
 
   m14: {
-    title: loc('第 14 课 — Yield、Characterization、Shmoo'),
+    title: loc('Yield、Characterization、Shmoo'),
     goal: loc('量产钉在一个条件判 Bin；表征是在扫芯片还能工作到哪条边界。'),
     introTitle: loc('表征不是再做一次 Pass / Fail'),
     introBody: loc(
@@ -473,7 +475,7 @@ export const ui = {
   },
 
   m15: {
-    title: loc('第 15 课 — 虚拟 4-bit ALU 的 Test Program'),
+    title: loc('虚拟 4-bit ALU 的 Test Program'),
     goal: loc('走完一条闭环。每一步当场判对错。不写 Tester 代码，不导出报告。'),
     introTitle: loc('用一颗教学 ALU 把前面串起来'),
     introBody: loc(
@@ -502,7 +504,7 @@ export const ui = {
   },
 
   m16: {
-    title: loc('第 16 课 — Latch-up 入口'),
+    title: loc('Latch-up 入口'),
     goal: loc('先能说出 Latch-up 是什么，并能拆开“寄生 PNPN”每个字。不做成完整实验。'),
     introTitle: loc('不是功能向量写错了'),
     introBody: loc(
@@ -527,11 +529,11 @@ export const ui = {
   },
 
   m17: {
-    title: loc('第 17 课 — 交互实验'),
+    title: loc('交互实验'),
     goal: loc('自己设时间或电流限，立刻看到波形和 Pass / Fail。比听一小时 Setup 更有效。'),
     introTitle: loc('拧旋钮，不要只听名字'),
     introBody: loc(
-      '三个台子：时序、Leakage、Pattern / Stuck。词还是 M04 / M08 / M10 / M15 那些，这里让结果跟着你的手变。',
+      '三个台子：时序、Leakage、Pattern / Stuck。词还是 {@pmu} / {@timing} / {@vector} / {@alu} 那些，这里让结果跟着你的手变。',
     ),
     tabTime: loc('时序模拟器'),
     tabLeak: loc('Leakage / PMU'),
@@ -558,7 +560,7 @@ export const ui = {
     kickerLeak: loc('PMU'),
     kickerPat: loc('Pattern'),
     kickerQuiz: loc('确认'),
-    asideLater: loc('Setup / Hold / tPD 的名字在 M08 / M09。这里只问：你把采样点放在哪。'),
+    asideLater: loc('Setup / Hold / tPD 的名字在 {@timing} / {@ac}。这里只问：你把采样点放在哪。'),
     yes: loc('对。'),
     no: loc('不对。'),
   },
@@ -575,28 +577,83 @@ export const ui = {
   },
 
   m18: {
-    title: loc('第 18 课 — 器件规格书'),
+    title: loc('器件规格书'),
     goal: loc('读懂一份数字芯片规格书：每一行都是“在什么条件下，量什么，极限多少”。'),
   },
 
   m19: {
-    title: loc('第 19 课 — 开短路测试'),
+    title: loc('开短路测试'),
     goal: loc('用 PMU 打一个小电流，读保护二极管电压，判断管脚是接好、开路还是短路。'),
   },
 
   m20: {
-    title: loc('第 20 课 — DC 参数测试'),
+    title: loc('DC 参数测试'),
     goal: loc('VOH/VOL、IDD、IIL/IIH、IOZ、VI、IOS：怎么测、按什么顺序测、Fail 了怎么看 Datalog。'),
   },
 
   m21: {
-    title: loc('第 21 课 — 功能测试'),
+    title: loc('功能测试'),
     goal: loc('信号格式、Strobe、向量字符、Time Set 和 DFT。把“跑向量”拆成能调的每一个旋钮。'),
   },
 
   m22: {
-    title: loc('第 22 课 — AC 参数测试'),
+    title: loc('AC 参数测试'),
     goal: loc('Setup、Hold、传输延迟、脉宽、fMAX：Go/No-Go 判一次，或者用二分搜索把边界找出来。'),
+  },
+
+  fBasics: {
+    title: loc('电学与数字逻辑基础'),
+    goal: loc('工程计数法、电压电流电阻、用欧姆定律测电阻、二 / 十 / 十六进制、逻辑电平和基本门电路。'),
+  },
+
+  fAte: {
+    title: loc('晶圆、封装与测试设备'),
+    goal: loc('芯片从晶圆到封装要被测两次。认识探针台、分选机、负载板，以及四类测试机。'),
+  },
+
+  fIntro: {
+    title: loc('测试入门：DUT、PMU 与管脚电子'),
+    goal: loc('DUT 有哪些管脚、测试程序分几段、测试系统里有什么；PMU 怎么 Force / Measure、为什么一定要设钳位。'),
+  },
+
+  fChar: {
+    title: loc('器件表征'),
+    goal: loc('找出芯片真正能工作到哪里：二分搜索、线性搜索、Shmoo 图和 Datalog。'),
+  },
+
+  fVector: {
+    title: loc('测试向量开发'),
+    goal: loc('向量文件长什么样、仿真数据怎么变成向量、给设计工程师的 Simulation for Test 守则。'),
+  },
+
+  fProgram: {
+    title: loc('测试程序开发要点'),
+    goal: loc('工程 / 表征 / 量产三种程序；开发前要想清楚的事；上电下电顺序；分 Bin 和测试汇总。'),
+  },
+
+  fCreate: {
+    title: loc('编写测试程序'),
+    goal: loc('从规格书列测试计划、定管脚映射，先写负载板测试，再一步步让新程序第一次跑起来。'),
+  },
+
+  fDebug: {
+    title: loc('排错'),
+    goal: loc('Fail 了先怀疑谁：DUT、接口硬件、测试机、测试程序。逐个排除，再用好调试工具。'),
+  },
+
+  fQualify: {
+    title: loc('程序验证与文档'),
+    goal: loc('程序写完还不能交：留样品、查 Margin、Shmoo 每个向量、验证分 Bin，最后整理文档包。'),
+  },
+
+  fLatch: {
+    title: loc('CMOS 闩锁测试'),
+    goal: loc('寄生 SCR 怎么被触发，以及怎么用过压和注入电流去“故意点火”，看芯片会不会锁住。'),
+  },
+
+  fScan: {
+    title: loc('Scan 测试原理'),
+    goal: loc('时序电路为什么难测；Scan 怎么把触发器串成移位寄存器；Flush / Shift 测试和 Scan 专用测试机。'),
   },
 
   hop: {

@@ -1,0 +1,61 @@
+/* Scan 测试原理课专用样式 */
+
+.scan-sub {
+  margin: 22px 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.scan-label {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.scan-edit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin: 8px 0;
+}
+
+.scan-edit > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.scan-edit .bits-edit {
+  margin: 0;
+}
+
+.scan-edit .bits-edit button {
+  width: 48px;
+  font-size: 13px;
+}
+
+.scan-phase {
+  margin: 8px 0;
+  padding: 10px 14px;
+  border: 1px solid var(--gold-line);
+  border-radius: var(--r-l);
+  background: var(--gold-bg);
+  font-size: 14px;
+  color: var(--text);
+}
+
+.scan-phase b {
+  margin-right: 8px;
+  font-family: var(--mono);
+  color: var(--gold);
+}
+
+.scan-cmp td.is-bad {
+  color: var(--red-2);
+  font-weight: 600;
+}
+
+.scan-cmp td.is-ok {
+  color: var(--green-2);
+}

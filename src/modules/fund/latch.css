@@ -1,0 +1,88 @@
+/* 闩锁测试课专用样式 */
+
+.latch-sub {
+  margin: 22px 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.latch-steps {
+  margin: 10px 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: latch-step;
+}
+
+.latch-steps li {
+  counter-increment: latch-step;
+  position: relative;
+  margin: 0 0 6px;
+  padding: 8px 12px 8px 40px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  background: var(--card);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--dim);
+}
+
+.latch-steps li::before {
+  content: counter(latch-step);
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  width: 20px;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.latch-steps li b {
+  font-weight: 600;
+}
+
+.latch-steps li span {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-2);
+}
+
+.latch-steps li.is-done {
+  color: var(--text-2);
+}
+
+.latch-steps li.is-now {
+  border-color: var(--gold-line);
+  background: var(--gold-bg);
+  color: var(--text);
+}
+
+.latch-steps li.is-skip {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
+.latch-steps li.is-bad {
+  border-color: var(--red-line);
+  background: var(--red-bg);
+  color: var(--text);
+}
+
+.latch-params td.typ {
+  font-family: var(--mono);
+  white-space: nowrap;
+}
+
+.latch-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 720px) {
+  .latch-cols {
+    grid-template-columns: 1fr;
+  }
+}

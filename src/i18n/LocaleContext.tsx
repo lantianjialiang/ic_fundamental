@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { resolveLessonRefs } from '../tracks/catalog'
 import { loc, pick, readStoredLocale, writeStoredLocale, type Locale, type LText } from './locale'
 
 type LocaleContextValue = {
@@ -26,7 +27,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     () => ({
       locale,
       setLocale,
-      t: (text) => pick(text, locale),
+      t: (text) => resolveLessonRefs(pick(text, locale)),
     }),
     [locale],
   )

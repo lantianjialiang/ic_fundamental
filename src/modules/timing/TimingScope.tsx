@@ -5,7 +5,7 @@ import { TIMING, type TimingMark } from './glossary'
 type TimingScopeProps = {
   mark: TimingMark
   t: (text: LText | string) => string
-  /** M08：Strobe 位置，单位 ns，0–10 */
+  /** {@timing}：Strobe 位置，单位 ns，0–10 */
   strobeNs?: number
   replayLabel: string
 }
@@ -46,17 +46,17 @@ export function TimingScope({ mark, t, strobeNs = 5, replayLabel }: TimingScopeP
       >
         <defs>
           <marker id={`arr-${mark}-${play}`} markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-            <path d="M0 0 L7 3.5 L0 7 Z" fill="#e8c45a" />
+            <path d="M0 0 L7 3.5 L0 7 Z" fill="var(--gold)" />
           </marker>
         </defs>
-        <rect x="0" y="0" width="680" height="300" rx="6" fill="#0d1117" />
+        <rect x="0" y="0" width="680" height="300" rx="6" fill="var(--well)" />
         {ticks()}
         {railName('CLK', CLK)}
         {railName('DATA', DAT)}
         {railName(outName, OUT)}
         {canonicalWaves(mark)}
         {highlights(mark, strobeX, t, `arr-${mark}-${play}`)}
-        <line className="term-fig__now" x1={X0} y1="20" x2={X0} y2="248" stroke="#e8c45a" strokeWidth="1.5">
+        <line className="term-fig__now" x1={X0} y1="20" x2={X0} y2="248" stroke="var(--gold)" strokeWidth="1.5">
           <animate attributeName="x1" from={X0} to={X1} dur="3.4s" repeatCount="indefinite" />
           <animate attributeName="x2" from={X0} to={X1} dur="3.4s" repeatCount="indefinite" />
         </line>
@@ -68,7 +68,7 @@ export function TimingScope({ mark, t, strobeNs = 5, replayLabel }: TimingScopeP
 
 function ticks() {
   return (
-    <g stroke="#21262d" strokeWidth="1">
+    <g stroke="var(--fig-box-2)" strokeWidth="1">
       {[160, 240, 320, 400, 480, 560].map((x) => (
         <line key={x} x1={x} y1="20" x2={x} y2="248" />
       ))}
@@ -78,7 +78,7 @@ function ticks() {
 
 function railName(name: string, y: number) {
   return (
-    <text x="16" y={y + 4} fill="#8b949e" fontSize="13" fontFamily="Segoe UI, Microsoft YaHei, sans-serif">
+    <text x="16" y={y + 4} fill="var(--muted)" fontSize="13" fontFamily="Segoe UI, Microsoft YaHei, sans-serif">
       {name}
     </text>
   )
@@ -112,7 +112,7 @@ function canonicalWaves(mark: TimingMark) {
     H ${X1}
   `
   return (
-    <g fill="none" stroke="#58a6ff" strokeWidth="2.2" strokeLinejoin="round">
+    <g fill="none" stroke="var(--blue)" strokeWidth="2.2" strokeLinejoin="round">
       <path d={clk} />
       <path d={data} className={slopeClass} />
       <path d={out} className={mark === 'ctq' ? 'term-fig__q' : undefined} />
@@ -123,14 +123,14 @@ function canonicalWaves(mark: TimingMark) {
 function dim(x1: number, x2: number, y: number, label: string, marker: string) {
   return (
     <g>
-      <line x1={x1} y1={y} x2={x2} y2={y} stroke="#e8c45a" strokeWidth="1.6" markerEnd={`url(#${marker})`} />
-      <line x1={x1} y1={y - 8} x2={x1} y2={y + 8} stroke="#e8c45a" strokeWidth="1.4" />
-      <line x1={x2} y1={y - 8} x2={x2} y2={y + 8} stroke="#e8c45a" strokeWidth="1.4" />
+      <line x1={x1} y1={y} x2={x2} y2={y} stroke="var(--gold)" strokeWidth="1.6" markerEnd={`url(#${marker})`} />
+      <line x1={x1} y1={y - 8} x2={x1} y2={y + 8} stroke="var(--gold)" strokeWidth="1.4" />
+      <line x1={x2} y1={y - 8} x2={x2} y2={y + 8} stroke="var(--gold)" strokeWidth="1.4" />
       <text
         x={(x1 + x2) / 2}
         y={y - 10}
         textAnchor="middle"
-        fill="#e8c45a"
+        fill="var(--gold)"
         fontSize="13"
         fontFamily="Segoe UI, Microsoft YaHei, sans-serif"
       >
@@ -143,8 +143,8 @@ function dim(x1: number, x2: number, y: number, label: string, marker: string) {
 function edgeMark(x: number, y: number, label: string) {
   return (
     <g className="term-fig__edge">
-      <line x1={x} y1={y - 28} x2={x} y2={y + 28} stroke="#e8c45a" strokeWidth="1.4" strokeDasharray="3 3" />
-      <text x={x + 8} y={y - 32} fill="#e8c45a" fontSize="13">
+      <line x1={x} y1={y - 28} x2={x} y2={y + 28} stroke="var(--gold)" strokeWidth="1.4" strokeDasharray="3 3" />
+      <text x={x + 8} y={y - 32} fill="var(--gold)" fontSize="13">
         {label}
       </text>
     </g>
@@ -171,7 +171,7 @@ function highlights(
         <rect className="term-fig__win" x={OUT_AT} y={OUT - 22} width={WIN_R - OUT_AT} height="44" />
         {edgeMark(strobeX, OUT, t(loc('Strobe')))}
         {dim(OUT_AT, WIN_R, 268, t(loc('有效窗口')), marker)}
-        <circle className="term-fig__dot" cx={strobeX} cy={yOf(OUT, true)} r="5" fill="#e8c45a" />
+        <circle className="term-fig__dot" cx={strobeX} cy={yOf(OUT, true)} r="5" fill="var(--gold)" />
       </g>
     )
   }

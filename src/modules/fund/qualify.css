@@ -1,0 +1,114 @@
+/* 程序验证与文档课专用样式 */
+
+.qual-sub {
+  margin: 22px 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.qual-trace {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.qual-trace__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  background: var(--card);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.qual-trace__row b {
+  flex: none;
+  min-width: 4.5em;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.qual-trace__row.is-ok b {
+  color: var(--green-2);
+}
+
+.qual-trace__row.is-bad b {
+  color: var(--red-2);
+}
+
+.qual-progress {
+  height: 10px;
+  margin: 8px 0 12px;
+  border-radius: 5px;
+  background: var(--well);
+  overflow: hidden;
+}
+
+.qual-progress > div {
+  height: 100%;
+  border-radius: 5px;
+  background: var(--green-line);
+  transition: width 0.2s;
+}
+
+.qual-docs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.qual-docs__item {
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  background: var(--card);
+}
+
+.qual-docs__item.is-open {
+  border-color: var(--gold-line);
+}
+
+.qual-docs__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.qual-docs__head input {
+  accent-color: var(--green);
+}
+
+.qual-docs__head button {
+  flex: 1;
+  appearance: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.qual-docs__head i {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.qual-docs__body {
+  margin: 0;
+  padding: 0 12px 10px 38px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-2);
+}

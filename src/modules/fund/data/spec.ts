@@ -127,12 +127,12 @@ export const SHEET: Record<SheetTab, SheetRow[]> = {
     {
       id: 'vdd',
       cells: () => ['VDD', '−0.5 ~ 7.0 V', loc('示例值')],
-      explain: [ABS_NOTE, loc('测试中最容易越界的是热切换和 IOS 测试：瞬间电压冲击可能超过额定值，见 M20。')],
+      explain: [ABS_NOTE, loc('测试中最容易越界的是热切换和 IOS 测试：瞬间电压冲击可能超过额定值，见 {@fDc}。')],
     },
     {
       id: 'vin',
       cells: () => ['VIN', '−0.5 ~ VDD + 0.5 V', loc('示例值')],
-      explain: [ABS_NOTE, loc('输入比 VDD 高、或比地低超过一个二极管压降，保护二极管就会导通，严重时触发 Latch-up（M16）。')],
+      explain: [ABS_NOTE, loc('输入比 VDD 高、或比地低超过一个二极管压降，保护二极管就会导通，严重时触发 Latch-up（{@latch}）。')],
     },
     {
       id: 'tstg',
@@ -180,7 +180,7 @@ export const SHEET: Record<SheetTab, SheetRow[]> = {
       cells: () => ['VIH', loc('保证识别为 1'), '2.2 V', '—'],
       explain: [
         loc('输入高电平门槛：只要输入 ≥ 2.2 V，芯片必须当成 1。'),
-        loc('不是用 PMU 量的。做法是把 Tester 的驱动高电平设成 2.2 V 跑功能向量，全对就 Pass（M21）。'),
+        loc('不是用 PMU 量的。做法是把 Tester 的驱动高电平设成 2.2 V 跑功能向量，全对就 Pass（{@fFunc}）。'),
       ],
     },
     {
@@ -252,7 +252,7 @@ export const SHEET: Record<SheetTab, SheetRow[]> = {
     rowT('tRC', '读周期', '15', '—', '连续两次读之间的最短时间。它决定了读的最高频率：1 / 15 ns ≈ 66.7 MHz。'),
     rowT('tAA', '地址到数据有效', '—', '15', '地址变化后，最慢 15 ns 新数据必须出现。测法：地址在 T0 变，Strobe 放在 T0 + 15 ns。'),
     rowT('tACS', '片选到数据有效', '—', '10', '片选有效后最慢 10 ns 出数据。'),
-    rowT('tDOE', 'OE 到数据有效', '—', '10', 'OE 下降后最慢 10 ns 出数据。OE 控制的读时序就靠它（M22）。'),
+    rowT('tDOE', 'OE 到数据有效', '—', '10', 'OE 下降后最慢 10 ns 出数据。OE 控制的读时序就靠它（{@fAc}）。'),
     rowT('tHZCS', '片选无效到高阻', '—', '8', '取消片选后，输出最慢 8 ns 进入高阻。测法：用带 VREF 的负载，在 Strobe 时看引脚是否落在 VOL 与 VOH 之间。'),
     rowT('tHZOE', 'OE 无效到高阻', '—', '8', 'OE 拉高后最慢 8 ns 高阻。'),
     rowT('tLZCS', '片选有效到低阻', '2', '—', '片选有效后，至少 2 ns 输出才开始驱动。是最小值：太快打开会和总线上别的器件冲突。'),
@@ -400,7 +400,7 @@ export const QUIZ: QuizQuestion[] = [
       { id: 'c', text: loc('不用测速度') },
     ],
     answer: 'a',
-    explain: loc('测试机能力不够，必须在规格阶段就发现并作出取舍（M22 讲多路复用）。'),
+    explain: loc('测试机能力不够，必须在规格阶段就发现并作出取舍（{@fAc} 讲多路复用）。'),
   },
   {
     id: 'q4',
@@ -412,5 +412,87 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'a',
     explain: loc('手册上的项不等于测试项，测试规格会标注“设计保证”。'),
+  },
+  {
+    id: 'b1',
+    prompt: loc('标准 TTL 的输入电平是？'),
+    options: [
+      { id: 'a', text: loc('VIL = 1.5 V（0.3 VDD），VIH = 3.5 V（0.7 VDD），VDD = 5 V') },
+      { id: 'b', text: loc('VIL = 0.4 V，VIH = 2.0 V') },
+      { id: 'c', text: loc('VIL = 0.8 V，VIH = 2.4 V') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'd',
+    explain: loc('标准 TTL 输入是 VIL = 0.8 V、VIH = 2.0 V，三个选项都不对。A 是标准 CMOS 输入电平；B 把 VOL（0.4 V）当成了 VIL；C 把 VOH（2.4 V）当成了 VIH。见上面的“标准逻辑电平”表。'),
+  },
+  {
+    id: 'b2',
+    prompt: loc('哪一项 DC 测试是“往输入脚上强加电压，再量电流”？'),
+    options: [
+      { id: 'a', text: loc('VOH / VOL') },
+      { id: 'b', text: loc('IIL / IIH') },
+      { id: 'c', text: loc('VIL / VIH') },
+      { id: 'd', text: loc('IDD') },
+    ],
+    answer: 'b',
+    explain: loc('IIL / IIH（输入漏电）：把输入强加到 0 V 量 IIL，强加到 VDD 量 IIH。VOH / VOL 是对输出强加电流、量电压；VIL / VIH 靠功能测试验证；IDD 量的是电源脚的电流。'),
+  },
+  {
+    id: 'b3',
+    prompt: loc('256×4 SRAM 商业级的 IDD 上限是多少？'),
+    options: [
+      { id: 'a', text: loc('120 mA') },
+      { id: 'b', text: loc('150 mA') },
+      { id: 'c', text: loc('10 µA') },
+      { id: 'd', text: loc('8 mA') },
+    ],
+    answer: 'a',
+    explain: loc('DC 特性表里 IDD 一行：VDD = VDDmax、f = fMAX、输出开路，商业级最大 120 mA，军用级 150 mA。10 µA 是 IIL/IIH 的极限，8 mA 是 IOL。'),
+  },
+  {
+    id: 'b4',
+    prompt: loc('输出处于逻辑 0 时，用哪项测试保证输出电压正确？'),
+    options: [
+      { id: 'a', text: loc('VIL') },
+      { id: 'b', text: loc('VOL') },
+      { id: 'c', text: loc('IOZL') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'b',
+    explain: loc('VOL 是输出为低时允许的最高电压：吸 IOL = 8 mA 时不能高于 0.4 V。VIL 是输入门槛，不是输出；IOZL 是输出关断（高阻）时的漏电，输出根本不在逻辑 0。'),
+  },
+  {
+    id: 'b5',
+    prompt: loc('256×4 SRAM 商业级的工作温度范围是？'),
+    options: [
+      { id: 'a', text: loc('−55 °C ~ 125 °C') },
+      { id: 'b', text: loc('0 °C ~ 70 °C') },
+      { id: 'c', text: loc('−40 °C ~ 85 °C') },
+      { id: 'd', text: loc('25 °C') },
+    ],
+    answer: 'b',
+    explain: loc('工作范围表：商业级 0–70 °C、VDD = 5 V ± 5%；军用级 −55–125 °C、VDD = 5 V ± 10%。−40–85 °C 是常见的工业级，这份规格里没有。'),
+  },
+  {
+    id: 'b6',
+    prompt: loc('256×4 SRAM 的 IIL / IIH 测试用什么电流极限？'),
+    options: [
+      { id: 'a', text: loc('−10 µA ~ +10 µA') },
+      { id: 'b', text: loc('−5.2 mA ~ +8 mA') },
+      { id: 'c', text: loc('0 ~ 120 mA') },
+      { id: 'd', text: loc('−2 µA ~ +2 µA') },
+    ],
+    answer: 'a',
+    explain: loc('规格写的是 VSS ≤ VIN ≤ VDD 时，Input Load Current 最小 −10 µA、最大 +10 µA。也就是说强加 0 V 时电流不能比 −10 µA 更负（流出），强加 VDD 时不能超过 +10 µA（流进）。'),
+  },
+  {
+    id: 'b7',
+    prompt: loc('256×4 SRAM 规格里，IOL 和 IOH 的数值相等。'),
+    options: [
+      { id: 'a', text: loc('对') },
+      { id: 'b', text: loc('错') },
+    ],
+    answer: 'b',
+    explain: loc('不相等：IOL = 8 mA（输出为低时吸入），IOH = −5.2 mA（输出为高时流出）。不但大小不同，符号也相反——负号表示电流流出芯片。'),
   },
 ]

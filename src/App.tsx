@@ -20,10 +20,21 @@ import { Module15Page } from './modules/module15/Module15Page'
 import { Module16Page } from './modules/module16/Module16Page'
 import { Module17Page } from './modules/module17/Module17Page'
 import { FundAcPage } from './modules/fund/FundAcPage'
+import { FundAtePage } from './modules/fund/FundAtePage'
+import { FundBasicsPage } from './modules/fund/FundBasicsPage'
+import { FundCharPage } from './modules/fund/FundCharPage'
+import { FundCreatePage } from './modules/fund/FundCreatePage'
 import { FundDcPage } from './modules/fund/FundDcPage'
+import { FundDebugPage } from './modules/fund/FundDebugPage'
 import { FundFuncPage } from './modules/fund/FundFuncPage'
+import { FundIntroPage } from './modules/fund/FundIntroPage'
+import { FundLatchPage } from './modules/fund/FundLatchPage'
 import { FundOpensPage } from './modules/fund/FundOpensPage'
+import { FundProgramPage } from './modules/fund/FundProgramPage'
+import { FundQualifyPage } from './modules/fund/FundQualifyPage'
+import { FundScanPage } from './modules/fund/FundScanPage'
 import { FundSpecPage } from './modules/fund/FundSpecPage'
+import { FundVectorPage } from './modules/fund/FundVectorPage'
 import { type ModuleId } from './modules/catalog'
 import { type TrackId, trackById, trackOfLesson } from './tracks/catalog'
 
@@ -48,11 +59,22 @@ const LESSONS: Partial<Record<ModuleId, ComponentType<LessonProps>>> = {
   alu: Module15Page,
   latch: Module16Page,
   bench: Module17Page,
+  fBasics: FundBasicsPage,
+  fAte: FundAtePage,
+  fIntro: FundIntroPage,
   fSpec: FundSpecPage,
   fOpens: FundOpensPage,
   fDc: FundDcPage,
   fFunc: FundFuncPage,
   fAc: FundAcPage,
+  fChar: FundCharPage,
+  fVector: FundVectorPage,
+  fProgram: FundProgramPage,
+  fCreate: FundCreatePage,
+  fDebug: FundDebugPage,
+  fQualify: FundQualifyPage,
+  fLatch: FundLatchPage,
+  fScan: FundScanPage,
 }
 
 type Screen =

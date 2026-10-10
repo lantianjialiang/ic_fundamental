@@ -25,7 +25,7 @@ export const TRACKS: Array<{
   {
     id: 'digital',
     title: loc('基础 / 数字'),
-    blurb: loc('测什么、接到哪，再进 MCU / 逻辑的 DC、功能、Scan。现课 M01–M16，实验 M17。'),
+    blurb: loc('测什么、接到哪，再进 MCU / 逻辑的 DC、功能、Scan。现课 {@intro}–{@latch}，实验 {@bench}。'),
     ready: true,
     lessons: [
       'intro',
@@ -47,44 +47,69 @@ export const TRACKS: Array<{
       'bench',
     ],
     knowledge: [
-      { title: loc('产业位置'), text: loc('现 M01。CP / FT、ATE、DUT、Bin、Yield。') },
-      { title: loc('物理连接'), text: loc('现 M02。仪器 → 板 → 座或探针 → DUT。') },
-      { title: loc('规格变成测试'), text: loc('现 M05。主线：Datasheet → Spec → Method → Program → 结果。') },
-      { title: loc('0/1 不是物理量'), text: loc('现 M04。PMU、电压电流、开短路。') },
-      { title: loc('通道'), text: loc('Driver / Comparator / Timing / Level。M03。') },
-      { title: loc('数字 DC'), text: loc('VIH/VIL、VOH@IOH、Source / Sink。M06。') },
-      { title: loc('功能与时间'), text: loc('真值表、Pattern、Strobe、Setup / Hold、tpd。M07–M09。拧旋钮见 M17。') },
-      { title: loc('交互实验'), text: loc('现 M17。自己设 Period / Drive / Delay / Strobe，以及 Leakage 限流。') },
-      { title: loc('向量与 Scan'), text: loc('穷举会爆、ATPG、Shift → Capture → Compare。M10–M11。') },
-      { title: loc('程序与表征'), text: loc('Flow、Bin、Debug、Shmoo、ALU。M12–M15。') },
-      { title: loc('可靠性入口'), text: loc('现 M16 Latch-up。完整 ESD / 老化 / 车规见可靠性轨道。') },
+      { title: loc('产业位置'), text: loc('现 {@intro}。CP / FT、ATE、DUT、Bin、Yield。') },
+      { title: loc('物理连接'), text: loc('现 {@connection}。仪器 → 板 → 座或探针 → DUT。') },
+      { title: loc('规格变成测试'), text: loc('现 {@spec}。主线：Datasheet → Spec → Method → Program → 结果。') },
+      { title: loc('0/1 不是物理量'), text: loc('现 {@pmu}。PMU、电压电流、开短路。') },
+      { title: loc('通道'), text: loc('Driver / Comparator / Timing / Level。{@ate}。') },
+      { title: loc('数字 DC'), text: loc('VIH/VIL、VOH@IOH、Source / Sink。{@dc}。') },
+      { title: loc('功能与时间'), text: loc('真值表、Pattern、Strobe、Setup / Hold、tpd。{@func}–{@ac}。拧旋钮见 {@bench}。') },
+      { title: loc('交互实验'), text: loc('现 {@bench}。自己设 Period / Drive / Delay / Strobe，以及 Leakage 限流。') },
+      { title: loc('向量与 Scan'), text: loc('穷举会爆、ATPG、Shift → Capture → Compare。{@vector}–{@scan}。') },
+      { title: loc('程序与表征'), text: loc('Flow、Bin、Debug、Shmoo、ALU。{@program}–{@alu}。') },
+      { title: loc('可靠性入口'), text: loc('现 {@latch} Latch-up。完整 ESD / 老化 / 车规见可靠性轨道。') },
     ],
   },
   {
     id: 'fund',
     title: loc('数字测试基础'),
-    blurb: loc('规格书 → 开短路 → DC → 功能 → AC。按量产程序的顺序，讲清每一项怎么测、怎么判、Fail 了怎么查。M18–M22。'),
+    blurb: loc('从欧姆定律和逻辑门讲起，按量产程序的顺序走完开短路、DC、功能、AC，再到表征、向量、写程序、排错和文档。'),
     ready: true,
-    lessons: ['fSpec', 'fOpens', 'fDc', 'fFunc', 'fAc'],
+    lessons: [
+      'fBasics',
+      'fAte',
+      'fIntro',
+      'fSpec',
+      'fOpens',
+      'fDc',
+      'fFunc',
+      'fAc',
+      'fChar',
+      'fVector',
+      'fProgram',
+      'fCreate',
+      'fDebug',
+      'fQualify',
+      'fLatch',
+      'fScan',
+    ],
     knowledge: [
-      { title: loc('规格书是合同'), text: loc('设计规格、测试规格、数据手册各写给谁。条件 + 极限 = 一条测试。M18。') },
-      { title: loc('先确认接上了'), text: loc('PMU 打 ±100 µA，读保护二极管约 0.65 V。开路、短路一眼分开。M19。') },
-      { title: loc('DC 就是欧姆定律'), text: loc('VOH/VOL、IDD、IIL/IIH、IOZ、VI、IOS。每条规格背后都藏着一个电阻。M20。') },
-      { title: loc('功能测试'), text: loc('信号格式、Strobe、向量字符、Time Set，以及 Scan / BIST / JTAG 等 DFT。M21。') },
-      { title: loc('AC 是在找时间边界'), text: loc('Setup、Hold、tPD、脉宽、fMAX。Go/No-Go 与二分搜索。M22。') },
-      { title: loc('和「基础 / 数字」的关系'), text: loc('那边先立名词（M04–M09）；这里用一颗 256×4 SRAM 把量产测试走一遍。') },
+      { title: loc('电学与逻辑底子'), text: loc('V = I·R、进制、逻辑电平和噪声容限、门电路、D 触发器。{@fBasics}。') },
+      { title: loc('芯片从哪来，测试机长什么样'), text: loc('晶圆、Die、封装；探针台、分选机、负载板；四类测试机。{@fAte}。') },
+      { title: loc('测试系统里面'), text: loc('DPS、RVS、PMU、管脚电子；Force / Measure、钳位、Kelvin。{@fIntro}。') },
+      { title: loc('规格书是合同'), text: loc('设计规格、测试规格、数据手册各写给谁。条件 + 极限 = 一条测试。{@fSpec}。') },
+      { title: loc('先确认接上了'), text: loc('PMU 打 ±100 µA，读保护二极管约 0.65 V。开路、短路一眼分开。{@fOpens}。') },
+      { title: loc('DC 就是欧姆定律'), text: loc('VOH/VOL、IDD、IIL/IIH、IOZ、VI、IOS。每条规格背后都藏着一个电阻。{@fDc}。') },
+      { title: loc('功能测试'), text: loc('信号格式、Strobe、向量字符、Time Set，以及 Scan / BIST / JTAG 等 DFT。{@fFunc}。') },
+      { title: loc('AC 是在找时间边界'), text: loc('Setup、Hold、tPD、脉宽、fMAX。Go/No-Go 与二分搜索。{@fAc}。') },
+      { title: loc('表征'), text: loc('二分 / 线性搜索、Shmoo、Datalog。找出芯片真正的工作边界。{@fChar}。') },
+      { title: loc('向量从哪来'), text: loc('仿真转向量、Print on Strobe / Change、Simulation for Test 守则。{@fVector}。') },
+      { title: loc('写程序、调程序'), text: loc('程序类型、上下电顺序、负载板测试、第一次跑程序、四个嫌疑对象排错。{@fProgram}–{@fDebug}。') },
+      { title: loc('交付'), text: loc('Margin、样品、文档包。{@fQualify}。') },
+      { title: loc('进阶'), text: loc('Latch-up 测试流程、Scan 的 Flush / Shift 测试。{@fLatch}–{@fScan}。') },
+      { title: loc('和「基础 / 数字」的关系'), text: loc('那边先立名词（{@pmu}–{@ac}）；这里用一颗 256×4 SRAM 把量产测试走一遍。') },
     ],
   },
   {
     id: 'bench',
     title: loc('交互实验'),
-    blurb: loc('时序、Leakage、Pattern / Stuck。自己拧旋钮，立刻 Pass / Fail。现课 M17。'),
+    blurb: loc('时序、Leakage、Pattern / Stuck。自己拧旋钮，立刻 Pass / Fail。现课 {@bench}。'),
     ready: true,
     lessons: ['bench'],
     knowledge: [
       { title: loc('时序模拟器'), text: loc('设 Period / Drive / DUT Delay / Strobe。波形跟着变，Strobe 太早就是 Compare 在稳定前。') },
       { title: loc('Leakage'), text: loc('Force 电压 → Measure 电流 → 和 Limit 比。拧紧限流，好芯片也会 Fail。') },
-      { title: loc('和讲义的关系'), text: loc('词在 M04 / M08 / M09。这里不讲新名词，只让你亲手把 Pass 拧成 Fail。') },
+      { title: loc('和讲义的关系'), text: loc('词在 {@pmu} / {@timing} / {@ac}。这里不讲新名词，只让你亲手把 Pass 拧成 Fail。') },
     ],
   },
   {
@@ -144,7 +169,7 @@ export const TRACKS: Array<{
       { title: loc('误码'), text: loc('PRBS、BER、bathtub。') },
       { title: loc('抖动'), text: loc('RJ / DJ / TJ、TIE。先会看图，不推公式。') },
       { title: loc('均衡与时钟'), text: loc('TX FFE、RX CTLE / DFE；PLL、CDR、SSC。') },
-      { title: loc('信号完整性'), text: loc('损耗、ISI、串扰、过孔。回扣 M02 多层板。') },
+      { title: loc('信号完整性'), text: loc('损耗、ISI、串扰、过孔。回扣 {@connection} 多层板。') },
       { title: loc('合规 vs 表征'), text: loc('规格钉一个眼；Shmoo 轴可换成摆幅 / 预加重 / 线损。') },
     ],
   },
@@ -188,7 +213,7 @@ export const TRACKS: Array<{
     lessons: ['latch'],
     knowledge: [
       { title: loc('失效浴缸'), text: loc('早期失效、偶然失效、磨损失效。量产测试抓早期；可靠性抓尾巴。') },
-      { title: loc('电过应力'), text: loc('ESD（HBM / CDM）、EOS、Latch-up。M16 是入口：寄生晶闸管，通常要掉电。') },
+      { title: loc('电过应力'), text: loc('ESD（HBM / CDM）、EOS、Latch-up。{@latch} 是入口：寄生晶闸管，通常要掉电。') },
       { title: loc('加速老化'), text: loc('温度、电压、湿度加快机理。HTOL、HAST、温循、THB 各加速哪一种。') },
       { title: loc('车规框架'), text: loc('AEC-Q100 是抽样鉴定，不是每颗都跑完整 qual。Grade 说的是温度范围。') },
       { title: loc('Burn-in vs 量产'), text: loc('老化筛弱品；量产测试钉规格点。两者目的不同，不要混成一道程序。') },
@@ -213,6 +238,36 @@ export const TRACKS: Array<{
     ],
   },
 ]
+
+/** 课程编号前缀：课程编号 = 前缀 + 它在所属轨道里的序号 */
+const PREFIX: Record<TrackId, string> = {
+  digital: 'D',
+  fund: 'F',
+  bench: 'X',
+  analog: 'A',
+  memory: 'M',
+  rf: 'R',
+  hs: 'H',
+  power: 'P',
+  sensor: 'S',
+  qual: 'Q',
+  cpo: 'C',
+}
+
+/** 课程的显示编号。一课出现在多条轨道时，以第一条（所属轨道）为准。 */
+export function lessonCode(id: ModuleId): string {
+  for (const track of TRACKS) {
+    const index = track.lessons.indexOf(id)
+    if (index >= 0) return `${PREFIX[track.id]}${String(index + 1).padStart(2, '0')}`
+  }
+  return id
+}
+
+/** 把文案里的 {@课程ID} 换成当前编号 */
+export function resolveLessonRefs(text: string): string {
+  if (!text.includes('{@')) return text
+  return text.replace(/\{@(\w+)\}/g, (_, id: string) => lessonCode(id as ModuleId))
+}
 
 export function trackById(id: TrackId) {
   return TRACKS.find((item) => item.id === id)

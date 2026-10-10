@@ -26,7 +26,7 @@ export const APPROACH: Card[] = [
     title: loc('Go / No-Go'),
     sub: loc('判一次'),
     text: loc('只在规格值跑一次：过或不过。'),
-    explain: [loc('量产的默认做法：只关心有没有满足规格，不关心离规格还有多远。')],
+    explain: [loc('量产的默认做法：只关心有没有满足规格，不关心离规格还有多远。Pass 说明达到或超过了要求，但余量多少不知道。它比读出记录快得多。')],
   },
   {
     id: 'search',
@@ -34,7 +34,8 @@ export const APPROACH: Card[] = [
     sub: loc('Read & record · 搜索'),
     text: loc('反复调整边沿，找到芯片刚好从 Pass 变 Fail 的那个时间，记录下来。'),
     explain: [
-      loc('用于表征、建立 Guardband、做 Shmoo（M14）。每个参数要跑十几次，所以量产很少用。'),
+      loc('用于表征、建立 Guardband、做 Shmoo（{@shmoo}）。每个参数要跑十几次，所以量产很少用。'),
+      loc('测出的 DC、AC 实际值会保存到文件或打印出来，便于分析芯片的真实性能。军用规格常常要求这种测法。'),
     ],
   },
 ]
@@ -54,7 +55,7 @@ export const PARAMS: Array<Card & { id: ParamId; how: LText; pass: LText }> = [
     sub: loc('数据要提前多久'),
     text: loc('时钟有效边沿之前，数据必须保持稳定的最短时间。'),
     how: loc('时钟边沿固定，把数据边沿往时钟方向推近。数据离时钟越近越难；搜到刚好开始失败的位置。'),
-    pass: loc('给出的建立时间 ≥ 芯片实际需要的建立时间 → Pass。规格是最小值：在规格值上必须 Pass。'),
+    pass: loc('给出的建立时间 ≥ 芯片实际需要的建立时间 → Pass。规格是最小值：在规格值上必须 Pass。只在输入脚上测；实测值可以是负数（数据在参考边沿之后才到也能被正确锁存）。'),
   },
   {
     id: 'hold',
@@ -62,7 +63,7 @@ export const PARAMS: Array<Card & { id: ParamId; how: LText; pass: LText }> = [
     sub: loc('数据要多留多久'),
     text: loc('时钟有效边沿之后，数据还必须保持的最短时间。'),
     how: loc('时钟边沿固定，把数据撤走的边沿往时钟方向拉近。常用 SBC 格式，让数据后面紧跟反码。'),
-    pass: loc('给出的保持时间 ≥ 芯片需要的保持时间 → Pass。'),
+    pass: loc('给出的保持时间 ≥ 芯片需要的保持时间 → Pass。只在输入脚上测；实测值也可以是负数（数据在参考边沿之前撤走也没问题）。'),
   },
   {
     id: 'tpd',
@@ -70,7 +71,7 @@ export const PARAMS: Array<Card & { id: ParamId; how: LText; pass: LText }> = [
     sub: loc('输入到输出'),
     text: loc('输入（或时钟）变化到输出变化之间的时间。'),
     how: loc('输入边沿固定，移动输出 Strobe。Strobe 早于输出稳定就 Fail，晚于就 Pass。'),
-    pass: loc('规格是最大值：Strobe 放在规格时刻，输出已正确 → Pass。'),
+    pass: loc('规格是最大值：Strobe 放在规格时刻，输出已正确 → Pass。只在输出脚上测，结果只能是正数——输出不可能在引起它的信号之前就变化。'),
   },
   {
     id: 'pw',
@@ -93,7 +94,7 @@ export const PARAMS: Array<Card & { id: ParamId; how: LText; pass: LText }> = [
     title: loc('输出使能 / 关断'),
     sub: loc('tEN / tDIS · tLZ / tHZ'),
     text: loc('使能信号变化后，输出从高阻变成驱动（或反过来）的时间。'),
-    how: loc('要带 VREF 负载。测关断（tHZ）时期望 Z，Strobe 放在规格时刻，看引脚是否已离开 VOL / VOH 区。'),
+    how: loc('使能（Enable）是从高阻变成驱动有效电平，关断（Disable）是从驱动变成高阻。两者都要带 VREF 负载（中间电平，如 2.0 V）：关断后靠它把引脚拉到 VOL 与 VOH 之间。测关断（tHZ）时期望 Z，Strobe 放在规格时刻，看引脚是否已离开有效电平。'),
     pass: loc('tHZ、tEN 是最大值；tLZ 是最小值（不能太早开始驱动）。'),
   },
 ]
@@ -193,17 +194,6 @@ export const TAKEAWAY: LText[] = [
 
 export const QUIZ: QuizQuestion[] = [
   {
-    id: 'q1',
-    prompt: loc('量产为什么多用 Go/No-Go，而不是每颗都搜出实际值？'),
-    options: [
-      { id: 'a', text: loc('搜索每个参数要跑十几次，测试时间太长') },
-      { id: 'b', text: loc('搜索不准') },
-      { id: 'c', text: loc('规格不允许') },
-    ],
-    answer: 'a',
-    explain: loc('量产只需要知道是否满足规格。实际值留给表征。'),
-  },
-  {
     id: 'q2',
     prompt: loc('0–32 ns 范围、0.25 ns 分辨率，二分搜索要几次？'),
     options: [
@@ -246,5 +236,90 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'a',
     explain: loc('两路轮流，每路只管一半的拍。测试速率 50 MHz，数据速率 100 MHz。'),
+  },
+  {
+    id: 'b1',
+    prompt: loc('参考信号到达某个电压点之后，数据还必须保持的时间叫？'),
+    options: [
+      { id: 'a', text: loc('建立时间（Setup）') },
+      { id: 'b', text: loc('传输延迟') },
+      { id: 'c', text: loc('最小脉宽') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'd',
+    explain: loc('这是保持时间（Hold），选项里没有。建立时间是参考信号之前数据必须到位的时间；例如 tHD = 1 ns：WE 上升（1.5 V 处）之后，数据还要保持至少 1 ns。'),
+  },
+  {
+    id: 'b2',
+    prompt: loc('规格要求建立时间 12 ns，芯片在只给 10 ns 时也能正常工作。这颗芯片：'),
+    options: [
+      { id: 'a', text: loc('不满足规格') },
+      { id: 'b', text: loc('优于规格') },
+      { id: 'c', text: loc('看不懂这道题') },
+      { id: 'd', text: loc('以上都不对') },
+      { id: 'e', text: loc('以上都对') },
+    ],
+    answer: 'b',
+    explain: loc('建立时间是最小值型参数：规格承诺“给够 12 ns 一定能工作”。芯片只要 10 ns 就够，说明它比承诺的更好，有 2 ns 余量。'),
+  },
+  {
+    id: 'b3',
+    prompt: loc('测出负的传输延迟是不可能的（至少是不对的）。'),
+    options: [
+      { id: 'a', text: loc('对') },
+      { id: 'b', text: loc('错') },
+    ],
+    answer: 'a',
+    explain: loc('传输延迟是“参考信号变化 → 由它引起的输出变化”之间的时间，结果只能是正数：输出不可能在原因发生之前就变。测出负数，说明参考点或搜索设置错了。对比：Setup 和 Hold 可以是负数。'),
+  },
+  {
+    id: 'b4',
+    prompt: loc('传输延迟只在输出信号上测量。'),
+    options: [
+      { id: 'a', text: loc('对') },
+      { id: 'b', text: loc('错') },
+    ],
+    answer: 'a',
+    explain: loc('传输延迟测的是输出什么时候变成有效值，搜索的是输出 Strobe 的位置，所以只在输出脚上做。大多数是从某个输入到输出（如 tAA），有时也测两个输出之间的相对延迟，但被测的仍是输出。Setup / Hold 才是在输入脚上测。'),
+  },
+  {
+    id: 'b5',
+    prompt: loc('输出使能（Enable）测试测的是输出从驱动有效数据变成高阻的时间。'),
+    options: [
+      { id: 'a', text: loc('对') },
+      { id: 'b', text: loc('错') },
+    ],
+    answer: 'b',
+    explain: loc('说反了。使能是从高阻变成驱动有效电平（如 tDOE：OE 下降到数据有效）；从驱动变成高阻是输出关断（Disable）时间（如 tHZOE：OE 上升到高阻）。'),
+  },
+  {
+    id: 'b6',
+    prompt: loc('输出使能和输出关断测试，都需要一个外部参考电压来表示输出已进入高阻。'),
+    options: [
+      { id: 'a', text: loc('对') },
+      { id: 'b', text: loc('错') },
+    ],
+    answer: 'a',
+    explain: loc('高阻的引脚自己不会到任何确定电平，要靠接在 VREF（中间电平，如 2.0 V）上的负载把它拉到 VOL 与 VOH 之间。使能测试从这个中间电平出发，看输出何时变成有效电平；关断测试看输出何时回到中间电平。两者都离不开它。'),
+  },
+  {
+    id: 'b7',
+    prompt: loc('读出记录（Read & record）是最快的测试方法，所以量产常用。'),
+    options: [
+      { id: 'a', text: loc('对') },
+      { id: 'b', text: loc('错') },
+    ],
+    answer: 'b',
+    explain: loc('读出记录要把每个参数的实际值测出来（例如用搜索）并保存，最慢。量产常用的是 Go / No-Go：每个参数只按极限判一次，快得多。'),
+  },
+  {
+    id: 'b8',
+    prompt: loc('当必须记录芯片的确切性能时（比如军用测试），常用 Go / No-Go 方法。'),
+    options: [
+      { id: 'a', text: loc('对') },
+      { id: 'b', text: loc('错') },
+    ],
+    answer: 'b',
+    explain: loc('Go / No-Go 只给出 Pass / Fail，不知道实际值和余量。要记录确切性能，用的是读出记录（Read & record），军用规格常常要求它。'),
   },
 ]

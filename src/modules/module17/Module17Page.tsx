@@ -415,43 +415,43 @@ function TimingCanvas({
 
   return (
     <svg viewBox="0 0 720 280" className="sim-wave" role="img">
-      <rect width="720" height="280" rx="6" fill="#0d1117" />
+      <rect width="720" height="280" rx="6" fill="var(--well)" />
       {[10, 20, 30].map((ns) => (
         <g key={ns}>
-          <line x1={xAt(ns)} y1="14" x2={xAt(ns)} y2="228" stroke="#21262d" />
-          <text x={xAt(ns)} y="268" textAnchor="middle" fill="#6e7681" fontSize="11">
+          <line x1={xAt(ns)} y1="14" x2={xAt(ns)} y2="228" stroke="var(--fig-box-2)" />
+          <text x={xAt(ns)} y="268" textAnchor="middle" fill="var(--dim)" fontSize="11">
             {ns} ns
           </text>
         </g>
       ))}
-      <text x={X0} y="268" fill="#6e7681" fontSize="11">
+      <text x={X0} y="268" fill="var(--dim)" fontSize="11">
         0
       </text>
-      <text x={X1} y="268" textAnchor="end" fill="#6e7681" fontSize="11">
+      <text x={X1} y="268" textAnchor="end" fill="var(--dim)" fontSize="11">
         40 ns
       </text>
-      <line x1={px} y1="14" x2={px} y2="228" stroke="#8b949e" strokeDasharray="4 4" />
-      <text x={px + 4} y="24" fill="#8b949e" fontSize="11">
+      <line x1={px} y1="14" x2={px} y2="228" stroke="var(--muted)" strokeDasharray="4 4" />
+      <text x={px + 4} y="24" fill="var(--muted)" fontSize="11">
         Period {period.toFixed(1)}
       </text>
-      <text x="10" y={clk + 4} fill="#8b949e" fontSize="11">
+      <text x="10" y={clk + 4} fill="var(--muted)" fontSize="11">
         CLK
       </text>
-      <text x="10" y={dat + 4} fill="#79c0ff" fontSize="11">
+      <text x="10" y={dat + 4} fill="var(--sky)" fontSize="11">
         DATA
       </text>
-      <text x="10" y={out + 4} fill="#3fb950" fontSize="11">
+      <text x="10" y={out + 4} fill="var(--green)" fontSize="11">
         OUT
       </text>
-      <path d={clockPath(xAt, period, clk, hi, lo)} fill="none" stroke="#58a6ff" strokeWidth="2" />
-      <path d={drivenPath(xAt, period, drive, dat, hi, lo)} fill="none" stroke="#79c0ff" strokeWidth="2" />
-      <path d={drivenPath(xAt, period, settle, out, hi, lo)} fill="none" stroke="#3fb950" strokeWidth="2" />
-      <line x1={dx} y1="28" x2={dx} y2="220" stroke="#79c0ff" strokeWidth="1.5" strokeDasharray="3 3" />
-      <text x={dx + 5} y="42" fill="#79c0ff" fontSize="12">
+      <path d={clockPath(xAt, period, clk, hi, lo)} fill="none" stroke="var(--blue)" strokeWidth="2" />
+      <path d={drivenPath(xAt, period, drive, dat, hi, lo)} fill="none" stroke="var(--sky)" strokeWidth="2" />
+      <path d={drivenPath(xAt, period, settle, out, hi, lo)} fill="none" stroke="var(--green)" strokeWidth="2" />
+      <line x1={dx} y1="28" x2={dx} y2="220" stroke="var(--sky)" strokeWidth="1.5" strokeDasharray="3 3" />
+      <text x={dx + 5} y="42" fill="var(--sky)" fontSize="12">
         Drive
       </text>
-      <line x1={sx} y1="28" x2={sx} y2="220" stroke="#e8c45a" strokeWidth="1.8" />
-      <text x={sx + 5} y="58" fill="#e8c45a" fontSize="12">
+      <line x1={sx} y1="28" x2={sx} y2="220" stroke="var(--gold)" strokeWidth="1.8" />
+      <text x={sx + 5} y="58" fill="var(--gold)" fontSize="12">
         Strobe
       </text>
     </svg>

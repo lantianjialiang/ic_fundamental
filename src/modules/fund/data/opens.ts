@@ -78,28 +78,6 @@ export const TAKEAWAY: LText[] = [
 
 export const QUIZ: QuizQuestion[] = [
   {
-    id: 'q1',
-    prompt: loc('开短路测试时，VDD 管脚接在哪里？'),
-    options: [
-      { id: 'a', text: loc('0 V，和其他管脚一样') },
-      { id: 'b', text: loc('5 V') },
-      { id: 'c', text: loc('悬空') },
-    ],
-    answer: 'a',
-    explain: loc('所有脚都接 0 V，对 VDD 的二极管才有确定的参考点；也避免芯片在接触未知时被上电。'),
-  },
-  {
-    id: 'q2',
-    prompt: loc('打 −100 µA，读到 −3.0 V，说明什么？'),
-    options: [
-      { id: 'a', text: loc('开路，电压撞到钳位') },
-      { id: 'b', text: loc('短路') },
-      { id: 'c', text: loc('正常') },
-    ],
-    answer: 'a',
-    explain: loc('电流没有通路，PMU 只能把电压一直推到钳位值。'),
-  },
-  {
     id: 'q3',
     prompt: loc('为什么要设电压钳位 ±3 V？'),
     options: [
@@ -131,5 +109,61 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'a',
     explain: loc('100 µA 量级既能让二极管正偏，又能把几 kΩ 级的漏电暴露出来。'),
+  },
+  {
+    id: 'b1',
+    prompt: loc('开短路测试前，芯片的管脚要处于什么状态？'),
+    options: [
+      { id: 'a', text: loc('全部接 VDD') },
+      { id: 'b', text: loc('全部接地（0 V），包括 VDD 管脚') },
+      { id: 'c', text: loc('全部悬空') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'b',
+    explain: loc('所有管脚（包括电源和地）都接 0 V。这样两只保护二极管都有确定的参考点：VDD 也是 0 V，打 +100 µA 才能让对 VDD 的二极管正偏；相邻脚接地，脚间短路才会表现为读数接近 0 V。悬空的脚电位不定，读数没有意义。'),
+  },
+  {
+    id: 'b2',
+    prompt: loc('用 PMU 做开短路测试时，强加的电流是？'),
+    options: [
+      { id: 'a', text: loc('只能是正电流') },
+      { id: 'b', text: loc('只能是负电流') },
+      { id: 'c', text: loc('正电流或负电流都可以') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'c',
+    explain: loc('负电流（约 −100 µA）让对地（VSS）二极管正偏，读到约 −0.65 V；正电流（约 +100 µA）让对 VDD 的二极管正偏，读到约 +0.65 V。两种都是标准做法，常常两只二极管都测。'),
+  },
+  {
+    id: 'b3',
+    prompt: loc('−100 µA 下某脚读到 −3.0 V（就像上面 Datalog 里的 A2），它失败的原因是？'),
+    options: [
+      { id: 'a', text: loc('开路') },
+      { id: 'b', text: loc('短路') },
+    ],
+    answer: 'a',
+    explain: loc('判开路的极限是 −1.5 V。−3.0 V 远比它更负，而且正好等于钳位值：电流找不到通路，PMU 把电压一直推到钳位。典型原因是探针没扎上、Socket 接触不良或焊线断了。'),
+  },
+  {
+    id: 'b4',
+    prompt: loc('−100 µA 下某脚读到 −0.003 V（就像上面 Datalog 里的 D0），它失败的原因是？'),
+    options: [
+      { id: 'a', text: loc('开路') },
+      { id: 'b', text: loc('短路') },
+    ],
+    answer: 'b',
+    explain: loc('判短路的极限是 −0.2 V。几乎 0 V 说明电流没有经过保护二极管，而是从一条低阻通路流走了——管脚对地短路，或者和某个（此刻也接 0 V 的）相邻脚短路。'),
+  },
+  {
+    id: 'b5',
+    prompt: loc('开路脚读到 −3.0 V，这个数值是由什么决定的？'),
+    options: [
+      { id: 'a', text: loc('PMU 的电压钳位') },
+      { id: 'b', text: loc('管脚短路') },
+      { id: 'c', text: loc('PMU 的最大电压量程') },
+      { id: 'd', text: loc('以上都不对') },
+    ],
+    answer: 'a',
+    explain: loc('PMU 强加电流时必须设电压钳位，开短路一般设 ±3 V。开路时电流无路可走，电压被推到钳位就停住，所以读数等于钳位值。如果没设钳位，读数会冲到测试机量程的极限，那才是“最大量程”，而且可能进一步损伤芯片。'),
   },
 ]

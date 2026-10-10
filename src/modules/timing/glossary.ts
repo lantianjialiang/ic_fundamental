@@ -1,6 +1,6 @@
 import { loc, type LText } from '../../i18n/locale'
 
-/** M08 / M09 共用：一张 CLK / DATA / OUT 上的全部标注 */
+/** {@timing} / {@ac} 共用：一张 CLK / DATA / OUT 上的全部标注 */
 export type TimingMark =
   | 'drive'
   | 'strobe'
@@ -26,7 +26,7 @@ export const TIMING: Record<TimingMark, { title: string; text: LText; caption: L
   period: {
     title: 'Period',
     text: loc('相邻两个 CLK 上升沿之间的时间。一拍有多长。缩短 Period = 提高频率，fMAX 就是它的下限。'),
-    caption: loc('沿 1 到沿 2 就是 Period。M09 会把 Period 往短里拖，直到功能 Fail。'),
+    caption: loc('沿 1 到沿 2 就是 Period。{@ac} 会把 Period 往短里拖，直到功能 Fail。'),
   },
   setup: {
     title: 'Setup Time',
@@ -55,7 +55,7 @@ export const TIMING: Record<TimingMark, { title: string; text: LText; caption: L
   },
   fmax: {
     title: 'fMAX',
-    text: loc('功能仍对的最高时钟。Period 再短，同一套向量就开始 Fail。教学门槛对接 M05 的 100 MHz。'),
+    text: loc('功能仍对的最高时钟。Period 再短，同一套向量就开始 Fail。教学门槛对接 {@spec} 的 100 MHz。'),
     caption: loc('Period 必须装得下 tCQ（或 tPD）+ tSU。再短，不是真值表反了，是来不及。'),
   },
 }

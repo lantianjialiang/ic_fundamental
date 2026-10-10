@@ -39,7 +39,7 @@ export const CASES: Array<{
       { id: 'scan', text: loc('一定是扫描链断了') },
     ],
     answer: 'path',
-    explain: loc('单 Pin 把问题收窄到一条物理路径。回扣 M02：点亮这一条，其余变暗。'),
+    explain: loc('单 Pin 把问题收窄到一条物理路径。回扣 {@connection}：点亮这一条，其余变暗。'),
     order: loc('建议顺序：确认是哪一根脚 → 看 Channel / 映射 → 板走线 → Socket 触点 → 最后才是这颗 DUT 的这一管。'),
   },
   {
@@ -53,7 +53,7 @@ export const CASES: Array<{
       { id: 'bin', text: loc('Bin 号写反了') },
     ],
     answer: 'speed',
-    explain: loc('80 MHz 能过，说明功能大体在。100 MHz 挂掉，先回 M08 / M09：Strobe、tpd、SI、电压。'),
+    explain: loc('80 MHz 能过，说明功能大体在。100 MHz 挂掉，先回 {@timing} / {@ac}：Strobe、tpd、SI、电压。'),
     order: loc('建议顺序：确认 Period / Strobe → 电压是否在规格边 → Load Board 高频路径 → 再问 DUT 的 fMAX。'),
   },
 ]
@@ -85,7 +85,7 @@ export const QUIZ: QuizQuestion[] = [
       { id: 'yield', text: loc('先改良率公式') },
     ],
     answer: 'one',
-    explain: loc('这是 M02 的路径在 Debug 里的用法。'),
+    explain: loc('这是 {@connection} 的路径在 Debug 里的用法。'),
   },
   {
     id: 'q3',

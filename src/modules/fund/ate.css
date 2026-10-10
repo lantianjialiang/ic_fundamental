@@ -1,0 +1,39 @@
+/* 晶圆、封装与测试设备课专用样式 */
+
+.ate-sub {
+  margin: 22px 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ate-temps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 8px 0;
+}
+
+.ate-temps span {
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  font-family: var(--mono);
+  font-size: 16px;
+  color: var(--text);
+}
+
+.ate-temps span.is-cold {
+  border-color: var(--blue-line);
+  background: var(--blue-bg);
+}
+
+.ate-temps span.is-room {
+  border-color: var(--green-line);
+  background: var(--green-bg);
+}
+
+.ate-temps span.is-hot {
+  border-color: var(--red-line);
+  background: var(--red-bg);
+}

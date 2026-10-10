@@ -1,0 +1,192 @@
+/* 编写测试程序课专用样式 */
+
+.create-sub {
+  margin: 22px 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.create-check {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.create-check__group {
+  margin: 10px 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.create-check__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  background: var(--card);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.create-check__item.is-active {
+  border-color: var(--gold-line);
+  background: var(--gold-bg);
+}
+
+.create-check__item.is-done {
+  color: var(--text);
+}
+
+.create-check__item input {
+  margin-top: 3px;
+  accent-color: var(--green);
+}
+
+.create-progress {
+  height: 8px;
+  margin: 8px 0;
+  border-radius: 4px;
+  background: var(--well);
+  overflow: hidden;
+}
+
+.create-progress > div {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--green-line);
+  transition: width 0.2s;
+}
+
+.create-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.create-groups__box {
+  padding: 8px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-l);
+  background: var(--panel-2);
+}
+
+.create-groups__box b {
+  display: block;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--gold);
+}
+
+.create-groups__box span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.create-groups__pins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.create-groups__pins i {
+  padding: 1px 6px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  background: var(--card);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-style: normal;
+  color: var(--text);
+}
+
+.create-groups__pins i.is-bad {
+  border-color: var(--red-line);
+  background: var(--red-bg);
+}
+
+.dtable tbody tr.create-pin--found td {
+  background: var(--green-bg);
+}
+
+.dtable tbody tr.create-pin--wrong td {
+  background: var(--red-bg);
+}
+
+.create-run {
+  margin: 10px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-l);
+  background: var(--panel-2);
+}
+
+.create-run__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 8px;
+}
+
+.create-run__head b {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.create-run__head span {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.create-run__ask {
+  margin: 10px 0 8px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.create-run__opts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.create-run__opts .kind__btn {
+  text-align: left;
+  line-height: 1.5;
+}
+
+.create-trail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+
+.create-trail span {
+  padding: 2px 8px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  font-size: 12px;
+  color: var(--dim);
+}
+
+.create-trail span.is-done {
+  border-color: var(--green-line);
+  color: var(--green-2);
+}
+
+.create-trail span.is-now {
+  border-color: var(--gold-line);
+  background: var(--gold-bg);
+  color: var(--text);
+}

@@ -5,11 +5,11 @@ export type FlowId = 'power' | 'dc' | 'func' | 'ac' | 'mem' | 'scan' | 'bin'
 
 export const FLOW: Array<{ id: FlowId; title: string; text: LText }> = [
   { id: 'power', title: 'Power Up', text: loc('先供电、查电流。没有稳妥的 VDD，后面全不可信。') },
-  { id: 'dc', title: 'DC Test', text: loc('开短路、VIH/VOH、漏电。链回 M06。') },
-  { id: 'func', title: 'Functional Test', text: loc('按向量 Drive / Compare。链回 M07。') },
-  { id: 'ac', title: 'AC Test', text: loc('Setup / Hold / tpd / fMAX。链回 M08 / M09。') },
+  { id: 'dc', title: 'DC Test', text: loc('开短路、VIH/VOH、漏电。链回 {@dc}。') },
+  { id: 'func', title: 'Functional Test', text: loc('按向量 Drive / Compare。链回 {@func}。') },
+  { id: 'ac', title: 'AC Test', text: loc('Setup / Hold / tpd / fMAX。链回 {@timing} / {@ac}。') },
   { id: 'mem', title: 'Memory Test', text: loc('流程里占一个位置。March 算法本阶段不展开。') },
-  { id: 'scan', title: 'Scan Test', text: loc('结构向量走扫描链。链回 M11。') },
+  { id: 'scan', title: 'Scan Test', text: loc('结构向量走扫描链。链回 {@scan}。') },
   { id: 'bin', title: 'Bin', text: loc('按失败项分箱。这是给后道和良率看的结果，不是再测一遍。') },
 ]
 
@@ -20,8 +20,8 @@ export const PIECES: Array<{ id: PieceId; title: string; text: LText }> = [
   { id: 'item', title: 'Test Item', text: loc('Flow 里的一条，比如 “VIH on pin A”。') },
   { id: 'cond', title: 'Test Condition', text: loc('电压、温度、电流负载。DC 课的 VOH@IOH 就是条件。') },
   { id: 'pattern', title: 'Pattern', text: loc('向量序列。Functional / Scan 的主体。') },
-  { id: 'timing', title: 'Timing', text: loc('Period、Drive、Strobe。链回 M08。') },
-  { id: 'level', title: 'Level', text: loc('VIH/VIL/VOH/VOL。链回 M03 / M06。') },
+  { id: 'timing', title: 'Timing', text: loc('Period、Drive、Strobe。链回 {@timing}。') },
+  { id: 'level', title: 'Level', text: loc('VIH/VIL/VOH/VOL。链回 {@ate} / {@dc}。') },
   { id: 'exec', title: 'Execute', text: loc('Tester 真正跑起来。') },
   { id: 'cmp', title: 'Compare', text: loc('和期望或规格比。') },
   { id: 'result', title: 'Result', text: loc('Pass / Fail，再回到 Flow 决定下一跳或 Bin。') },

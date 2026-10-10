@@ -1,0 +1,90 @@
+/* 排错课专用样式 */
+
+.debug-sub {
+  margin: 22px 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.debug-order {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  margin: 10px 0;
+  padding: 12px 16px;
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--gold-line);
+  border-radius: var(--r-l);
+  background: var(--panel-2);
+  font-size: 13px;
+}
+
+.debug-order b {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.debug-order span {
+  font-family: var(--mono);
+  color: var(--text);
+}
+
+.debug-order span.is-fail {
+  color: var(--red-2);
+}
+
+.debug-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.debug-actions .kind__btn {
+  text-align: left;
+  line-height: 1.4;
+}
+
+.debug-actions .kind__btn small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.debug-actions .kind__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.debug-reload {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+  padding: 10px 14px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-l);
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.debug-log td.clue {
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.debug-verdict {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+@media (max-width: 720px) {
+  .debug-actions {
+    grid-template-columns: 1fr;
+  }
+}

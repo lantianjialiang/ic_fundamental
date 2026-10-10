@@ -33,12 +33,12 @@ export function WaveRows({ span, period, rows, strobe, window, edges = [], ariaL
 
   return (
     <svg viewBox={`0 0 680 ${height}`} className="term-fig__svg" role="img" aria-label={ariaLabel}>
-      <rect width="680" height={height} rx="10" fill="#0d1117" />
+      <rect width="680" height={height} rx="10" fill="var(--well)" />
       {/* T0 网格与边沿 */}
       {cycleIdx.map((i) => (
         <g key={i}>
-          <line x1={x(i * period)} y1={20} x2={x(i * period)} y2={height - 8} stroke="#303844" />
-          <text x={x(i * period) + 3} y={16} fill="#6e7681" fontSize="10">
+          <line x1={x(i * period)} y1={20} x2={x(i * period)} y2={height - 8} stroke="var(--line)" />
+          <text x={x(i * period) + 3} y={16} fill="var(--dim)" fontSize="10">
             {i === 0 ? 'T0' : `${i * period}`}
           </text>
           {edges.map((e) => (
@@ -48,7 +48,7 @@ export function WaveRows({ span, period, rows, strobe, window, edges = [], ariaL
               y1={26}
               x2={x(i * period + e)}
               y2={height - 8}
-              stroke="#58a6ff"
+              stroke="var(--blue)"
               strokeOpacity="0.35"
               strokeDasharray="3 4"
             />
@@ -59,7 +59,7 @@ export function WaveRows({ span, period, rows, strobe, window, edges = [], ariaL
               y={24}
               width={Math.max(2, x(i * period + window[1]) - x(i * period + window[0]))}
               height={height - 32}
-              fill="#e8c45a"
+              fill="var(--gold)"
               opacity="0.12"
             />
           ) : null}
@@ -69,23 +69,23 @@ export function WaveRows({ span, period, rows, strobe, window, edges = [], ariaL
               y1={24}
               x2={x(i * period + strobe)}
               y2={height - 8}
-              stroke="#e8c45a"
+              stroke="var(--gold)"
               strokeWidth="1.5"
             />
           ) : null}
         </g>
       ))}
-      <line x1={x(span)} y1={20} x2={x(span)} y2={height - 8} stroke="#303844" />
+      <line x1={x(span)} y1={20} x2={x(span)} y2={height - 8} stroke="var(--line)" />
       {rows.map((row, r) => {
         const top = 34 + r * ROW_H
         const hi = top + 8
         const lo = top + 34
         const mid = (hi + lo) / 2
         const y = (level: Seg['level']) => (level === 'z' ? mid : level ? hi : lo)
-        const color = row.color ?? '#79c0ff'
+        const color = row.color ?? 'var(--sky)'
         return (
           <g key={row.name}>
-            <text x={12} y={mid + 4} fill="#c3cbd5" fontSize="12" fontFamily="monospace">
+            <text x={12} y={mid + 4} fill="var(--text-2)" fontSize="12" fontFamily="monospace">
               {row.name}
             </text>
             {row.segs.map((seg, i) => {
@@ -102,7 +102,7 @@ export function WaveRows({ span, period, rows, strobe, window, edges = [], ariaL
                     y1={y(seg.level)}
                     x2={x(seg.x1)}
                     y2={y(seg.level)}
-                    stroke={seg.level === 'z' ? '#8b949e' : color}
+                    stroke={seg.level === 'z' ? 'var(--muted)' : color}
                     strokeWidth="2"
                     strokeDasharray={seg.level === 'z' ? '4 4' : undefined}
                   />
@@ -114,7 +114,7 @@ export function WaveRows({ span, period, rows, strobe, window, edges = [], ariaL
                 key={i}
                 x={x(label.t) + 4}
                 y={top + 4}
-                fill={label.bad ? '#f85149' : '#e8c45a'}
+                fill={label.bad ? 'var(--red)' : 'var(--gold)'}
                 fontSize="11"
                 fontFamily="monospace"
               >
