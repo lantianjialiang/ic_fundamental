@@ -11,19 +11,20 @@ export const ui = {
 
   home: {
     title: loc('选一条轨道开始'),
-    goal: loc('现课在「基础 / 数字」。其他轨道大纲已列。'),
+    goal: loc('换芯片类型，换的是规格和仪器，不换这条主线。'),
     introTitle: loc('一种主线，多种芯片'),
-    introBody: loc(
-      '换芯片类型，换的是规格和仪器，不是这条句子：Datasheet → Test Spec → Method → Tester Setup → Program → Pass / Fail。',
-    ),
+    introBody: loc('不管测哪种芯片，都沿着这一串走：'),
+    spineSteps: ['Datasheet', 'Test Spec', 'Method', 'Tester Setup', 'Program', 'Pass / Fail'],
+    readyGroup: loc('可以上课'),
+    pendingGroup: loc('大纲已列，课还没做'),
+    lessonCount: loc('节课 →'),
     home: loc('首页'),
     backTrack: loc('返回轨道'),
     openLesson: loc('进入这一课'),
-    pending: loc('大纲已列，课未做'),
+    pending: loc('待开课'),
     ready: loc('可上课'),
-    lessonsTitle: loc('现有课'),
+    lessonsTitle: loc('课程'),
     knowledgeTitle: loc('需要掌握'),
-    spine: loc('主线'),
   },
 
   m01: {
@@ -560,6 +561,42 @@ export const ui = {
     asideLater: loc('Setup / Hold / tPD 的名字在 M08 / M09。这里只问：你把采样点放在哪。'),
     yes: loc('对。'),
     no: loc('不对。'),
+  },
+
+  fund: {
+    quizTitle: loc('复习题'),
+    quizNote: loc('选完立刻出对错和解释。'),
+    takeawayTitle: loc('带走这几句'),
+    yes: loc('对。'),
+    no: loc('不对。'),
+    pass: loc('PASS'),
+    fail: loc('FAIL'),
+    next: loc('下一课：'),
+  },
+
+  m18: {
+    title: loc('第 18 课 — 器件规格书'),
+    goal: loc('读懂一份数字芯片规格书：每一行都是“在什么条件下，量什么，极限多少”。'),
+  },
+
+  m19: {
+    title: loc('第 19 课 — 开短路测试'),
+    goal: loc('用 PMU 打一个小电流，读保护二极管电压，判断管脚是接好、开路还是短路。'),
+  },
+
+  m20: {
+    title: loc('第 20 课 — DC 参数测试'),
+    goal: loc('VOH/VOL、IDD、IIL/IIH、IOZ、VI、IOS：怎么测、按什么顺序测、Fail 了怎么看 Datalog。'),
+  },
+
+  m21: {
+    title: loc('第 21 课 — 功能测试'),
+    goal: loc('信号格式、Strobe、向量字符、Time Set 和 DFT。把“跑向量”拆成能调的每一个旋钮。'),
+  },
+
+  m22: {
+    title: loc('第 22 课 — AC 参数测试'),
+    goal: loc('Setup、Hold、传输延迟、脉宽、fMAX：Go/No-Go 判一次，或者用二分搜索把边界找出来。'),
   },
 
   hop: {

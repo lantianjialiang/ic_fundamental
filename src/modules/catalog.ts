@@ -16,6 +16,11 @@ export type ModuleId =
   | 'alu'
   | 'latch'
   | 'bench'
+  | 'fSpec'
+  | 'fOpens'
+  | 'fDc'
+  | 'fFunc'
+  | 'fAc'
 
 export const MODULES: Array<{
   id: ModuleId
@@ -39,4 +44,9 @@ export const MODULES: Array<{
   { id: 'alu', code: '15', title: '4-bit ALU test program' },
   { id: 'latch', code: '16', title: 'Latch-up entry' },
   { id: 'bench', code: '17', title: 'Interactive bench' },
+  { id: 'fSpec', code: '18', title: 'Device specifications' },
+  { id: 'fOpens', code: '19', title: 'Opens / shorts' },
+  { id: 'fDc', code: '20', title: 'DC parameters' },
+  { id: 'fFunc', code: '21', title: 'Functional testing' },
+  { id: 'fAc', code: '22', title: 'AC parameters' },
 ]

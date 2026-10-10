@@ -1,0 +1,401 @@
+import { useState } from 'react'
+import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
+import { ui } from '../../i18n/ui'
+import { LessonFrame, Section } from '../../lab/LessonFrame'
+import { QuizList } from '../../lab/QuizList'
+import { type ModuleId } from '../catalog'
+import {
+  BINS,
+  FLOWS,
+  FLOW_ITEMS,
+  IDDQ_BAD,
+  IDDQ_GOOD,
+  IDDQ_LIMIT,
+  IDD_KINDS,
+  IN_LEAK,
+  IN_LIMIT,
+  IN_MEAS_MS,
+  IN_METHODS,
+  IN_PINS,
+  IOS_STEPS,
+  OHMS,
+  OHM_LEAD,
+  OTHER,
+  QUIZ,
+  TAKEAWAY,
+  VOX_DIAG,
+  VOX_STEPS,
+  WORDS,
+  expectedMs,
+  voxReading,
+  type InMethod,
+} from './data/dc'
+import { DriverFig } from './DriverFig'
+import { Callout, Cards, Explain, Knob, Readout, Seg, Steps, fmtOhm, fmtV, type Note } from './parts'
+
+type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
+
+const S = {
+  wordTitle: loc('先立四个词'),
+  binTitle: loc('Bin 表示例'),
+  binNote: loc('软 Bin 记录“哪一项挂了”，硬 Bin 决定“放进哪个料盒”。'),
+  colSoft: loc('软 Bin'),
+  colItem: loc('失败项'),
+  colHard: loc('硬 Bin'),
+  colMeaning: loc('含义'),
+  flowTitle: loc('测试顺序影响平均测试时间'),
+  flowNote: loc('遇到第一项 Fail 就停。坏片越早停下，平均时间越短；良品永远要跑完全程。'),
+  flowBook: loc('教科书顺序'),
+  flowSorted: loc('按失败率重排'),
+  flowAvg: loc('平均每颗'),
+  flowGood: loc('良品每颗'),
+  flowFail: loc('失败率'),
+  flowDep: loc('开短路必须第一，粗功能必须在 DC 前——有依赖的项不能为了省时间乱排。'),
+  ohmTitle: loc('每条规格背后的电阻'),
+  ohmCalc: loc('自己算：'),
+  colName: loc('项目'),
+  colV: loc('电压'),
+  colI: loc('电流'),
+  colR: loc('R = V / I'),
+  voxTitle: loc('VOH / VOL：串行静态测法'),
+  voxLab: loc('动手：让 VOH / VOL 通过或失败'),
+  voxLabNote: loc('改驱动强度，或者故意让预处理放错状态，看读数和诊断怎么变。'),
+  testVol: loc('测 VOL'),
+  testVoh: loc('测 VOH'),
+  stateOk: loc('预处理正确'),
+  stateBad: loc('预处理放错状态'),
+  rn: loc('下拉电阻 Rn'),
+  rp: loc('上拉电阻 Rp'),
+  read: loc('读数'),
+  limit: loc('极限'),
+  iddTitle: loc('IDD 的四种测法'),
+  iddqLab: loc('IDDQ：在 8 个向量停点量静态电流（纵轴为对数刻度）'),
+  iddqGood: loc('良品'),
+  iddqBad: loc('有桥接缺陷'),
+  iddqLimit: loc('极限'),
+  inTitle: loc('IIL / IIH：串行、并行、并联'),
+  inNote: loc('12 个输入脚，其中 A5 漏 35 µA（极限 ±10 µA）。每次 PMU 量测约 2 ms，IIL、IIH 各量一次。'),
+  inTime: loc('测试时间'),
+  inResult: loc('结果'),
+  inGangLimit: loc('并联极限 = 12 × 10 µA'),
+  inFound: loc('找到 A5'),
+  inMissed: loc('漏掉 A5'),
+  colPin: loc('管脚'),
+  colIih: loc('IIH'),
+  colVerdict: loc('判定'),
+  total: loc('总和'),
+  otherTitle: loc('其他 DC 项'),
+  iosTitle: loc('IOS：不热切换的步骤'),
+  kicker: loc('DC 参数'),
+  later: loc('DC 都过了，下一课用向量跑功能。'),
+}
+
+export function FundDcPage({ moduleId, onModuleChange }: Props) {
+  const { t } = useLocale()
+  const [word, setWord] = useState('flow')
+  const [flow, setFlow] = useState<'book' | 'sorted'>('book')
+  const [ohmId, setOhmId] = useState('vol')
+  const [calcV, setCalcV] = useState(0.4)
+  const [calcI, setCalcI] = useState(8)
+  const [test, setTest] = useState<'vol' | 'voh'>('vol')
+  const [state, setState] = useState<'ok' | 'bad'>('ok')
+  const [rn, setRn] = useState(40)
+  const [rp, setRp] = useState(350)
+  const [idd, setIdd] = useState('iddq')
+  const [iddqBad, setIddqBad] = useState(false)
+  const [inMethod, setInMethod] = useState<InMethod>('serial')
+  const [other, setOther] = useState('ios')
+  const [note, setNote] = useState<Note>({ kicker: S.kicker, title: WORDS[3].title, text: WORDS[3].text })
+
+  const order = FLOWS[flow]
+  const avg = expectedMs(order)
+  const goodMs = order.reduce((sum, id) => sum + FLOW_ITEMS[id].ms, 0)
+
+  const wrong = state === 'bad'
+  const volt = voxReading(test, rn, rp, wrong)
+  const pass = test === 'vol' ? volt <= 0.4 : volt >= 2.4
+  const diag = pass ? VOX_DIAG.pass : !wrong ? VOX_DIAG.weak : test === 'vol' ? VOX_DIAG.wrongVol : VOX_DIAG.wrongVoh
+  const outHigh = test === 'vol' ? wrong : !wrong
+
+  const iddq = iddqBad ? IDDQ_BAD : IDDQ_GOOD
+  const iddqPass = iddq.every((value) => value <= IDDQ_LIMIT)
+
+  const leaks = IN_PINS.map((pin) => IN_LEAK[pin] ?? 0.05 + (pin.length % 3) * 0.02)
+  const gangTotal = leaks.reduce((sum, value) => sum + value, 0)
+  const gangLimit = IN_PINS.length * IN_LIMIT
+  const inMs = inMethod === 'serial' ? 2 * IN_PINS.length * IN_MEAS_MS : 2 * IN_MEAS_MS
+  const inFound = inMethod !== 'gang'
+
+  return (
+    <LessonFrame
+      moduleId={moduleId}
+      onModuleChange={onModuleChange}
+      title={t(ui.m20.title)}
+      goal={t(ui.m20.goal)}
+      kicker={t(note.kicker)}
+      asideTitle={t(note.title)}
+      asideText={t(note.text)}
+      asideLater={t(S.later)}
+      nextId="fFunc"
+      nextLabel={t(ui.fund.next) + t(ui.m21.title)}
+    >
+      <Section title={t(S.wordTitle)}>
+        <Cards
+          items={WORDS}
+          activeId={word}
+          cols={4}
+          onPick={(item) => {
+            setWord(item.id)
+            setNote({ kicker: S.kicker, title: item.title, text: item.text })
+          }}
+        />
+        <Explain paras={WORDS.find((item) => item.id === word)?.explain} />
+      </Section>
+
+      <Section title={t(S.binTitle)} note={t(S.binNote)}>
+        <table className="dtable">
+          <thead>
+            <tr>
+              <th>{t(S.colSoft)}</th>
+              <th>{t(S.colItem)}</th>
+              <th>{t(S.colHard)}</th>
+              <th>{t(S.colMeaning)}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {BINS.map((row) => (
+              <tr key={row.soft}>
+                <td className="mono-cell">{row.soft}</td>
+                <td>{t(row.item)}</td>
+                <td className="mono-cell">{row.hard}</td>
+                <td>{t(row.note)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Section>
+
+      <Section title={t(S.flowTitle)} note={t(S.flowNote)}>
+        <Seg
+          options={[
+            { id: 'book' as const, label: S.flowBook },
+            { id: 'sorted' as const, label: S.flowSorted },
+          ]}
+          value={flow}
+          onChange={setFlow}
+        />
+        <ol className="flow-steps">
+          {order.map((id) => {
+            const item = FLOW_ITEMS[id]
+            return (
+              <li key={id}>
+                <b>{t(item.name)}</b> · {item.ms} ms · {t(S.flowFail)} {(item.fail * 100).toFixed(1)}%
+              </li>
+            )
+          })}
+        </ol>
+        <Readout
+          items={[
+            { label: S.flowAvg, value: `${avg.toFixed(1)} ms` },
+            { label: S.flowGood, value: `${goodMs} ms` },
+          ]}
+        />
+        <Callout tone="warn">{t(S.flowDep)}</Callout>
+      </Section>
+
+      <Section title={t(S.ohmTitle)} note={t(OHM_LEAD)}>
+        <table className="dtable">
+          <thead>
+            <tr>
+              <th>{t(S.colName)}</th>
+              <th>{t(S.colV)}</th>
+              <th>{t(S.colI)}</th>
+              <th>{t(S.colR)}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {OHMS.map((row) => {
+              const r = row.id === 'ios' ? `${fmtOhm(5.25 / 85e-3)} – ${fmtOhm(5.25 / 30e-3)}` : fmtOhm(row.v / row.i)
+              return (
+                <tr
+                  key={row.id}
+                  className={`is-click${row.id === ohmId ? ' is-active' : ''}`}
+                  onClick={() => {
+                    setOhmId(row.id)
+                    setNote({ kicker: S.kicker, title: `${row.name} → ${r}`, text: row.text })
+                  }}
+                >
+                  <td className="mono-cell">{row.name}</td>
+                  <td className="mono-cell">{row.vText}</td>
+                  <td className="mono-cell">{row.iText}</td>
+                  <td className="mono-cell">{r}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+        <Explain paras={[OHMS.find((row) => row.id === ohmId)?.text ?? '']} />
+        <div className="calc">
+          <span>{t(S.ohmCalc)}</span>
+          <input type="number" step="0.01" value={calcV} onChange={(e) => setCalcV(Number(e.target.value))} />
+          <span>V ÷</span>
+          <input type="number" step="0.001" value={calcI} onChange={(e) => setCalcI(Number(e.target.value))} />
+          <span>mA =</span>
+          <b>{calcI > 0 ? fmtOhm(calcV / (calcI * 1e-3)) : '—'}</b>
+        </div>
+      </Section>
+
+      <Section title={t(S.voxTitle)}>
+        <Steps items={VOX_STEPS} />
+        <h3>{t(S.voxLab)}</h3>
+        <p className="intro__note">{t(S.voxLabNote)}</p>
+        <Seg
+          options={[
+            { id: 'vol' as const, label: S.testVol },
+            { id: 'voh' as const, label: S.testVoh },
+          ]}
+          value={test}
+          onChange={setTest}
+        />{' '}
+        <Seg
+          options={[
+            { id: 'ok' as const, label: S.stateOk },
+            { id: 'bad' as const, label: S.stateBad },
+          ]}
+          value={state}
+          onChange={setState}
+        />
+        <div className="knob-row">
+          <Knob label={S.rn} value={rn} unit="Ω" min={10} max={100} step={2} onChange={setRn} />
+          <Knob label={S.rp} value={rp} unit="Ω" min={100} max={700} step={10} onChange={setRp} />
+        </div>
+        <DriverFig test={test} high={outHigh} rn={rn} rp={rp} volt={volt} />
+        <Readout
+          items={[
+            { label: S.read, value: fmtV(volt), state: pass ? 'pass' : 'fail' },
+            { label: S.limit, value: test === 'vol' ? '≤ 0.40 V' : '≥ 2.40 V' },
+          ]}
+        />
+        <Callout tone={pass ? 'ok' : wrong ? 'bad' : 'warn'}>{t(diag)}</Callout>
+      </Section>
+
+      <Section title={t(S.iddTitle)}>
+        <Cards
+          items={IDD_KINDS}
+          activeId={idd}
+          cols={4}
+          onPick={(item) => {
+            setIdd(item.id)
+            setNote({ kicker: S.kicker, title: item.title, text: item.text })
+          }}
+        />
+        <Explain paras={IDD_KINDS.find((item) => item.id === idd)?.explain} />
+        <h3>{t(S.iddqLab)}</h3>
+        <Seg
+          options={[
+            { id: 'good', label: S.iddqGood },
+            { id: 'bad', label: S.iddqBad },
+          ]}
+          value={iddqBad ? 'bad' : 'good'}
+          onChange={(id) => setIddqBad(id === 'bad')}
+        />
+        <div className="bars">
+          <div className="bars__limit" style={{ bottom: `${(Math.log10(IDDQ_LIMIT) / Math.log10(300)) * 100}%` }}>
+            <span>
+              {t(S.iddqLimit)} {IDDQ_LIMIT} µA
+            </span>
+          </div>
+          {iddq.map((value, index) => (
+            <div key={index} className="bars__col">
+              <div
+                className={`bars__fill${value > IDDQ_LIMIT ? ' is-bad' : ''}`}
+                style={{ height: `${(Math.log10(Math.max(value, 1)) / Math.log10(300)) * 100}%` }}
+              />
+              <span>V{index + 1}</span>
+              <em>{value} µA</em>
+            </div>
+          ))}
+        </div>
+        <Callout tone={iddqPass ? 'ok' : 'bad'}>
+          {iddqPass
+            ? t(loc('8 个停点都在几 µA。PASS。'))
+            : t(loc('V3、V6 两个状态电流跳到 160 µA 以上：某两根线在这两个状态下被驱动成相反电平，桥接点导通。功能可能是对的，但 IDDQ 判 FAIL。'))}
+        </Callout>
+      </Section>
+
+      <Section title={t(S.inTitle)} note={t(S.inNote)}>
+        <Seg options={IN_METHODS.map((m) => ({ id: m.id, label: m.label }))} value={inMethod} onChange={setInMethod} />
+        <p>{t(IN_METHODS.find((m) => m.id === inMethod)?.text ?? '')}</p>
+        <Readout
+          items={[
+            { label: S.inTime, value: `${inMs} ms` },
+            { label: S.inResult, value: t(inFound ? S.inFound : S.inMissed), state: inFound ? 'pass' : 'fail' },
+          ]}
+        />
+        {inMethod === 'gang' ? (
+          <table className="dtable">
+            <tbody>
+              <tr className="is-pass">
+                <td>{t(S.total)} IIH</td>
+                <td className="mono-cell">{gangTotal.toFixed(1)} µA</td>
+                <td className="mono-cell">
+                  {t(S.inGangLimit)} = {gangLimit} µA
+                </td>
+                <td className="verdict">PASS</td>
+              </tr>
+            </tbody>
+          </table>
+        ) : (
+          <table className="dtable">
+            <thead>
+              <tr>
+                <th>{t(S.colPin)}</th>
+                <th>{t(S.colIih)}</th>
+                <th>{t(S.colVerdict)}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {IN_PINS.map((pin, index) => {
+                const bad = leaks[index] > IN_LIMIT
+                return (
+                  <tr key={pin} className={bad ? 'is-fail' : 'is-pass'}>
+                    <td className="mono-cell">{pin}</td>
+                    <td className="mono-cell">{leaks[index].toFixed(2)} µA</td>
+                    <td className="verdict">{bad ? 'FAIL' : 'PASS'}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        )}
+      </Section>
+
+      <Section title={t(S.otherTitle)}>
+        <Cards
+          items={OTHER}
+          activeId={other}
+          onPick={(item) => {
+            setOther(item.id)
+            setNote({ kicker: S.kicker, title: item.title, text: item.text })
+          }}
+        />
+        <Explain paras={OTHER.find((item) => item.id === other)?.explain} />
+        <h3>{t(S.iosTitle)}</h3>
+        <Steps items={IOS_STEPS} />
+      </Section>
+
+      <Section title={t(ui.fund.takeawayTitle)}>
+        <Callout tone="warn">
+          {TAKEAWAY.map((item) => (
+            <p key={item.zh}>{t(item)}</p>
+          ))}
+        </Callout>
+      </Section>
+
+      <Section title={t(ui.fund.quizTitle)} note={t(ui.fund.quizNote)}>
+        <QuizList questions={QUIZ} yes={t(ui.fund.yes)} no={t(ui.fund.no)} />
+      </Section>
+    </LessonFrame>
+  )
+}
