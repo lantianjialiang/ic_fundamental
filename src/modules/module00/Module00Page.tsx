@@ -5,7 +5,7 @@ import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
 import { type ModuleId } from '../catalog'
 import { Callout, Cards, type Note } from '../fund/parts'
-import { CHAIN, CHIP_TYPES, QUIZ, SYS, TAKEAWAY, TERMS, WHAT, type ChainId, type SysId, type TermId } from './data/content'
+import { CHAIN, CHIP_TYPES, QUIZ, SYS, SYS_ORDER, TAKEAWAY, TERMS, WHAT, type ChainId, type SysId, type TermId } from './data/content'
 import { GlossaryArt } from './GlossaryArt'
 import { ChainFig, SysFig } from './IntroFigs'
 import './module00.css'
@@ -18,11 +18,12 @@ type Module00PageProps = {
 
 export function Module00Page({ moduleId, onModuleChange, onOpenConnection }: Module00PageProps) {
   const { t } = useLocale()
-  const [chain, setChain] = useState<ChainId | null>('cp')
-  const [chip, setChip] = useState('digital')
-  const [term, setTerm] = useState<TermId>('cp')
-  const [sys, setSys] = useState<SysId | null>(null)
-  const [note, setNote] = useState<Note>({ kicker: ui.m01.kickerChain, title: CHAIN[1].title, text: CHAIN[1].text })
+  // 每组默认选中界面上的第一项；侧栏初始说明对应页面上第一组（产业链）的第一项
+  const [chain, setChain] = useState<ChainId>(CHAIN[0].id)
+  const [chip, setChip] = useState(CHIP_TYPES[0].id)
+  const [term, setTerm] = useState<TermId>(TERMS[0].id)
+  const [sys, setSys] = useState<SysId>(SYS_ORDER[0])
+  const [note, setNote] = useState<Note>({ kicker: ui.m01.kickerChain, title: CHAIN[0].title, text: CHAIN[0].text })
 
   const termItem = TERMS.find((item) => item.id === term) ?? TERMS[0]
   const chipItem = CHIP_TYPES.find((item) => item.id === chip) ?? CHIP_TYPES[0]

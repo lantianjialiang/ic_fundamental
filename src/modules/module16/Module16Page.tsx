@@ -19,7 +19,7 @@ type Focus = { kind: 'part' } | { kind: 'phase' } | { kind: 'takeaway' }
 
 export function Module16Page({ moduleId, onModuleChange }: Module16PageProps) {
   const { t } = useLocale()
-  const [part, setPart] = useState<PartId>('pnpn')
+  const [part, setPart] = useState<PartId>(PARTS[0].id)
   const [focus, setFocus] = useState<Focus>({ kind: 'part' })
   const player = useStepPlayer(PHASES.length, 1600)
   const item = PARTS.find((x) => x.id === part) ?? PARTS[0]

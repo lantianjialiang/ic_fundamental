@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { LabShell } from './LabShell'
+import { PageFeedback } from './Feedback'
 import { type ModuleId } from '../modules/catalog'
+import { lessonCode } from '../tracks/catalog'
 
 type LessonFrameProps = {
   moduleId: ModuleId
@@ -50,6 +52,7 @@ export function LessonFrame({
               {nextLabel}
             </button>
           ) : null}
+          <PageFeedback page={`${lessonCode(moduleId)} · ${title}`} />
         </aside>
       </div>
     </LabShell>

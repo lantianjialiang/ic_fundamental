@@ -100,6 +100,10 @@ const S = {
 }
 
 const TEST_LABEL: Record<ChainTest, typeof S.fFlush1> = { flush1: S.fFlush1, flush0: S.fFlush0, shift: S.fShift }
+const CHAIN_TESTS: ChainTest[] = ['flush1', 'flush0', 'shift']
+type ScanMode = 'normal' | 'scan'
+const SCAN_MODES: ScanMode[] = ['normal', 'scan']
+const SCAN_MODE_LABEL: Record<ScanMode, typeof S.normal> = { normal: S.normal, scan: S.scanOn }
 
 function fmtTime(ms: number) {
   if (ms >= 1000) return `${(ms / 1000).toFixed(2)} s`
@@ -109,20 +113,20 @@ function fmtTime(ms: number) {
 
 export function FundScanPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
-  const [note, setNote] = useState<Note>({ kicker: S.kicker, title: S.whyTitle, text: WHY_LEAD[2] })
-  const [scanMode, setScanMode] = useState<'normal' | 'scan'>('scan')
-  const [ability, setAbility] = useState('iso')
+  const [note, setNote] = useState<Note>({ kicker: S.kicker, title: S.normal, text: MODE_TEXT[SCAN_MODES[0]] })
+  const [scanMode, setScanMode] = useState<ScanMode>(SCAN_MODES[0])
+  const [ability, setAbility] = useState(ABILITIES[0].id)
   // Flush / Shift
-  const [test, setTest] = useState<ChainTest>('flush1')
+  const [test, setTest] = useState<ChainTest>(CHAIN_TESTS[0])
   const [faultK, setFaultK] = useState(0)
-  const [faultV, setFaultV] = useState<Bit>(1)
+  const [faultV, setFaultV] = useState<Bit>(0)
   const [cStep, setCStep] = useState(0)
   const [cPlay, setCPlay] = useState(false)
   // 完整三步
   const [vec, setVec] = useState<Bit[]>([1, 0, 1, 1])
   const [a, setA] = useState<Bit>(1)
   const [b, setB] = useState<Bit>(1)
-  const [cf, setCf] = useState<CombFault>('none')
+  const [cf, setCf] = useState<CombFault>(COMB_FAULTS[0].id)
   const [ph, setPh] = useState(0)
   const [pPlay, setPPlay] = useState(false)
   // 计算器
@@ -130,7 +134,7 @@ export function FundScanPage({ moduleId, onModuleChange }: Props) {
   const [chains, setChains] = useState(8)
   const [pats, setPats] = useState(1000)
   const [mhz, setMhz] = useState(50)
-  const [mem, setMem] = useState('par')
+  const [mem, setMem] = useState(MEM_CARDS[0].id)
 
   const cEnd = cStep >= CHAIN_CLOCKS
   useEffect(() => {
@@ -238,14 +242,11 @@ export function FundScanPage({ moduleId, onModuleChange }: Props) {
           <p key={para.zh}>{t(para)}</p>
         ))}
         <Seg
-          options={[
-            { id: 'normal' as const, label: S.normal },
-            { id: 'scan' as const, label: S.scanOn },
-          ]}
+          options={SCAN_MODES.map((id) => ({ id, label: SCAN_MODE_LABEL[id] }))}
           value={scanMode}
           onChange={(id) => {
             setScanMode(id)
-            setNote({ kicker: S.kicker, title: id === 'scan' ? S.scanOn : S.normal, text: MODE_TEXT[id] })
+            setNote({ kicker: S.kicker, title: SCAN_MODE_LABEL[id], text: MODE_TEXT[id] })
           }}
         />
         <ScanModelFig mode={scanMode} />
@@ -265,7 +266,7 @@ export function FundScanPage({ moduleId, onModuleChange }: Props) {
       {/* 3. Flush / Shift */}
       <Section title={t(S.chainTitle)} note={t(S.chainNote)}>
         <Seg
-          options={(['flush1', 'flush0', 'shift'] as ChainTest[]).map((id) => ({ id, label: TEST_LABEL[id] }))}
+          options={CHAIN_TESTS.map((id) => ({ id, label: TEST_LABEL[id] }))}
           value={test}
           onChange={(id) => {
             setTest(id)

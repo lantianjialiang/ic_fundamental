@@ -78,7 +78,7 @@ export type ShmooVec = { id: string; name: string; k: number; holes: Array<[numb
 export const SHMOO_VECS: ShmooVec[] = [
   { id: 'march', name: 'march.pat', k: 0.3, holes: [], text: loc('边界平滑，随 VDD 升高，能容忍的 VIL 也升高——正常。', 'Smooth boundary; the tolerable VIL rises as VDD rises. Normal.') },
   { id: 'checker', name: 'checker.pat', k: 0.28, holes: [], text: loc('边界比 march 稍低，但依然平滑、连续——正常。不同图形的边界本来就会有点差别。', 'The boundary is a bit lower than march, but still smooth and continuous. Normal; different patterns naturally have slightly different boundaries.') },
-  { id: 'walk', name: 'walk1.pat', k: 0.3, holes: [[5.0, 0.8], [5.25, 0.8], [5.0, 1.0]], text: loc('Pass 区中间有一个洞，而且就落在规格点（VDD 5 V、VIL 0.8 V）旁边！可能是图形敏感、噪声或时序临界。要在量产前查清楚。', 'There is a hole in the middle of the pass region, right next to the spec point (VDD 5 V, VIL 0.8 V)! It may be pattern sensitivity, noise, or marginal timing. Resolve it before production.') },
+  { id: 'walk', name: 'walk1.pat', k: 0.3, holes: [[5.25, 0.8], [5.25, 1.0], [5.5, 1.0]], text: loc('Pass 区中间有一个洞，而且就落在规格点（VDD 5 V、VIL 0.8 V）旁边！可能是图形敏感、噪声或时序临界。要在量产前查清楚。', 'There is a hole in the middle of the pass region, right next to the spec point (VDD 5 V, VIL 0.8 V)! It may be pattern sensitivity, noise, or marginal timing. Resolve it before production.') },
   { id: 'decode', name: 'addr_dec.pat', k: 0.31, holes: [], text: loc('边界平滑——正常。', 'Smooth boundary. Normal.') },
 ]
 

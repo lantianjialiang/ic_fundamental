@@ -53,7 +53,7 @@ const VERDICT_LABEL: Record<Verdict, typeof S.vPass> = { pass: S.vPass, open: S.
 
 export function FundOpensPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
-  const [fault, setFault] = useState<Fault>('good')
+  const [fault, setFault] = useState<Fault>(FAULTS[0].id)
   const [pol, setPol] = useState<'neg' | 'pos'>('neg')
   const [amp, setAmp] = useState(100)
   const [answers, setAnswers] = useState<Record<string, Verdict>>({})

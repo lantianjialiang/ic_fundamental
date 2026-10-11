@@ -110,7 +110,7 @@ export function TimingScope({ period, strobe, strobeOk = true, labelWindow, mark
 
         {marks.includes('period') ? dim(0, P, 26, `Period ${fmt(P)} ns`, active === 'period') : null}
         {marks.includes('setup') ? dim(-DRIVE_LEAD, 0, 180, `tSU ${fmt(DRIVE_LEAD)} ns`, active === 'setup') : null}
-        {marks.includes('hold') ? dim(0, P - DRIVE_LEAD, 180, `tH ${fmt(P - DRIVE_LEAD)} ns`, active === 'hold') : null}
+        {marks.includes('hold') ? dim(0, P - DRIVE_LEAD, 180, `tH ${fmt(P - DRIVE_LEAD)} ns`, active === 'hold', true) : null}
         {marks.includes('tpd') ? dim(0, TPD, 274, `tPD ${fmt(TPD)} ns`, active === 'tpd') : null}
 
         {strobe !== undefined ? strobeMark(strobe, strobeOk, t(L.strobe)) : null}
@@ -192,19 +192,32 @@ function bus(a: number, b: number, top: number, bot: number, label: string, key:
   )
 }
 
-function dim(t1: number, t2: number, y: number, label: string, on: boolean) {
+/** 12px 等宽字大约 7.2px 一个字符 */
+const MONO_W = 7.2
+
+/** 尺寸标注。alignStart：段太短放不下字时，字改成从段的左端往右写，免得和左边相邻的标注叠在一起 */
+function dim(t1: number, t2: number, y: number, label: string, on: boolean, alignStart = false) {
   const x1 = xs(t1)
   const x2 = xs(t2)
   const c = on ? 'var(--gold)' : 'var(--muted)'
   const w = on ? 2 : 1.2
   const head = Math.min(6, Math.abs(x2 - x1) / 2)
+  const outside = alignStart && label.length * MONO_W + 8 > Math.abs(x2 - x1)
   return (
     <g opacity={on ? 1 : 0.7}>
       <line x1={x1} y1={y} x2={x2} y2={y} stroke={c} strokeWidth={w} />
       <path d={`M ${x1} ${y} l ${head} -4 v 8 z M ${x2} ${y} l ${-head} -4 v 8 z`} fill={c} />
       <line x1={x1} y1={y - 7} x2={x1} y2={y + 7} stroke={c} strokeWidth={w} />
       <line x1={x2} y1={y - 7} x2={x2} y2={y + 7} stroke={c} strokeWidth={w} />
-      <text x={(x1 + x2) / 2} y={y - 8} textAnchor="middle" fill={c} fontSize="12" fontWeight={on ? 600 : 400} fontFamily="var(--mono)">
+      <text
+        x={outside ? Math.min(x1, x2) + 4 : (x1 + x2) / 2}
+        y={y - 8}
+        textAnchor={outside ? 'start' : 'middle'}
+        fill={c}
+        fontSize="12"
+        fontWeight={on ? 600 : 400}
+        fontFamily="var(--mono)"
+      >
         {label}
       </text>
     </g>

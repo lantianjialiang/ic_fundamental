@@ -20,8 +20,8 @@ export const T = {
   labels: loc('3D 标注', '3D labels'),
   resetView: loc('重置视角', 'Reset view'),
   hint: loc(
-    '左键旋转 · 滚轮缩放 · 右键平移 · 点板上的走线或侧栏通道看信号路径',
-    'Left-drag orbit · wheel zoom · right-drag pan · click a board trace or a channel in the panel',
+    '左键 360° 旋转 · 滚轮缩放 · 右键平移 · 点板上的走线或侧栏通道看信号路径',
+    'Left-drag to orbit 360° · wheel zoom · right-drag pan · click a board trace or a channel in the panel',
   ),
   next: loc('下一课：ATE 里面有什么', 'Next: What is inside an ATE?'),
   stageAria: loc('3D 测试工位', '3D test cell'),
@@ -37,10 +37,17 @@ export const T = {
   pathTitle: loc('信号路径', 'Signal path'),
   noChannel: loc('选一个通道，或在 3D 中点 Load Board / Probe Card 上的走线。', 'Pick a channel, or click a trace on the Load Board / Probe Card in 3D.'),
   clear: loc('清除选择', 'Clear selection'),
+  pathViewGroup: loc('路径显示方式', 'Path view'),
+  pathOnly: loc('只看路径', 'Path only'),
+  showAll: loc('显示全部', 'Show all'),
+  pathOnlyHint: loc(
+    '只看路径：其它部件变得几乎透明，只留下这一路真正经过的零件发光——通道板、那根 Pogo 针、板上的焊盘 / 走线 / 过孔，以及 FT 的 Socket 针和锡球、CP 的空间转换器、探针和 die pad。',
+    'Path only: everything else turns nearly transparent and only the parts this channel actually passes through glow — the channel card, its pogo pin, the pads / traces / vias on the board, plus the socket pin and solder ball (FT) or the space transformer, probe and die pad (CP).',
+  ),
   pcbTitle: loc('PCB 层', 'PCB layers'),
   pcbText: loc(
-    '顶层焊盘金色、内层走线铜色、底层灰蓝，竖柱是过孔 (via)。分解、剖开或选中通道时板子变半透明，能看到内层。',
-    'Top pads gold, inner tracks copper, bottom layer blue-gray; vertical posts are vias. The board turns see-through when exploded, cut away or a channel is selected.',
+    'Load Board 是 8 层板：板边能看到绿油、铜箔、FR4 介质一层层交替。表面绿色的是阻焊绿油 (solder mask)，焊盘处开窗露出沉金；白字是丝印 (silkscreen)，标出位号 C/R/K/J/TP 和 PIN 1。示意走线：底层 L8 → 过孔 → 内层 L3 → 过孔 → 顶层 L1。分解、剖开或选中通道时板子变半透明；剖开后切口能看到各层铜箔和贯穿全板的过孔。',
+    'The load board is an 8-layer PCB: its edge shows solder mask, copper and FR4 dielectric alternating. The green coat is solder mask, opened over the gold (ENIG) pads; the white print is silkscreen marking reference designators C/R/K/J/TP and PIN 1. Example route: bottom L8 → via → inner L3 → via → top L1. The board turns see-through when exploded, cut away or a channel is selected; the cutaway face shows every copper layer and vias running through the whole board.',
   ),
   phaseTitle: loc('接触动画', 'Contact sequence'),
   phaseIdle: loc('点工具栏「接触动画」观看压接 / 扎针全过程。', 'Press “Contact animation” in the toolbar to watch the docking / probing sequence.'),
@@ -57,6 +64,12 @@ export const T = {
   st: loc('空间转换器', 'Space transformer'),
   stiffener: loc('加强板', 'Stiffener'),
 } as const
+
+/** 路径显示方式：数组顺序即按钮顺序，初始值取第一个（只看路径） */
+export const PATH_VIEWS = [
+  { id: 'path', pathOnly: true, label: T.pathOnly },
+  { id: 'all', pathOnly: false, label: T.showAll },
+] as const
 
 type LayerText = { name: LText; sub: LText; desc: LText }
 
@@ -88,10 +101,10 @@ export const LAYER_TEXT: Record<TestFlow, Partial<Record<LayerId, LayerText>>> =
     },
     loadboard: {
       name: loc('Load Board / DIB', 'Load Board / DIB'),
-      sub: loc('多层 PCB · 沉金焊盘', 'Multilayer PCB · ENIG pads'),
+      sub: loc('8 层 PCB · 绿油 · 丝印 · 沉金焊盘', '8-layer PCB · mask · silk · ENIG'),
       desc: loc(
-        '每种芯片专用的多层接口板：把 Socket 下的细间距焊盘扇出到测试头通道，板上还有旁路电容、继电器等。',
-        'A device-specific multilayer interface board: fans the fine-pitch socket pads out to tester channels, and carries bypass capacitors, relays and more.',
+        '每种芯片专用的 8 层接口板：把 Socket 下的细间距焊盘经过孔和内层扇出到测试头通道；板上有旁路电容、串联电阻、测试点、继电器和连接器，丝印标着每个器件的位号。',
+        'A device-specific 8-layer interface board: vias and inner layers fan the fine-pitch socket pads out to tester channels. It carries bypass capacitors, series resistors, test points, relays and connectors, each labeled in silkscreen.',
       ),
     },
     pogo: {
@@ -177,11 +190,11 @@ export const HOP_TEXT = {
   pe: loc('Test Head 通道板：驱动器 / 比较器', 'Test head channel card: driver / comparator'),
   cardEdge: loc('通道板金手指 → 接口', 'Card edge fingers → interface'),
   pogoTower: loc('Pogo Tower 弹簧针', 'Pogo tower pin'),
-  lbBottom: loc('Load Board 底层焊盘', 'Load board bottom pad'),
-  ftVia1: loc('过孔 1：底层 → 内层', 'Via 1: bottom → inner'),
-  ftVia2: loc('过孔 2：内层 → 顶层', 'Via 2: inner → top'),
+  lbBottom: loc('Load Board 底层焊盘（L8）', 'Load board bottom pad (L8)'),
+  ftVia1: loc('过孔 1：底层 L8 → 内层 L3', 'Via 1: bottom L8 → inner L3'),
+  ftVia2: loc('过孔 2：内层 L3 → 顶层 L1', 'Via 2: inner L3 → top L1'),
   inner: loc('内层走线', 'Inner-layer track'),
-  lbTop: loc('Load Board 顶层焊盘', 'Load board top pad'),
+  lbTop: loc('Load Board 顶层焊盘（L1）', 'Load board top pad (L1)'),
   socketPin: loc('Socket 弹簧针', 'Socket pogo pin'),
   dutBall: loc('DUT 锡球 {name}', 'DUT ball {name}'),
   dutLead: loc('DUT 引脚 Pin {name}', 'DUT lead pin {name}'),

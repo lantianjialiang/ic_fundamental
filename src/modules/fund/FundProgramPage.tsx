@@ -122,8 +122,8 @@ export function FundProgramPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [note, setNote] = useState<Note>({ kicker: S.kicker, title: PROGRAMS[0].title, text: PROGRAMS[0].text })
   // 1. 三种程序
-  const [prog, setProg] = useState('eng')
-  const [concern, setConcern] = useState('hw')
+  const [prog, setProg] = useState(PROGRAMS[0].id)
+  const [concern, setConcern] = useState(CONCERNS[0].id)
   // 2. 计算器
   const [testMs, setTestMs] = useState(800)
   const [indexMs, setIndexMs] = useState(400)
@@ -131,9 +131,9 @@ export function FundProgramPage({ moduleId, onModuleChange }: Props) {
   const [rate, setRate] = useState(120)
   const [price, setPrice] = useState(1.5)
   // 3. 菜单
-  const [mode, setMode] = useState<TestMode>('final')
-  const [temp, setTemp] = useState<string>('25')
-  const [ver, setVer] = useState<string>('Rev A')
+  const [mode, setMode] = useState<TestMode>(MODES[0].id)
+  const [temp, setTemp] = useState<string>(TEMPS[0])
+  const [ver, setVer] = useState<string>(VERSIONS[0])
   const [lot, setLot] = useState('')
   const [op, setOp] = useState('')
   const [tester, setTester] = useState('')
@@ -147,7 +147,7 @@ export function FundProgramPage({ moduleId, onModuleChange }: Props) {
   const [playing, setPlaying] = useState(false)
   // 5. 分 Bin
   const [rates, setRates] = useState<Record<string, number>>(() => Object.fromEntries(BIN_TESTS.map((x) => [x.id, x.rate])))
-  const [rateTest, setRateTest] = useState('func')
+  const [rateTest, setRateTest] = useState(BIN_TESTS[0].id)
   const [bins, setBins] = useState<Record<number, number>>({})
 
   /* ---- 上下电动画 ---- */

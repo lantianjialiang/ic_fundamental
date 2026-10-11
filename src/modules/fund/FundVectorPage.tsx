@@ -142,12 +142,12 @@ function simText(names: string[], lines: SimLine[]) {
 export function FundVectorPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [note, setNote] = useState<Note>({ kicker: S.kicker, title: CHARS[0].title, text: CHARS[0].text })
-  const [ch, setCh] = useState('0')
+  const [ch, setCh] = useState(CHARS[0].id)
   // 流水线
-  const [pipe, setPipe] = useState({ v: 1, s: 0 })
+  const [pipe, setPipe] = useState({ v: 0, s: 0 })
   const [pipePlaying, setPipePlaying] = useState(false)
   const [stuck, setStuck] = useState(false)
-  const [micro, setMicro] = useState('repeat')
+  const [micro, setMicro] = useState(MICRO[0].id)
   // 向量文件
   const [pc, setPc] = useState(-1)
   const [filePlaying, setFilePlaying] = useState(false)
@@ -155,17 +155,17 @@ export function FundVectorPage({ moduleId, onModuleChange }: Props) {
   // 棋盘格
   const [cbView, setCbView] = useState<CbView>('write')
   const [cbStart, setCbStart] = useState(0)
-  const [tester, setTester] = useState('its')
+  const [tester, setTester] = useState(TESTERS[0].id)
   // 仿真
   const [scene, setScene] = useState<SimScene>('mixed')
   const [strobe, setStrobe] = useState(50)
   // 存储
   const [totalK, setTotalK] = useState(2000)
-  const [depthId, setDepthId] = useState('4k')
+  const [depthId, setDepthId] = useState(DEPTHS[0].id)
   const [reloadMs, setReloadMs] = useState(100)
   const [periodNs, setPeriodNs] = useState(100)
   // 守则
-  const [rule, setRule] = useState(1)
+  const [rule, setRule] = useState(RULES[0].n)
   const [viol, setViol] = useState<Record<string, number>>({})
 
   const pipeEnd = pipe.v === PIPE_VECS.length - 1 && pipe.s === STAGES.length - 1

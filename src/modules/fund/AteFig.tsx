@@ -157,7 +157,8 @@ export function BondFig() {
       <svg viewBox="0 0 680 250" className="term-fig__svg" role="img" aria-label={t(BL.cap)}>
         <rect width="680" height="250" rx="10" fill="var(--well)" />
         <rect x={cx - 120} y={cy - 80} width="240" height="160" rx="6" fill="var(--fig-box)" stroke="var(--line)" strokeDasharray="5 4" />
-        <text x={cx + 116} y={cy - 66} textAnchor="end" fill="var(--dim)" fontSize="11" fontFamily="var(--mono)">{BL.cavity}</text>
+        {/* 写在虚线框右下角外侧：框内右上角会被 bond wire 穿过 */}
+        <text x={cx + 124} y={cy + 92} fill="var(--dim)" fontSize="11" fontFamily="var(--mono)">{BL.cavity}</text>
         {pads.map((p, i) => (
           <rect key={`l${i}`} x={p.lx - 6} y={p.ly - 6} width="12" height="12" fill="var(--gold-bg-2)" stroke="var(--gold-line)" />
         ))}

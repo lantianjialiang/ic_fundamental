@@ -13,6 +13,7 @@ import {
   OPENS_SETUP,
   PMU_MORE,
   QUIZ,
+  SIDE_IDS,
   SIDES,
   TAKEAWAY,
   VERDICT,
@@ -33,11 +34,11 @@ type Module04PageProps = {
 
 export function Module04Page({ moduleId, onModuleChange }: Module04PageProps) {
   const { t } = useLocale()
-  const [side, setSide] = useState<PinSide>('input')
+  const [side, setSide] = useState<PinSide>(SIDE_IDS[0])
   const [volts, setVolts] = useState(1.2)
-  const [mode, setMode] = useState<PmuMode>('fimv')
-  const [fault, setFault] = useState<Fault>('good')
-  const [note, setNote] = useState<Note>({ kicker: ui.m04.kickerScale, title: SIDES.input.label, text: SIDES.input.text })
+  const [mode, setMode] = useState<PmuMode>(MODES[0].id)
+  const [fault, setFault] = useState<Fault>(FAULTS[0].id)
+  const [note, setNote] = useState<Note>({ kicker: ui.m04.kickerScale, title: SIDES[SIDE_IDS[0]].label, text: SIDES[SIDE_IDS[0]].text })
 
   const s = SIDES[side]
   const zone = zoneOf(side, volts)
@@ -63,7 +64,7 @@ export function Module04Page({ moduleId, onModuleChange }: Module04PageProps) {
 
       <Section title={t(ui.m04.scaleTitle)} note={t(ui.m04.scaleNote)}>
         <Seg
-          options={(['input', 'output'] as PinSide[]).map((id) => ({ id, label: SIDES[id].label }))}
+          options={SIDE_IDS.map((id) => ({ id, label: SIDES[id].label }))}
           value={side}
           onChange={(id) => {
             setSide(id)

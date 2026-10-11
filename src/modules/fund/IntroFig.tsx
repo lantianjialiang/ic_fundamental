@@ -233,7 +233,7 @@ export function SystemFig({ active, onPick }: { active: BlockId; onPick: (id: Bl
           {[0, 1, 2, 3].map((i) => (
             <g key={i}>
               <rect x="436" y={60 + i * 50} width="118" height="38" rx="4" fill="var(--fig-box-2)" stroke="var(--line-2)" />
-              <text x="495" y={84 + i * 50} textAnchor="middle" fill="var(--text-2)" fontSize="11">
+              <text x="495" y={84 + i * 50} textAnchor="middle" fill="var(--text-2)" fontSize="10">
                 {t(SL.card)}
               </text>
             </g>

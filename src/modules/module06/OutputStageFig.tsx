@@ -1,6 +1,6 @@
 import { useLocale } from '../../i18n/LocaleContext'
 import { loc } from '../../i18n/locale'
-import { MODES, VDD, type Mode } from './data/content'
+import { MODES, VDD, VMAX, type Mode } from './data/content'
 
 const L = {
   dut: loc('DUT 输出级', 'DUT output stage'),
@@ -11,6 +11,7 @@ const L = {
   sinkDir: loc('PMU 灌入 → DUT Sink', 'PMU pushes → DUT sinks'),
   vohMin: loc('VOH min 2.4 V', 'VOH min 2.4 V'),
   volMax: loc('VOL max 0.4 V', 'VOL max 0.4 V'),
+  vddMin: loc('（VDD 最低值）', '(VDD min)'),
   capVoh: loc(
     '输出为 1：上拉管导通，把 VDD 经 R_on 接到管脚。PMU 抽走 IOH，R_on 上的压降让 VOH 低于 VDD。',
     'Output is 1: the pull-up is on and connects VDD to the pin through R_on. The PMU draws IOH, and the drop across R_on pulls VOH below VDD.',
@@ -22,7 +23,7 @@ const L = {
 }
 
 /** 电压刻度：0–3.3 V 映射到 y 270–30 */
-const vy = (v: number) => 270 - (v / VDD) * 240
+const vy = (v: number) => 270 - (v / VMAX) * 240
 
 function resistor(x: number, y: number, on: boolean) {
   return (
@@ -59,8 +60,8 @@ export function OutputStageFig({
   const formula = high
     ? `VOH = ${VDD.toFixed(1)} − ${ma.toFixed(1)} mA × ${ron} Ω`
     : `VOL = ${ma.toFixed(1)} mA × ${ron} Ω`
-  const zoneTop = high ? vy(VDD) : vy(limit)
-  const zoneH = high ? vy(limit) - vy(VDD) : vy(0) - vy(limit)
+  const zoneTop = high ? vy(VMAX) : vy(limit)
+  const zoneH = high ? vy(limit) - vy(VMAX) : vy(0) - vy(limit)
 
   return (
     <figure className="term-fig">
@@ -82,6 +83,9 @@ export function OutputStageFig({
         <line x1="120" y1="50" x2="220" y2="50" stroke="var(--sky)" strokeWidth="2" />
         <text x="228" y="54" fill="var(--sky)" fontSize="12">
           {`VDD ${VDD.toFixed(1)} V`}
+        </text>
+        <text x="228" y="70" fill="var(--sky)" fontSize="11">
+          {t(L.vddMin)}
         </text>
         <line x1="170" y1="50" x2="170" y2="65" stroke={high ? hot : off} strokeWidth="2.5" />
         {resistor(170, 65, high)}
@@ -166,10 +170,14 @@ export function OutputStageFig({
         </text>
 
         {/* 电压刻度：绿色是合格区 */}
-        <rect x="650" y={vy(VDD)} width="18" height={vy(0) - vy(VDD)} fill="var(--red-bg)" stroke="var(--line)" />
+        <rect x="650" y={vy(VMAX)} width="18" height={vy(0) - vy(VMAX)} fill="var(--red-bg)" stroke="var(--line)" />
         <rect x="650" y={zoneTop} width="18" height={zoneH} fill="var(--green-bg)" />
-        <text x="644" y={vy(VDD) + 4} textAnchor="end" fill="var(--muted)" fontSize="11">
-          3.3 V
+        <text x="644" y={vy(VMAX) + 4} textAnchor="end" fill="var(--muted)" fontSize="11">
+          {`${VMAX.toFixed(1)} V`}
+        </text>
+        <line x1="644" y1={vy(VDD)} x2="650" y2={vy(VDD)} stroke="var(--sky)" strokeWidth="1.5" />
+        <text x="640" y={vy(VDD) + 4} textAnchor="end" fill="var(--sky)" fontSize="11">
+          {`VDD ${VDD.toFixed(1)} V`}
         </text>
         <text x="644" y={vy(0) + 4} textAnchor="end" fill="var(--muted)" fontSize="11">
           0 V

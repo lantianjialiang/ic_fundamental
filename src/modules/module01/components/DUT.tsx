@@ -3,7 +3,8 @@ import { useMemo } from 'react'
 import { ExtrudeGeometry, MeshStandardMaterial, Shape } from 'three'
 import { useLocale } from '../../../i18n/LocaleContext'
 import { useScene } from '../context/SceneContext'
-import { BGA, DUT_BASE_Y, QFP, allContacts, contactFor, qfpLeads } from '../data/layout'
+import { registerDim } from '../data/dim'
+import { BGA, DUT_BASE_Y, QFP, allContacts, qfpLeads } from '../data/layout'
 import { GEO, MAT } from '../data/materials'
 import { dutMarkTexture } from '../data/textures'
 import { T } from '../data/text'
@@ -34,8 +35,8 @@ function gullWingGeometry(): ExtrudeGeometry {
 }
 
 const markMaterials = {
-  BGA: new MeshStandardMaterial({ map: dutMarkTexture('BGA'), roughness: 0.6, metalness: 0 }),
-  QFP: new MeshStandardMaterial({ map: dutMarkTexture('QFP'), roughness: 0.6, metalness: 0 }),
+  BGA: registerDim(new MeshStandardMaterial({ map: dutMarkTexture('BGA'), roughness: 0.6, metalness: 0 })),
+  QFP: registerDim(new MeshStandardMaterial({ map: dutMarkTexture('QFP'), roughness: 0.6, metalness: 0 })),
 }
 
 /** DUT：BGA（基板 + 塑封 + 锡球阵列）或 QFP（塑封 + 四边鸥翼引脚），顶面带打标贴图 */
@@ -49,7 +50,6 @@ export function DUT() {
     [],
   )
   const leads = useMemo<InstanceItem[]>(() => qfpLeads().map((l) => ({ p: [l.x, 0, l.z], r: [0, l.rotY, 0] })), [])
-  const marker = cfg.selected === null ? null : contactFor(cfg.pkg, cfg.selected)
   const isBga = cfg.pkg === 'BGA'
 
   return (
@@ -94,12 +94,6 @@ export function DUT() {
             </mesh>
           </>
         )}
-        {marker ? (
-          <mesh position={[marker.x, isBga ? BGA.ballR * 0.88 : 0.006, marker.z]}>
-            <sphereGeometry args={[isBga ? BGA.ballR * 1.12 : 0.03, 16, 12]} />
-            <meshBasicMaterial color="#ffd84a" transparent opacity={0.55} toneMapped={false} depthWrite={false} />
-          </mesh>
-        ) : null}
       </group>
     </LayerGroup>
   )

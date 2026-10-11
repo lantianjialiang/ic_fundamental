@@ -1,4 +1,8 @@
 import { ContactShadows, Environment, Lightformer } from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
+import { useRef } from 'react'
+import type { DirectionalLight } from 'three'
+import { useScene } from '../context/SceneContext'
 import { FLOOR_Y, type TestFlow } from '../data/layout'
 import type { SceneTheme } from '../hooks/useSceneTheme'
 
@@ -9,7 +13,15 @@ type StageProps = { theme: SceneTheme; flow: TestFlow }
  * 带阴影的主光、跟随主题的背景 / 地面 / 网格 / 接触阴影。
  */
 export function Stage({ theme, flow }: StageProps) {
+  const { store } = useScene()
+  const sun = useRef<DirectionalLight>(null)
   const light = theme.mode === 'light'
+
+  // 只看路径时，几乎透明的部件不该再往高亮路径上投下浓重阴影
+  useFrame(() => {
+    if (sun.current) sun.current.shadow.intensity = 1 - 0.85 * store.dim
+  })
+
   return (
     <>
       <color attach="background" args={[theme.bg]} />
@@ -17,6 +29,7 @@ export function Stage({ theme, flow }: StageProps) {
       <ambientLight intensity={light ? 0.35 : 0.22} />
       <hemisphereLight args={[light ? '#ffffff' : '#c9d6e6', light ? '#c7ccd2' : '#1b1f25', light ? 0.55 : 0.35]} />
       <directionalLight
+        ref={sun}
         position={[6, 11, 6]}
         intensity={light ? 2.1 : 2.3}
         castShadow

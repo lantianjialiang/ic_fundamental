@@ -78,7 +78,7 @@ const S = {
   iddqBad: loc('有桥接缺陷', 'Bridging defect'),
   iddqLimit: loc('极限', 'Limit'),
   inTitle: loc('IIL / IIH：串行、并行、并联', 'IIL / IIH: serial, parallel, ganged'),
-  inNote: loc('12 个输入脚，每脚极限 ±10 µA。每次 PMU 量测约 2 ms，IIL、IIH 各量一次。切换良品和 A5 漏 35 µA 的坏片，比较三种测法的时间。', '12 input pins, each with a ±10 µA limit. Each PMU measurement takes about 2 ms; IIL and IIH are each measured once. Switch between a good part and a bad part whose A5 leaks 35 µA, and compare the test time of the three methods.'),
+  inNote: loc('12 个输入脚，每脚极限 ±10 µA。每次 PMU 量测约 2 ms，IIL、IIH 各量一次。先看 A5 漏 35 µA 的坏片，再切到良品，比较三种测法的时间。', '12 input pins, each with a ±10 µA limit. Each PMU measurement takes about 2 ms; IIL and IIH are each measured once. Start with a bad part whose A5 leaks 35 µA, then switch to a good part, and compare the test time of the three methods.'),
   inGood: loc('良品', 'Good part'),
   inBad: loc('A5 漏电', 'A5 leaks'),
   inTime: loc('测试时间', 'Test time'),
@@ -100,21 +100,21 @@ const S = {
 
 export function FundDcPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
-  const [word, setWord] = useState('flow')
+  const [word, setWord] = useState(WORDS[0].id)
   const [flow, setFlow] = useState<'book' | 'sorted'>('book')
-  const [ohmId, setOhmId] = useState('vol')
+  const [ohmId, setOhmId] = useState(OHMS[0].id)
   const [calcV, setCalcV] = useState(0.4)
   const [calcI, setCalcI] = useState(8)
   const [test, setTest] = useState<'vol' | 'voh'>('vol')
   const [state, setState] = useState<'ok' | 'bad'>('ok')
   const [rn, setRn] = useState(40)
   const [rp, setRp] = useState(350)
-  const [idd, setIdd] = useState('iddq')
+  const [idd, setIdd] = useState(IDD_KINDS[0].id)
   const [iddqBad, setIddqBad] = useState(false)
-  const [inMethod, setInMethod] = useState<InMethod>('serial')
+  const [inMethod, setInMethod] = useState<InMethod>(IN_METHODS[0].id)
   const [inLeaky, setInLeaky] = useState(true)
-  const [other, setOther] = useState('ios')
-  const [note, setNote] = useState<Note>({ kicker: S.kicker, title: WORDS[3].title, text: WORDS[3].text })
+  const [other, setOther] = useState(OTHER[0].id)
+  const [note, setNote] = useState<Note>({ kicker: S.kicker, title: WORDS[0].title, text: WORDS[0].text })
 
   const order = FLOWS[flow]
   const avg = expectedMs(order)
@@ -342,8 +342,8 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
         <Seg options={IN_METHODS.map((m) => ({ id: m.id, label: m.label }))} value={inMethod} onChange={setInMethod} />
         <Seg
           options={[
-            { id: 'good', label: S.inGood },
             { id: 'bad', label: S.inBad },
+            { id: 'good', label: S.inGood },
           ]}
           value={inLeaky ? 'bad' : 'good'}
           onChange={(id) => setInLeaky(id === 'bad')}

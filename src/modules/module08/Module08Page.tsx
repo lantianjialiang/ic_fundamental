@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
+import { type LText } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
@@ -28,14 +29,20 @@ type Module08PageProps = {
 type Focus = { kind: 'strobe' } | { kind: 'mark'; id: TimingMark }
 
 const PRESET: Record<StrobeKind, number> = { early: 4, window: 14, late: 23 }
+/** 按时间先后排：太早 → 刚好 → 太晚；初始选第一个 */
+const STROBE_OPTS: Array<{ id: StrobeKind; label: LText }> = [
+  { id: 'early', label: ui.m08.early },
+  { id: 'window', label: ui.m08.window },
+  { id: 'late', label: ui.m08.late },
+]
 const CARDS = TIMING_MARKS.map((id) => ({ id, title: TIMING[id].title, text: TIMING[id].text }))
 const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1))
 
 export function Module08Page({ moduleId, onModuleChange }: Module08PageProps) {
   const { t } = useLocale()
-  const [strobe, setStrobe] = useState(PRESET.window)
+  const [strobe, setStrobe] = useState(PRESET[STROBE_OPTS[0].id])
   const [period, setPeriod] = useState(PERIOD_MAX)
-  const [mark, setMark] = useState<TimingMark>('tpd')
+  const [mark, setMark] = useState<TimingMark>(CARDS[0].id)
   const [focus, setFocus] = useState<Focus>({ kind: 'strobe' })
 
   const kind = strobeKind(strobe)
@@ -77,11 +84,7 @@ export function Module08Page({ moduleId, onModuleChange }: Module08PageProps) {
 
       <Section title={t(ui.m08.s1Title)} note={t(ui.m08.s1Note)}>
         <Seg
-          options={[
-            { id: 'early' as const, label: ui.m08.early },
-            { id: 'window' as const, label: ui.m08.window },
-            { id: 'late' as const, label: ui.m08.late },
-          ]}
+          options={STROBE_OPTS}
           value={kind}
           onChange={(id) => {
             setStrobe(PRESET[id])

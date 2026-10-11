@@ -18,7 +18,8 @@ export const PREFIXES: Prefix[] = [
   { id: 'n', sym: 'n', name: loc('纳（Nano）', 'Nano'), exp: -9 },
 ]
 
-export const UNITS = ['V', 'A', 'Ω', 'Hz', 's'] as const
+/** Hz 排第一：换算器默认取第一个前缀 G 和第一个单位，演示 2.5 GHz 这种常见的时钟频率 */
+export const UNITS = ['Hz', 'V', 'A', 'Ω', 's'] as const
 export type Unit = (typeof UNITS)[number]
 
 export const NOTATION_LEAD: LText[] = [

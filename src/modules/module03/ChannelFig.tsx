@@ -22,25 +22,26 @@ const yA = (v: number) => 292 - v * 10
 const yY = (v: number) => 348 - v * 12
 
 const FOCUS_BOX: Record<PeId, [number, number, number, number]> = {
-  driver: [292, 28, 66, 64],
-  comparator: [292, 168, 66, 56],
+  driver: [292, 14, 66, 78],
+  comparator: [292, 168, 66, 70],
   timing: [154, 90, 142, 68],
   level: [304, 90, 162, 68],
 }
 
-export function ChannelFig({ step, dut, focus }: { step: number; dut: DutCase; focus: PeId | null }) {
+export function ChannelFig({ step, dut, focus }: { step: number; dut: DutCase; focus: PeId }) {
   const { t } = useLocale()
   const hot = 'var(--gold)'
   const done = 'var(--blue)'
   const idle = 'var(--line-2)'
   const col = (k: number) => (step === k ? hot : step > k ? done : idle)
   const txt = (k: number) => (step >= k ? 'var(--text)' : 'var(--dim)')
-  const yOut = dut === 'good' ? LV.vih : 0
+  // DUT 输出高电平由它自己的 VDD 决定，不等于测试机的驱动电平
+  const yOut = dut === 'good' ? LV.vdd : 0
   const readH = yOut >= LV.voh
   const pass = readH
   const yPath =
     dut === 'good'
-      ? `M${xt(0)} ${yY(0)} H${xt(TM.drive + TM.tpd)} V${yY(LV.vih)} H${xt(TM.period)}`
+      ? `M${xt(0)} ${yY(0)} H${xt(TM.drive + TM.tpd)} V${yY(LV.vdd)} H${xt(TM.period)}`
       : `M${xt(0)} ${yY(0)} H${xt(TM.period)}`
 
   return (
@@ -209,19 +210,17 @@ export function ChannelFig({ step, dut, focus }: { step: number; dut: DutCase; f
         ) : null}
 
         {/* PE 点选框 */}
-        {focus ? (
-          <rect
-            x={FOCUS_BOX[focus][0]}
-            y={FOCUS_BOX[focus][1]}
-            width={FOCUS_BOX[focus][2]}
-            height={FOCUS_BOX[focus][3]}
-            rx="10"
-            fill="none"
-            stroke="var(--purple)"
-            strokeWidth="2"
-            strokeDasharray="5 4"
-          />
-        ) : null}
+        <rect
+          x={FOCUS_BOX[focus][0]}
+          y={FOCUS_BOX[focus][1]}
+          width={FOCUS_BOX[focus][2]}
+          height={FOCUS_BOX[focus][3]}
+          rx="10"
+          fill="none"
+          stroke="var(--purple)"
+          strokeWidth="2"
+          strokeDasharray="5 4"
+        />
 
         {/* 波形 */}
         <line x1={xt(0)} y1="356" x2={xt(TM.period)} y2="356" stroke="var(--line-2)" />

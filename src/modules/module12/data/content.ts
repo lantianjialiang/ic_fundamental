@@ -61,7 +61,7 @@ export const TESTS: TestItem[] = [
     id: 'dc',
     name: loc('DC 参数', 'DC parametrics'),
     short: 'DC',
-    cond: loc('VDD max，IOH = −1 mA', 'VDD max, IOH = −1 mA'),
+    cond: loc('VOH 在 VDD min、IOH = −1 mA；漏电在 VDD max', 'VOH at VDD min with IOH = −1 mA; leakage at VDD max'),
     vec: loc('把输出设成 1 或 0 的向量', 'Vectors that set outputs to 1 or 0'),
     limit: loc('VOH ≥ 2.4 V，|IIL|、|IIH| ≤ 1 µA', 'VOH ≥ 2.4 V, |IIL| and |IIH| ≤ 1 µA'),
     bin: 3,
@@ -151,8 +151,8 @@ export const CASES: Array<{
       {
         id: 'common',
         text: loc(
-          '先查所有芯片共用的东西：电源、管脚映射、负载板 / Socket、测试机',
-          'Check what all chips share first: power, pin map, load board / socket, tester',
+          '先查所有芯片共用的东西：电源、程序设置（管脚映射、电平、时序）、负载板 / Socket、测试机',
+          'Check what all chips share first: power, program settings (pin map, levels, timing), load board / socket, tester',
         ),
       },
       { id: 'logic', text: loc('芯片里的 XOR 设计反了', 'The XOR in the chip design is inverted') },
@@ -164,8 +164,8 @@ export const CASES: Array<{
       'When every chip fails the same item, something they all share is far more likely to be wrong than every chip failing at once.',
     ),
     order: loc(
-      '建议顺序：电源 → 管脚映射 → 负载板 / Socket → 测试机 → 电平 / 时序 / 向量 → 最后才怀疑芯片。',
-      'Suggested order: power → pin map → load board / socket → tester → levels / timing / vectors → the chip last.',
+      '建议顺序：电源 → 管脚映射 → 电平 / 时序 / 向量 → 负载板 / Socket → 测试机（跑自检诊断）→ 最后才怀疑芯片。程序设置在电脑上就能核对，最便宜，所以排在硬件前面。',
+      'Suggested order: power → pin map → levels / timing / vectors → load board / socket → tester (run its diagnostics) → the chip last. Program settings can be checked at the desk, which is cheapest, so they come before the hardware.',
     ),
   },
   {

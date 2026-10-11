@@ -3,7 +3,7 @@ import { useRef, type ReactNode } from 'react'
 import type { Group } from 'three'
 import { useLocale } from '../../../i18n/LocaleContext'
 import { useScene } from '../context/SceneContext'
-import { LAYER_BOX, type LayerId } from '../data/layout'
+import { LABEL_ANCHOR, LAYER_BOX, type LayerId } from '../data/layout'
 import { LAYER_TEXT } from '../data/text'
 import { SceneLabel } from './SceneLabel'
 
@@ -28,6 +28,7 @@ export function LayerGroup({ id, children, sub }: LayerGroupProps) {
 
   const box = LAYER_BOX[cfg.flow][id]
   const text = LAYER_TEXT[cfg.flow][id]
+  const anchor = LABEL_ANCHOR[cfg.flow][id] ?? { ax: 1, az: 1, side: 'right' }
   const focused = cfg.focus === id
   const showLabel = (cfg.showLabels || focused) && box && text
 
@@ -36,10 +37,11 @@ export function LayerGroup({ id, children, sub }: LayerGroupProps) {
       {children}
       {showLabel ? (
         <SceneLabel
-          position={[box.c[0] + box.s[0] / 2 + 0.2, box.c[1], box.c[2] + box.s[2] / 2]}
+          position={[box.c[0] + anchor.ax * (box.s[0] / 2 + 0.2), box.c[1], box.c[2] + anchor.az * (box.s[2] / 2)]}
           title={t(text.name)}
           subtitle={sub ?? t(text.sub)}
           active={focused}
+          side={anchor.side}
         />
       ) : null}
     </group>

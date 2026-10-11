@@ -103,7 +103,7 @@ export function OpensFig({ fault, pos, volt }: { fault: Fault; pos: boolean; vol
           <>
             <circle cx="270" cy="200" r="7" fill="var(--card)" stroke="var(--text)" />
             <path d="M270 137 L270 193" stroke={hot} strokeWidth="2.5" strokeDasharray="6 4" />
-            <text x="282" y="222" fill="var(--red)" fontSize="12">
+            <text x="258" y="204" textAnchor="end" fill="var(--red)" fontSize="12">
               {t(L.nb)}
             </text>
           </>

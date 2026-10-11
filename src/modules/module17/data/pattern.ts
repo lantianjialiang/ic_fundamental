@@ -17,8 +17,8 @@ export const STUCKS: Array<{ id: StuckId; title: LText; hint: LText }> = [
     id: 'add_and',
     title: loc('ADD 做成了 AND', 'ADD behaves as AND'),
     hint: loc(
-      'OP=ADD 时按 AND 算。例：A=0011 B=0001，期望 Y=0100，实测 Y=0001。其它 OP 不受影响。',
-      'When OP=ADD it computes AND. E.g. A=0011 B=0001: expected Y=0100, actual Y=0001. Other OPs are unaffected.',
+      'OP=ADD 时按 AND 算。例：A=0011 B=0100，期望 Y=0111，实测 Y=0000。其它 OP 不受影响。',
+      'When OP=ADD it computes AND. E.g. A=0011 B=0100: expected Y=0111, actual Y=0000. Other OPs are unaffected.',
     ),
   },
   {
@@ -45,8 +45,8 @@ export const STUCKS: Array<{ id: StuckId; title: LText; hint: LText }> = [
     id: 'a0_1',
     title: loc('A[0] stuck-at-1', 'A[0] stuck-at-1'),
     hint: loc(
-      '输入 A 最右一位粘 1：A=0010 进芯片后变成 0011。故障在输入，但只能从输出 Y 看出来。',
-      'Input A\'s rightmost bit is stuck at 1: A=0010 enters the chip as 0011. The fault is on an input but is only visible at output Y.',
+      '输入 A 最右一位粘 1：A=1000 进芯片后变成 1001。例：SHL A=1000 B=0001，期望 Y=0000 C=1，实测 Y=0010 C=1。A 本来就是奇数的行测不到它。故障在输入，但只能从输出看出来。',
+      'Input A\'s rightmost bit is stuck at 1: A=1000 enters the chip as 1001. E.g. SHL A=1000 B=0001: expected Y=0000 C=1, actual Y=0010 C=1. Rows where A is already odd cannot detect it. The fault is on an input but is only visible at the outputs.',
     ),
   },
 ]

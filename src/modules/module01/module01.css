@@ -81,6 +81,13 @@
   box-shadow: 0 2px 8px rgb(0 0 0 / 0.18);
 }
 
+.m01-label--left {
+  align-items: flex-end;
+  border-left: 1px solid var(--line);
+  border-right: 3px solid var(--gold);
+  transform: translate(calc(-100% - 6px), -50%);
+}
+
 .m01-label.is-active {
   border-color: var(--gold);
 }
@@ -168,6 +175,10 @@
   font-weight: 600;
 }
 
+.legend .m01-pathview {
+  margin: 0 0 8px;
+}
+
 .m01-channels {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -211,5 +222,14 @@
 
   .m01-overlay--phase {
     font-size: 12.5px;
+  }
+
+  /* 窄屏下 3D 画布优先，侧栏压低后自身滚动 */
+  .lab__body:has(> .m01-stage) > .legend {
+    max-height: 26vh;
+  }
+
+  .m01-stage {
+    min-height: 240px;
   }
 }

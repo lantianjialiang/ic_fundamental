@@ -39,8 +39,8 @@ export const CHIPS: ChipModel[] = [
     holes: [],
     islands: [],
     text: loc(
-      '边界平滑：电压越高能跑得越快，大约是一条斜线；0.75 V 以下全 Fail。规格框四周都留着好几格 Pass，裕量充足。',
-      'A smooth boundary: higher voltage allows higher speed, roughly a straight slope; below 0.75 V everything fails. Several passing cells surround the spec box, so the margin is healthy.',
+      '边界平滑：电压越高能跑得越快，大约是一条斜线；低于 0.75 V 全 Fail。0.90 V 下能跑到 550 MHz，比规格 400 MHz 多 150 MHz；规格框下方还有 3 行 Pass，裕量充足。',
+      'A smooth boundary: higher voltage allows higher speed, roughly a straight slope; below 0.75 V everything fails. At 0.90 V it runs to 550 MHz, 150 MHz above the 400 MHz spec, and three passing rows sit below the spec box, so the margin is healthy.',
     ),
   },
   {
@@ -52,8 +52,8 @@ export const CHIPS: ChipModel[] = [
     holes: [],
     islands: [],
     text: loc(
-      '形状一样，但整块 Pass 区往左下缩，边界贴着规格框的左下角（0.90 V / 400 MHz）。量产今天能 Pass，温度一高或换一台测试机就可能 Fail。',
-      'Same shape, but the pass region has shrunk toward the lower left, so its edge touches the spec box corner (0.90 V / 400 MHz). It passes production today but may fail when hotter or on another tester.',
+      '形状一样，但 Pass 区缩小了：斜边界左移（0.90 V 下只能跑到 400 MHz），底边上移到 0.85 V。边界正好贴着规格框的右下角（0.90 V / 400 MHz），频率裕量为 0。量产今天能 Pass，温度一高或换一台测试机就可能 Fail。',
+      'Same shape, but the pass region has shrunk: the sloped edge moved left (only 400 MHz at 0.90 V) and the bottom edge rose to 0.85 V. The edge just touches the lower-right corner of the spec box (0.90 V / 400 MHz), so the frequency margin is 0. It passes production today but may fail when hotter or on another tester.',
     ),
   },
   {
@@ -65,8 +65,8 @@ export const CHIPS: ChipModel[] = [
     holes: [cellKey(1.0, 300), cellKey(1.0, 350), cellKey(1.05, 300), cellKey(1.05, 350)],
     islands: [cellKey(0.8, 600), cellKey(0.8, 650), cellKey(0.85, 650)],
     text: loc(
-      '规格框里有一个空洞（本该 Pass 却 Fail），边界外还有一块孤岛（本该 Fail 却 Pass）。边界不连续，说明有不稳定的失效、噪声或测试程序本身的问题，要先排查。注意：如果量产只测框角那一点，这颗会被放过。',
-      'There is a hole inside the spec box (should pass, fails) and an island outside the edge (should fail, passes). A broken boundary points to an unstable failure, noise or a test program problem, so investigate first. Note: if production only tests the box corner, this chip slips through.',
+      '边界模型和好芯片一样（0.90 V 下 fMAX 也是 550 MHz），单看裕量看不出问题。但图上有两处不连续：红框是空洞，1.00–1.05 V × 300–350 MHz 四格在规格框里，四周都 Pass，偏偏这里 Fail；金框是孤岛，0.80 V 的 600、650 MHz 和 0.85 V 的 650 MHz 三格，按模型这两个电压最多只能跑 450、500 MHz，本该 Fail 却 Pass。边界不连续，说明有不稳定的失效、噪声或测试程序本身的问题，要先排查。注意：如果量产只测框角（0.90 V、1.10 V 下的 400 MHz），这颗会被放过。',
+      'Its boundary model matches the good chip (fMAX is also 550 MHz at 0.90 V), so the margin alone shows nothing wrong. But the plot has two breaks: the red box is a hole, four cells at 1.00–1.05 V × 300–350 MHz inside the spec box that fail although everything around them passes; the gold box is an island, 600 and 650 MHz at 0.80 V plus 650 MHz at 0.85 V, which pass although the model allows only 450 and 500 MHz at those voltages. A broken boundary points to an unstable failure, noise or a test program problem, so investigate first. Note: if production only tests the box corners (400 MHz at 0.90 V and 1.10 V), this chip slips through.',
     ),
   },
 ]
@@ -137,10 +137,13 @@ export const L = {
   vminLine: loc('最低工作电压', 'Min. operating voltage'),
   legendPass: loc('Pass', 'Pass'),
   legendFail: loc('Fail', 'Fail'),
-  legendBad: loc('规格内 Fail', 'Fail in spec'),
+  legendBad: loc('空洞（规格内 Fail）', 'Hole (fails in spec)'),
+  legendIsland: loc('孤岛（边界外 Pass）', 'Island (passes past the edge)'),
+  noteHole: loc('空洞：规格内本该 Pass 却 Fail', 'Hole: should pass, but fails'),
+  noteIsland: loc('孤岛：边界外本该 Fail 却 Pass', 'Island: should fail, but passes'),
   figCap: loc(
-    '绿色 Pass，灰色 Fail，红色是规格框内的 Fail。斜虚线是 fMAX 随 VDD 升高的趋势，横虚线是最低工作电压。',
-    'Green passes, grey fails, red is a failure inside the spec box. The sloped dashed line is fMAX rising with VDD; the flat one is the minimum operating voltage.',
+    '绿色 Pass，灰色 Fail；红底 ✕ 是规格框内的 Fail（空洞），橙底圆点是模型边界外却 Pass 的格子（孤岛）。斜虚线是 fMAX 随 VDD 升高的趋势，横虚线是最低工作电压。',
+    'Green passes, grey fails; red with ✕ is a failure inside the spec box (a hole), orange with a dot passes beyond the model edge (an island). The sloped dashed line is fMAX rising with VDD; the flat one is the minimum operating voltage.',
   ),
   rdFails: loc('规格框内 Fail', 'Fails in spec box'),
   rdFmax: loc('0.90 V 时 fMAX', 'fMAX at 0.90 V'),

@@ -131,7 +131,7 @@ export function VectorRunFig({
 
         {/* 右：当前这一行在硬件上怎么走。key 让每换一行重新播放一次 */}
         <g key={`${step}-${fault}-${expected[step]}`} className="m07-run">
-          {/* 第 1 拍：Tester 驱动 */}
+          {/* 第 1 步：Tester 驱动 */}
           <g className="m07-s1">
             {[
               { label: L.driveA, bit: row.a, y: 70 },
@@ -150,7 +150,7 @@ export function VectorRunFig({
             ))}
           </g>
 
-          {/* 第 2 拍：DUT 内部 */}
+          {/* 第 2 步：DUT 内部 */}
           <g className="m07-s2">
             <polyline points="428,90 452,90 452,120 494,120" fill="none" stroke={sig(out.aIn)} strokeWidth="3" />
             <polyline points="428,190 452,190 452,160 494,160" fill="none" stroke={sig(row.b)} strokeWidth="3" />
@@ -188,7 +188,7 @@ export function VectorRunFig({
             DUT
           </text>
 
-          {/* 第 3 拍：Strobe 比较 */}
+          {/* 第 3 步：Strobe 比较 */}
           <g className="m07-s3">
             <rect x="612" y="88" width="92" height="104" rx="8" fill="var(--panel-2)" stroke={ok ? 'var(--green)' : 'var(--red)'} strokeWidth="2" />
             <text x="658" y="106" textAnchor="middle" fill="var(--muted)" fontSize="11">

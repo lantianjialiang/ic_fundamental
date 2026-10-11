@@ -58,6 +58,9 @@ import { Callout, Cards, Explain, Knob, Readout, Seg, type Note } from './parts'
 import { WaveRows } from './WaveRows'
 import './basics.css'
 
+type Nib = 'hi' | 'lo'
+const NIBS: Nib[] = ['hi', 'lo']
+
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
 const S = {
@@ -168,11 +171,11 @@ export function FundBasicsPage({ moduleId, onModuleChange }: Props) {
   const [note, setNote] = useState<Note>({ kicker: S.kicker, title: VIR[0].title, text: VIR[0].text })
   // 工程计数法
   const [numStr, setNumStr] = useState('2.5')
-  const [prefix, setPrefix] = useState('m')
-  const [unit, setUnit] = useState<Unit>('A')
+  const [prefix, setPrefix] = useState(PREFIXES[0].id)
+  const [unit, setUnit] = useState<Unit>(UNITS[0])
   // 电压电流电阻
-  const [vir, setVir] = useState('v')
-  const [mat, setMat] = useState('cu')
+  const [vir, setVir] = useState(VIR[0].id)
+  const [mat, setMat] = useState(MATERIALS[0].id)
   const [temp, setTemp] = useState(25)
   // 欧姆定律
   const [mode, setMode] = useState<OhmMode>('fv')
@@ -181,16 +184,16 @@ export function FundBasicsPage({ moduleId, onModuleChange }: Props) {
   const [vTarget, setVTarget] = useState(5)
   // 进制
   const [bits, setBits] = useState<number[]>([1, 0, 1, 1, 1, 1, 0, 1])
-  const [nib, setNib] = useState<'hi' | 'lo'>('hi')
+  const [nib, setNib] = useState<Nib>(NIBS[0])
   // 电平
   const [volt, setVolt] = useState(1.5)
   const [noise, setNoise] = useState(0.3)
   const [freq, setFreq] = useState(10)
   // 门
-  const [gate, setGate] = useState<GateId>('nand')
+  const [gate, setGate] = useState<GateId>(GATES[0].id)
   const [a, setA] = useState(1)
   const [b, setB] = useState(0)
-  const [term, setTerm] = useState('t0')
+  const [term, setTerm] = useState(INV_TERMS[0].id)
   // D 触发器
   const [dBits, setDBits] = useState<number[]>([1, 0, 0, 1, 1, 0, 1, 0])
   const [tick, setTick] = useState(0)
@@ -490,7 +493,7 @@ export function FundBasicsPage({ moduleId, onModuleChange }: Props) {
         </div>
         <div className="basics-hexdig">
           <span>{t(S.hexDig)}</span>
-          {(['hi', 'lo'] as const).map((which) => (
+          {NIBS.map((which) => (
             <button key={which} type="button" className={nib === which ? 'is-active' : ''} onClick={() => setNib(which)}>
               {which === 'hi' ? hexStr[0] : hexStr[1]}
             </button>

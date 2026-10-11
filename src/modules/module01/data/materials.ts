@@ -10,6 +10,9 @@ import {
   Vector3,
   type MeshStandardMaterialParameters,
 } from 'three'
+import { registerDim } from './dim'
+import type { Pkg } from './layout'
+import { lbBottomTextures, lbEdgeTextures, lbSectionTexture, lbTopTextures, relayTopTexture } from './textures'
 
 /**
  * 物体本身的物理材质（FR4 绿、沉金、铜、塑封、金属……），不跟随站点主题。
@@ -92,6 +95,52 @@ export const MAT = {
   scrub: std('#5a4a35', 0.3, 0.8),
   led: new MeshBasicMaterial({ color: '#3fd0ff', toneMapped: false }),
   ledGreen: new MeshBasicMaterial({ color: '#4ee08a', toneMapped: false }),
+  /** 走线 / 过孔（实例着色），参与剖切 */
+  trackClip: clipped(std('#ffffff', 0.7, 0.35)),
+  /** 过孔孔壁电镀铜，参与剖切 */
+  copperClip: clipped(std('#c8743f', 1, 0.3)),
+  /** 牛角座 / 继电器塑壳 */
+  plasticGray: std('#3a3e45', 0.05, 0.55),
+  relayBody: std('#20252c', 0.05, 0.4),
+}
+
+for (const [key, mat] of Object.entries(MAT)) registerDim(mat, key === 'fr4Lb' || key === 'fr4Pc')
+
+/** Load Board 板体材质：四周侧面是叠层截面贴图，顶 / 底面是绿油 + 丝印 + 焊盘贴图；按封装缓存 */
+type LbMaterials = { side: MeshStandardMaterial; top: MeshStandardMaterial; bottom: MeshStandardMaterial; cap: MeshStandardMaterial }
+const lbCache = new Map<Pkg, LbMaterials>()
+let lbSide: MeshStandardMaterial | null = null
+
+export function lbMaterials(pkg: Pkg): LbMaterials {
+  const hit = lbCache.get(pkg)
+  if (hit) return hit
+  if (!lbSide) {
+    const t = lbEdgeTextures()
+    lbSide = registerDim(clipped(new MeshStandardMaterial({ map: t.map, roughnessMap: t.orm, metalnessMap: t.orm, roughness: 1, metalness: 1 })), true)
+  }
+  const top = lbTopTextures(pkg)
+  const bottom = lbBottomTextures(pkg)
+  const mats: LbMaterials = {
+    side: lbSide,
+    top: registerDim(
+      clipped(new MeshStandardMaterial({ map: top.map, roughnessMap: top.orm, metalnessMap: top.orm, roughness: 1, metalness: 1 })),
+      true,
+    ),
+    bottom: registerDim(
+      clipped(new MeshStandardMaterial({ map: bottom.map, roughnessMap: bottom.orm, metalnessMap: bottom.orm, roughness: 1, metalness: 1 })),
+      true,
+    ),
+    // 剖切截面：不随「板子半透明」变淡，剖开后一直看得清各层
+    cap: registerDim(new MeshStandardMaterial({ map: lbSectionTexture(pkg), roughness: 0.55, metalness: 0.15 })),
+  }
+  lbCache.set(pkg, mats)
+  return mats
+}
+
+let relayTop: MeshStandardMaterial | null = null
+export function relayTopMaterial(): MeshStandardMaterial {
+  if (!relayTop) relayTop = registerDim(new MeshStandardMaterial({ map: relayTopTexture(), roughness: 0.45, metalness: 0.05 }))
+  return relayTop
 }
 
 export const COPPER_COLOR = {

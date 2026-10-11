@@ -13,6 +13,11 @@ export type TrackId =
   | 'sensor'
   | 'qual'
   | 'cpo'
+  | 'glossary'
+  | 'faq'
+
+/** 不是课程列表、而是一整页工具的轨道（术语表、FAQ），首页照样显示成卡片 */
+export type TrackPageKind = 'glossary' | 'faq'
 
 export const TRACKS: Array<{
   id: TrackId
@@ -21,6 +26,7 @@ export const TRACKS: Array<{
   ready: boolean
   lessons: ModuleId[]
   knowledge: Array<{ title: LText; text: LText }>
+  page?: TrackPageKind
 }> = [
   {
     id: 'digital',
@@ -703,6 +709,30 @@ export const TRACKS: Array<{
       },
     ],
   },
+  {
+    id: 'glossary',
+    title: loc('术语表', 'Glossary'),
+    blurb: loc(
+      '把 D、F 两条轨道里讲到的名词收在一起：原文、中英文名、一句话解释和出处课程。可以搜索，可以按课程或按 A–Z 看。',
+      'Every term from the D and F tracks in one place: the original name, Chinese and English names, a one-line definition and the lessons it comes from. Search it, or browse by lesson or A–Z.',
+    ),
+    ready: true,
+    lessons: [],
+    knowledge: [],
+    page: 'glossary',
+  },
+  {
+    id: 'faq',
+    title: loc('常见问题', 'FAQ'),
+    blurb: loc(
+      '学的时候最容易卡住的问题：电平为什么这样设、Strobe 为什么会错、Scan 怎么走，以及这个网站怎么用。',
+      'The questions learners get stuck on most: why levels are set the way they are, how a strobe goes wrong, how scan works, and how to use this site.',
+    ),
+    ready: true,
+    lessons: [],
+    knowledge: [],
+    page: 'faq',
+  },
 ]
 
 /** 课程编号前缀：课程编号 = 前缀 + 它在所属轨道里的序号 */
@@ -718,6 +748,9 @@ const PREFIX: Record<TrackId, string> = {
   sensor: 'S',
   qual: 'Q',
   cpo: 'C',
+  // 术语表、FAQ 没有课程，前缀只是占位，不参与任何编号
+  glossary: 'G',
+  faq: 'FAQ',
 }
 
 /** 课程的显示编号。一课出现在多条轨道时，以第一条（所属轨道）为准。 */

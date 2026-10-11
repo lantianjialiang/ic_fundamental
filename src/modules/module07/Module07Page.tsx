@@ -20,7 +20,7 @@ const NO_FLIP = VECTORS.map(() => false)
 export function Module07Page({ moduleId, onModuleChange }: Module07PageProps) {
   const { t } = useLocale()
   const player = useStepPlayer(VECTORS.length, 1500)
-  const [fault, setFault] = useState<FaultId>('none')
+  const [fault, setFault] = useState<FaultId>(FAULTS[0].id)
   const [flipped, setFlipped] = useState<boolean[]>(NO_FLIP)
 
   const expected = VECTORS.map((row, i) => (flipped[i] ? 1 - row.y : row.y) as Bit)

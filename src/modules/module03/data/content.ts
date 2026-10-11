@@ -8,8 +8,8 @@ export const INTRO: LText[] = [
   ),
 ]
 
-/** 教学用电平 */
-export const LV = { vih: 3.0, vil: 0.0, voh: 2.4, vol: 0.4 }
+/** 教学用电平：vih / vil 是测试机 Driver 的驱动电平，voh / vol 是 Comparator 门限，vdd 是 DUT 自己的电源（决定它输出高电平有多高） */
+export const LV = { vih: 3.0, vil: 0.0, voh: 2.4, vol: 0.4, vdd: 3.3 }
 /** 一拍 20 ns：5 ns 驱动沿，DUT 延迟 6 ns，15 ns Strobe */
 export const TM = { period: 20, drive: 5, tpd: 6, strobe: 15 }
 
@@ -33,8 +33,8 @@ export const STEPS: Array<{ label: LText; text: LText }> = [
   {
     label: loc('选电平', 'Pick level'),
     text: loc(
-      'Level 决定给多高：逻辑 1 用 VIH = 3.0 V（逻辑 0 用 VIL = 0 V），交给 Driver。',
-      'Level decides how high: logic 1 uses VIH = 3.0 V (logic 0 would use VIL = 0 V), handed to the driver.',
+      'Level 决定给多高：逻辑 1 用 VIH = 3.0 V（逻辑 0 用 VIL = 0 V），交给 Driver。这里的 VIH / VIL 是测试机实际给出的驱动电平，不是规格书里芯片的输入门限（VIH min = 2.0 V），区别见下面的 Level 卡片。',
+      'Level decides how high: logic 1 uses VIH = 3.0 V (logic 0 would use VIL = 0 V), handed to the driver. These VIH / VIL are the levels the tester actually drives, not the chip’s input thresholds in the datasheet (VIH min = 2.0 V); see the Level card below.',
     ),
   },
   {
@@ -47,15 +47,15 @@ export const STEPS: Array<{ label: LText; text: LText }> = [
   {
     label: loc('DUT 响应', 'DUT responds'),
     text: loc(
-      'DUT 经过约 6 ns 延迟，在 Y 脚输出。Y 的电压回到另一路 Channel 的 Comparator，和 VOH = 2.4 V、VOL = 0.4 V 比。',
-      'After about 6 ns of delay the DUT drives pin Y. Y’s voltage returns to another channel’s comparator and is checked against VOH = 2.4 V and VOL = 0.4 V.',
+      'DUT 经过约 6 ns 延迟（5 + 6 = 11 ns），在 Y 脚输出高电平。这个高电平由 DUT 自己的电源 VDD = 3.3 V 决定，和测试机给的 3.0 V 无关。Y 的电压回到另一路 Channel 的 Comparator，和 VOH = 2.4 V、VOL = 0.4 V 比。',
+      'After about 6 ns of delay (5 + 6 = 11 ns) the DUT drives pin Y high. That high level comes from the DUT’s own supply, VDD = 3.3 V, not from the tester’s 3.0 V. Y’s voltage returns to another channel’s comparator and is checked against VOH = 2.4 V and VOL = 0.4 V.',
     ),
   },
   {
     label: loc('Strobe 采样', 'Strobe'),
     text: loc(
-      '15 ns 时 Strobe 采样一次：此刻高于 VOH 读成 H，低于 VOL 读成 L。Strobe 要放在输出稳定之后。',
-      'At 15 ns the strobe samples once: above VOH reads H, below VOL reads L. The strobe must come after the output has settled.',
+      '15 ns 时 Strobe 采样一次：此刻高于 VOH 读成 H，低于 VOL 读成 L。输出在 11 ns 才变，Strobe 放在 15 ns，留了 4 ns 让它稳定。',
+      'At 15 ns the strobe samples once: above VOH reads H, below VOL reads L. The output only changes at 11 ns, so a strobe at 15 ns leaves 4 ns for it to settle.',
     ),
   },
   {
@@ -107,8 +107,8 @@ export const PE: Array<{ id: PeId; title: LText; sub: LText; text: LText }> = [
     title: loc('Level', 'Level'),
     sub: loc('电平：决定“多高”', 'Level: decides “how high”'),
     text: loc(
-      '提供驱动电平 VIH / VIL 和比较门限 VOH / VOL。数值来自规格书，见 {@spec}。',
-      'Supplies drive levels VIH / VIL and compare thresholds VOH / VOL. The numbers come from the datasheet; see {@spec}.',
+      '提供驱动电平 VIH / VIL 和比较门限 VOH / VOL，数值由测试程序按规格书设定。注意同名不同义：测试机的 VIH 是 Driver 真正输出的高电平（本课 3.0 V）；规格书的 VIH min（2.0 V，{@pmu}）是芯片保证认成 1 的最低输入。驱动电平高于门限，1 才一定被认出；专门验证门限时，才把驱动电平恰好设成 2.0 V（{@spec}）。VOH / VOL 一般直接取规格书的 VOH min / VOL max。',
+      'Supplies drive levels VIH / VIL and compare thresholds VOH / VOL, set by the test program from the datasheet. Same names, different meanings: the tester’s VIH is the high level the driver really outputs (3.0 V here); the datasheet’s VIH min (2.0 V, {@pmu}) is the lowest input the chip promises to read as 1. A drive level above the threshold makes sure a 1 is recognized; only when the threshold itself is being verified is the drive level set to exactly 2.0 V ({@spec}). VOH / VOL usually take the datasheet’s VOH min / VOL max directly.',
     ),
   },
 ]

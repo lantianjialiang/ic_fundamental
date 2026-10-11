@@ -48,8 +48,9 @@ function summarize(chip: ChipModel) {
 
 export function Module14Page({ moduleId, onModuleChange }: Module14PageProps) {
   const { t } = useLocale()
-  const [chipId, setChipId] = useState<ChipId>('good')
-  const [cell, setCell] = useState<Cell | null>({ v: 1.0, f: 300 })
+  const [chipId, setChipId] = useState<ChipId>(CHIPS[0].id)
+  // 格子的「第一个」是图上左上角：最高电压、最低频率；初始侧栏讲芯片，不高亮格子
+  const [cell, setCell] = useState<Cell | null>({ v: VOLTS[VOLTS.length - 1], f: FREQS[0] })
   const [focus, setFocus] = useState<'cell' | 'chip'>('chip')
   const chip = CHIPS.find((c) => c.id === chipId) ?? CHIPS[0]
   const sum = summarize(chip)

@@ -89,7 +89,7 @@ type FaultId = (typeof LB_FAULTS)[number]['id']
 
 export function FundCreatePage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
-  const [note, setNote] = useState<Note>({ kicker: S.kicker, title: S.planTitle, text: PLAN_LEAD[0] })
+  const [note, setNote] = useState<Note>({ kicker: S.kicker, title: CHECKLIST[0].group, text: CHECKLIST[0].why })
   // 1. 清单
   const [checks, setChecks] = useState<Record<string, boolean>>({})
   const [checkId, setCheckId] = useState(CHECKLIST[0].id)
@@ -101,10 +101,10 @@ export function FundCreatePage({ moduleId, onModuleChange }: Props) {
   const [found, setFound] = useState<PinErr[]>([])
   const [pinClick, setPinClick] = useState<number | null>(null)
   // 4. 负载板
-  const [fault, setFault] = useState<FaultId>('none')
+  const [fault, setFault] = useState<FaultId>(LB_FAULTS[0].id)
   const [lbStep, setLbStep] = useState(0)
-  const [lbNode, setLbNode] = useState<LbNodeId>('start')
-  const [diag, setDiag] = useState('dc')
+  const [lbNode, setLbNode] = useState<LbNodeId>(LB_CHAIN[0])
+  const [diag, setDiag] = useState(DIAG_CARDS[0].id)
   // 5. 第一次跑
   const [runIdx, setRunIdx] = useState(0)
   const [runPick, setRunPick] = useState<Record<string, string>>({})
@@ -365,7 +365,7 @@ export function FundCreatePage({ moduleId, onModuleChange }: Props) {
             className="lab__btn"
             onClick={() => {
               setLbStep(0)
-              pickLb('start')
+              pickLb(LB_CHAIN[0])
             }}
           >
             {t(S.reset)}

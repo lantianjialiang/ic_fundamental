@@ -29,14 +29,21 @@ export const GROUPS: Array<{ id: string; group: LText; items: string; ask: LText
 export type Mode = 'voh' | 'vol'
 export type Drive = 'good' | 'weak'
 
-export const VDD = 3.3
+/** 分段按钮的显示顺序 */
+export const MODE_IDS: Mode[] = ['voh', 'vol']
+export const DRIVE_IDS: Drive[] = ['good', 'weak']
 
-/** 每种测法的规格与输出管等效电阻（Ω） */
+/** 测试时的电源：VDD 最低值。VDD 越低管子越弱、R_on 越大，是 VOH / VOL 的最坏情况 */
+export const VDD = 3.0
+/** 电压刻度上限（3.3 V 芯片的标称电压） */
+export const VMAX = 3.3
+
+/** 每种测法的规格与输出管等效电阻（Ω），按 VDD = 3.0 V 时取值 */
 export const MODES: Record<
   Mode,
   { limit: number; specMa: number; ron: Record<Drive, number> }
 > = {
-  voh: { limit: 2.4, specMa: 4, ron: { good: 150, weak: 260 } },
+  voh: { limit: 2.4, specMa: 4, ron: { good: 100, weak: 200 } },
   vol: { limit: 0.4, specMa: 8, ron: { good: 40, weak: 70 } },
 }
 
@@ -52,12 +59,16 @@ export function isPass(mode: Mode, volt: number): boolean {
 
 export const TAKEAWAY: LText[] = [
   loc(
-    '输出规格是“带负载的电压”：VOH @ IOH、VOL @ IOL。不带电流测，坏的驱动也能过。',
-    'Output specs are voltages under load: VOH @ IOH and VOL @ IOL. Without the current, a weak driver still passes.',
+    '输出规格是“带负载的电压”：VOH @ IOH、VOL @ IOL。不带电流测，坏的驱动也能过。原因：输出级导通的那个 MOS 管相当于一个导通电阻 R_on。不带负载时没有电流流过 R_on，上面没有压降，输出就是 VDD 或 0 V；哪怕 R_on 变大了（驱动变弱、管子有缺陷、工艺偏差），读数也一模一样。只有拉出 / 灌入规定的 IOH / IOL 电流，压降 I × R_on 才显现：VOH = VDD − |IOH| × R_on，VOL = IOL × R_on。按本课的图（VDD = 3.0 V）：VOL @ 8 mA，正常下拉 40 Ω → 0.32 V Pass，偏弱 70 Ω → 0.56 V Fail；VOH @ 4 mA，正常上拉 100 Ω → 2.60 V Pass，偏弱 200 Ω → 2.20 V Fail。可空载（0 mA）时两颗芯片都是 0 V / 3.00 V，分不出来。',
+    'Output specs are voltages under load: VOH @ IOH and VOL @ IOL. Without the current, a weak driver still passes. Why: the MOS transistor that is on in the output stage acts like an on-resistance R_on. With no load, no current flows through R_on, so there is no drop across it and the output is simply VDD or 0 V — even if R_on has grown (weaker drive, a defective transistor, process variation), the reading is identical. Only when the specified IOH / IOL is pulled out or pushed in does the drop I × R_on appear: VOH = VDD − |IOH| × R_on, VOL = IOL × R_on. In this lesson’s figure (VDD = 3.0 V): VOL @ 8 mA, a normal 40 Ω pull-down gives 0.32 V (Pass) while a weak 70 Ω one gives 0.56 V (Fail); VOH @ 4 mA, a normal 100 Ω pull-up gives 2.60 V (Pass) while a weak 200 Ω one gives 2.20 V (Fail). Unloaded (0 mA), both parts read 0 V / 3.00 V and cannot be told apart.',
   ),
   loc(
-    '输出管可以看成一个导通电阻 R_on。电流越大，VOH 掉得越多、VOL 抬得越高。',
-    'An output transistor acts like an on-resistance R_on. More current pulls VOH down further and pushes VOL up further.',
+    'IOH / IOL 对应客户板上这根脚真实要带的负载：后级芯片的输入（尤其 TTL 类输入要吃电流）、上拉 / 下拉电阻、传输线和端接电阻。测试时用 PMU 模拟这份负载，带不动的芯片装到板上就会电平不够、被后级认错。',
+    'IOH / IOL stand for the real load this pin must carry on the customer’s board: the next chip’s inputs (TTL-style inputs in particular draw current), pull-up / pull-down resistors, transmission lines and termination. The PMU stands in for that load during test; a part that cannot carry it will give marginal levels on the board and be misread by the next stage.',
+  ),
+  loc(
+    '输出管可以看成一个导通电阻 R_on。电流越大，VOH 掉得越多、VOL 抬得越高。VDD 越低管子越弱，所以 VOH / VOL 在 VDD 最低值下测。',
+    'An output transistor acts like an on-resistance R_on. More current pulls VOH down further and pushes VOL up further. A lower VDD makes the transistor weaker, so VOH / VOL are tested at the minimum VDD.',
   ),
   loc(
     '先分清电流方向：测 VOH 时 DUT Source、PMU 吸电流；测 VOL 时 PMU 灌电流、DUT Sink。',
@@ -98,15 +109,15 @@ export const QUIZ: QuizQuestion[] = [
   },
   {
     id: 'q3',
-    prompt: loc('上拉 R_on = 150 Ω，VDD = 3.3 V，IOH = 4 mA。VOH 是多少？', 'Pull-up R_on = 150 Ω, VDD = 3.3 V, IOH = 4 mA. What is VOH?'),
+    prompt: loc('上拉 R_on = 100 Ω，VDD = 3.0 V，IOH = 4 mA。VOH 是多少？', 'Pull-up R_on = 100 Ω, VDD = 3.0 V, IOH = 4 mA. What is VOH?'),
     options: [
-      { id: 'a', text: loc('3.30 V', '3.30 V') },
-      { id: 'b', text: loc('2.70 V', '2.70 V') },
-      { id: 'c', text: loc('0.60 V', '0.60 V') },
+      { id: 'a', text: loc('3.00 V', '3.00 V') },
+      { id: 'b', text: loc('2.60 V', '2.60 V') },
+      { id: 'c', text: loc('0.40 V', '0.40 V') },
       { id: 'd', text: loc('2.40 V', '2.40 V') },
     ],
     answer: 'b',
-    explain: loc('压降 4 mA × 150 Ω = 0.6 V，VOH = 3.3 − 0.6 = 2.7 V，高于 2.4 V，Pass。', 'Drop = 4 mA × 150 Ω = 0.6 V, so VOH = 3.3 − 0.6 = 2.7 V, above 2.4 V: Pass.'),
+    explain: loc('压降 4 mA × 100 Ω = 0.4 V，VOH = 3.0 − 0.4 = 2.6 V，不低于 2.4 V，Pass。3.00 V 是空载读数。', 'Drop = 4 mA × 100 Ω = 0.4 V, so VOH = 3.0 − 0.4 = 2.6 V, not below 2.4 V: Pass. 3.00 V would be the unloaded reading.'),
   },
   {
     id: 'q4',

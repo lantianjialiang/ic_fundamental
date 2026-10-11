@@ -150,6 +150,11 @@ const S = {
 
 const fmtNs = (v: number) => `${v.toFixed(1)} ns`
 
+const AC_KINDS: AcKind[] = ['setup', 'hold', 'tpd']
+const AC_KIND_LABEL: Record<AcKind, string> = { setup: 'Setup', hold: 'Hold', tpd: 'tPD' }
+/** Shmoo 图 X 轴档数选项 */
+const SH_COLS = [26, 51]
+
 /** 两种语言都填好占位符，右侧栏切换语言时仍正确 */
 const fill96 = (text: LText, row: { pin: string; measured: number; fail: number }): LText => {
   const fill = (s: string) => s.replace('{p}', row.pin).replace('{m}', row.measured.toFixed(1)).replace('{f}', String(row.fail))
@@ -159,28 +164,28 @@ const fill96 = (text: LText, row: { pin: string; measured: number; fail: number 
 export function FundCharPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [note, setNote] = useState<Note>({ kicker: S.kicker, title: WHAT[0].title, text: WHAT[0].text })
-  const [what, setWhat] = useState('limit')
-  const [checkId, setCheckId] = useState('good')
+  const [what, setWhat] = useState(WHAT[0].id)
+  const [checkId, setCheckId] = useState(CHECK_RANGES[0].id)
 
   // 二分 vs 线性
   const [truth, setTruth] = useState(1.287)
-  const [res, setRes] = useState<ResMv>(20)
+  const [res, setRes] = useState<ResMv>(RES_OPTIONS[0])
   const n = Math.round((RACE_MAX * 1000) / res)
   const resV = res / 1000
-  const [bin, setBin] = useState<BinState>(() => binInit(100))
+  const [bin, setBin] = useState<BinState>(() => binInit(Math.round((RACE_MAX * 1000) / RES_OPTIONS[0])))
   const [lin, setLin] = useState<LinState>(() => linInit())
   const [racing, setRacing] = useState(false)
   const [demo, setDemo] = useState(0)
 
   // AC 计算
-  const [acKind, setAcKind] = useState<AcKind>('setup')
+  const [acKind, setAcKind] = useState<AcKind>(AC_KINDS[0])
   const [acPos, setAcPos] = useState(AC_DEFAULT)
 
   // 参数表
-  const [param, setParam] = useState('vddmin')
+  const [param, setParam] = useState(PARAMS[0].id)
 
   // Shmoo
-  const [cols, setCols] = useState(51)
+  const [cols, setCols] = useState(SH_COLS[0])
   const [hole, setHole] = useState(false)
   const [track, setTrack] = useState(true)
   const [charView, setCharView] = useState(false)
@@ -422,11 +427,7 @@ export function FundCharPage({ moduleId, onModuleChange }: Props) {
       {/* 3. 从搜索结果算 AC 参数 */}
       <Section title={t(S.acTitle)} note={t(AC_LEAD)}>
         <Seg
-          options={[
-            { id: 'setup' as const, label: 'Setup' },
-            { id: 'hold' as const, label: 'Hold' },
-            { id: 'tpd' as const, label: 'tPD' },
-          ]}
+          options={AC_KINDS.map((id) => ({ id, label: AC_KIND_LABEL[id] }))}
           value={acKind}
           onChange={(id) => {
             setAcKind(id)
@@ -496,10 +497,7 @@ export function FundCharPage({ moduleId, onModuleChange }: Props) {
         <div className="row-actions">
           <span className="intro__note">{t(S.cols)}</span>
           <Seg
-            options={[
-              { id: '26', label: '26' },
-              { id: '51', label: '51' },
-            ]}
+            options={SH_COLS.map((c) => ({ id: String(c), label: String(c) }))}
             value={String(cols)}
             onChange={(id) => {
               setCols(Number(id))

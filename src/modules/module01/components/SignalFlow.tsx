@@ -13,7 +13,7 @@ import {
   type LineSegments,
   type Mesh,
 } from 'three'
-import { useScene } from '../context/SceneContext'
+import { activeChannel, useScene } from '../context/SceneContext'
 import { CHANNEL_COUNT, buildHops, hopPolyline, type Vec3 } from '../data/layout'
 import { GEO } from '../data/materials'
 import type { SceneTheme } from '../hooks/useSceneTheme'
@@ -48,7 +48,7 @@ function sample(pts: Vec3[], cum: number[], s: number): Vec3 {
 }
 
 /**
- * 信号路径：选中通道（或接触动画「信号」阶段的默认 CH1）画一条发光细管，
+ * 信号路径：选中通道（或接触动画「信号」阶段的默认 CH1）画一条发光管线，
  * 一串发光小球沿路径从 Test Head 流向 DUT，再流回（去程金色、回程蓝色）。
  * 分解且未选通道时，用细线画出全部 16 路的走向。
  */
@@ -67,7 +67,8 @@ export function SignalFlow({ theme }: SignalFlowProps) {
   )
   const mats = useMemo(
     () => ({
-      tube: new MeshBasicMaterial({ color: colors.tube, transparent: true, opacity: 0.85, toneMapped: false }),
+      // 不透明：和 PathHighlight 一起画在不透明队列里，淡化的部件不会和它抢排序
+      tube: new MeshBasicMaterial({ color: colors.tube, toneMapped: false }),
       pulse: new MeshBasicMaterial({ color: colors.out, toneMapped: false }),
       halo: new MeshBasicMaterial({ color: colors.out, transparent: true, opacity: 0.28, toneMapped: false, depthWrite: false }),
       lines: new LineBasicMaterial({ color: theme.muted, transparent: true, opacity: 0.75 }),
@@ -89,9 +90,7 @@ export function SignalFlow({ theme }: SignalFlowProps) {
   useFrame((_, rawDt) => {
     const dt = Math.min(rawDt, 0.05)
     const pose = store.pose
-    // 减少动态效果时，接触动画直接跳到「完成」，用静态路径代替流动脉冲
-    const signalPhase = store.phase === 'signal' || (cfg.reduced && store.phase === 'done')
-    const ch = cfg.selected ?? (signalPhase ? 0 : null)
+    const ch = activeChannel(store, cfg)
 
     const tubeMesh = tube.current
     const pulseMesh = pulses.current
@@ -113,7 +112,7 @@ export function SignalFlow({ theme }: SignalFlowProps) {
             path.add(new LineCurve3(new Vector3(...a), new Vector3(...b)))
           }
           tubeMesh.geometry.dispose()
-          tubeMesh.geometry = new TubeGeometry(path, Math.max(48, pts.length * 14), 0.011, 6, false)
+          tubeMesh.geometry = new TubeGeometry(path, Math.max(48, pts.length * 14), 0.014, 8, false)
         }
         tubeMesh.visible = true
 
@@ -131,7 +130,7 @@ export function SignalFlow({ theme }: SignalFlowProps) {
           const dir = outbound ? -1 : 1
           for (let i = 0; i < TRAIL; i += 1) {
             const p = sample(pts, cum, head + dir * i * 0.045)
-            writeInstance(pulseMesh, i, { p, s: 0.03 * (1 - i / (TRAIL + 1)) })
+            writeInstance(pulseMesh, i, { p, s: 0.036 * (1 - i / (TRAIL + 1)) })
           }
           pulseMesh.instanceMatrix.needsUpdate = true
           const hp = sample(pts, cum, head)
@@ -145,7 +144,7 @@ export function SignalFlow({ theme }: SignalFlowProps) {
 
     const lineMesh = lines.current
     if (lineMesh) {
-      const showAll = store.explode > 0.3 && cfg.selected === null && !signalPhase
+      const showAll = store.explode > 0.3 && ch === null
       lineMesh.visible = showAll
       if (showAll) {
         const arr = lineGeo.getAttribute('position') as BufferAttribute

@@ -8,8 +8,8 @@ const L = {
   psub: loc('P 衬底', 'P-substrate'),
   pType: loc('P 型', 'P-type'),
   nType: loc('N 型', 'N-type'),
-  pick: loc('点图里的管子、电阻或通路', 'Click a transistor, resistor or the path'),
-  trig: loc('触发', 'Trigger'),
+  pick: loc('点图里的管子、电阻或通路', 'Click a part in the figure'),
+  trig: loc('触发', 'Trig'),
   zero: loc('0 V', '0 V'),
   partCap: loc(
     'CMOS 反相器剖面：左边 PMOS 做在 N 阱里，右边 NMOS 做在 P 衬底上。叠在上面的两只三极管和两个电阻是结构自带的寄生元件。',

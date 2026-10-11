@@ -8,7 +8,7 @@ export const LAYERS: Array<{ id: LayerId; name: string; sub: LText; text: LText 
   {
     id: 'sheet',
     name: 'Datasheet',
-    sub: loc('器件承诺', 'What the part promises'),
+    sub: loc('器件承诺', 'What it promises'),
     text: loc(
       '规格书只写一句承诺：输入不低于 2.0 V，芯片一定认成 1。它不告诉你怎么测。',
       'The datasheet makes one promise: any input at or above 2.0 V is read as a 1. It does not say how to test it.',
@@ -17,16 +17,16 @@ export const LAYERS: Array<{ id: LayerId; name: string; sub: LText; text: LText 
   {
     id: 'spec',
     name: 'Test Spec',
-    sub: loc('测什么、怎么判', 'What to test, how to judge'),
+    sub: loc('测什么、怎么判', 'What & how to judge'),
     text: loc(
-      'Test Spec 把承诺写成可判定的一项：在什么条件下测，什么结果算过。条件取最坏情况：VDD 用最低值，输入 1 只给 2.0 V。',
-      'The test spec turns the promise into one judgeable item: the test conditions and the pass limit. Use the worst case: VDD at its minimum, and every input 1 driven at only 2.0 V.',
+      'Test Spec 把承诺写成可判定的一项：在什么条件下测，什么结果算过。条件取最坏情况：CMOS 输入门限随 VDD 升高而升高，所以 VIH 在 VDD 最高值 3.6 V 下最难过，就在 3.6 V 测（VIL 反过来在 VDD 最低值 3.0 V 测）；输入 1 只给 2.0 V。',
+      'The test spec turns the promise into one judgeable item: the test conditions and the pass limit. Use the worst case: a CMOS input threshold rises with VDD, so VIH is hardest to meet at the maximum VDD of 3.6 V and is tested there (VIL, the other way round, at the minimum VDD of 3.0 V); every input 1 is driven at only 2.0 V.',
     ),
   },
   {
     id: 'method',
     name: 'Method',
-    sub: loc('怎么施加、怎么看', 'How to apply, how to observe'),
+    sub: loc('怎么施加、怎么看', 'Apply & observe'),
     text: loc(
       'ATE 看不见芯片内部“认成了什么”。办法是跑功能向量：输入的 1 只给 2.0 V，看输出是否仍然对。门限高于 2.0 V 的芯片会把这些 1 认成 0。',
       'ATE cannot see what the chip “thinks” the input is. So run functional vectors with every input 1 at only 2.0 V and check the outputs. A part whose threshold is above 2.0 V reads those 1s as 0s.',
@@ -35,10 +35,10 @@ export const LAYERS: Array<{ id: LayerId; name: string; sub: LText; text: LText 
   {
     id: 'setup',
     name: 'Tester Setup / Program',
-    sub: loc('机台上的设置', 'Settings on the tester'),
+    sub: loc('机台上的设置', 'Tester settings'),
     text: loc(
-      '落到机台上，就是 Level 表里的一个数：VIH = 2.0 V。程序再写上电源、跑哪个 Pattern、失败进哪个 Bin。',
-      'On the tester this becomes one number in the level table: VIH = 2.0 V. The program adds the supply, which pattern to run, and which bin a failure goes to.',
+      '落到机台上，就是 Level 表里的一个数：Driver 的驱动高电平 VIH = 2.0 V（平时功能测试可能给 3.0 V，这里故意压到规格边沿）。程序再写上电源 VDD = 3.6 V、跑哪个 Pattern、失败进哪个 Bin。',
+      'On the tester this becomes one number in the level table: the driver’s high level VIH = 2.0 V (an ordinary functional test might drive 3.0 V; here it is deliberately pushed to the spec edge). The program adds the supply VDD = 3.6 V, which pattern to run, and which bin a failure goes to.',
     ),
   },
   {

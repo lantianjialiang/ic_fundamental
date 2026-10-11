@@ -17,8 +17,8 @@ const L = {
   rowIn: loc('只看输入', 'Inputs only'),
   rowState: loc('加上触发器', 'With flip-flops'),
   explodeCap: loc(
-    '每条向量 100 ns（10 MHz）。横轴是对数刻度：每往右一格，时间都乘上千倍。',
-    'Each vector takes 100 ns (10 MHz). The axis is logarithmic: each step to the right multiplies the time by about a thousand.',
+    '每条向量 100 ns（10 MHz）。横轴是对数刻度：同样的长度代表同样的倍数，而不是同样的秒数；刻度只标了几个常用时间点，间距并不相等。n 或 s 每加 1，条只往右长一小截，时间却翻一倍。',
+    'Each vector takes 100 ns (10 MHz). The axis is logarithmic: equal lengths mean equal ratios, not equal seconds. The ticks mark a few familiar times and are not evenly spaced. Each +1 in n or s adds only a short piece to the bar, yet doubles the time.',
   ),
   t1us: loc('1 µs', '1 µs'),
   t1ms: loc('1 ms', '1 ms'),
@@ -28,9 +28,12 @@ const L = {
   t1ky: loc('1000 年', '1000 yr'),
   tUni: loc('宇宙年龄', 'Age of universe'),
   sourceCap: loc(
-    '三种向量都要交给 ATE 回放，区别在于谁写、依据什么、什么时候生成。',
-    'All three end up on the ATE. They differ in who writes them, what they are based on, and when they are generated.',
+    '三种向量最后都由测试工程师放上 ATE。Functional 主要来自设计验证仿真，ATPG / Scan 来自 DFT 工程师，Algorithmic 由 APG 或 MBIST 现场生成；测试工程师负责转格式、配时序和电平、上机调试。',
+    'All three end up on the ATE through the test engineer. Functional vectors mostly come from design-verification simulation, ATPG / scan vectors from the DFT engineer, and algorithmic vectors are generated live by the APG or MBIST. The test engineer converts formats, adds timing and levels, and debugs on the tester.',
   ),
+  colWho: loc('谁提供 · 依据', 'Who provides · from what'),
+  colHow: loc('怎么生成', 'How it is made'),
+  colTe: loc('测试工程师做什么', 'Test engineer’s job'),
   good: loc('好', 'good'),
   bad: loc('坏', 'faulty'),
   caught: loc('抓到', 'caught'),
@@ -140,9 +143,9 @@ const LANES: Array<{ id: SourceId; name: string; color: string; boxes: Array<[LT
     name: 'Functional',
     color: 'var(--green)',
     boxes: [
-      [loc('规格书', 'Datasheet'), loc('真值表', 'truth table')],
-      [loc('工程师', 'Engineer'), loc('按功能手写', 'writes by hand')],
-      [loc('证明功能对', 'Proves function'), loc('不数故障覆盖率', 'no fault coverage')],
+      [loc('设计 / 验证工程师', 'Design / verif. eng.'), loc('testbench 仿真', 'testbench simulation')],
+      [loc('导出仿真波形', 'Export waveforms'), loc('VCD / WGL / STIL', 'VCD / WGL / STIL')],
+      [loc('转成 ATE Pattern', 'Convert to ATE pattern'), loc('配时序 · 补边界条件', 'timing · edge cases')],
     ],
   },
   {
@@ -150,19 +153,19 @@ const LANES: Array<{ id: SourceId; name: string; color: string; boxes: Array<[LT
     name: 'Algorithmic',
     color: 'var(--sky)',
     boxes: [
-      [loc('规则阵列', 'Regular array'), loc('Memory', '(memory)')],
-      [loc('March 算法', 'March algorithm'), loc('w0 · r0w1 · r1w0', 'w0 · r0w1 · r1w0')],
-      [loc('ATE 按地址', 'ATE generates'), loc('现场生成每一拍', 'each cycle live')],
+      [loc('March 等算法', 'March-type algorithm'), loc('面向 Memory 阵列', 'for memory arrays')],
+      [loc('ATE 的 APG 现场算', 'ATE’s APG, live'), loc('或片内 MBIST 自己跑', 'or on-chip MBIST')],
+      [loc('写 APG 程序', 'Write APG program'), loc('或启动 MBIST 读结果', 'or run MBIST')],
     ],
   },
   {
     id: 'atpg',
-    name: 'ATPG',
+    name: 'ATPG / Scan',
     color: 'var(--gold)',
     boxes: [
-      [loc('门级网表', 'Gate netlist'), loc('故障列表', 'fault list')],
-      [loc('ATPG 工具', 'ATPG tool'), loc('激活 · 传播', 'activate · propagate')],
-      [loc('预先存成', 'Stored ahead'), loc('Pattern 文件', 'as pattern file')],
+      [loc('DFT 工程师', 'DFT engineer'), loc('插 Scan / BIST', 'inserts scan / BIST')],
+      [loc('ATPG 工具', 'ATPG tool'), loc('输出 STIL / WGL', 'writes STIL / WGL')],
+      [loc('转成 ATE Pattern', 'Convert to ATE pattern'), loc('配时序 · 上机调试', 'timing · debug on ATE')],
     ],
   },
 ]
@@ -172,12 +175,18 @@ const BOX_W = 146
 
 export function SourceFig({ active }: { active: SourceId }) {
   const { t } = useLocale()
+  const heads = [L.colWho, L.colHow, L.colTe]
   return (
     <figure className="term-fig">
-      <svg viewBox="0 0 680 248" className="term-fig__svg" role="img" aria-label={t(L.sourceCap)}>
-        <rect width="680" height="248" rx="10" fill="var(--well)" />
+      <svg viewBox="0 0 680 268" className="term-fig__svg" role="img" aria-label={t(L.sourceCap)}>
+        <rect width="680" height="268" rx="10" fill="var(--well)" />
+        {heads.map((h, j) => (
+          <text key={j} x={BOX_X[j] + BOX_W / 2} y="24" textAnchor="middle" fill="var(--muted)" fontSize="11">
+            {t(h)}
+          </text>
+        ))}
         {LANES.map((lane, i) => {
-          const y = 18 + i * 76
+          const y = 38 + i * 76
           const on = lane.id === active
           const c = on ? lane.color : 'var(--line-2)'
           return (

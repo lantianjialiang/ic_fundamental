@@ -20,9 +20,12 @@ const L = {
   pnp: loc('寄生 PNP', 'Parasitic PNP'),
   npn: loc('寄生 NPN', 'Parasitic NPN'),
   anode: loc('阳极：PNP 发射极（P+ 接 VDD）', 'Anode: PNP emitter (P+ to VDD)'),
-  cathode: loc('阴极：NPN 发射极（N+ 接 GND）', 'Cathode: NPN emitter (N+ to GND)'),
-  c2b: loc('PNP 集电极 → NPN 基极', 'PNP collector → NPN base'),
-  b2c: loc('NPN 集电极 → PNP 基极', 'NPN collector → PNP base'),
+  cathode1: loc('阴极：NPN 发射极', 'Cathode: NPN emitter'),
+  cathode2: loc('（N+ 接 GND）', '(N+ to GND)'),
+  c2b1: loc('PNP 集电极 →', 'PNP collector →'),
+  c2b2: loc('NPN 基极', 'NPN base'),
+  b2c1: loc('NPN 集电极 →', 'NPN collector →'),
+  b2c2: loc('PNP 基极', 'PNP base'),
   capOff: loc('平时两只寄生管都关着，VDD 和 GND 之间没有通路。', 'Normally both parasitic transistors are off, and there is no path between VDD and GND.'),
   capOn: loc('触发后：PNP 的集电极电流流过 Rsub 打开 NPN，NPN 的集电极电流流过 Rwell 又打开 PNP——正反馈，VDD 直通 GND。', 'After triggering: PNP collector current through Rsub turns on the NPN, and NPN collector current through Rwell turns on the PNP. Positive feedback shorts VDD to GND.'),
   ivCap: loc('黑线是 SCR 的伏安曲线，蓝色虚线是外部电路的负载线，黄点是当前工作点。', 'The black line is the SCR I-V curve, the blue dashed line is the load line of the external circuit, and the yellow dot is the present operating point.'),
@@ -73,7 +76,7 @@ export function ScrCircuitFig({ fired }: { fired: boolean }) {
         </text>
         {/* 阳极：VDD → PNP 发射极 */}
         <line x1="230" y1="30" x2="230" y2="70" stroke={hot} strokeWidth={fired ? 4 : 2} />
-        <text x="150" y="56" fill="var(--muted)" fontSize="11">
+        <text x="222" y="56" textAnchor="end" fill="var(--muted)" fontSize="11">
           {t(L.anode)}
         </text>
         {/* PNP 集电极 → NPN 基极，Rsub 到 GND */}
@@ -84,8 +87,12 @@ export function ScrCircuitFig({ fired }: { fired: boolean }) {
         <text x="214" y="214" textAnchor="end" fill="var(--muted)" fontSize="12">
           Rsub
         </text>
-        <text x="296" y="168" textAnchor="middle" fill="var(--muted)" fontSize="11">
-          {t(L.c2b)}
+        {/* 夹在 PNP 框下沿、导线 x=230 与 NPN 框之间，分两行避免压线 */}
+        <text x="297" y="150" textAnchor="middle" fill="var(--muted)" fontSize="11">
+          {t(L.c2b1)}
+        </text>
+        <text x="297" y="164" textAnchor="middle" fill="var(--muted)" fontSize="11">
+          {t(L.c2b2)}
         </text>
         {/* NPN 集电极 → PNP 基极，Rwell 到 VDD */}
         <path d="M470 150 L470 95 L330 95" fill="none" stroke={hot} strokeWidth={fired ? 4 : 2} />
@@ -95,13 +102,19 @@ export function ScrCircuitFig({ fired }: { fired: boolean }) {
         <text x="486" y="64" fill="var(--muted)" fontSize="12">
           Rwell
         </text>
-        <text x="400" y="88" textAnchor="middle" fill="var(--muted)" fontSize="11">
-          {t(L.b2c)}
+        <text x="398" y="72" textAnchor="middle" fill="var(--muted)" fontSize="11">
+          {t(L.b2c1)}
+        </text>
+        <text x="398" y="86" textAnchor="middle" fill="var(--muted)" fontSize="11">
+          {t(L.b2c2)}
         </text>
         {/* 阴极：NPN 发射极 → GND */}
         <line x1="400" y1="200" x2="400" y2="240" stroke={hot} strokeWidth={fired ? 4 : 2} />
-        <text x="412" y="226" fill="var(--muted)" fontSize="11">
-          {t(L.cathode)}
+        <text x="410" y="217" fill="var(--muted)" fontSize="11">
+          {t(L.cathode1)}
+        </text>
+        <text x="410" y="231" fill="var(--muted)" fontSize="11">
+          {t(L.cathode2)}
         </text>
         {fired ? (
           <>
@@ -223,7 +236,7 @@ export function ScrIvFig({ vs, ig, r, limit, mode }: { vs: number; ig: number; r
           {t(L.onReg)}
         </text>
         {vb > 3 ? (
-          <text x={xv((vb + vHold) / 2)} y={yi(30)} textAnchor="middle" fill="var(--dim)" fontSize="10">
+          <text x={xv((vb + vHold) / 2)} y={yi(62)} textAnchor="middle" fill="var(--dim)" fontSize="10">
             {t(L.neg)}
           </text>
         ) : null}
@@ -320,16 +333,20 @@ export function LatchSeqFig({ points, step }: { points: SimPoint[]; step: number
         </text>
         <path d={stair((p) => syd(p.idd))} fill="none" stroke="var(--purple)" strokeWidth="2.5" />
         {/* 两次测量 */}
-        {[3, 8].map((k) =>
-          step >= k && points[k] ? (
+        {[3, 8].map((k) => {
+          if (step < k || !points[k]) return null
+          const cy = syd(points[k].idd)
+          // 电流很大时圆点贴近上方的“测”字，读数改写在圆点下方
+          const above = cy > SQ.dTop + 24
+          return (
             <g key={k}>
-              <circle cx={(sx(k) + sx(k + 1)) / 2} cy={syd(points[k].idd)} r="5" fill="var(--gold)" stroke="var(--text)" />
-              <text x={(sx(k) + sx(k + 1)) / 2} y={syd(points[k].idd) - 9} textAnchor="middle" fill="var(--gold)" fontSize="10" fontFamily="var(--mono)">
+              <circle cx={(sx(k) + sx(k + 1)) / 2} cy={cy} r="5" fill="var(--gold)" stroke="var(--text)" />
+              <text x={(sx(k) + sx(k + 1)) / 2} y={above ? cy - 9 : cy + 17} textAnchor="middle" fill="var(--gold)" fontSize="10" fontFamily="var(--mono)">
                 {fmtIdd(points[k].idd)}
               </text>
             </g>
-          ) : null,
-        )}
+          )
+        })}
         {/* 步号 */}
         {Array.from({ length: STEPS }, (_, k) => k).map((k) =>
           k === 0 ? null : (

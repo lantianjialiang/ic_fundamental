@@ -120,17 +120,32 @@ type Scr = { vs: number; ig: number; r: number; limit: boolean; mode: ScrMode }
 
 const MODE_LABEL: Record<ScrMode, typeof S.sOn> = { block: S.sBlock, on: S.sOn, fizzle: S.sFizzle }
 
+/** 默认演示会闩锁的芯片，所以把它排在第一个 */
+const CHIPS: Chip[] = ['latch', 'good', 'leaky']
+const CHIP_LABEL: Record<Chip, typeof S.cGood> = { latch: S.cLatch, good: S.cGood, leaky: S.cLeaky }
+
+const polOptionsOf = (mode: TestMode): Array<{ id: Pol; label: typeof S.pHi }> =>
+  mode === 'output'
+    ? [
+        { id: 'lo', label: S.oLo },
+        { id: 'hi', label: S.oHi },
+      ]
+    : [
+        { id: 'hi', label: S.pHi },
+        { id: 'lo', label: S.pLo },
+      ]
+
 export function FundLatchPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [note, setNote] = useState<Note>({ kicker: S.kicker, title: S.scrTitle, text: SCR_LEAD[1] })
   const [fired, setFired] = useState(false)
   const [scr, setScr] = useState<Scr>({ vs: 5, ig: 0, r: 10, limit: true, mode: 'block' })
-  const [trig, setTrig] = useState('rail')
-  const [param, setParam] = useState('VDDMAX')
+  const [trig, setTrig] = useState(TRIGGERS[0].id)
+  const [param, setParam] = useState(PARAMS[0].sym)
   // 流程模拟器
   const [mode, setMode] = useState<TestMode>('vbo')
-  const [pol, setPol] = useState<Pol>('hi')
-  const [chip, setChip] = useState<Chip>('latch')
+  const [pol, setPol] = useState<Pol>(polOptionsOf('vbo')[0].id)
+  const [chip, setChip] = useState<Chip>(CHIPS[0])
   const [drop, setDrop] = useState(false)
   const [step, setStep] = useState(0)
   const [playing, setPlaying] = useState(false)
@@ -176,16 +191,7 @@ export function FundLatchPage({ moduleId, onModuleChange }: Props) {
   const trigVal = mode === 'vbo' ? `VDDOVR = ${VDDOVR.toFixed(1)} V` : `${trigLabel} = ${pol === 'hi' ? '+' : '−'}${TRIG_MA} mA`
   const outLine = `${verdictKey === 'pass' ? 'NO LATCH-UP · PASS' : verdictKey === 'latch' ? 'LATCH-UP · FAIL' : 'INITIAL IDDQ FAIL'} · VDD = ${VDDMAX} V · IDD1 = ${fmtIdd(sim.idd1)}${verdictKey === 'abort' ? '' : ` · IDD = ${fmtIdd(sim.idd2)} · ${trigVal}${mode === 'vbo' ? '' : ' · PIN A3'}`}`
 
-  const polOptions =
-    mode === 'output'
-      ? [
-          { id: 'lo' as const, label: S.oLo },
-          { id: 'hi' as const, label: S.oHi },
-        ]
-      : [
-          { id: 'hi' as const, label: S.pHi },
-          { id: 'lo' as const, label: S.pLo },
-        ]
+  const polOptions = polOptionsOf(mode)
 
   const trigItem = TRIGGERS.find((c) => c.id === trig)
 
@@ -332,6 +338,7 @@ export function FundLatchPage({ moduleId, onModuleChange }: Props) {
             value={mode}
             onChange={(id) => {
               setMode(id)
+              setPol(polOptionsOf(id)[0].id)
               resetSim()
               setNote({ kicker: S.kicker, title: id === 'vbo' ? S.mVbo : id === 'input' ? S.mIn : id === 'hiz' ? S.mHiz : S.mOut, text: MODE_NOTE[id] })
             }}
@@ -351,11 +358,7 @@ export function FundLatchPage({ moduleId, onModuleChange }: Props) {
         )}
         <div className="row-actions">
           <Seg
-            options={[
-              { id: 'good' as const, label: S.cGood },
-              { id: 'latch' as const, label: S.cLatch },
-              { id: 'leaky' as const, label: S.cLeaky },
-            ]}
+            options={CHIPS.map((id) => ({ id, label: CHIP_LABEL[id] }))}
             value={chip}
             onChange={(id) => {
               setChip(id)

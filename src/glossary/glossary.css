@@ -1,0 +1,172 @@
+/* 术语表页面 */
+.gl-top .tool-bar {
+  margin-bottom: 0;
+}
+
+.gl-group__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin: 0 0 12px;
+}
+
+.gl-group__head h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  font-size: 17px;
+}
+
+.gl-code {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--blue);
+}
+
+.gl-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 10px;
+}
+
+.gl-term {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-l);
+  background: var(--card);
+  scroll-margin: 80px;
+}
+
+.gl-term__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+
+.gl-term__name {
+  margin: 0;
+  font-size: 15px;
+  font-family: var(--mono);
+  color: var(--blue);
+}
+
+.gl-term__zh {
+  font-weight: 600;
+}
+
+.gl-term__en {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.gl-term__link {
+  margin-left: auto;
+  padding: 0 4px;
+  color: var(--muted);
+  font-family: var(--mono);
+  text-decoration: none;
+}
+
+.gl-term__link:hover {
+  color: var(--blue);
+}
+
+.gl-term__def {
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* 主词条在别的课：只列名字 + “见 Dxx” */
+.gl-refs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.gl-ref {
+  appearance: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.gl-ref strong {
+  font-family: var(--mono);
+  font-weight: 600;
+  color: var(--blue);
+}
+
+.gl-ref em {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.gl-ref:hover {
+  border-color: var(--blue-line);
+  background: var(--card-hover);
+}
+
+/* A–Z 视图 */
+.gl-letters {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 0 12px;
+  padding: 6px 0;
+  background: var(--bg, var(--panel-2));
+}
+
+.gl-letter {
+  appearance: none;
+  min-width: 28px;
+  padding: 3px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+  color: var(--blue);
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.gl-letter:hover {
+  border-color: var(--blue-line);
+}
+
+.gl-letter-head {
+  margin: 18px 0 8px;
+  font-family: var(--mono);
+  font-size: 16px;
+  color: var(--muted);
+  scroll-margin: 56px;
+}
+
+@media (max-width: 900px) {
+  .gl-list {
+    grid-template-columns: 1fr;
+  }
+
+  .gl-group__head h2 {
+    font-size: 15px;
+  }
+}

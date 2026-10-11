@@ -8,7 +8,8 @@ import { FocusBox } from './components/FocusBox'
 import { Handler } from './components/Handler'
 import { LoadBoard } from './components/LoadBoard'
 import { Mainframe } from './components/Mainframe'
-import { PogoTower } from './components/PogoTower'
+import { PathHighlight } from './components/PathHighlight'
+import { PogoTowerCP, PogoTowerFT } from './components/PogoTower'
 import { ProbeCard } from './components/ProbeCard'
 import { SignalFlow } from './components/SignalFlow'
 import { Socket } from './components/Socket'
@@ -16,7 +17,7 @@ import { Stage } from './components/Stage'
 import { TestHead } from './components/TestHead'
 import { Wafer } from './components/Wafer'
 import { SceneContext, type SceneConfig, type SceneStore } from './context/SceneContext'
-import { CAMERA_PRESET, type ContactPhase } from './data/layout'
+import { CAMERA_LIMITS, CAMERA_PRESET, type ContactPhase } from './data/layout'
 import { useSceneTheme } from './hooks/useSceneTheme'
 
 type SceneProps = {
@@ -47,29 +48,43 @@ export function Scene({ store, cfg, resetKey, onPhase }: SceneProps) {
         <Stage theme={theme} flow={cfg.flow} />
         <AnimationDriver onPhase={onPhase} />
 
+        {/* 两条流程各自一整棵子树（带 key）：切换时旧流程的部件全部卸载，任何时刻只渲染当前流程的叠层 */}
         {isFT ? (
-          <>
+          <group key="FT">
             <Handler />
             <DUT />
             <Socket />
             <LoadBoard />
-          </>
+            <PogoTowerFT />
+            <TestHead />
+          </group>
         ) : (
-          <>
+          <group key="CP">
+            <TestHead />
+            <PogoTowerCP />
             <ProbeCard />
             <Wafer />
             <Chuck />
             <ProberBase />
-          </>
+          </group>
         )}
-        <PogoTower />
-        <TestHead />
         <Mainframe />
 
+        <PathHighlight />
         <SignalFlow theme={theme} />
         <FocusBox color={theme.gold} />
 
-        <OrbitControls makeDefault enableDamping dampingFactor={0.12} minDistance={0.6} maxDistance={26} maxPolarAngle={Math.PI * 0.49} />
+        <OrbitControls
+          makeDefault
+          enableDamping
+          dampingFactor={0.12}
+          minDistance={1.2}
+          maxDistance={22}
+          minAzimuthAngle={-Infinity}
+          maxAzimuthAngle={Infinity}
+          minPolarAngle={CAMERA_LIMITS.minPolar}
+          maxPolarAngle={CAMERA_LIMITS.maxPolar}
+        />
         <CameraRig resetKey={resetKey} />
       </SceneContext.Provider>
     </Canvas>

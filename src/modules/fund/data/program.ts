@@ -124,11 +124,12 @@ export const MODES: Array<{ id: TestMode; label: LText }> = [
 export const MODE_TEXT: Record<TestMode, LText> = {
   sort: loc('晶圆测试：在探针台上，用针卡扎每一颗 Die。', 'Wafer sort: on the prober, a probe card contacts each die.'),
   final: loc('成品测试：封装以后，在分选机上测。', 'Final test: after packaging, tested on the handler.'),
-  qa: loc('QA 抽检：从已经测过的成品里抽样再测一遍，通常限值更严。', 'QA sampling: a sample of already tested parts is retested, usually with tighter limits.'),
+  qa: loc('QA 抽检：从已经测过的成品里抽样再测一遍。通常直接用规格书限值，比量产限值略松——量产限值带 Guardband，好片不该在 QA 被误杀。', 'QA sampling: a sample of already tested parts is retested, usually at the data sheet limits, slightly looser than production limits. Production limits carry a guardband, so good parts should not be rejected at QA.'),
   char: loc('表征：工程用，跑 Shmoo、搜索等慢例程。', 'Characterization: for engineering, runs slow routines such as Shmoo and searches.'),
 }
 
-export const TEMPS: string[] = ['-40', '25', '85', '125']
+/** 常温放第一个，作为菜单默认温度 */
+export const TEMPS: string[] = ['25', '-40', '85', '125']
 export const VERSIONS: string[] = ['Rev A', 'Rev B']
 
 /** 负载板测试 / 诊断可能出现的故障，用来模拟“偶尔失败” */

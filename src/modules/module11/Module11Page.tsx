@@ -18,7 +18,7 @@ type Module11PageProps = {
 
 export function Module11Page({ moduleId, onModuleChange }: Module11PageProps) {
   const { t } = useLocale()
-  const [fault, setFault] = useState<FaultId>('none')
+  const [fault, setFault] = useState<FaultId>(FAULTS[0].id)
   const frames = useMemo(() => buildFrames(fault), [fault])
   const player = useStepPlayer(frames.length, 1100)
   const frame = frames[Math.min(player.step, frames.length - 1)]

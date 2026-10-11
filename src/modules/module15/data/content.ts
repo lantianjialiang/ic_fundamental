@@ -4,7 +4,7 @@ import { type QuizQuestion } from '../../../lab/QuizList'
 export const SPECS: Array<{ name: string; limit: LText }> = [
   { name: 'VDD', limit: loc('3.3 V', '3.3 V') },
   { name: 'VIH / VIL', limit: loc('≥ 2.0 V / ≤ 0.8 V', '≥ 2.0 V / ≤ 0.8 V') },
-  { name: 'VOH / VOL', limit: loc('≥ 2.4 V @ 8 mA / ≤ 0.4 V', '≥ 2.4 V @ 8 mA / ≤ 0.4 V') },
+  { name: 'VOH / VOL', limit: loc('≥ 2.4 V @ IOH 8 mA / ≤ 0.4 V @ IOL 8 mA', '≥ 2.4 V @ IOH 8 mA / ≤ 0.4 V @ IOL 8 mA') },
   { name: 'IDD', limit: loc('< 20 mA', '< 20 mA') },
   { name: 'tpd', limit: loc('< 8 ns', '< 8 ns') },
   { name: 'fMAX', limit: loc('100 MHz', '100 MHz') },
@@ -102,9 +102,10 @@ export type BankVec = {
 }
 
 export const BANK: BankVec[] = [
-  { id: 'add1', op: 0, a: 0x3, b: 0x1, tags: ['add'] },
+  // add1 / and1 / or1 的结果 Y[0] = 1，这样「Y[0] 粘 0」会在多种 OP 上同时暴露
+  { id: 'add1', op: 0, a: 0x3, b: 0x4, tags: ['add'] },
   { id: 'addc', op: 0, a: 0xf, b: 0x1, tags: ['add', 'carry'] },
-  { id: 'and1', op: 1, a: 0xc, b: 0xa, tags: ['and'] },
+  { id: 'and1', op: 1, a: 0xd, b: 0xb, tags: ['and'] },
   { id: 'or1', op: 2, a: 0x1, b: 0x2, tags: ['or'] },
   { id: 'xor1', op: 3, a: 0x5, b: 0x3, tags: ['xor'] },
   { id: 'shl1', op: 4, a: 0x3, b: 0x1, tags: ['shl'] },
@@ -237,7 +238,7 @@ export const QUIZ: QuizQuestion[] = [
       { id: 'vdd', text: loc('这样才能供电', 'It is needed to power the chip') },
     ],
     answer: 'carry',
-    explain: loc('3+1 只覆盖加法本身，不碰 Carry。进位位必须有一条向量去激活它。', '3+1 never touches Carry. The carry bit needs a vector that activates it.'),
+    explain: loc('0x3 + 0x4 = 0x7 只覆盖加法本身，Carry 一直是 0。进位位必须有一条向量去激活它。', '0x3 + 0x4 = 0x7 only covers the sum; Carry stays 0. The carry bit needs a vector that activates it.'),
   },
   {
     id: 'q2',
@@ -315,8 +316,8 @@ export function judgeTiming(period: number, strobe: number, drive = 0): { ok: bo
       ok: false,
       kind: 'early',
       text: loc(
-        `Strobe ${strobe} ns 早于 Drive + tpd = ${settle} ns：采到上一拍的旧值，好芯片也会 Fail。`,
-        `Strobe ${strobe} ns is before Drive + tpd = ${settle} ns: it reads the previous value, so even a good chip fails.`,
+        `Strobe ${strobe} ns 早于 Drive + tpd = ${settle} ns：输出还没变到本拍的结果，采到的是上一拍的旧值，好芯片也会 Fail（只有新旧值碰巧相同的行能 Pass）。`,
+        `Strobe ${strobe} ns is before Drive + tpd = ${settle} ns: the output has not reached this cycle's result, so it reads the previous value and even a good chip fails (only rows whose old and new values happen to match pass).`,
       ),
     }
   }

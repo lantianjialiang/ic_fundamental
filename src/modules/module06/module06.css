@@ -18,6 +18,25 @@
   }
 }
 
+/* 空载 vs 带载对比表：当前选中的那颗芯片一列高亮 */
+.m06-cmp {
+  margin-top: 14px;
+}
+
+.m06-cmp caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.m06-cmp th.is-cur,
+.m06-cmp td.is-cur {
+  background: var(--gold-bg);
+}
+
 .m06-ctrl {
   display: flex;
   flex-wrap: wrap;

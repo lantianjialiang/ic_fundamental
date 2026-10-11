@@ -7,8 +7,8 @@ export const WHAT: LText[] = [
     'From wafer to shipment, every step can produce bad parts. Test uses ATE to stimulate each DUT, measure the response, and judge Pass / Fail. Bad parts are pulled out; only good ones move on.',
   ),
   loc(
-    '测试只做判断，不修芯片。它保护的是出货质量和后面工序的成本。',
-    'Test only judges; it does not repair. It protects outgoing quality and the cost of later steps.',
+    '测试的本职是判断，不是修芯片。它保护的是出货质量和后面工序的成本。（存储芯片是个例外：测出坏单元后可以换上备用行列，这叫 Repair，是测试流程里专门加的一步。）',
+    'Test’s job is to judge, not to repair. It protects outgoing quality and the cost of later steps. (Memory is the exception: once test finds bad cells, spare rows/columns can be swapped in. That step is called repair and is added to the test flow on purpose.)',
   ),
 ]
 
@@ -20,8 +20,8 @@ export const CHAIN: Array<{ id: ChainId; title: LText; sub: LText; text: LText; 
     title: loc('Wafer', 'Wafer'),
     sub: loc('晶圆', 'Wafer'),
     text: loc(
-      'Fab 把电路做到硅片上，一片晶圆上有成千上万颗还没切开的 die。此时谁好谁坏还不知道。',
-      'The fab builds the circuit on silicon. One wafer holds thousands of undiced dies. Nobody knows yet which ones work.',
+      'Fab 把电路做到硅片上，一片晶圆上有几十到几万颗还没切开的 die（die 越大，颗数越少）。此时谁好谁坏还不知道。',
+      'The fab builds the circuit on silicon. One wafer holds tens to tens of thousands of undiced dies (bigger dies, fewer per wafer). Nobody knows yet which ones work.',
     ),
   },
   {
@@ -30,8 +30,8 @@ export const CHAIN: Array<{ id: ChainId; title: LText; sub: LText; text: LText; 
     sub: loc('晶圆测试', 'Wafer sort'),
     test: true,
     text: loc(
-      'Circuit Probe。封装前，用探针扎晶圆上的 pad，把坏 die 标出来，省掉封装坏片的钱。',
-      'Circuit Probe. Before packaging, needles touch the pads on the wafer and bad dies are marked, so nobody pays to package them.',
+      'Chip Probing（也叫 Circuit Probe、Wafer Sort）。封装前，用探针扎晶圆上的 pad，把坏 die 记进晶圆 Bin 图，省掉封装坏片的钱。',
+      'Chip Probing (also called Circuit Probe or Wafer Sort). Before packaging, needles touch the pads on the wafer and bad dies are recorded in the wafer bin map, so nobody pays to package them.',
     ),
   },
   {
@@ -39,8 +39,8 @@ export const CHAIN: Array<{ id: ChainId; title: LText; sub: LText; text: LText; 
     title: loc('Packaging', 'Packaging'),
     sub: loc('封装', 'Assembly'),
     text: loc(
-      '晶圆切开，好 die 装进封装、打线，长出引脚或焊球，变成常见的芯片样子。',
-      'The wafer is diced; good dies are packaged and bonded and get pins or balls — the chip shape people recognize.',
+      '晶圆切割成一颗颗 die，只把 CP 判为好的 die 装进封装（打线或倒装焊），引出引脚或焊球，变成常见的芯片样子。',
+      'The wafer is diced; only the dies CP judged good are packaged (wire-bonded or flip-chip) and given pins or balls — the chip shape people recognize.',
     ),
   },
   {
@@ -49,8 +49,8 @@ export const CHAIN: Array<{ id: ChainId; title: LText; sub: LText; text: LText; 
     sub: loc('成品测试', 'Final test'),
     test: true,
     text: loc(
-      'Final Test。封装后的器件放进 Socket，做更完整的功能、DC、AC 测试，决定能不能出货。封装本身也可能做坏，所以还要再测。',
-      'Final Test. Packaged devices sit in a socket and get fuller functional, DC, and AC tests that decide shipment. Assembly itself can break parts, so they are tested again.',
+      'Final Test。Handler 把封装好的器件压进 Socket，做更完整的功能、DC、AC 测试，决定能不能出货。封装本身也可能做坏（打线断、焊球虚接），所以还要再测。',
+      'Final Test. A handler presses packaged devices into a socket for fuller functional, DC, and AC tests that decide shipment. Assembly itself can break parts (broken bond wires, bad balls), so they are tested again.',
     ),
   },
   {
@@ -136,11 +136,14 @@ export const TERMS: Term[] = [
   {
     id: 'cp',
     name: 'CP',
-    full: loc('Circuit Probe / Wafer Sort', 'Circuit Probe / Wafer Sort'),
-    text: loc('封装前的晶圆测试。DUT 是晶圆上的一颗 die。', 'Wafer test before packaging. The DUT is one die on the wafer.'),
+    full: loc('Chip Probing / 晶圆测试', 'Chip Probing / Wafer Sort'),
+    text: loc(
+      '封装前的晶圆测试，也叫 Circuit Probe、Wafer Sort。DUT 是晶圆上还没切开的 die。',
+      'Wafer test before packaging, also called Circuit Probe or Wafer Sort. The DUT is a die on the uncut wafer.',
+    ),
     caption: loc(
-      '探针卡压在晶圆上方，探针扎在 die 的 pad 上。晶圆放在可移动的 chuck 上，测完一颗挪到下一颗。',
-      'The probe card sits over the wafer and its needles land on a die’s pads. The wafer rides on a moving chuck that steps to the next die.',
+      '侧视：探针卡固定在测试头下方，Prober 的 chuck 托着晶圆往上顶，让针尖扎到一颗 die（金框）的 pad 上。测完，chuck 移到下一颗。',
+      'Side view: the probe card is fixed under the test head. The prober’s chuck lifts the wafer so the needle tips land on one die’s pads (gold frame). After the test, the chuck steps to the next die.',
     ),
   },
   {
@@ -149,8 +152,8 @@ export const TERMS: Term[] = [
     full: loc('Final Test', 'Final Test'),
     text: loc('封装后的成品测试。DUT 是封装好的芯片。', 'Test after packaging. The DUT is the packaged chip.'),
     caption: loc(
-      '封装芯片被压进 Socket，Socket 焊在 Load Board 上，下面接测试头。',
-      'The packaged chip is pressed into a socket mounted on the load board, with the test head below.',
+      '侧视：Handler 压头把封装好的芯片压进 Socket，焊球压在弹簧针上。Socket 用螺丝固定在 Load Board 上（方便更换），Load Board 下面是测试头。',
+      'Side view: the handler plunger presses the packaged chip into the socket so its balls rest on spring pins. The socket is screwed onto the load board (so it can be replaced), and the test head is below.',
     ),
   },
   {
@@ -162,8 +165,8 @@ export const TERMS: Term[] = [
       'Automatic Test Equipment. It follows the test program to stimulate the DUT, measure the response, and judge Pass / Fail.',
     ),
     caption: loc(
-      '量产 ATE = 主机柜 + 测试头。电缆把主机里的资源接到测试头，DUT 在测试头上方。',
-      'A production ATE = mainframe + test head. Cables bring the mainframe resources to the head; the DUT sits on top of the head.',
+      '量产 ATE = 主机柜 + 测试头。电缆把主机里的资源接到测试头，测试头架在支架上；DUT 在测试头上方，中间隔着 Load Board 和 Socket。',
+      'A production ATE = mainframe + test head. Cables bring the mainframe resources to the head, which sits on a manipulator. The DUT is on top of the head, with the load board and socket in between.',
     ),
   },
   {
@@ -175,8 +178,8 @@ export const TERMS: Term[] = [
       'The device being tested: a die on the wafer in CP, a packaged chip in FT.',
     ),
     caption: loc(
-      '一颗 QFP 封装芯片，四边是引脚，圆点标出 1 号脚。',
-      'A QFP packaged chip with pins on four sides; the dot marks pin 1.',
+      '一颗 QFP 封装芯片：四边各 8 根引脚，从塑封体侧面伸出、向下弯成鸥翼形（右侧侧视），左上角圆点标出 1 号脚。',
+      'A QFP packaged chip: 8 leads on each side come out of the body and bend down into a gull wing (side view on the right). The dot at top left marks pin 1.',
     ),
   },
   {
@@ -188,8 +191,8 @@ export const TERMS: Term[] = [
       'The usual shop-floor name for the ATE. It gives every pin its own test channel.',
     ),
     caption: loc(
-      '测试头内部插着一排通道板，每块板有若干 Channel，顶面的弹簧针把信号送到 Load Board。',
-      'Inside the test head sits a row of channel boards, each with several channels. Pogo pins on top carry signals up to the load board.',
+      '测试头剖面：里面竖插着一排通道板，每块板有若干 Channel；顶面每组弹簧针对应下面一块板，把信号送到 Load Board。',
+      'Test head cross-section: a row of channel boards stands inside, each with several channels. Each group of pogo pins on top belongs to the board below it and carries its signals up to the load board.',
     ),
   },
   {
@@ -201,8 +204,8 @@ export const TERMS: Term[] = [
       'A PCB made for this one device. It routes test-head channels to every pin of the socket.',
     ),
     caption: loc(
-      '四周是接测试头的焊盘，金色走线汇到中间的 Socket 位置，圆点是换层的过孔。',
-      'Pads around the edge meet the test head; gold traces run to the socket site in the middle; dots are vias.',
+      '俯视：四边是和测试头弹簧针接触的焊盘，金色走线汇到中间 Socket 位置四边的焊盘，蓝色圆点是换层的过孔。',
+      'Top view: pads along the edges meet the test head’s pogo pins; gold traces run to the pads on all four sides of the socket site in the middle; blue dots are vias.',
     ),
   },
   {
@@ -214,8 +217,8 @@ export const TERMS: Term[] = [
       'The FT socket. It lets chips be inserted again and again with reliable contact and no soldering.',
     ),
     caption: loc(
-      '剖面：底座里是一排弹簧针，芯片的焊球压在针上，盖子合上把芯片压紧。',
-      'Cross-section: spring pins in the base, the chip’s balls rest on them, and the lid closes to press the chip down.',
+      '翻盖式 Socket 剖面：底座里是一排弹簧针，上端顶着芯片焊球，下端压在 Load Board 焊盘上；盖子合上，压块把芯片压紧。量产时没有盖子，改由 Handler 压头往下压。',
+      'Clamshell socket cross-section: spring pins in the base touch the chip’s balls at the top and the load-board pads at the bottom. Closing the lid lets its pusher press the chip down. In production there is no lid; the handler plunger presses instead.',
     ),
   },
   {
@@ -227,8 +230,8 @@ export const TERMS: Term[] = [
       'The CP interface board; it does the job of the FT load board plus socket.',
     ),
     caption: loc(
-      '俯视：圆形 PCB，四周接测试头，中间窗口里探针向中心排开，针尖对准 die 的 pad。',
-      'Top view: a round PCB that meets the test head at the rim. In the center window, needles point inward to the die pads.',
+      '俯视：圆形 PCB，边缘一圈焊盘接测试头；中间窗口里，探针从四边伸向中心，每根针尖对准 die 上的一个 pad。',
+      'Top view: a round PCB whose rim pads meet the test head. In the center window, needles reach in from all four sides, each tip aimed at one pad on the die.',
     ),
   },
   {
@@ -240,8 +243,8 @@ export const TERMS: Term[] = [
       'The FT material-moving machine: it puts chips into the socket and sorts them by Bin after test. It moves parts; it does not measure.',
     ),
     caption: loc(
-      '从进料盘取芯片 → 压进测试位 → 按 ATE 给的 Bin 放进不同出料盘。',
-      'Pick from the input tray → press into the test site → drop into an output tray by the Bin the ATE reports.',
+      '俯视：从进料盘取芯片 → 压进测试位的 Socket → 按 ATE 给的 Bin 放进对应的出料盘。',
+      'Top view: pick from the input tray → press into the socket at the test site → drop into the output tray for the Bin the ATE reports.',
     ),
   },
   {
@@ -253,8 +256,8 @@ export const TERMS: Term[] = [
       'Tells the ATE what to test, in what order, against which limits, and which Bin a failure goes to.',
     ),
     caption: loc(
-      '程序按顺序跑一串测试项，每项有测量值和限值，第一个失败项决定 Bin。',
-      'The program runs a list of tests in order. Each has a measured value and limits; the first failing test decides the Bin.',
+      '程序按顺序跑一串测试项，每项把测量值和限值比较。量产常用“遇错即停”：第一个失败项决定 Bin，这里 VOH 低于 2.4 V，进 Bin 3（DC 失败）。',
+      'The program runs tests in order and compares each measured value to its limits. Production usually stops on the first fail, and that test decides the Bin: here VOH is below 2.4 V, so the part goes to Bin 3 (DC fail).',
     ),
   },
   {
@@ -262,12 +265,12 @@ export const TERMS: Term[] = [
     name: 'Pattern',
     full: loc('测试向量', 'Test vectors'),
     text: loc(
-      '一拍一行的表：每根输入脚给 0 还是 1，每根输出脚期望 H 还是 L。',
-      'A table, one row per cycle: drive 0 or 1 on each input, expect H or L on each output.',
+      '一拍一行的表：每根输入脚给 0 还是 1，每根输出脚期望 H 还是 L（或 X 不比较）。',
+      'A table, one row per cycle: drive 0 or 1 on each input, expect H or L on each output (or X: do not compare).',
     ),
     caption: loc(
-      '1 / 0 = 驱动，H / L = 期望，X = 这一拍不比较。高亮的是正在执行的那一行。',
-      '1 / 0 = drive, H / L = expect, X = do not compare this cycle. The highlighted row is the one running now.',
+      '1 / 0 = 驱动，H / L = 期望，X = 这一拍不比较。例子里 Y = A·B + C，可以逐行核对期望值。高亮的是正在执行的那一行。',
+      '1 / 0 = drive, H / L = expect, X = do not compare this cycle. Here Y = A·B + C, so every expected value can be checked row by row. The highlighted row is the one running now.',
     ),
   },
   {
@@ -275,12 +278,12 @@ export const TERMS: Term[] = [
     name: 'Bin',
     full: loc('分档', 'Bin'),
     text: loc(
-      '测完后给每颗 DUT 的分类号，例如 Bin 1 = 好品，Bin 5 = 功能失败。',
-      'The category number each DUT gets after test, e.g. Bin 1 = good, Bin 5 = functional fail.',
+      '测完后给每颗 DUT 的分类号。编号的含义由测试程序定义，本课例子：Bin 1 = 好品，Bin 3 = DC 失败，Bin 5 = 功能失败。',
+      'The category number each DUT gets after test. The test program defines what each number means; in this lesson Bin 1 = good, Bin 3 = DC fail, Bin 5 = functional fail.',
     ),
     caption: loc(
-      '晶圆 Bin 图：每个格子是一颗 die，颜色是它的 Bin。',
-      'Wafer bin map: each square is one die, colored by its Bin.',
+      'CP 的晶圆 Bin 图：每个格子是一颗完整的 die，颜色是它的 Bin。边缘不完整的 die 不测、不画；底部小缺口是晶圆定位 notch。',
+      'CP wafer bin map: each square is one whole die, colored by its Bin. Partial dies at the edge are not tested or drawn; the small notch at the bottom orients the wafer.',
     ),
   },
   {
@@ -292,8 +295,8 @@ export const TERMS: Term[] = [
       'Good count ÷ tested count — the most direct quality and cost number.',
     ),
     caption: loc(
-      '同一张 Bin 图数一数：绿色格子数 ÷ 全部格子数 = 良率。',
-      'Count the same bin map: green squares ÷ all squares = yield.',
+      '和 Bin 图是同一张晶圆：绿色（Bin 1）格子数 ÷ 全部格子数 = 良率，四舍五入到整数。',
+      'The same wafer as the bin map: green (Bin 1) squares ÷ all squares = yield, rounded to a whole percent.',
     ),
   },
 ]
@@ -363,15 +366,27 @@ export const SYS: Record<SysId, { title: LText; text: LText }> = {
   },
   result: {
     title: loc('Pass / Fail → Bin', 'Pass / Fail → Bin'),
-    text: loc('每一项和限值比完，工作站给出 Bin 号，Handler 或 Prober 按它分拣。', 'After every test is compared to its limits, the workstation assigns a Bin; the handler or prober sorts by it.'),
+    text: loc(
+      '每一项和限值比完，工作站给出 Bin 号。FT 时 Handler 按它把芯片放进对应料盘；CP 时 die 还连在晶圆上没法分拣，Prober 把 Bin 号记进晶圆 Bin 图，封装厂只封好 die。',
+      'After every test is compared to its limits, the workstation assigns a Bin. In FT the handler drops the chip into the matching tray. In CP the die is still part of the wafer and cannot be sorted, so the prober records the Bin in the wafer bin map and assembly packages only the good dies.',
+    ),
   },
 }
 
+/** 系统框图里方块的显示顺序（从左上到右下），默认选中第一个 */
+export const SYS_ORDER: SysId[] = ['program', 'controller', 'ate', 'pe', 'pmu', 'dps', 'head', 'loadboard', 'socket', 'dut', 'result']
+
 export const TAKEAWAY: LText[] = [
-  loc('测试 = 自动加信号、测响应、判 Pass / Fail；只判断，不修理。', 'Test = automatically stimulate, measure, and judge Pass / Fail. It judges; it does not repair.'),
+  loc(
+    '测试 = 自动加信号、测响应、判 Pass / Fail；本职是判断，不修理（存储芯片的冗余修复是专门加的一步）。',
+    'Test = automatically stimulate, measure, and judge Pass / Fail. Its job is to judge, not repair (memory redundancy repair is a step added on purpose).',
+  ),
   loc('测两次：封装前 CP 测 die，封装后 FT 测成品。', 'Test twice: CP tests dies before packaging, FT tests finished parts after.'),
   loc('CP 用 Probe Card 扎晶圆；FT 用 Load Board + Socket 接芯片，Handler 负责搬运分拣。', 'CP needles the wafer through a probe card; FT reaches the chip through a load board and socket, with a handler moving and sorting.'),
-  loc('结果是 Bin 号；好品数 ÷ 测试数 = 良率。', 'The result is a Bin number; good count ÷ tested count = yield.'),
+  loc(
+    '结果是 Bin 号：FT 时 Handler 按 Bin 分拣，CP 时记进晶圆 Bin 图；好品数 ÷ 测试数 = 良率。',
+    'The result is a Bin number: in FT the handler sorts by it, in CP it goes into the wafer bin map. Good count ÷ tested count = yield.',
+  ),
 ]
 
 export const QUIZ: QuizQuestion[] = [
@@ -395,7 +410,10 @@ export const QUIZ: QuizQuestion[] = [
       { id: 'c', text: loc('CP 测过就不用 FT 了', 'After CP, FT is not needed') },
     ],
     answer: 'b',
-    explain: loc('测试不修芯片。封装也可能做坏，所以 FT 还要再测。', 'Test never repairs. Packaging can break parts too, so FT tests again.'),
+    explain: loc(
+      'CP 只判断好坏、把坏 die 记下来，坏 die 修不好；先挑掉它们，就不用花钱封装坏片。封装也可能做坏，所以 FT 还要再测。',
+      'CP only judges and records bad dies; it cannot make them good. Pulling them out first means nobody pays to package bad parts. Packaging can break parts too, so FT tests again.',
+    ),
   },
   {
     id: 'q3',

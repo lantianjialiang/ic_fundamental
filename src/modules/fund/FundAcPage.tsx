@@ -62,14 +62,17 @@ const S = {
 
 type Run = { strobe: number; pass: boolean; lo: number; hi: number }
 
+/** 芯片 A、芯片 B 的实际 tPD（ns），顺序即按钮顺序 */
+const CHIPS = [11.3, 16.4] as const
+
 export function FundAcPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
-  const [approach, setApproach] = useState('worst')
-  const [param, setParam] = useState('tpd')
-  const [actual, setActual] = useState(11.3)
+  const [approach, setApproach] = useState(APPROACH[0].id)
+  const [param, setParam] = useState<string>(PARAMS[0].id)
+  const [actual, setActual] = useState<number>(CHIPS[0])
   const [runs, setRuns] = useState<Run[]>([])
   const [kind, setKind] = useState<TimingKind>('write')
-  const [span, setSpan] = useState('tAW')
+  const [span, setSpan] = useState(WRITE_SPANS[0].id)
   const [note, setNote] = useState<Note>({ kicker: S.kicker, title: APPROACH[0].title, text: APPROACH[0].text })
 
   const last = runs[runs.length - 1]
@@ -181,8 +184,8 @@ export function FundAcPage({ moduleId, onModuleChange }: Props) {
         <div className="row-actions">
           <Seg
             options={[
-              { id: '11.3', label: S.chipGood },
-              { id: '16.4', label: S.chipSlow },
+              { id: String(CHIPS[0]), label: S.chipGood },
+              { id: String(CHIPS[1]), label: S.chipSlow },
             ]}
             value={String(actual)}
             onChange={(id) => newChip(Number(id))}
@@ -261,7 +264,9 @@ export function FundAcPage({ moduleId, onModuleChange }: Props) {
           value={kind}
           onChange={(id) => {
             setKind(id)
-            setSpan(id === 'write' ? 'tAW' : 'tDOE')
+            const first = (id === 'write' ? WRITE_SPANS : READ_SPANS)[0]
+            setSpan(first.id)
+            setNote({ kicker: S.kicker, title: first.label, text: first.text })
           }}
         />
         <div className="kind" style={{ marginBottom: 10 }}>

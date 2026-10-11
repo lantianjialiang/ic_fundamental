@@ -260,19 +260,19 @@ export function FundIntroPage({ moduleId, onModuleChange }: Props) {
   const pickNote = (title: Note['title'], text: Note['text']) => setNote({ kicker: S.kicker, title, text })
 
   // 1–3
-  const [pin, setPin] = useState<PinKind>('input')
-  const [part, setPart] = useState('dc')
+  const [pin, setPin] = useState<PinKind>(PIN_TYPES[0].id)
+  const [part, setPart] = useState(PROG_PARTS[0].id)
   const [fmax, setFmax] = useState(160)
   const [lot, setLot] = useState<BinId[] | null>(null)
-  const [factor, setFactor] = useState('purpose')
-  const [purpose, setPurpose] = useState('wafer')
+  const [factor, setFactor] = useState(FACTORS[0].id)
+  const [purpose, setPurpose] = useState(PURPOSES[0].id)
   const [testerRow, setTesterRow] = useState<string | null>(null)
-  const [use, setUse] = useState<UseId>('toy')
+  const [use, setUse] = useState<UseId>(USES[0].id)
   const [chosen, setChosen] = useState<Record<TestItemId, boolean>>(ZERO_PICK)
   // 4
   const [block, setBlock] = useState<BlockId>('cpu')
   const [arch, setArch] = useState<ArchId>('shared')
-  const [vecKind, setVecKind] = useState('par')
+  const [vecKind, setVecKind] = useState(VEC_KINDS[0].id)
   // 5 PMU
   const [mode, setMode] = useState<PmuMode>('fvmi')
   const [force, setForce] = useState(5)
@@ -283,7 +283,7 @@ export function FundIntroPage({ moduleId, onModuleChange }: Props) {
   const [hi, setHi] = useState(25)
   const [loOn, setLoOn] = useState(false)
   const [lo, setLo] = useState(0)
-  const [preset, setPreset] = useState<string | null>('fv-good')
+  const [preset, setPreset] = useState<string | null>(PMU_PRESETS[0].id)
   // 6 Kelvin
   const [four, setFour] = useState(false)
   const [rw, setRw] = useState(0.5)
@@ -295,10 +295,10 @@ export function FundIntroPage({ moduleId, onModuleChange }: Props) {
   const [connected, setConnected] = useState(true)
   const [glitch, setGlitch] = useState(false)
   // 8 管脚电子
-  const [peMode, setPeMode] = useState<PeMode>('drive')
-  const [pePrev, setPePrev] = useState<PeMode>('drive')
+  const [peMode, setPeMode] = useState<PeMode>(PE_MODES[0].id)
+  const [pePrev, setPePrev] = useState<PeMode>(PE_MODES[0].id)
   const [switching, setSwitching] = useState(false)
-  const [fdata, setFdata] = useState<0 | 1>(1)
+  const [fdata, setFdata] = useState<0 | 1>(0)
   const [conflict, setConflict] = useState(false)
   const [vout, setVout] = useState(0.2)
   const [vref, setVref] = useState(1.5)

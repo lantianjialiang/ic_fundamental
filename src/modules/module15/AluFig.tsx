@@ -19,7 +19,7 @@ const L = {
   dut: loc('DUT', 'DUT'),
   actual: loc('实际', 'Actual'),
   expect: loc('期望', 'Expected'),
-  stale: loc('采到的是上一拍的输出', 'read the previous cycle\'s output'),
+  stale: loc('采到的是上一拍的输出', 'stale: previous cycle'),
   ready: loc('还没开始。点“下一拍”执行第 1 条向量。', 'Not started. Press “Next cycle” to run vector 1.'),
   cycle: loc('拍', 'Cycle'),
   runCap: loc(

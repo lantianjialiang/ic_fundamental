@@ -9,6 +9,16 @@ export const WHY: LText[] = [
 
 export const KINDS: Card[] = [
   {
+    id: 'device',
+    title: loc('器件规格 / 数据手册', 'Device Spec / Data Sheet'),
+    sub: loc('Data Sheet · 写给客户', 'Data Sheet · for customers'),
+    text: loc('对外的承诺。客户照它设计系统，出货芯片必须满足它——相当于买卖合同。', 'The external promise. Customers design their systems from it, and every shipped chip must meet it - it is effectively a sales contract.'),
+    explain: [
+      loc('客户不会看你的设计文件，只看数据手册。他按手册里的 VOH、tAA 去设计电路板，如果芯片达不到，就是违约。', 'Customers never see your design files, only the data sheet. They design their boards around its VOH and tAA; if the chip falls short, that is a breach of contract.'),
+      loc('所以量产测试的核心任务只有一句：证明每一颗出货的芯片都满足数据手册。', 'So the core task of production test fits in one sentence: prove that every shipped chip meets the data sheet.'),
+    ],
+  },
+  {
     id: 'design',
     title: loc('设计规格', 'Design Spec'),
     sub: loc('Design Spec · 写给设计', 'Design Spec · for designers'),
@@ -26,16 +36,6 @@ export const KINDS: Card[] = [
     explain: [
       loc('测试规格把数据手册里的每一行变成可执行的测试：施加什么电压电流、用哪组向量预处理、在什么时刻比较、极限是多少。', 'The test spec turns each line of the data sheet into an executable test: what voltage or current to apply, which vectors to precondition with, when to compare, and what the limits are.'),
       loc('它的极限通常比数据手册更紧一点（Guardband），给测试机误差和温度漂移留余量，保证出货的芯片在客户手里一定满足手册。', 'Its limits are usually a bit tighter than the data sheet (guardband), leaving margin for tester error and temperature drift, so shipped chips are sure to meet the data sheet in the customer\'s hands.'),
-    ],
-  },
-  {
-    id: 'device',
-    title: loc('器件规格 / 数据手册', 'Device Spec / Data Sheet'),
-    sub: loc('Data Sheet · 写给客户', 'Data Sheet · for customers'),
-    text: loc('对外的承诺。客户照它设计系统，出货芯片必须满足它——相当于买卖合同。', 'The external promise. Customers design their systems from it, and every shipped chip must meet it - it is effectively a sales contract.'),
-    explain: [
-      loc('客户不会看你的设计文件，只看数据手册。他按手册里的 VOH、tAA 去设计电路板，如果芯片达不到，就是违约。', 'Customers never see your design files, only the data sheet. They design their boards around its VOH and tAA; if the chip falls short, that is a breach of contract.'),
-      loc('所以量产测试的核心任务只有一句：证明每一颗出货的芯片都满足数据手册。', 'So the core task of production test fits in one sentence: prove that every shipped chip meets the data sheet.'),
     ],
   },
 ]

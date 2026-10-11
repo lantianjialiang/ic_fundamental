@@ -22,7 +22,7 @@ const REASON: Record<TimingReason, LText> = {
   early: loc('Strobe 早于 Drive + tpd：DUT 输出还没变完，比较到的是上一拍的旧值。', 'The strobe is before Drive + tpd: the DUT output has not settled, so it compares the previous value.'),
   late: loc('Strobe 落到了周期之外。Strobe 必须在本周期内。', 'The strobe lies outside the cycle. It must stay within the cycle.'),
   'before-drive': loc('Strobe 比 Drive 还早：本拍输入都还没给，更谈不上新输出。', 'The strobe is even before Drive: this cycle\'s inputs have not been applied yet.'),
-  slow: loc('Drive + tpd ≥ Period：这一拍里 DUT 来不及稳定，Strobe 放哪都不对。降频或换更快的芯片。', 'Drive + tpd ≥ Period: the DUT cannot settle within the cycle, so no strobe position works. Lower the frequency.'),
+  slow: loc('Drive + tpd ≥ Period：这一拍里 DUT 来不及稳定，Strobe 放哪都不对。降频或换更快的芯片。', 'Drive + tpd ≥ Period: the DUT cannot settle within the cycle, so no strobe position works. Lower the frequency or use a faster chip.'),
 }
 
 const S = {
@@ -41,17 +41,23 @@ const S = {
   got: loc('实际', 'Got'),
 }
 
+const TABS: Array<{ id: Tab; label: LText }> = [
+  { id: 'timing', label: ui.m17.tabTime },
+  { id: 'leak', label: ui.m17.tabLeak },
+  { id: 'pattern', label: ui.m17.tabPat },
+]
+
 export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
   const { t } = useLocale()
-  const [tab, setTab] = useState<Tab>('timing')
-  const [focus, setFocus] = useState<Focus>({ kind: 'timing' })
+  const [tab, setTab] = useState<Tab>(TABS[0].id)
+  const [focus, setFocus] = useState<Focus>({ kind: TABS[0].id })
   const [period, setPeriod] = useState(10)
   const [drive, setDrive] = useState(2)
   const [delay, setDelay] = useState(4)
   const [strobe, setStrobe] = useState(8)
   const [forceV, setForceV] = useState(3.3)
   const [limitUa, setLimitUa] = useState(10)
-  const [stuck, setStuck] = useState<StuckId>('none')
+  const [stuck, setStuck] = useState<StuckId>(STUCKS[0].id)
   const [patVecs, setPatVecs] = useState<string[]>(BANK.map((row) => row.id))
 
   const timing = useMemo(() => judgeTiming({ period, drive, delay, strobe }), [period, drive, delay, strobe])
@@ -93,12 +99,6 @@ export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
               text: t(REASON[timing.reason]),
             }
 
-  const tabs: Array<{ id: Tab; label: LText }> = [
-    { id: 'timing', label: ui.m17.tabTime },
-    { id: 'leak', label: ui.m17.tabLeak },
-    { id: 'pattern', label: ui.m17.tabPat },
-  ]
-
   const preset = (s: number) => {
     setPeriod(10)
     setDrive(2)
@@ -123,7 +123,7 @@ export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
       </Section>
 
       <div className="sim-tabs" role="tablist">
-        {tabs.map((item) => (
+        {TABS.map((item) => (
           <button
             key={item.id}
             type="button"

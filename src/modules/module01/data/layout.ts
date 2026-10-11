@@ -421,10 +421,52 @@ export const STATIC_POSE: Record<TestFlow, Pose> = {
 export type PcbLayer = 'top' | 'inner' | 'bottom'
 export type PcbNode = { x: number; z: number; layer: PcbLayer; via?: boolean }
 
+/**
+ * 8 层板叠层（从上到下）：L1 顶层信号 · L2 GND · L3 内层信号 · L4 PWR · L5 GND · L6 信号 · L7 GND · L8 底层信号。
+ * 上下表面各一层阻焊绿油；厚度为教学放大值。
+ */
+export const PCB_STACK = {
+  layers: ['SIG', 'GND', 'SIG', 'PWR', 'GND', 'SIG', 'GND', 'SIG'] as const,
+  cu: 0.004,
+  mask: 0.003,
+}
+/** 示意走线所在的内层：L3 */
+export const INNER_LAYER = 2
+
+export type StackInfo = {
+  /** 每层铜箔中心相对板中心的 y */
+  copper: number[]
+  /** 介质层（芯板 / 半固化片）中心 y 与厚度 */
+  dielectric: Array<{ y: number; h: number }>
+}
+
+const stackCache = new Map<number, StackInfo>()
+export function pcbStack(t: number): StackInfo {
+  const hit = stackCache.get(t)
+  if (hit) return hit
+  const n = PCB_STACK.layers.length
+  const diel = (t - 2 * PCB_STACK.mask - n * PCB_STACK.cu) / (n - 1)
+  const copper: number[] = []
+  const dielectric: Array<{ y: number; h: number }> = []
+  let y = t / 2 - PCB_STACK.mask
+  for (let i = 0; i < n; i += 1) {
+    copper.push(y - PCB_STACK.cu / 2)
+    y -= PCB_STACK.cu
+    if (i < n - 1) {
+      dielectric.push({ y: y - diel / 2, h: diel })
+      y -= diel
+    }
+  }
+  const info = { copper, dielectric }
+  stackCache.set(t, info)
+  return info
+}
+
 export function pcbLayerY(t: number, layer: PcbLayer): number {
-  if (layer === 'top') return t / 2 + 0.004
-  if (layer === 'bottom') return -t / 2 - 0.004
-  return 0
+  const s = pcbStack(t)
+  if (layer === 'top') return s.copper[0]!
+  if (layer === 'bottom') return s.copper[s.copper.length - 1]!
+  return s.copper[INNER_LAYER]!
 }
 
 /** FT：Load Board 底层（Pogo）→ 过孔 → 内层 → 过孔 → 顶层（Socket 焊盘） */
@@ -601,6 +643,32 @@ export const LAYER_BOX: Record<TestFlow, Partial<Record<LayerId, LayerBox>>> = {
     chuck: { c: [0, -0.2, 0], s: [4.05, 0.36, 4.05] },
   },
 }
+
+/**
+ * 3D 标注的锚点：ax / az ∈ {-1, 0, 1} 表示层包围盒的左 / 中 / 右、后 / 中 / 前，side 为标签朝哪边展开。
+ * 这组取值是按默认视角在 760–1300 px 宽的画布、中英文、组装与分解两种状态下逐一投影检查过的，互不重叠、不出界。
+ */
+export type LabelAnchor = { ax: -1 | 0 | 1; az: -1 | 0 | 1; side: 'left' | 'right' }
+export const LABEL_ANCHOR: Record<TestFlow, Partial<Record<LayerId, LabelAnchor>>> = {
+  FT: {
+    handler: { ax: 1, az: 1, side: 'right' },
+    dut: { ax: -1, az: 1, side: 'left' },
+    socket: { ax: 1, az: 1, side: 'right' },
+    loadboard: { ax: 0, az: 1, side: 'left' },
+    pogo: { ax: 1, az: -1, side: 'right' },
+    testhead: { ax: 0, az: 1, side: 'right' },
+  },
+  CP: {
+    testhead: { ax: -1, az: 1, side: 'right' },
+    pogo: { ax: 1, az: -1, side: 'right' },
+    probecard: { ax: 1, az: 1, side: 'right' },
+    wafer: { ax: -1, az: 1, side: 'left' },
+    chuck: { ax: 0, az: 1, side: 'left' },
+  },
+}
+
+/** 轨道相机：水平方向不限（可 360° 环绕）；俯仰从接近正上方到略低于水平，另外每帧按地面高度再收紧，镜头不钻到地面下 */
+export const CAMERA_LIMITS = { minPolar: 0.05, maxPolar: Math.PI * 0.55, floorClear: 0.25 }
 
 export const CAMERA_PRESET: Record<TestFlow, { position: Vec3; target: Vec3; explodeShift: number }> = {
   FT: { position: [7.4, 3.4, 8.4], target: [0, -0.25, 0], explodeShift: 1.2 },

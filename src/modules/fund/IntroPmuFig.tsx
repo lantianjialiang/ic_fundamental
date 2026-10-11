@@ -181,7 +181,15 @@ export function PmuFig({
           </>
         ) : null}
         <path d={`M${mx} 280 L${mx - 6} 268 L${mx + 6} 268 Z`} fill={fail ? 'var(--red)' : 'var(--gold)'} />
-        <text x={mx} y="264" textAnchor="middle" fill={fail ? 'var(--red)' : 'var(--gold)'} fontSize="11" fontFamily="var(--mono)">
+        {/* 读数靠近左端时改为左对齐，避免英文标签伸出画布 */}
+        <text
+          x={mx < 100 ? mx - 8 : mx}
+          y="264"
+          textAnchor={mx < 100 ? 'start' : 'middle'}
+          fill={fail ? 'var(--red)' : 'var(--gold)'}
+          fontSize="11"
+          fontFamily="var(--mono)"
+        >
           {`${t(PL.meas)} ${fmtM(meas)}`}
         </text>
       </svg>
@@ -268,10 +276,11 @@ export function KelvinFig({ four, rw, iMa, vOut, vDut }: { four: boolean; rw: nu
           DUT
         </text>
         <path d="M600 100 l10 5 l-20 10 l20 10 l-20 10 l20 10 l-10 5 V160" fill="none" stroke="var(--text)" strokeWidth="2" />
-        <text x="618" y="134" fill={Math.abs(vDut - KELVIN_V) > 0.005 ? 'var(--red)' : 'var(--green)'} fontSize="12" fontFamily="var(--mono)">
+        {/* 写在电阻左侧：右侧只剩约 40 px，会压到 DUT 虚线框 */}
+        <text x="584" y="134" textAnchor="end" fill={Math.abs(vDut - KELVIN_V) > 0.005 ? 'var(--red)' : 'var(--green)'} fontSize="12" fontFamily="var(--mono)">
           {`${vDut.toFixed(3)} V`}
         </text>
-        <text x="618" y="118" fill="var(--muted)" fontSize="10">
+        <text x="584" y="118" textAnchor="end" fill="var(--muted)" fontSize="10">
           {t(KL.dut)}
         </text>
       </svg>

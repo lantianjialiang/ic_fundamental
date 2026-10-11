@@ -8,7 +8,7 @@ export type Bit = 0 | 1
 /** 链上的一位数据。key 稳定，用来让同一位在画面上平移，而不是凭空换值。 */
 export type Tok = { key: string; v: Bit | null; kind: 'x' | 'stim' | 'cap' | 'next' }
 
-export type Phase = 'plain' | 'scanify' | 'load' | 'shiftIn' | 'capture' | 'shiftOut' | 'compare'
+export type Phase = 'plain' | 'scanify' | 'load' | 'shiftIn' | 'capPrep' | 'capture' | 'shiftOut' | 'compare'
 
 export type Frame = {
   phase: Phase
@@ -22,7 +22,9 @@ export type Frame = {
   so: Tok | null
   /** 已经从 SO 读到、拿去比较的位 */
   outs: Bit[]
-  /** 组合逻辑此刻算出的 D1–D4 */
+  /** Capture 用到的 Q1–Q4（时钟沿之前的值）；只在 Capture 两帧里有 */
+  q: Bit[] | null
+  /** D1–D4 线上的实际值（有故障时已含故障）；只在 Capture 两帧里有 */
   d: Bit[] | null
   caption: LText
 }
@@ -36,19 +38,36 @@ export const STIM: Bit[] = [1, 0, 1, 1]
 /** 移出时顺手移入的下一条 Pattern（Q1–Q4） */
 const NEXT: Bit[] = [0, 1, 1, 0]
 
-export const EQUATIONS = ['D1 = Q1 · Q2', 'D2 = Q2 + Q3', 'D3 = ¬Q4', 'D4 = Q1 ⊕ Q3']
+/** 组合逻辑：每个 D 由哪几个 Q 算出来。ins 是用到的 Q 下标，图里据此画 Q → D 的连线 */
+export type Eq = { name: string; expr: string; ins: number[]; fn: (q: Bit[]) => Bit; sub: (q: Bit[]) => string }
+
+export const EQS: Eq[] = [
+  { name: 'D1', expr: 'Q1 · Q2', ins: [0, 1], fn: (q) => (q[0] & q[1]) as Bit, sub: (q) => `${q[0]} · ${q[1]}` },
+  { name: 'D2', expr: 'Q2 + Q3', ins: [1, 2], fn: (q) => (q[1] | q[2]) as Bit, sub: (q) => `${q[1]} + ${q[2]}` },
+  { name: 'D3', expr: '¬Q4', ins: [3], fn: (q) => (q[3] ? 0 : 1), sub: (q) => `¬${q[3]}` },
+  { name: 'D4', expr: 'Q1 ⊕ Q3', ins: [0, 2], fn: (q) => (q[0] ^ q[2]) as Bit, sub: (q) => `${q[0]} ⊕ ${q[2]}` },
+]
+
+/** 故障 d2sa0 落在 D2 这根线上 */
+export const FAULT_AT = 1
+
+export function logicGood(q: Bit[]): Bit[] {
+  return EQS.map((e) => e.fn(q))
+}
 
 export function logic(q: Bit[], fault: FaultId): Bit[] {
-  const d: Bit[] = [(q[0] & q[1]) as Bit, (q[1] | q[2]) as Bit, (q[3] ? 0 : 1) as Bit, (q[0] ^ q[2]) as Bit]
-  if (fault === 'd2sa0') d[1] = 0
+  const d = logicGood(q)
+  if (fault === 'd2sa0') d[FAULT_AT] = 0
   return d
 }
 
-/** 好芯片的期望：捕获后从 SO 依次出来的是 Q4、Q3、Q2、Q1 */
-export const EXPECTED: Bit[] = [...logic(STIM, 'none')].reverse()
+/** 好芯片的期望：捕获后从 SO 依次出来的是 FF4、FF3、FF2、FF1 */
+export const EXPECTED: Bit[] = [...logicGood(STIM)].reverse()
 
 /** 第 k 次从 SO 读到的位来自哪个 FF */
 export const OUT_FROM = ['FF4', 'FF3', 'FF2', 'FF1']
+
+const bits = (list: Array<Bit | null>) => list.map((v) => (v === null ? 'X' : String(v))).join(' ')
 
 const C = {
   plain: loc(
@@ -56,40 +75,93 @@ const C = {
     'Plain circuit: four FFs hold the state. D comes from the combinational logic and Q feeds back into it. No external pin can set or read Q.',
   ),
   scanify: loc(
-    '换成 Scan FF：每个 D 前加一个二选一 MUX。SE=0 选功能 D，SE=1 选上一个 FF 的 Q。4 个 FF 串成一条链：SI → FF1 → … → FF4 → SO。',
-    'Swap in scan FFs: a 2-to-1 MUX goes in front of each D. SE=0 selects the functional D; SE=1 selects the previous Q. The FFs now form a chain: SI → FF1 → … → FF4 → SO.',
+    '换成 Scan FF：每个 FF 前加一个二选一 MUX。于是每个 Scan FF 有 D（功能输入，来自组合逻辑）、SI（扫描输入，接前一个 FF 的 Q；FF1 的 SI 接 SI 管脚）、SE（选择）和 Q（输出）。SE=1 时 FF 存 SI（移位），SE=0 时存 D（捕获）。4 个 FF 串成一条链：SI → FF1 → … → FF4 → SO。',
+    'Swap in scan FFs: a 2-to-1 MUX goes in front of each FF. Each scan FF now has D (functional input, from the logic), SI (scan input, from the previous FF’s Q; FF1’s SI comes from the SI pin), SE (select) and Q (output). With SE=1 the FF stores SI (shift); with SE=0 it stores D (capture). The four FFs form a chain: SI → FF1 → … → FF4 → SO.',
   ),
   load: loc(
-    'Shift 准备：SE=1，链现在是一个移位寄存器。里面的值未知（X）。要让 Q1–Q4 = 1 0 1 1，最远的 Q4 要最先送进去。',
-    'Ready to shift: SE=1, so the chain is a shift register. Its contents are unknown (X). To get Q1–Q4 = 1 0 1 1, the bit for Q4 (the far end) goes in first.',
-  ),
-  shiftIn: loc(
-    'Shift：打一拍时钟，SI 上的位进 FF1，其余每位往右挪一格。旧的 X 从 SO 出去，不比较。',
-    'Shift: one clock moves the SI bit into FF1 and every other bit one place right. The old X leaves through SO and is not compared.',
-  ),
-  loaded: loc(
-    'Shift 完成：4 拍以后 Q1–Q4 = 1 0 1 1。激励已经放进芯片内部。',
-    'Shift done: after 4 clocks Q1–Q4 = 1 0 1 1. The stimulus is now inside the chip.',
-  ),
-  capture: loc(
-    'Capture：SE=0，只打一拍功能时钟。组合逻辑根据 Q 算出 D，每个 FF 把自己的 D 存下来。被测的就是这一拍里的组合逻辑。',
-    'Capture: SE=0 and one functional clock. The logic computes D from Q, and every FF stores its own D. This one clock is what tests the combinational logic.',
-  ),
-  shiftOut: loc(
-    'Shift：SE=1。每拍先 Strobe SO（就是 FF4 的 Q），再打时钟。捕获结果一位一位出来，下一条 Pattern 同时从 SI 移进去。',
-    'Shift: SE=1. Each clock, strobe SO (the Q of FF4) first, then clock. The captured bits come out one by one while the next pattern shifts in through SI.',
-  ),
-  pass: loc(
-    'Compare：4 位都和期望一致，这条 Pattern Pass。',
-    'Compare: all 4 bits match the expected data. This pattern passes.',
-  ),
-  fail: loc(
-    'Compare：第 3 个读出的位不对。它来自 FF2，所以问题出在算 D2 的那部分逻辑。Fail 落在链上的某一位，可以反查是哪个 FF。',
-    'Compare: the 3rd bit out is wrong. It came from FF2, so the fault is in the logic that drives D2. A scan failure points to one bit in the chain, so you can trace it to one FF.',
+    'Shift 准备：SE=1，链现在是一个移位寄存器。里面的值未知（X）。要让 Q1–Q4 = 1 0 1 1，最远的 Q4 要最先送进去，所以 SI 上依次送 1、1、0、1（Q4、Q3、Q2、Q1）。',
+    'Ready to shift: SE=1, so the chain is a shift register. Its contents are unknown (X). To get Q1–Q4 = 1 0 1 1, the bit for Q4 (the far end) goes in first, so SI receives 1, 1, 0, 1 (for Q4, Q3, Q2, Q1).',
   ),
 }
 
-/** 按「普通 → Scan FF → Shift → Capture → Shift → Compare」生成每一帧 */
+function shiftInCap(k: number, v: Bit, chain: Tok[]): LText {
+  const now = bits(chain.map((tok) => tok.v))
+  if (k === N - 1) {
+    return loc(
+      `Shift 第 ${k + 1} 拍：FF1 收下最后一位 ${v}，最先送进去的那位已经走到 FF4。现在 Q1–Q4 = ${now}，激励放好了。下一步切到 Capture。`,
+      `Shift clock ${k + 1}: FF1 takes the last bit, ${v}, and the first bit sent in has reached FF4. Now Q1–Q4 = ${now}; the stimulus is in place. Next comes capture.`,
+    )
+  }
+  return loc(
+    `Shift 第 ${k + 1} 拍：SE=1，每个 FF 存自己 SI 端的值。FF1 的 SI 接 SI 管脚，收下 ${v}（这一位最终要停在 FF${N - k}）；FF2–FF4 各收下前一个 FF 原来的 Q；FF4 原来的 X 从 SO 出去，不比较。现在 Q1–Q4 = ${now}。`,
+    `Shift clock ${k + 1}: SE=1, so every FF stores the value on its SI. FF1’s SI is the SI pin, so it takes ${v} (this bit will end up in FF${N - k}); FF2–FF4 each take the previous FF’s old Q; FF4’s old X leaves through SO and is not compared. Now Q1–Q4 = ${now}.`,
+  )
+}
+
+/** 动态拼句子用的片段：分隔符、故障提示、比对结果 */
+const W = {
+  sep: loc('，', '; '),
+  badNote: loc('D2 这根线粘在 0：逻辑算出 1，线上却是 0。', ' The D2 wire is stuck at 0: the logic computes 1, but the wire stays 0.'),
+  match: loc('一致', 'matches'),
+  mismatch: loc('不一致', 'does not match'),
+}
+
+const joinL = (parts: LText[], sep: LText): LText =>
+  loc(parts.map((p) => p.zh).join(sep.zh), parts.map((p) => p.en ?? p.zh).join(sep.en ?? sep.zh))
+
+function capPrepCap(q: Bit[], fault: FaultId): LText {
+  const list = EQS.map((e) => `${e.name} = ${e.expr} = ${e.sub(q)} = ${e.fn(q)}`)
+  const bad = fault === 'd2sa0'
+  return loc(
+    `Capture 准备：SE 切到 0，每个 MUX 改选 D 端（来自组合逻辑），不再选 SI。时钟还没打，Q1–Q4 仍是 ${bits(q)}。组合逻辑以这 4 个 Q 为输入，已经算好：${list.join(W.sep.zh)}。${bad ? W.badNote.zh : ''}（本例只画 FF 之间的逻辑；真实电路还有主输入，由测试机在这一拍之前从 Pin 给好。）`,
+    `Capture setup: SE goes to 0, so every MUX now selects its D input (from the logic) instead of SI. No clock yet, so Q1–Q4 is still ${bits(q)}. With these four Qs as inputs, the logic has already computed: ${list.join('; ')}.${bad ? W.badNote.en : ''} (Only the logic between FFs is drawn here; a real circuit also has primary inputs, which the tester applies from the pins before this clock.)`,
+  )
+}
+
+function captureCap(q: Bit[], d: Bit[], fault: FaultId): LText {
+  const good = logicGood(q)
+  const items = d.map((v, i) =>
+    fault === 'd2sa0' && i === FAULT_AT
+      ? loc(
+          `Q${i + 1}：${q[i]}→${v}（D${i + 1} 粘在 0，好芯片这里应变成 ${good[i]}）`,
+          `Q${i + 1}: ${q[i]}→${v} (D${i + 1} is stuck at 0; a good chip would give ${good[i]})`,
+        )
+      : loc(`Q${i + 1}：${q[i]}→${v}（存 D${i + 1} = ${v}）`, `Q${i + 1}: ${q[i]}→${v} (stores D${i + 1} = ${v})`),
+  )
+  const changes = joinL(items, W.sep)
+  return loc(
+    `Capture 时钟沿：只打这一拍功能时钟，FF1–FF4 在同一个沿同时存下各自的 D。${changes.zh}。所有 FF 用的都是沿前的旧 Q（${bits(q)}），所以算式里代入的仍是旧值。现在 Q1–Q4 = ${bits(d)}，这就是组合逻辑对激励的响应；被测的就是这一拍。`,
+    `Capture edge: one functional clock, and FF1–FF4 all store their own D on the same edge. ${changes.en}. Every FF uses the old Q from before the edge (${bits(q)}), so the equations still use the old values. Now Q1–Q4 = ${bits(d)}: the logic’s response to the stimulus. This one clock is what tests the logic.`,
+  )
+}
+
+function shiftOutCap(k: number, v: Bit): LText {
+  const e = EXPECTED[k]
+  const src = N - k
+  const res = v === e ? W.match : W.mismatch
+  return loc(
+    `Shift 移出第 ${k + 1} 位：SE=1。先 Strobe SO（就是 FF4 的 Q），读到 ${v}——它是 FF${src} 在 Capture 时存下的 D${src}，期望 ${e}，${res.zh}。再打一拍时钟，链往右挪一格，下一条 Pattern 的一位从 SI 进 FF1。`,
+    `Shift out bit ${k + 1}: SE=1. First strobe SO (the Q of FF4) and read ${v}: this is the D${src} that FF${src} captured; expected ${e}, so it ${res.en}. Then one clock moves the chain one place right, and a bit of the next pattern enters FF1 from SI.`,
+  )
+}
+
+function compareCap(outs: Bit[]): LText {
+  const m = outs.findIndex((v, i) => v !== EXPECTED[i])
+  if (m < 0) {
+    return loc(
+      `Compare：读出顺序是 FF4、FF3、FF2、FF1，读到 ${bits(outs)}，和期望 ${bits(EXPECTED)} 4 位都一致，这条 Pattern Pass。`,
+      `Compare: bits come out FF4, FF3, FF2, FF1. Read ${bits(outs)}, expected ${bits(EXPECTED)}: all 4 match, so this pattern passes.`,
+    )
+  }
+  const ff = OUT_FROM[m]
+  const dn = `D${N - m}`
+  return loc(
+    `Compare：读出顺序是 FF4、FF3、FF2、FF1，读到 ${bits(outs)}，期望 ${bits(EXPECTED)}。第 ${m + 1} 位期望 ${EXPECTED[m]}、读到 ${outs[m]}，它来自 ${ff}，所以问题出在算 ${dn} 的那部分逻辑（或 ${dn} 这根线）。Fail 落在链上的某一位，就能反查是哪个 FF。`,
+    `Compare: bits come out FF4, FF3, FF2, FF1. Read ${bits(outs)}, expected ${bits(EXPECTED)}. Bit ${m + 1} should be ${EXPECTED[m]} but is ${outs[m]}; it came from ${ff}, so the fault is in the logic that drives ${dn} (or the ${dn} wire itself). A scan failure points to one bit in the chain, so you can trace it to one FF.`,
+  )
+}
+
+/** 按「普通 → Scan FF → Shift → Capture 准备 → Capture 沿 → Shift → Compare」生成每一帧 */
 export function buildFrames(fault: FaultId): Frame[] {
   const frames: Frame[] = []
   const stimOrder = [...STIM].reverse()
@@ -97,31 +169,32 @@ export function buildFrames(fault: FaultId): Frame[] {
   const stimToks: Tok[] = stimOrder.map((v, i) => ({ key: `s${i}`, v, kind: 'stim' }))
   const nextToks: Tok[] = nextOrder.map((v, i) => ({ key: `n${i}`, v, kind: 'next' }))
   let chain: Tok[] = Array.from({ length: N }, (_, i) => ({ key: `x${i}`, v: null, kind: 'x' }))
+  const base = { outs: [] as Bit[], q: null, d: null }
 
-  frames.push({ phase: 'plain', scan: false, se: 0, chain, si: null, so: null, outs: [], d: null, caption: C.plain })
-  frames.push({ phase: 'scanify', scan: true, se: 1, chain, si: null, so: null, outs: [], d: null, caption: C.scanify })
-  frames.push({ phase: 'load', scan: true, se: 1, chain, si: stimToks[0], so: null, outs: [], d: null, caption: C.load })
+  frames.push({ ...base, phase: 'plain', scan: false, se: 0, chain, si: null, so: null, caption: C.plain })
+  frames.push({ ...base, phase: 'scanify', scan: true, se: 1, chain, si: null, so: null, caption: C.scanify })
+  frames.push({ ...base, phase: 'load', scan: true, se: 1, chain, si: stimToks[0], so: null, caption: C.load })
 
   for (let k = 0; k < N; k += 1) {
     const so = chain[N - 1]
     chain = [stimToks[k], ...chain.slice(0, N - 1)]
     frames.push({
+      ...base,
       phase: 'shiftIn',
       scan: true,
       se: 1,
       chain,
       si: stimToks[k + 1] ?? null,
       so,
-      outs: [],
-      d: null,
-      caption: k === N - 1 ? C.loaded : C.shiftIn,
+      caption: shiftInCap(k, stimToks[k].v as Bit, chain),
     })
   }
 
   const q = chain.map((tok) => tok.v as Bit)
   const d = logic(q, fault)
+  frames.push({ ...base, phase: 'capPrep', scan: true, se: 0, chain, si: null, so: null, q, d, caption: capPrepCap(q, fault) })
   chain = d.map((v, i) => ({ key: `c${i}`, v, kind: 'cap' }))
-  frames.push({ phase: 'capture', scan: true, se: 0, chain, si: null, so: null, outs: [], d, caption: C.capture })
+  frames.push({ ...base, phase: 'capture', scan: true, se: 0, chain, si: null, so: null, q, d, caption: captureCap(q, d, fault) })
 
   const outs: Bit[] = []
   for (let k = 0; k < N; k += 1) {
@@ -129,6 +202,7 @@ export function buildFrames(fault: FaultId): Frame[] {
     outs.push(so.v as Bit)
     chain = [nextToks[k], ...chain.slice(0, N - 1)]
     frames.push({
+      ...base,
       phase: 'shiftOut',
       scan: true,
       se: 1,
@@ -136,13 +210,11 @@ export function buildFrames(fault: FaultId): Frame[] {
       si: nextToks[k + 1] ?? null,
       so,
       outs: [...outs],
-      d: null,
-      caption: C.shiftOut,
+      caption: shiftOutCap(k, so.v as Bit),
     })
   }
 
-  const ok = outs.every((v, i) => v === EXPECTED[i])
-  frames.push({ phase: 'compare', scan: true, se: 1, chain, si: null, so: null, outs: [...outs], d: null, caption: ok ? C.pass : C.fail })
+  frames.push({ ...base, phase: 'compare', scan: true, se: 1, chain, si: null, so: null, outs: [...outs], caption: compareCap(outs) })
   return frames
 }
 
@@ -151,15 +223,16 @@ export const PHASE_LABEL: Record<Phase, LText> = {
   scanify: loc('换成 Scan FF', 'To scan FF'),
   load: loc('准备 Shift', 'Ready'),
   shiftIn: loc('Shift 移入', 'Shift in'),
-  capture: loc('Capture', 'Capture'),
+  capPrep: loc('Capture 准备（SE=0）', 'Capture setup (SE=0)'),
+  capture: loc('Capture 时钟沿', 'Capture edge'),
   shiftOut: loc('Shift 移出', 'Shift out'),
   compare: loc('Compare', 'Compare'),
 }
 
-/** 页面上那四个大步骤，以及每步对应的第一帧 */
+/** 页面上那四个大步骤，以及每步对应的帧 */
 export const BIG_STEPS: Array<{ id: string; label: LText; phases: Phase[] }> = [
   { id: 'shift1', label: loc('1. Shift 移入激励', '1. Shift in stimulus'), phases: ['load', 'shiftIn'] },
-  { id: 'capture', label: loc('2. Capture 捕获一拍', '2. Capture one clock'), phases: ['capture'] },
+  { id: 'capture', label: loc('2. Capture 捕获一拍', '2. Capture one clock'), phases: ['capPrep', 'capture'] },
   { id: 'shift2', label: loc('3. Shift 移出响应', '3. Shift out response'), phases: ['shiftOut'] },
   { id: 'compare', label: loc('4. Compare 比较', '4. Compare'), phases: ['compare'] },
 ]
@@ -184,8 +257,8 @@ export const L = {
   ),
   playTitle: loc('四步：Shift → Capture → Shift → Compare', 'Four steps: Shift → Capture → Shift → Compare'),
   playNote: loc(
-    '先看普通 FF 怎么变成 Scan FF，再一拍一拍地走完一条 Scan Pattern。可以换成有故障的芯片再走一遍。',
-    'First see a plain FF become a scan FF, then run one scan pattern clock by clock. Switch to the faulty chip and run it again.',
+    '先看普通 FF 怎么变成 Scan FF，再一拍一拍地走完一条 Scan Pattern。Capture 分两帧：先看组合逻辑怎样用 Q 算出 D，再看时钟沿把 D 打进 FF。可以换成有故障的芯片再走一遍。',
+    'First see a plain FF become a scan FF, then run one scan pattern clock by clock. Capture takes two frames: first how the logic computes D from Q, then how the clock edge stores D in the FFs. Switch to the faulty chip and run it again.',
   ),
   advTitle: loc('实际芯片还会加什么', 'What real chips add'),
   advNote: loc(
@@ -212,8 +285,8 @@ export const L = {
   act: loc('读到', 'Read'),
   from: loc('来自', 'From'),
   figCap: loc(
-    '金色：移入的激励；绿色：捕获的结果；灰色：下一条 Pattern。黄线是这一拍有效的路径。',
-    'Gold: stimulus shifted in. Green: captured result. Grey: next pattern. The yellow path is active on this clock.',
+    '金色方块：移入的激励；绿色方块：捕获的结果；灰色方块：下一条 Pattern。金色线是这一拍起作用的路径。组合逻辑里每格是一个 D 的算式，Capture 时代入当前 Q 的值；FF 下方的「1→0」是 Capture 沿上 Q 的变化。',
+    'Gold squares: stimulus shifted in. Green: captured result. Grey: next pattern. Gold lines are the paths active on this clock. Each cell in the logic is the equation for one D; during capture it shows the current Q values plugged in. The “1→0” under each FF is how its Q changes on the capture edge.',
   ),
 }
 
@@ -225,8 +298,8 @@ export const FF_FIG = {
   edge: loc('上升沿采样', 'Sample on rising edge'),
   hold: loc('D 变了，Q 不跟', 'D changes, Q holds'),
   cap: loc(
-    '只在 CLK 上升沿（虚线）Q 才跟上 D。两个沿之间 D 怎么变，Q 都不动。',
-    'Q follows D only on a rising CLK edge (dashed). Between edges Q ignores D.',
+    '只在 CLK 上升沿（虚线）Q 才跟上 D。两个沿之间 D 怎么变，Q 都不动：红框里 D 的窄脉冲夹在两个沿之间，没有被采到。',
+    'Q follows D only on a rising CLK edge (dashed). Between edges Q ignores D: the narrow D pulse in the red box falls between two edges and is never sampled.',
   ),
 }
 
@@ -265,9 +338,15 @@ export const ADVANCED: Array<{ id: string; name: LText; what: LText }> = [
 
 export const TAKEAWAY: LText[] = [
   loc('FF 存状态。外部 Pin 够不到它们，所以测试时把 FF 串成扫描链。', 'FFs hold the state. Pins cannot reach them, so in test mode the FFs are chained into a scan chain.'),
-  loc('Scan FF = 普通 FF + 二选一 MUX。SE=1 移位，SE=0 正常工作。', 'Scan FF = plain FF + 2-to-1 MUX. SE=1 shifts; SE=0 works normally.'),
-  loc('Shift 移入激励 → Capture 一拍 → Shift 移出 → Compare。被测的是 Capture 那一拍里的组合逻辑。', 'Shift in the stimulus → capture one clock → shift out → compare. The capture clock is what tests the logic.'),
-  loc('哪一位比错，就能反查是哪个 FF 前面的逻辑有问题。', 'The failing bit position tells you which FF, and so which logic, is at fault.'),
+  loc(
+    'Scan FF = 普通 FF + 二选一 MUX，端口有 D、SI、SE、Q。SE=1 存 SI（移位），SE=0 存 D（捕获 / 正常工作）。',
+    'Scan FF = plain FF + 2-to-1 MUX, with ports D, SI, SE and Q. SE=1 stores SI (shift); SE=0 stores D (capture / normal operation).',
+  ),
+  loc(
+    'Shift 移入激励 → Capture 一拍 → Shift 移出 → Compare。Capture 时组合逻辑以刚移进去的 Q 算出 D，所有 FF 在同一个沿把 D 存下；被测的就是这一拍里的组合逻辑。',
+    'Shift in the stimulus → capture one clock → shift out → compare. On capture the logic computes D from the Q just shifted in, and every FF stores its D on the same edge; that clock is what tests the logic.',
+  ),
+  loc('离 SO 最近的 FF 最先出来。哪一位比错，就能反查是哪个 FF 前面的逻辑有问题。', 'The FF nearest SO comes out first. The failing bit position tells you which FF, and so which logic, is at fault.'),
 ]
 
 export const QUIZ: QuizQuestion[] = [
@@ -305,7 +384,7 @@ export const QUIZ: QuizQuestion[] = [
       { id: 'none', text: loc('什么都没加，只是改了名字', 'Nothing, only the name') },
     ],
     answer: 'mux',
-    explain: loc('SE=1 时 MUX 选上一级 Q，FF 们就连成了移位寄存器。', 'With SE=1 the MUX picks the previous Q, so the FFs form a shift register.'),
+    explain: loc('SE=1 时 MUX 选 SI（上一级 Q），FF 们就连成了移位寄存器；SE=0 时选 D，FF 照常工作。', 'With SE=1 the MUX picks SI (the previous Q), so the FFs form a shift register; with SE=0 it picks D and the FF works normally.'),
   },
   {
     id: 'q4',
@@ -318,6 +397,24 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'func',
     explain: loc('没有 Capture，移进移出的只是同一串数据，测不到组合逻辑。', 'Without capture you only shift the same data through and never test the logic.'),
+  },
+  {
+    id: 'q4b',
+    prompt: loc(
+      'Capture 前 Q1–Q4 = 1 0 1 1，D2 = Q2 + Q3。Capture 时钟沿之后 Q2 是多少？',
+      'Before capture Q1–Q4 = 1 0 1 1 and D2 = Q2 + Q3. What is Q2 after the capture edge?',
+    ),
+    options: [
+      { id: '1', text: loc('1', '1') },
+      { id: '0', text: loc('0，Q2 原来是 0，保持不变', '0; Q2 was 0 and stays 0') },
+      { id: 'x', text: loc('X，不确定', 'X, unknown') },
+      { id: 'si', text: loc('等于 FF1 的 Q（SI 端的值）', 'Equal to FF1’s Q (the SI value)') },
+    ],
+    answer: '1',
+    explain: loc(
+      'SE=0 时 FF2 存的是 D2，不是 SI。D2 = Q2 + Q3 = 0 + 1 = 1，所以沿后 Q2 从 0 变成 1。算式里用的是沿前的旧 Q。',
+      'With SE=0, FF2 stores D2, not SI. D2 = Q2 + Q3 = 0 + 1 = 1, so Q2 goes from 0 to 1 on the edge. The equation uses the old Q from before the edge.',
+    ),
   },
   {
     id: 'q5',

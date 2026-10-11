@@ -18,10 +18,10 @@ type Module05PageProps = {
 export function Module05Page({ moduleId, onModuleChange }: Module05PageProps) {
   const { t } = useLocale()
   const player = useStepPlayer(LAYERS.length, 2200)
-  const [dut, setDut] = useState<'good' | 'bad'>('good')
+  const [dut, setDut] = useState<'good' | 'bad'>(DUTS[0].id)
   const [guesses, setGuesses] = useState<Record<string, Family>>({})
   const layer = LAYERS[player.step]
-  const threshold = DUTS.find((item) => item.id === dut)?.threshold ?? 1.6
+  const threshold = (DUTS.find((item) => item.id === dut) ?? DUTS[0]).threshold
 
   return (
     <LessonFrame

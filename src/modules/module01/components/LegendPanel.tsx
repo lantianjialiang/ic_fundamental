@@ -14,7 +14,7 @@ import {
   type ProbeType,
   type TestFlow,
 } from '../data/layout'
-import { HOP_TEXT, LAYER_TEXT, PHASE_TEXT, T } from '../data/text'
+import { HOP_TEXT, LAYER_TEXT, PATH_VIEWS, PHASE_TEXT, T } from '../data/text'
 
 type LegendPanelProps = {
   flow: TestFlow
@@ -25,9 +25,11 @@ type LegendPanelProps = {
   focus: LayerId | null
   onFocus: (id: LayerId) => void
   phase: ContactPhase
+  pathOnly: boolean
+  onPathOnly: (on: boolean) => void
 }
 
-export function LegendPanel({ flow, pkg, probe, selected, onSelect, focus, onFocus, phase }: LegendPanelProps) {
+export function LegendPanel({ flow, pkg, probe, selected, onSelect, focus, onFocus, phase, pathOnly, onPathOnly }: LegendPanelProps) {
   const { t } = useLocale()
   const phases = PHASES[flow]
   const phaseIndex = phases.indexOf(phase)
@@ -126,6 +128,27 @@ export function LegendPanel({ flow, pkg, probe, selected, onSelect, focus, onFoc
       </div>
 
       <h2>{t(T.pathTitle)}</h2>
+      {selected !== null || phase === 'signal' ? (
+        <>
+          <div className="lab__modes m01-pathview" role="group" aria-label={t(T.pathViewGroup)}>
+            {PATH_VIEWS.map((v) => {
+              const active = pathOnly === v.pathOnly
+              return (
+                <button
+                  key={v.id}
+                  type="button"
+                  className={`lab__mode${active ? ' is-active' : ''}`}
+                  aria-pressed={active}
+                  onClick={() => onPathOnly(v.pathOnly)}
+                >
+                  {t(v.label)}
+                </button>
+              )
+            })}
+          </div>
+          {pathOnly ? <p className="legend__hint">{t(T.pathOnlyHint)}</p> : null}
+        </>
+      ) : null}
       {selected !== null ? (
         <div className="legend__path">
           <p className="legend__path-title">{`CH${selected + 1} → ${endpoint(selected)}`}</p>

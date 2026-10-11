@@ -82,10 +82,10 @@ export const PHASES: Array<{ title: LText; text: LText }> = [
     ),
   },
   {
-    title: loc('掉电：唯一的解除办法', 'Power off: the only way out'),
+    title: loc('掉电：解除的办法', 'Power off: the way out'),
     text: loc(
-      'VDD 降到 0，电流降到维持电流以下，寄生管关断。重新上电后芯片恢复正常——前提是还没被烧坏。',
-      'With VDD at 0 the current falls below the holding current and the parasitics turn off. After power-up the chip works again, if it has not burned out.',
+      'VDD 降到 0（至少要降到维持电压以下），电流跌到维持电流 IH 以下，正反馈断掉，寄生管关断。重新上电后芯片恢复正常——前提是大电流还没把它烧坏。',
+      'Take VDD to 0 (at least below the holding voltage): the current falls below the holding current IH, the feedback loop breaks and the parasitics turn off. After power-up the chip works again, provided the high current has not burned it out.',
     ),
   },
 ]

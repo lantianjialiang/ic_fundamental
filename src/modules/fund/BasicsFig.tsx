@@ -36,8 +36,8 @@ export function OhmFig({ mode, r, reading, pass }: { mode: OhmMode; r: number; r
         ) : (
           <path d="M110 142 L110 108 M102 116 L110 106 L118 116" fill="none" stroke="var(--text)" strokeWidth="2" />
         )}
-        <text x="58" y="120" textAnchor="end" fill="var(--text-2)" fontSize="13">{t(fv ? OL.vsrc : OL.isrc)}</text>
-        <text x="58" y="138" textAnchor="end" fill="var(--gold)" fontSize="13" fontFamily="var(--mono)">
+        <text x="72" y="120" textAnchor="end" fill="var(--text-2)" fontSize="13">{t(fv ? OL.vsrc : OL.isrc)}</text>
+        <text x="72" y="138" textAnchor="end" fill="var(--gold)" fontSize="13" fontFamily="var(--mono)">
           {fv ? '5.0 V' : '2.5 mA'}
         </text>
         {/* 电阻（锯齿） */}
@@ -66,7 +66,8 @@ export function OhmFig({ mode, r, reading, pass }: { mode: OhmMode; r: number; r
             <polyline points="470,200 610,200 610,147" fill="none" stroke="var(--line-2)" strokeWidth="2" />
             <circle cx="610" cy="125" r="22" fill="var(--fig-box)" stroke={meterColor} strokeWidth="2" />
             <text x="610" y="131" textAnchor="middle" fill="var(--text)" fontSize="16">V</text>
-            <text x="610" y="172" textAnchor="middle" fill="var(--text-2)" fontSize="12">{t(OL.vm)}</text>
+            {/* 放在表下方竖线右侧，避免压住 x=610 的导线 */}
+            <text x="618" y="180" fill="var(--text-2)" fontSize="11">{t(OL.vm)}</text>
             <text x="610" y="232" textAnchor="middle" fill={meterColor} fontSize="14" fontFamily="var(--mono)">{reading}</text>
             <text x="290" y="42" textAnchor="middle" fill="var(--muted)" fontSize="12">I = 2.5 mA →</text>
           </>

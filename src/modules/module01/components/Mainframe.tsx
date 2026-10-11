@@ -71,11 +71,21 @@ export function Mainframe() {
       <InstancedParts geometry={GEO.box} material={MAT.led} items={leds} />
       <mesh ref={cable} material={MAT.cable} castShadow />
       {cfg.showLabels ? (
-        <SceneLabel
-          position={[POS[0] + SIZE.w / 2 + 0.2, POS[1] + SIZE.h - 0.3, POS[2] + SIZE.d / 2]}
-          title={t(T.mainframe)}
-          subtitle={t(T.mainframeSub)}
-        />
+        cfg.flow === 'FT' ? (
+          <SceneLabel
+            position={[POS[0] + SIZE.w / 2 + 0.2, POS[1] + SIZE.h - 0.3, POS[2] + SIZE.d / 2]}
+            title={t(T.mainframe)}
+            subtitle={t(T.mainframeSub)}
+          />
+        ) : (
+          // CP 时测试头翻到高处，标签移到机柜中部、向左展开，避开通道板标签
+          <SceneLabel
+            position={[POS[0] + SIZE.w / 2, POS[1] + SIZE.h - 1.3, POS[2] + SIZE.d / 2]}
+            title={t(T.mainframe)}
+            subtitle={t(T.mainframeSub)}
+            side="left"
+          />
+        )
       ) : null}
     </group>
   )

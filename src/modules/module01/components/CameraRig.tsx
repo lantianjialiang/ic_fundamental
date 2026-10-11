@@ -2,7 +2,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 import { Vector3 } from 'three'
 import { useScene, type SceneConfig, type SceneStore } from '../context/SceneContext'
-import { CAMERA_PRESET, LAYER_BOX } from '../data/layout'
+import { CAMERA_LIMITS, CAMERA_PRESET, FLOOR_Y, LAYER_BOX } from '../data/layout'
 
 type CameraRigProps = {
   /** 每次变化都回到当前流程的默认视角 */
@@ -13,6 +13,7 @@ type Goal = { pos: Vector3; target: Vector3 }
 
 type OrbitLike = {
   target: Vector3
+  maxPolarAngle: number
   update: () => void
   addEventListener: (type: 'start', fn: () => void) => void
   removeEventListener: (type: 'start', fn: () => void) => void
@@ -98,7 +99,19 @@ export function CameraRig({ resetKey }: CameraRigProps) {
       controls.target.lerp(g.target, k)
       if (camera.position.distanceTo(g.pos) < 0.005 && controls.target.distanceTo(g.target) < 0.005) goal.current = null
     }
-    if (g || Math.abs(delta) > 1e-6) controls.update()
+
+    // 不钻到地面下：平移时目标点不低于地面；俯仰下限按「镜头高度 ≥ 地面 + floorClear」随距离收紧
+    const minY = FLOOR_Y + CAMERA_LIMITS.floorClear
+    let clamped = false
+    if (controls.target.y < minY) {
+      controls.target.y = minY
+      clamped = true
+    }
+    const dist = Math.max(1e-3, camera.position.distanceTo(controls.target))
+    const cosMax = Math.min(1, Math.max(-1, (minY - controls.target.y) / dist))
+    controls.maxPolarAngle = Math.max(CAMERA_LIMITS.minPolar, Math.min(CAMERA_LIMITS.maxPolar, Math.acos(cosMax)))
+
+    if (g || clamped || Math.abs(delta) > 1e-6) controls.update()
   })
 
   return null

@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { MeshStandardMaterial } from 'three'
 import { useLocale } from '../../../i18n/LocaleContext'
 import { useScene } from '../context/SceneContext'
+import { registerDim } from '../data/dim'
 import { CHANNEL_COUNT, PC, cpRoute, towerPinXZ } from '../data/layout'
 import { GEO, MAT } from '../data/materials'
 import { annulusGeometry } from '../data/shapes'
@@ -19,7 +20,7 @@ export function ProbeCard() {
   const { cfg } = useScene()
   const { t } = useLocale()
   const silk = useMemo(
-    () => new MeshStandardMaterial({ map: pcSilkTexture(), transparent: true, roughness: 0.6, depthWrite: false }),
+    () => registerDim(new MeshStandardMaterial({ map: pcSilkTexture(), transparent: true, roughness: 0.6, depthWrite: false }), true),
     [],
   )
   const geos = useMemo(
@@ -113,7 +114,7 @@ export function ProbeCard() {
 
       {cfg.showLabels ? (
         <>
-          <SceneLabel position={[-0.6, PC.stBottom, 0.6]} title={t(T.st)} />
+          <SceneLabel position={[0.55, PC.stBottom + 0.04, 0.55]} title={t(T.st)} />
           <SceneLabel position={[-1.2, PC.stiffTop + 0.05, -0.4]} title={t(T.stiffener)} />
         </>
       ) : null}

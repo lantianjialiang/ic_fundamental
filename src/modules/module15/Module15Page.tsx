@@ -77,7 +77,11 @@ const PORTS: Array<{ name: string; dir: LText; note: LText }> = [
   },
   { name: 'Y[3:0]', dir: S.output, note: loc('运算结果', 'Result') },
   { name: 'Carry', dir: S.output, note: loc('ADD 的进位，或移位时移出的那一位', 'ADD carry, or the bit shifted out') },
-  { name: 'VDD / GND', dir: S.power, note: loc('3.3 V。DC / IDD 测这里', '3.3 V. DC / IDD are measured here') },
+  {
+    name: 'VDD / GND',
+    dir: S.power,
+    note: loc('3.3 V。IDD 在电源脚上测；VIH、VOH 等 DC 项在信号脚上测', '3.3 V. IDD is measured on the supply pin; DC items such as VIH and VOH on the signal pins'),
+  },
 ]
 
 export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
@@ -88,8 +92,8 @@ export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
   const [period, setPeriod] = useState(16)
   const [drive, setDrive] = useState(2)
   const [strobe, setStrobe] = useState(12)
-  const [dc, setDc] = useState<string | null>(null)
-  const [fault, setFault] = useState<FaultId>('none')
+  const [dc, setDc] = useState<string>(DC_CHOICES[0].id)
+  const [fault, setFault] = useState<FaultId>(FAULTS[0].id)
   const [cause, setCause] = useState<FaultId | null>(null)
 
   const itemJudge = judgeItems(items)

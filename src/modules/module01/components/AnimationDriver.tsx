@@ -1,8 +1,9 @@
 import { useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
-import { useScene } from '../context/SceneContext'
+import { activeChannel, useScene } from '../context/SceneContext'
+import { applyFade } from '../data/dim'
 import { PHASES, PHASE_SECONDS, computePose, type ContactPhase } from '../data/layout'
-import { MAT, SECTION_OFF, SECTION_PLANE } from '../data/materials'
+import { SECTION_OFF, SECTION_PLANE } from '../data/materials'
 
 type AnimationDriverProps = {
   onPhase: (phase: ContactPhase) => void
@@ -14,18 +15,6 @@ const clamp01 = (t: number) => Math.min(1, Math.max(0, t))
 function approach(current: number, target: number, step: number) {
   if (current < target) return Math.min(target, current + step)
   return Math.max(target, current - step)
-}
-
-function setBoardFade(fade: number) {
-  for (const mat of [MAT.fr4Lb, MAT.fr4Pc]) {
-    const see = fade > 0.002
-    if (mat.transparent !== see) {
-      mat.transparent = see
-      mat.depthWrite = !see
-      mat.needsUpdate = true
-    }
-    mat.opacity = 1 - 0.7 * fade
-  }
 }
 
 /**
@@ -101,7 +90,10 @@ export function AnimationDriver({ onPhase }: AnimationDriverProps) {
 
     const wantFade = s.explode > 0.3 || s.sectionTarget > 0 || cfg.selected !== null ? 1 : 0
     s.boardFade = cfg.reduced ? wantFade : approach(s.boardFade, wantFade, dt * 2.5)
-    setBoardFade(s.boardFade)
+    // 只看路径：有高亮通道（选中或信号阶段）且开关打开时，其它部件淡到几乎透明
+    const wantDim = cfg.pathOnly && activeChannel(s, cfg) !== null ? 1 : 0
+    s.dim = cfg.reduced ? wantDim : approach(s.dim, wantDim, dt * 3.5)
+    applyFade(s.boardFade, s.dim)
 
     if (s.phase !== lastPhase.current) {
       lastPhase.current = s.phase

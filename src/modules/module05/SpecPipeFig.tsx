@@ -14,7 +14,7 @@ const L = {
   vilName: loc('输入低电平', 'Input low voltage'),
   promise: loc('承诺：输入 ≥ 2.0 V，一定认成 1', 'Promise: any input ≥ 2.0 V is read as 1'),
   condHead: loc('测试条件', 'Test conditions'),
-  cond1: loc('VDD = 3.0 V（最低工作电压）', 'VDD = 3.0 V (minimum supply)'),
+  cond1: loc('VDD = 3.6 V（最高工作电压，VIH 最难过）', 'VDD = 3.6 V (max supply, hardest for VIH)'),
   cond2: loc('输入 1 = 2.0 V，输入 0 = 0.8 V', 'Input 1 = 2.0 V, input 0 = 0.8 V'),
   cond3: loc('跑全部功能向量', 'Run all functional vectors'),
   limHead: loc('测试极限', 'Test limit'),
@@ -174,9 +174,6 @@ export function SpecPipeFig({
           <g>
             {/* 规格线与芯片实际门限 */}
             <line x1={X0} y1={vy(VIH_SPEC)} x2={X0 + CELL * 8} y2={vy(VIH_SPEC)} stroke="var(--gold)" strokeDasharray="6 4" />
-            <text x={X0 + CELL * 8} y={vy(VIH_SPEC) - 6} textAnchor="end" fill="var(--gold)" fontSize="12">
-              {t(L.vih)}
-            </text>
             <line
               x1={X0}
               y1={vy(threshold)}
@@ -186,7 +183,13 @@ export function SpecPipeFig({
               strokeDasharray="2 4"
               strokeWidth="2"
             />
-            <text x={X0 + 4} y={vy(threshold) + (ok ? 16 : -6)} fill={ok ? 'var(--green-2)' : 'var(--red-2)'} fontSize="12">
+            {/* 图例放在波形上方的空白行，避免文字压在波形跳变沿上 */}
+            <line x1={X0} y1="114" x2={X0 + 24} y2="114" stroke="var(--gold)" strokeDasharray="6 4" />
+            <text x={X0 + 30} y="118" fill="var(--gold)" fontSize="12">
+              {t(L.vih)}
+            </text>
+            <line x1={X0 + 300} y1="114" x2={X0 + 324} y2="114" stroke={ok ? 'var(--green)' : 'var(--red)'} strokeDasharray="2 4" strokeWidth="2" />
+            <text x={X0 + 330} y="118" fill={ok ? 'var(--green-2)' : 'var(--red-2)'} fontSize="12">
               {`${t(L.real)} ${threshold.toFixed(2)} V`}
             </text>
             <line x1={X0} y1={vy(0)} x2={X0 + CELL * 8} y2={vy(0)} stroke="var(--line)" />
@@ -234,7 +237,7 @@ export function SpecPipeFig({
               ['VIL', '0.8 V'],
               ['VOH', '2.4 V'],
               ['VOL', '0.4 V'],
-              ['VDD', '3.0 V'],
+              ['VDD', '3.6 V'],
             ].map(([name, value], i) => (
               <g key={name}>
                 {i === 0 ? <rect x="50" y="152" width="250" height="26" rx="4" fill="var(--gold-bg)" stroke="var(--gold)" /> : null}
@@ -250,7 +253,7 @@ export function SpecPipeFig({
             <text x="346" y="142" fill="var(--sky)" fontSize="13" fontWeight="600">
               {t(L.progHead)}
             </text>
-            {['set_vdd    3.0 V', 'set_level  VIH=2.0 VIL=0.8', 'run        pat_func', 'if fail -> bin 5'].map((line, i) => (
+            {['set_vdd    3.6 V', 'set_level  VIH=2.0 VIL=0.8', 'run        pat_func', 'if fail -> bin 5'].map((line, i) => (
               <text key={i} x="346" y={176 + i * 28} fill={i === 1 ? 'var(--gold)' : 'var(--text-2)'} fontSize="13" fontFamily="var(--mono)">
                 {line}
               </text>

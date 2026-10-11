@@ -18,9 +18,9 @@ type Module03PageProps = {
 export function Module03Page({ moduleId, onModuleChange }: Module03PageProps) {
   const { t } = useLocale()
   const player = useStepPlayer(STEPS.length, 1600)
-  const [dut, setDut] = useState<DutCase>('good')
-  const [pe, setPe] = useState<PeId | null>(null)
-  const [note, setNote] = useState<Note>({ kicker: ui.m03.kickerStep, title: ui.m03.asideTitle, text: ui.m03.asideText })
+  const [dut, setDut] = useState<DutCase>(CASES[0].id)
+  const [pe, setPe] = useState<PeId>(PE[0].id)
+  const [note, setNote] = useState<Note>({ kicker: ui.m03.kickerPe, title: PE[0].title, text: PE[0].text })
 
   const cur = STEPS[player.step]
   const last = player.step === STEPS.length - 1
@@ -59,7 +59,7 @@ export function Module03Page({ moduleId, onModuleChange }: Module03PageProps) {
       <Section title={t(ui.m03.peTitle)} note={t(ui.m03.peNote)}>
         <Cards
           items={PE}
-          activeId={pe ?? undefined}
+          activeId={pe}
           cols={4}
           onPick={(item) => {
             setPe(item.id)

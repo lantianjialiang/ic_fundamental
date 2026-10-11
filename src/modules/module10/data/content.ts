@@ -66,24 +66,24 @@ export const SOURCES: Array<{ id: SourceId; title: LText; text: LText }> = [
     id: 'func',
     title: loc('Functional', 'Functional'),
     text: loc(
-      '按规格书、真值表手写：输入 01，输出该是 1。证明芯片「功能对」，但说不出覆盖了多少故障。交货时仍然要跑。',
-      'Written by hand from the datasheet and truth table: input 01, output should be 1. It proves the function is right but says nothing about fault coverage. It is still run before shipping.',
+      '主要来自设计验证：设计 / 验证工程师用 testbench 跑仿真，把仿真波形（VCD）转成测试向量（WGL、STIL 等格式）交给测试工程师。测试工程师把它转成测试机格式，配上时序（Drive / Strobe 时刻）和电平，再上机调试；只有少量向量由测试工程师针对规格补写，例如某个特定工作模式或边界条件。Functional 证明芯片「功能对」，但说不出覆盖了多少故障。',
+      'Mostly from design verification: design or verification engineers run testbench simulations, and the simulation waveforms (VCD) are converted into test vectors (WGL, STIL and similar formats) for the test engineer. The test engineer converts them to the tester format, adds timing (drive / strobe times) and levels, and debugs them on the tester. Only a few vectors are written by the test engineer for specific spec items, such as a particular operating mode or a boundary condition. Functional vectors prove the function is right but say nothing about fault coverage.',
     ),
   },
   {
     id: 'algo',
     title: loc('Algorithmic', 'Algorithmic'),
     text: loc(
-      '面向 Memory 这类规则阵列：写一段算法（如 March：逐个地址写 0、读 0 写 1……），ATE 的算法引擎边跑边按地址生成下一拍，不预先存 2ⁿ 条。',
-      'For regular arrays such as memory: write an algorithm (e.g. March: write 0 to each address, then read 0 and write 1, …). The ATE’s algorithmic pattern generator computes each cycle from the address on the fly instead of storing 2ⁿ vectors.',
+      '面向 Memory 这类规则阵列，用 March 等算法（逐个地址写 0，再逐个读 0 写 1……），不预先存 2ⁿ 条，而是现场生成：一种是测试机的 APG（算法图形发生器）按地址边跑边算下一拍；另一种是 DFT 插在片内的 MBIST（Memory BIST）电路自己跑算法，测试机只负责启动它、读回 Pass / Fail。测试工程师选算法、写 APG 程序，或按 DFT 给的步骤调用 MBIST。',
+      'For regular arrays such as memory, using March-type algorithms (write 0 to every address, then read 0 and write 1 at every address, …). Nothing is stored as 2ⁿ vectors; the vectors are generated live. Either the tester’s APG (algorithmic pattern generator) computes each cycle from the address on the fly, or an on-chip MBIST (memory BIST) circuit inserted by DFT runs the algorithm itself, and the tester only starts it and reads back pass / fail. The test engineer picks the algorithm and writes the APG program, or runs MBIST following the steps provided by DFT.',
     ),
   },
   {
     id: 'atpg',
-    title: loc('ATPG', 'ATPG'),
+    title: loc('ATPG / Scan', 'ATPG / Scan'),
     text: loc(
-      'Automatic Test Pattern Generation：读门级网表和故障列表，对每个故障自动搜一条能抓到它的向量，预先存成 Pattern 文件交给 ATE 回放。面向不规则的逻辑，能报出故障覆盖率。',
-      'Automatic Test Pattern Generation reads the gate-level netlist and a fault list, searches for a vector that catches each fault, and stores the result as a pattern file for the ATE to replay. It targets irregular logic and reports fault coverage.',
+      '由 DFT 工程师提供：他们在设计里插入 Scan 链（以及 Logic BIST、Memory BIST 等电路），再用 ATPG（Automatic Test Pattern Generation）工具读门级网表和故障模型，对每个故障自动搜一条能抓到它的向量，报出故障覆盖率，输出 STIL / WGL 等 Pattern 文件。测试工程师拿到后转成测试机格式、配时序和电平、上机调试。量产程序里常有一半左右的向量是 DFT 工程师给的。',
+      'Provided by the DFT engineer: they insert scan chains (and circuits such as logic BIST and memory BIST) into the design, then run an ATPG (Automatic Test Pattern Generation) tool on the gate-level netlist and a fault model. The tool searches for a vector that catches each fault, reports fault coverage, and writes pattern files such as STIL or WGL. The test engineer converts them to the tester format, adds timing and levels, and debugs them on the tester. In a production program, roughly half of the vectors often come from the DFT engineer.',
     ),
   },
 ]
@@ -105,8 +105,8 @@ export const FAULTS: Array<{ id: FaultId; label: LText; text: LText }> = [
     id: 'A0',
     label: loc('A 粘在 0', 'A stuck-at-0'),
     text: loc(
-      'A 粘在 0：要先让好电路的 A = 1 才能「激活」它，还要 B = 1 让差别「传」到 Y。只有 11 能抓到。它和 Y 粘在 0 用同一条向量，叫等价故障。',
-      'A stuck-at-0: the good circuit must drive A = 1 to activate it, and B = 1 to propagate the difference to Y. Only 11 catches it. It needs the same vector as Y stuck-at-0, so the two are equivalent faults.',
+      'A 粘在 0：要先让好电路的 A = 1 才能「激活」它，还要 B = 1 让差别「传」到 Y。只有 11 能抓到。A 粘 0 时与门输出恒为 0，和 Y 粘在 0 的坏芯片对任何输入都输出一样，从外面根本分不出是哪一个，这叫等价故障（B 粘 0 也一样）。ATPG 对一组等价故障只需测一个。',
+      'A stuck-at-0: the good circuit must drive A = 1 to activate it, and B = 1 to propagate the difference to Y. Only 11 catches it. With A stuck at 0 the AND output is always 0, so for every input it behaves exactly like Y stuck-at-0; from outside you cannot tell which one it is. Such faults are called equivalent (B stuck-at-0 too), and ATPG needs to target only one fault from each equivalent group.',
     ),
   },
   {
@@ -142,8 +142,8 @@ export const TAKEAWAY = [
     'n inputs need 2ⁿ vectors; add s flip-flops and it is at least 2ⁿ⁺ˢ. A few dozen bits already take thousands of years, so exhaustive testing cannot ship product.',
   ),
   loc(
-    'Functional 按规格手写；Algorithmic 按算法给 Memory 现场生成；ATPG 按门级网表和故障模型自动搜。',
-    'Functional vectors are written by hand from the spec; algorithmic vectors are generated on the fly for memory; ATPG searches automatically from the gate netlist and a fault model.',
+    'Functional 主要由设计验证仿真转出来，测试工程师只少量补写；Algorithmic 由 APG 或片内 MBIST 给 Memory 现场生成；ATPG / Scan 由 DFT 工程师用工具按门级网表和故障模型生成。测试工程师的活是转格式、配时序和电平、上机调试。',
+    'Functional vectors mostly come from design-verification simulation, with only a few written by the test engineer; algorithmic vectors are generated live for memory by the APG or on-chip MBIST; ATPG / scan vectors are generated by the DFT engineer with tools from the gate netlist and a fault model. The test engineer converts formats, adds timing and levels, and debugs on the tester.',
   ),
   loc(
     '一条向量能不能抓到故障，看它能否激活故障、并把差别传到输出。Stuck-at 只问电平对不对，Transition 还问来不来得及。',
@@ -157,14 +157,14 @@ export const QUIZ: QuizQuestion[] = [
     prompt: loc('为什么 64 个输入的电路不能靠穷举交货？', 'Why can a 64-input circuit not be shipped with exhaustive testing?'),
     options: [
       { id: 'lazy', text: loc('只是工程师嫌麻烦', 'Engineers just find it tedious') },
-      { id: 'time', text: loc('2⁶⁴ 条在 10 MHz 下要约 5.8 万年，而且穷举也不等于故障覆盖率', '2⁶⁴ vectors at 10 MHz take about 58,000 years, and exhaustive is not the same as fault coverage') },
+      { id: 'time', text: loc('2⁶⁴ 条在 10 MHz 下要约 5.8 万年，时间根本不允许', '2⁶⁴ vectors at 10 MHz take about 58,000 years; there is simply no time') },
       { id: 'ate', text: loc('ATE 没有 64 个通道', 'The ATE does not have 64 channels') },
       { id: 'mem', text: loc('向量存储器只能存 64 条', 'Vector memory holds only 64 vectors') },
     ],
     answer: 'time',
     explain: loc(
-      '2⁶⁴ ≈ 1.8 × 10¹⁹ 条，每条 100 ns。时间是硬约束；就算跑完，也说不清对 Transition 这类故障覆盖了多少。',
-      '2⁶⁴ ≈ 1.8 × 10¹⁹ vectors at 100 ns each. Time is a hard limit, and even a full run says nothing clear about faults such as transition faults.',
+      '2⁶⁴ ≈ 1.8 × 10¹⁹ 条，每条 100 ns，约 1.8 × 10¹² 秒 ≈ 5.8 万年。时间是硬约束。而且穷举只是把每种静态输入各跑一次，不保证抓到 Transition 这类要「特定前后一对向量 + 快时钟」的故障。',
+      '2⁶⁴ ≈ 1.8 × 10¹⁹ vectors at 100 ns each is about 1.8 × 10¹² s ≈ 58,000 years. Time is a hard limit. Besides, exhaustive testing only applies each static input once; it does not guarantee catching faults such as transition faults, which need a specific pair of vectors and a fast clock.',
     ),
   },
   {
@@ -178,8 +178,8 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'mul',
     explain: loc(
-      '每种内部状态都要配上全部 2²⁰ 种输入：2²⁰ × 2¹⁰ = 2³⁰。而且进入每个状态还要额外的向量，所以这只是下限。',
-      'Each internal state must be combined with all 2²⁰ inputs: 2²⁰ × 2¹⁰ = 2³⁰. Reaching each state takes extra vectors too, so this is only a lower bound.',
+      '输出还取决于 10 个触发器存的状态，共 2¹⁰ = 1024 种；每种状态下都要把 2²⁰ 种输入试一遍：2²⁰ × 2¹⁰ = 2³⁰ ≈ 10.7 亿条。状态又不能从 Pin 直接设，进入每个状态还要额外的向量，所以这只是下限。',
+      'The output also depends on the state of the 10 flip-flops, 2¹⁰ = 1024 states, and all 2²⁰ inputs must be tried in each: 2²⁰ × 2¹⁰ = 2³⁰ ≈ 1.07 billion vectors. The state cannot be set directly from the pins, and reaching each state takes extra vectors, so this is only a lower bound.',
     ),
   },
   {
@@ -193,8 +193,23 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'diff',
     explain: loc(
-      'Memory March 不会给每个与门列故障；ATPG 也不会按地址递增。对象和生成时机都不同。',
-      'A memory March test does not list faults for each AND gate, and ATPG does not step through addresses. The target and the timing of generation both differ.',
+      'Memory March 由测试机 APG 或片内 MBIST 按地址现场生成，不会给每个与门列故障；ATPG 由 DFT 工程师用工具预先算好、存成 Pattern 文件，也不会按地址递增。两种都不是手写的，区别在对象和生成时机。',
+      'A memory March test is generated live by the tester’s APG or on-chip MBIST, address by address, and does not list faults for each AND gate. ATPG patterns are computed ahead by the DFT engineer’s tool and stored as a pattern file, and they do not step through addresses. Neither is hand-written; they differ in target and in when they are generated.',
+    ),
+  },
+  {
+    id: 'q3b',
+    prompt: loc('量产测试程序里的 ATPG / Scan 向量通常是谁生成的？', 'Who usually generates the ATPG / scan vectors in a production test program?'),
+    options: [
+      { id: 'te', text: loc('测试工程师按功能逐条手写', 'The test engineer writes them by hand, one by one') },
+      { id: 'dft', text: loc('DFT 工程师用 ATPG 工具按门级网表和故障模型生成', 'The DFT engineer, using an ATPG tool on the gate netlist and a fault model') },
+      { id: 'ate', text: loc('测试机上电后自己随机生成', 'The tester generates them randomly at power-up') },
+      { id: 'cust', text: loc('客户在规格书里写好', 'The customer writes them in the datasheet') },
+    ],
+    answer: 'dft',
+    explain: loc(
+      'Scan 链和 BIST 是 DFT 插进设计的，ATPG 向量也由 DFT 工程师生成后交出来。测试工程师负责转成测试机格式、配时序和电平、上机调试。',
+      'Scan chains and BIST are inserted by DFT, and the ATPG vectors are generated and handed over by the DFT engineer. The test engineer converts them to the tester format, adds timing and levels, and debugs them on the tester.',
     ),
   },
   {

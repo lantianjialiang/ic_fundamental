@@ -19,7 +19,8 @@ const L = {
   cmp: loc('电压比较器', 'Voltage comparator'),
   load: loc('电流负载', 'Current load'),
   pmu: 'PMU',
-  icmp: loc('电流比较器', 'Current comparator'),
+  icmp1: loc('电流', 'Current'),
+  icmp2: loc('比较器', 'comparator'),
   read0: loc('读成 0', 'Reads 0'),
   read1: loc('读成 1', 'Reads 1'),
   readX: loc('中间：三态或坏', 'Between: tri-state or bad'),
@@ -205,8 +206,12 @@ export function PinElecFig({
         <VSw x={665} y1={200} y2={256} on={sw.k3} label="K3" color={c(leakPath)} />
         <path d="M665 256 V290" stroke={c(leakPath)} strokeWidth="2.5" />
         <rect x="615" y="290" width="98" height="46" rx="8" fill={leakPath ? 'var(--gold-bg)' : 'var(--fig-box)'} stroke={leakPath ? 'var(--gold)' : 'var(--line)'} />
-        <text x="664" y="318" textAnchor="middle" fill="var(--text)" fontSize="12">
-          {t(L.icmp)}
+        {/* 框只有 98 px 宽，分两行写 */}
+        <text x="664" y="310" textAnchor="middle" fill="var(--text)" fontSize="12">
+          {t(L.icmp1)}
+        </text>
+        <text x="664" y="326" textAnchor="middle" fill="var(--text)" fontSize="12">
+          {t(L.icmp2)}
         </text>
 
         {switching ? (

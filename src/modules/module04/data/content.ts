@@ -10,6 +10,9 @@ export const VMAX = 3.3
 
 export type PinSide = 'input' | 'output'
 
+/** 分段按钮的显示顺序 */
+export const SIDE_IDS: PinSide[] = ['input', 'output']
+
 /** 教学门限：输入 VIL / VIH（DUT 怎么认），输出 VOL / VOH（ATE 怎么看） */
 export const SIDES: Record<
   PinSide,
@@ -23,8 +26,8 @@ export const SIDES: Record<
     hiName: 'VIH',
     sym: ['0', '1'],
     text: loc(
-      '规格书保证：不高于 VIL 一定认成 0，不低于 VIH 一定认成 1。中间 DUT 可能认成任何一个。所以 ATE 驱动时，1 要给得比 VIH 高、0 要给得比 VIL 低。',
-      'The datasheet guarantees: at or below VIL is always 0, at or above VIH is always 1. In between, the DUT may read either. So when the ATE drives, a 1 must be above VIH and a 0 below VIL.',
+      '规格书保证：不高于 VIL（0.8 V）一定认成 0，不低于 VIH（2.0 V）一定认成 1，中间 DUT 可能认成任何一个。所以 ATE 驱动时，1 至少给到 VIH、0 最多给到 VIL。注意同名不同义：这里的 VIH / VIL 是规格书里芯片的输入门限；上一课 Level 里的 VIH = 3.0 V、VIL = 0 V 是测试机实际给出的驱动电平。3.0 V ≥ 2.0 V、0 V ≤ 0.8 V，所以那一课的 1 和 0 一定被认对；要验证门限本身，就把驱动电平恰好设成 2.0 V / 0.8 V，见 {@spec}。',
+      'The datasheet guarantees: at or below VIL (0.8 V) is always 0, at or above VIH (2.0 V) is always 1. In between, the DUT may read either. So when the ATE drives, a 1 must be at least VIH and a 0 at most VIL. Same names, different meanings: here VIH / VIL are the chip’s input thresholds in the datasheet; in the last lesson, VIH = 3.0 V and VIL = 0 V in the Level block were the levels the tester actually drives. Since 3.0 V ≥ 2.0 V and 0 V ≤ 0.8 V, those 1s and 0s were surely read correctly. To verify the thresholds themselves, set the drive levels to exactly 2.0 V / 0.8 V; see {@spec}.',
     ),
   },
   output: {
@@ -35,8 +38,8 @@ export const SIDES: Record<
     hiName: 'VOH',
     sym: ['L', 'H'],
     text: loc(
-      'Comparator 用 VOL / VOH 两条线：高于 VOH 读成 H，低于 VOL 读成 L。落在中间既不是 H 也不是 L，期望什么都判 Fail。',
-      'The comparator uses two lines, VOL and VOH: above VOH reads H, below VOL reads L. In between is neither, so it fails whatever was expected.',
+      'Comparator 用 VOL / VOH 两条线（取自规格书的 VOL max 0.4 V、VOH min 2.4 V）：不低于 VOH 读成 H，不高于 VOL 读成 L。落在中间既不是 H 也不是 L，期望什么都判 Fail。',
+      'The comparator uses two lines, VOL and VOH (taken from the datasheet’s VOL max 0.4 V and VOH min 2.4 V): at or above VOH reads H, at or below VOL reads L. In between is neither, so it fails whatever was expected.',
     ),
   },
 }
@@ -58,8 +61,8 @@ export const MODES: Array<{ id: PmuMode; title: LText; sub: LText; text: LText }
     title: loc('FVMI 加压测流', 'FVMI: force V, measure I'),
     sub: loc('例：输入漏电 IIL / IIH、静态电流 IDDQ', 'e.g. input leakage IIL / IIH, quiescent current IDDQ'),
     text: loc(
-      'PMU 把管脚钉在一个电压上，读流过的电流。漏电太大说明输入结构有问题。',
-      'The PMU holds the pin at a set voltage and reads the current that flows. Too much leakage means the input structure is faulty.',
+      'PMU 把管脚钉在一个电压上（图中 3.3 V），读流过的电流。要的结果是电流，所以加压测流：输入漏电 IIH / IIL 就这样测，漏电太大说明输入结构有问题。IDDQ 也是加压测流，只是加在电源脚上，通常由 DPS 完成。',
+      'The PMU holds the pin at a set voltage (3.3 V in the figure) and reads the current that flows. The result wanted is a current, so force voltage, measure current: input leakage IIH / IIL is tested this way, and too much leakage means the input structure is faulty. IDDQ is also force-V-measure-I, but on the supply pin, usually done by the DPS.',
     ),
   },
   {
@@ -67,8 +70,8 @@ export const MODES: Array<{ id: PmuMode; title: LText; sub: LText; text: LText }
     title: loc('FIMV 加流测压', 'FIMV: force I, measure V'),
     sub: loc('例：开短路、输出 VOH / VOL', 'e.g. opens/shorts, output VOH / VOL'),
     text: loc(
-      'PMU 往管脚里灌或抽一个固定电流，读管脚上的电压。下面的开短路就是这种测法。',
-      'The PMU pushes or pulls a fixed current through the pin and reads the pin voltage. The opens/shorts test below works this way.',
+      'PMU 往管脚里灌或抽一个固定电流，读管脚上的电压。要的结果是电压，所以加流测压：下面的开短路（抽 100 µA 看二极管压降）和输出 VOH / VOL（带着 IOH / IOL 看电压，{@dc}）都是这种测法。',
+      'The PMU pushes or pulls a fixed current through the pin and reads the pin voltage. The result wanted is a voltage, so force current, measure voltage: the opens/shorts test below (pull 100 µA, read the diode drop) and output VOH / VOL (read the voltage while carrying IOH / IOL, {@dc}) both work this way.',
     ),
   },
 ]
@@ -93,8 +96,8 @@ export const FAULTS: Array<{ id: Fault; label: LText; volt: number; text: LText 
     label: loc('正常', 'Good'),
     volt: -0.65,
     text: loc(
-      '电流从 0 V 的 VSS 经对地保护二极管流到管脚，再被 PMU 抽走。二极管正偏，读到一个压降，约 −0.65 V。',
-      'Current flows from VSS at 0 V through the ground protection diode to the pin and into the PMU. The diode is forward-biased, so the pin reads one diode drop, about −0.65 V.',
+      '电流从 0 V 的 VSS 经对地保护二极管流到管脚，再被 PMU 抽走。这个二极管正偏，管脚比 VSS 低一个压降，读到约 −0.65 V；对 VDD 的二极管此时反偏，不导通。',
+      'Current flows from VSS at 0 V through the ground protection diode to the pin and into the PMU. That diode is forward-biased, so the pin sits one diode drop below VSS, about −0.65 V; the diode to VDD is reverse-biased and does not conduct.',
     ),
   },
   {
@@ -132,8 +135,8 @@ export const VERDICT: Record<Verdict, LText> = {
 }
 
 export const OPENS_SETUP = loc(
-  '设置：所有管脚（包括 VDD）接 0 V；PMU 对被测脚加 −100 µA，电压钳位 ±3 V。判定：比 −1.5 V 更负 → 开路；比 −0.2 V 更接近 0 → 短路；中间 → Pass。完整做法（正向电流、阻性短路、读 Datalog）见 {@fOpens}。',
-  'Setup: every pin, VDD included, at 0 V; the PMU forces −100 µA into the pin under test with a ±3 V clamp. Verdict: more negative than −1.5 V → open; closer to 0 than −0.2 V → short; in between → Pass. The full method (positive current, resistive shorts, reading the datalog) is in {@fOpens}.',
+  '设置：所有管脚（包括 VDD）接 0 V；PMU 对被测脚加 −100 µA（负号表示从管脚往外抽 100 µA），电压钳位 ±3 V。判定：比 −1.5 V 更负 → 开路；比 −0.2 V 更接近 0 → 短路；中间 → Pass。完整做法（正向电流、阻性短路、读 Datalog）见 {@fOpens}。',
+  'Setup: every pin, VDD included, at 0 V; the PMU forces −100 µA on the pin under test (the minus sign means 100 µA is pulled out of the pin) with a ±3 V clamp. Verdict: more negative than −1.5 V → open; closer to 0 than −0.2 V → short; in between → Pass. The full method (positive current, resistive shorts, reading the datalog) is in {@fOpens}.',
 )
 
 export const TAKEAWAY: LText[] = [

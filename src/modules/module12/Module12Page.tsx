@@ -30,12 +30,12 @@ type Module12PageProps = {
 
 export function Module12Page({ moduleId, onModuleChange }: Module12PageProps) {
   const { t } = useLocale()
-  const [fail, setFail] = useState<FailPick>('func')
+  const [fail, setFail] = useState<FailPick>(FAIL_OPTIONS[0].id)
   const frames = useMemo(() => flowFrames(fail), [fail])
   const player = useStepPlayer(frames.length, 1200)
   const frame = frames[Math.min(player.step, frames.length - 1)]
   const [focus, setFocus] = useState<'flow' | CaseId>('flow')
-  const [caseId, setCaseId] = useState<CaseId>('all')
+  const [caseId, setCaseId] = useState<CaseId>(CASES[0].id)
   const [guesses, setGuesses] = useState<Partial<Record<CaseId, string>>>({})
 
   const caption = (f: FlowFrame): string => {

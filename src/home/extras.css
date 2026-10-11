@@ -1,0 +1,118 @@
+/* 首页 / 轨道页 / 术语表 / FAQ 共用的小样式 */
+a.lab__nav-item {
+  text-decoration: none;
+}
+
+/* 文案里的 {@课程ID} 引用：显示成可点击的课程编号 */
+.lesson-ref {
+  appearance: none;
+  display: inline;
+  margin: 0 1px;
+  padding: 0 5px;
+  border: 1px solid var(--blue-line);
+  border-radius: var(--r);
+  background: var(--blue-bg);
+  color: var(--blue);
+  font-family: var(--mono);
+  font-size: 0.88em;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.lesson-ref:hover {
+  border-color: var(--blue);
+  background: var(--blue-bg-2);
+}
+
+/* 课程编号小签：术语出处、FAQ 相关课程 */
+.ref-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.ref-chip {
+  appearance: none;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--blue);
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ref-chip:hover {
+  border-color: var(--blue-line);
+  background: var(--card-hover);
+}
+
+/* 术语表 / FAQ 顶部的搜索 + 视图切换 */
+.tool-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin: 0 0 18px;
+}
+
+.tool-search {
+  flex: 1 1 260px;
+  min-width: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--panel-2);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs);
+}
+
+.tool-search:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+
+.tool-count {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.tool-empty {
+  padding: 24px 0;
+  color: var(--muted);
+  font-size: var(--fs);
+}
+
+/* 深链接跳到的条目闪一下 */
+@keyframes tool-target-flash {
+  0% {
+    box-shadow: 0 0 0 3px var(--gold);
+  }
+  100% {
+    box-shadow: 0 0 0 1px var(--gold-line);
+  }
+}
+
+.is-target {
+  border-color: var(--gold-line) !important;
+  animation: tool-target-flash 1.6s ease-out;
+  box-shadow: 0 0 0 1px var(--gold-line);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-target {
+    animation: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .intro__main.home {
+    padding: 20px 16px 48px;
+  }
+}

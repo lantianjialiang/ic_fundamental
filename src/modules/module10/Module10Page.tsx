@@ -35,10 +35,10 @@ export function Module10Page({ moduleId, onModuleChange }: Module10PageProps) {
   const { t } = useLocale()
   const [n, setN] = useState(20)
   const [s, setS] = useState(10)
-  const [source, setSource] = useState<SourceId>('atpg')
-  const [fault, setFault] = useState<FaultId>('A0')
-  const [vec, setVec] = useState('10')
-  const [tried, setTried] = useState<string[]>(['10'])
+  const [source, setSource] = useState<SourceId>(SOURCES[0].id)
+  const [fault, setFault] = useState<FaultId>(FAULTS[0].id)
+  const [vec, setVec] = useState(VECTORS[0].id)
+  const [tried, setTried] = useState<string[]>([VECTORS[0].id])
   const [focus, setFocus] = useState<Focus>({ kind: 'explode' })
   const tran = useStepPlayer(TRAN_STEPS.length, 1600)
 
@@ -107,6 +107,7 @@ export function Module10Page({ moduleId, onModuleChange }: Module10PageProps) {
             }}
           />
         </div>
+        <p>{t(ui.m10.explodeWhy)}</p>
         <ExplodeFig n={n} s={s} />
         <Readout
           items={[

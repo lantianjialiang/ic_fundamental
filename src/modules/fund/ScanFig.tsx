@@ -45,19 +45,20 @@ export function ScanModelFig({ mode }: { mode: 'none' | 'normal' | 'scan' }) {
         </text>
         <line x1="70" y1="48" x2="190" y2="48" stroke="var(--sky)" strokeWidth="2" />
         <path d="M182 43 L190 48 L182 53" fill="none" stroke="var(--sky)" strokeWidth="2" />
-        <text x="70" y="38" fill="var(--sky)" fontSize="12">
+        {/* 英文标签约 115 px 宽，往画布外侧靠，和组合逻辑框留出间距 */}
+        <text x="24" y="38" fill="var(--sky)" fontSize="12">
           {t(L.pi)}
         </text>
         <line x1="510" y1="48" x2="630" y2="48" stroke="var(--sky)" strokeWidth="2" />
         <path d="M622 43 L630 48 L622 53" fill="none" stroke="var(--sky)" strokeWidth="2" />
-        <text x="630" y="38" textAnchor="end" fill="var(--sky)" fontSize="12">
+        <text x="664" y="38" textAnchor="end" fill="var(--sky)" fontSize="12">
           {t(L.po)}
         </text>
         {/* Scan Select 线（画在开关后面） */}
         {hasMux ? (
           <>
             <line x1="96" y1="164" x2={xs[2] + 30} y2="164" stroke={mode === 'scan' ? 'var(--purple)' : 'var(--dim)'} strokeWidth="1.5" strokeDasharray="4 3" />
-            <text x="96" y="182" fill={mode === 'scan' ? 'var(--purple)' : 'var(--muted)'} fontSize="11">
+            <text x="142" y="182" textAnchor="end" fill={mode === 'scan' ? 'var(--purple)' : 'var(--muted)'} fontSize="11">
               {`Scan Select = ${mode === 'scan' ? 1 : 0}`}
             </text>
           </>
@@ -100,7 +101,7 @@ export function ScanModelFig({ mode }: { mode: 'none' | 'normal' | 'scan' }) {
         {hasMux ? (
           <>
             <circle cx="110" cy="140" r="3" fill={scanColor} />
-            <text x="104" y="132" textAnchor="start" fill={mode === 'scan' ? hot : 'var(--muted)'} fontSize="11">
+            <text x="102" y="144" textAnchor="end" fill={mode === 'scan' ? hot : 'var(--muted)'} fontSize="11">
               Scan Data In
             </text>
             <path d={`M${xs[2] + 60} 214 L630 214`} fill="none" stroke={scanColor} strokeWidth="2" />

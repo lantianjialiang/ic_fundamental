@@ -1,4 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useState, type ComponentType } from 'react'
+import type { FaqPageProps } from './faq/FaqPage'
+import type { GlossaryPageProps } from './glossary/GlossaryPage'
 import { HomePage } from './home/HomePage'
 import { TrackPage } from './home/TrackPage'
 import { useLocale } from './i18n/LocaleContext'
@@ -21,6 +23,8 @@ function page<P>(load: () => Promise<Record<string, unknown>>, name: string) {
 }
 
 const Module00Page = page<IntroProps>(() => import('./modules/module00/Module00Page'), 'Module00Page')
+const GlossaryPage = page<GlossaryPageProps>(() => import('./glossary/GlossaryPage'), 'GlossaryPage')
+const FaqPage = page<FaqPageProps>(() => import('./faq/FaqPage'), 'FaqPage')
 
 const LESSONS: Record<Exclude<ModuleId, 'intro'>, ComponentType<LessonProps>> = {
   connection: page(() => import('./modules/module01/Module01Page'), 'Module01Page'),
@@ -75,8 +79,21 @@ export default function App() {
     else window.location.hash = hash
   }
 
+  /** 改地址但不新增历史记录：用于把不存在的术语 / 问题 ID 纠正回列表页 */
+  const replaceScreen = (next: Screen) => {
+    window.history.replaceState(null, '', screenHash(next))
+    setScreenState(next)
+  }
+
   const openLesson = (moduleId: ModuleId, track?: TrackId) => {
     setScreen({ kind: 'lesson', track: trackOfLesson(moduleId, track), moduleId })
+  }
+
+  const openTrack = (id: TrackId) => {
+    const kind = trackById(id)?.page
+    if (kind === 'glossary') setScreen({ kind: 'glossary' })
+    else if (kind === 'faq') setScreen({ kind: 'faq' })
+    else setScreen({ kind: 'track', track: id })
   }
 
   const navValue = useMemo(() => {
@@ -93,7 +110,33 @@ export default function App() {
   }, [screen])
 
   if (screen.kind === 'home') {
-    return <HomePage onOpenTrack={(track) => setScreen({ kind: 'track', track })} />
+    return <HomePage onOpenTrack={openTrack} />
+  }
+
+  if (screen.kind === 'glossary') {
+    return (
+      <Suspense fallback={<Loading />}>
+        <GlossaryPage
+          termId={screen.termId}
+          onSelect={(termId, replace) => (replace ? replaceScreen : setScreen)({ kind: 'glossary', termId })}
+          onHome={() => setScreen({ kind: 'home' })}
+          onOpenLesson={(id) => openLesson(id)}
+        />
+      </Suspense>
+    )
+  }
+
+  if (screen.kind === 'faq') {
+    return (
+      <Suspense fallback={<Loading />}>
+        <FaqPage
+          faqId={screen.faqId}
+          onSelect={(faqId, replace) => (replace ? replaceScreen : setScreen)({ kind: 'faq', faqId })}
+          onHome={() => setScreen({ kind: 'home' })}
+          onOpenLesson={(id) => openLesson(id)}
+        />
+      </Suspense>
+    )
   }
 
   if (screen.kind === 'track') {

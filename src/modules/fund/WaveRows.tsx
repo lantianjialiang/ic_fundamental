@@ -109,18 +109,23 @@ export function WaveRows({ span, period, rows, strobe, window, edges = [], ariaL
                 </g>
               )
             })}
-            {row.labels?.map((label, i) => (
-              <text
-                key={i}
-                x={x(label.t) + 4}
-                y={top + 4}
-                fill={label.bad ? 'var(--red)' : 'var(--gold)'}
-                fontSize="11"
-                fontFamily="monospace"
-              >
-                {label.text}
-              </text>
-            ))}
+            {row.labels?.map((label, i) => {
+              // 太靠右时改成右对齐，避免文字出界
+              const nearEnd = x(label.t) + 4 + label.text.length * 7 > 676
+              return (
+                <text
+                  key={i}
+                  x={nearEnd ? x(label.t) - 4 : x(label.t) + 4}
+                  y={top + 4}
+                  textAnchor={nearEnd ? 'end' : 'start'}
+                  fill={label.bad ? 'var(--red)' : 'var(--gold)'}
+                  fontSize="11"
+                  fontFamily="monospace"
+                >
+                  {label.text}
+                </text>
+              )
+            })}
           </g>
         )
       })}

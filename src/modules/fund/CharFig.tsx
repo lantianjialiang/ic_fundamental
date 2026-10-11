@@ -17,6 +17,35 @@ const X1 = 650
 
 type Which = 'ref' | 'res'
 
+/** 估算 SVG 文字宽度：中文约 1em/字，其他约 0.55em/字 */
+function textW(text: string, size: number) {
+  let w = 0
+  for (const ch of text) w += /[\u3000-\u9fff\uff00-\uffef]/.test(ch) ? size : size * 0.55
+  return w
+}
+
+/** 两个居中标签互相推开（间距 6），并夹在 4…676 之内；返回两个中心 x */
+function spreadLabels(c1: number, w1: number, c2: number, w2: number): [number, number] {
+  const swap = c1 > c2
+  let [la, wa, lb, wb] = swap ? [c2, w2, c1, w1] : [c1, w1, c2, w2]
+  const overlap = la + wa / 2 + 6 - (lb - wb / 2)
+  if (overlap > 0) {
+    la -= overlap / 2
+    lb += overlap / 2
+  }
+  if (la - wa / 2 < 4) {
+    const d = 4 - (la - wa / 2)
+    la += d
+    lb = Math.max(lb, la + wa / 2 + 6 + wb / 2)
+  }
+  if (lb + wb / 2 > 676) {
+    const d = lb + wb / 2 - 676
+    lb -= d
+    la = Math.min(la, lb - wb / 2 - 6 - wa / 2)
+  }
+  return swap ? [lb, la] : [la, lb]
+}
+
 export function AcCalcFig({
   kind,
   refT,
@@ -87,6 +116,12 @@ export function AcCalcFig({
   const a = Math.min(refT, resT)
   const b = Math.max(refT, resT)
 
+  // 把手下方两个标签：按估算宽度推开，避免两点靠近时文字重叠
+  const refText = t(L.ref)
+  const resText = t(L.res)
+  const [refX, resX] = spreadLabels(x(refT), textW(refText, 10), x(resT), textW(resText, 10))
+  const strobeNearEnd = x(resT) + 5 + textW('Strobe', 11) > 676
+
   return (
     <figure className="term-fig">
       <svg
@@ -126,7 +161,14 @@ export function AcCalcFig({
               strokeWidth="2"
             />
             <line x1={x(resT)} y1={top2 - 10} x2={x(resT)} y2={top2 + h + 8} stroke={gold} strokeWidth="2.5" />
-            <text x={x(resT) + 5} y={top2 - 2} fill={gold} fontSize="11" fontFamily="var(--mono)">
+            <text
+              x={strobeNearEnd ? x(resT) - 5 : x(resT) + 5}
+              y={top2 - 2}
+              textAnchor={strobeNearEnd ? 'end' : 'start'}
+              fill={gold}
+              fontSize="11"
+              fontFamily="var(--mono)"
+            >
               Strobe
             </text>
           </>
@@ -175,17 +217,17 @@ export function AcCalcFig({
         <line x1={x(0)} y1={186} x2={x(AC_SPAN)} y2={186} stroke="var(--line)" />
         <g className="char-drag__handle" onPointerDown={startDrag('ref')}>
           <circle cx={x(refT)} cy={186} r={9} fill="var(--blue-bg)" stroke={blue} strokeWidth="2" />
-          <text x={x(refT)} y={204} textAnchor="middle" fill={blue} fontSize="10">
-            {t(L.ref)}
+          <text x={refX} y={204} textAnchor="middle" fill={blue} fontSize="10">
+            {refText}
           </text>
         </g>
         <g className="char-drag__handle" onPointerDown={startDrag('res')}>
           <circle cx={x(resT)} cy={186} r={9} fill="var(--gold-bg)" stroke={gold} strokeWidth="2" />
-          <text x={x(resT)} y={204} textAnchor="middle" fill={gold} fontSize="10">
-            {t(L.res)}
+          <text x={resX} y={204} textAnchor="middle" fill={gold} fontSize="10">
+            {resText}
           </text>
         </g>
-        <text x={672} y={180} textAnchor="end" fill="var(--dim)" fontSize="10">
+        <text x={14} y={176} fill="var(--dim)" fontSize="10">
           {t(L.drag)}
         </text>
       </svg>

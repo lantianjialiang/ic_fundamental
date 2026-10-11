@@ -144,12 +144,17 @@ const S = {
 
 const ZERO: Record<BinCat, number> = { s200: 0, s166: 0, s100: 0, dc: 0, ac: 0, func: 0 }
 
+/** 由粗到细排列；默认停在“只到分钟”，先让学生看到丢掉的 37 秒 */
+const RES_IDS: Res[] = ['min', 'sec', 'ds', 'cs']
+const RES_LABEL: Record<Res, typeof S.resMin> = { min: S.resMin, sec: S.resSec, ds: S.resDs, cs: S.resCs }
+const BIN_MODES: BinMode[] = ['min', 'full']
+
 type Flight = { key: number; cat: BinCat; stage: 'site' | 'bin' }
 
 export function FundAtePage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [note, setNote] = useState<Note>({ kicker: S.kicker, title: FLOW[0].title, text: FLOW[0].text })
-  const [flow, setFlow] = useState('fab')
+  const [flow, setFlow] = useState(FLOW[0].id)
   const [grade, setGrade] = useState<Grade>('com')
   // 晶圆
   const [results, setResults] = useState<number[]>(() => makeResults())
@@ -158,23 +163,23 @@ export function FundAtePage({ moduleId, onModuleChange }: Props) {
   const [mark, setMark] = useState<'ink' | 'map'>('ink')
   const [picked, setPicked] = useState<number | null>(null)
   // 封装 / ATE
-  const [pkg, setPkg] = useState('dip')
-  const [part, setPart] = useState('inst')
+  const [pkg, setPkg] = useState(PKGS[0].id)
+  const [part, setPart] = useState(ATE_PARTS[0].id)
   const [hookup, setHookup] = useState<Hookup>('cp')
   // 数字 vs 模拟
   const [sec, setSec] = useState(37.46)
-  const [res, setRes] = useState<Res>('sec')
-  const [mixed, setMixed] = useState('bdla')
+  const [res, setRes] = useState<Res>(RES_IDS[0])
+  const [mixed, setMixed] = useState(MIXED[0].id)
   // 测试机
-  const [tester, setTester] = useState('mem')
-  const [memPat, setMemPat] = useState<MemPat>('checker')
+  const [tester, setTester] = useState(TESTERS[0].id)
+  const [memPat, setMemPat] = useState<MemPat>(MEM_PATS[0].id)
   const [memStep, setMemStep] = useState(0)
   const [freq, setFreq] = useState(80)
   const [pins, setPins] = useState(160)
   const [chosen, setChosen] = useState<TierId | null>(null)
   // 周边 / 分选机
-  const [periph, setPeriph] = useState('lb')
-  const [binMode, setBinMode] = useState<BinMode>('full')
+  const [periph, setPeriph] = useState(PERIPH[0].id)
+  const [binMode, setBinMode] = useState<BinMode>(BIN_MODES[0])
   const [counts, setCounts] = useState<Record<BinCat, number>>(ZERO)
   const [left, setLeft] = useState(HANDLER_TOTAL)
   const [flight, setFlight] = useState<Flight | null>(null)
@@ -453,12 +458,7 @@ export function FundAtePage({ moduleId, onModuleChange }: Props) {
           <Knob label={S.sec} value={sec} unit="s" min={0} max={59.99} step={0.01} onChange={setSec} />
         </div>
         <Seg
-          options={[
-            { id: 'min' as const, label: S.resMin },
-            { id: 'sec' as const, label: S.resSec },
-            { id: 'ds' as const, label: S.resDs },
-            { id: 'cs' as const, label: S.resCs },
-          ]}
+          options={RES_IDS.map((id) => ({ id, label: RES_LABEL[id] }))}
           value={res}
           onChange={setRes}
         />
@@ -583,10 +583,7 @@ export function FundAtePage({ moduleId, onModuleChange }: Props) {
             {t(S.reset)}
           </button>
           <Seg
-            options={[
-              { id: 'min' as const, label: S.minBins },
-              { id: 'full' as const, label: S.fullBins },
-            ]}
+            options={BIN_MODES.map((id) => ({ id, label: id === 'min' ? S.minBins : S.fullBins }))}
             value={binMode}
             onChange={(id) => {
               setBinMode(id)

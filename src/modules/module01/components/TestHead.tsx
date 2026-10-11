@@ -91,7 +91,7 @@ export function TestHead() {
           </mesh>
         ) : null}
         {cfg.showLabels ? (
-          <SceneLabel position={[cardX(0), -0.9, TH.cardD / 2]} title={t(T.cards)} />
+          <SceneLabel position={flipped ? [cardX(0), -1.22, TH.d / 2 + 0.05] : [cardX(0), -0.9, TH.cardD / 2]} title={t(T.cards)} />
         ) : null}
       </group>
     </LayerGroup>

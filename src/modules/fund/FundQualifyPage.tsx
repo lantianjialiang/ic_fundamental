@@ -94,13 +94,13 @@ export function FundQualifyPage({ moduleId, onModuleChange }: Props) {
   const [fields, setFields] = useState<Record<FieldId, boolean>>({ sn: true, rev: false, tester: false, date: false, full: false })
   // 2. Margin
   const [pull, setPull] = useState(0)
-  const [param, setParam] = useState('per')
+  const [param, setParam] = useState(MARGIN_PARAMS[0].id)
   // 3. Shmoo
   const [shPick, setShPick] = useState<string | null>(null)
   const [shVerdict, setShVerdict] = useState<Record<string, 'right' | 'wrong'>>({})
   // 4. 分 Bin
   const [made, setMade] = useState<Record<string, number>>({})
-  const [range, setRange] = useState('com')
+  const [range, setRange] = useState(TEMP_RANGES[0].id)
   // 5. 文档
   const [docs, setDocs] = useState<Record<string, boolean>>({})
   const [docOpen, setDocOpen] = useState<string | null>(DOCS[0].id)

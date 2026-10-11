@@ -3,6 +3,7 @@ import { useLocale } from '../i18n/LocaleContext'
 import { ui } from '../i18n/ui'
 import { TRACKS, type TrackId } from '../tracks/catalog'
 import { AppChrome } from './AppChrome'
+import { HOME_EXTRA } from './text'
 
 type HomePageProps = {
   onOpenTrack: (id: TrackId) => void
@@ -43,11 +44,15 @@ export function HomePage({ onOpenTrack }: HomePageProps) {
                 <span className="home__card-top">
                   <strong>{t(track.title)}</strong>
                   <span className={`home__badge${track.ready ? ' is-ready' : ''}`}>
-                    {track.ready ? t(ui.home.ready) : t(ui.home.pending)}
+                    {track.page ? t(HOME_EXTRA.reference) : track.ready ? t(ui.home.ready) : t(ui.home.pending)}
                   </span>
                 </span>
                 <p>{t(track.blurb)}</p>
-                {track.ready ? (
+                {track.page ? (
+                  <span className="home__card-foot">
+                    {t(track.page === 'glossary' ? HOME_EXTRA.openGlossary : HOME_EXTRA.openFaq)}
+                  </span>
+                ) : track.ready ? (
                   <span className="home__card-foot">
                     {track.lessons.length} {t(ui.home.lessonCount)}
                   </span>

@@ -69,7 +69,7 @@ export function LabShell({
       <LabHeader title={`${lessonCode(moduleId)} · ${title}`} goal={goal} nav={nav} />
       {children}
       {footer}
-      <Copyright />
+      <Copyright page={`${lessonCode(moduleId)} · ${title}`} />
     </div>
   )
 }

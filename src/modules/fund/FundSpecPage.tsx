@@ -56,16 +56,20 @@ const S = {
   later: loc('下一课从第一项测试开始：开短路。', 'The next lesson starts with the first test: opens/shorts.'),
 }
 
+const GRADE_IDS: Grade[] = ['com', 'mil']
+const FREQS = ['20', '50', '100']
+const CHANNELS = ['8', '16', '32']
+
 export function FundSpecPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
-  const [kind, setKind] = useState('device')
-  const [word, setWord] = useState('pre')
-  const [grade, setGrade] = useState<Grade>('com')
-  const [tab, setTab] = useState<SheetTab>('dc')
-  const [rowId, setRowId] = useState<string>('voh')
-  const [freq, setFreq] = useState('50')
-  const [ch, setCh] = useState('32')
-  const [note, setNote] = useState<Note>({ kicker: S.kicker, title: KINDS[2].title, text: KINDS[2].text })
+  const [kind, setKind] = useState(KINDS[0].id)
+  const [word, setWord] = useState(WORDS[0].id)
+  const [grade, setGrade] = useState<Grade>(GRADE_IDS[0])
+  const [tab, setTab] = useState<SheetTab>(SHEET_TABS[0].id)
+  const [rowId, setRowId] = useState<string>(SHEET[SHEET_TABS[0].id][0].id)
+  const [freq, setFreq] = useState(FREQS[0])
+  const [ch, setCh] = useState(CHANNELS[0])
+  const [note, setNote] = useState<Note>({ kicker: S.kicker, title: KINDS[0].title, text: KINDS[0].text })
 
   const g = GRADES[grade]
   const rows = SHEET[tab]
@@ -142,7 +146,7 @@ export function FundSpecPage({ moduleId, onModuleChange }: Props) {
 
       <Section title={t(S.sheetTitle)} note={t(S.sheetNote)}>
         <Seg
-          options={(['com', 'mil'] as Grade[]).map((id) => ({ id, label: GRADES[id].name }))}
+          options={GRADE_IDS.map((id) => ({ id, label: GRADES[id].name }))}
           value={grade}
           onChange={setGrade}
         />{' '}
@@ -190,7 +194,7 @@ export function FundSpecPage({ moduleId, onModuleChange }: Props) {
           <div>
             <p className="intro__note">{t(S.testerFreq)}</p>
             <Seg
-              options={['20', '50', '100'].map((id) => ({ id, label: `${id} MHz` }))}
+              options={FREQS.map((id) => ({ id, label: `${id} MHz` }))}
               value={freq}
               onChange={setFreq}
             />
@@ -198,7 +202,7 @@ export function FundSpecPage({ moduleId, onModuleChange }: Props) {
           <div>
             <p className="intro__note">{t(S.testerCh)}</p>
             <Seg
-              options={['8', '16', '32'].map((id) => ({ id, label: `${id} ch` }))}
+              options={CHANNELS.map((id) => ({ id, label: `${id} ch` }))}
               value={ch}
               onChange={setCh}
             />

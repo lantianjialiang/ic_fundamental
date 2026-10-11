@@ -1,0 +1,51 @@
+/* 问题反馈入口：版权行和课程侧栏底部 */
+.fb-links {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.fb-link {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.fb-link:hover {
+  text-decoration: underline;
+}
+
+.fb-link:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.fb-links--compact {
+  gap: 4px 8px;
+}
+
+.lab__copyright .fb-report {
+  margin-left: 10px;
+  white-space: nowrap;
+}
+
+.lab__copyright .fb-report__label {
+  margin-right: 4px;
+}
+
+.fb-aside {
+  margin-top: 22px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  font-size: 12px;
+}
+
+.fb-aside__title {
+  margin: 0 0 6px;
+  color: var(--muted);
+}
+
+.fb-aside .fb-links {
+  font-size: 12px;
+}

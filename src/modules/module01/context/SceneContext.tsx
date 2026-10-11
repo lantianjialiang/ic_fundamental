@@ -21,6 +21,8 @@ export type SceneStore = AnimValues & {
   section: number
   sectionTarget: number
   boardFade: number
+  /** 「只看路径」淡化进度 0..1：其它部件的不透明度从 1 降到 DIM_OPACITY */
+  dim: number
   phase: ContactPhase
   phaseT: number
   pulseT: number
@@ -36,6 +38,7 @@ export function createStore(flow: TestFlow): SceneStore {
     section: 0,
     sectionTarget: 0,
     boardFade: 0,
+    dim: 0,
     phase: 'idle',
     phaseT: 0,
     pulseT: 0,
@@ -61,6 +64,8 @@ export type SceneConfig = {
   pkg: Pkg
   probe: ProbeType
   selected: number | null
+  /** 有高亮路径时，是否把其它部件淡化成几乎透明 */
+  pathOnly: boolean
   focus: LayerId | null
   showLabels: boolean
   reduced: boolean
@@ -68,6 +73,14 @@ export type SceneConfig = {
 }
 
 type SceneContextValue = { store: SceneStore; cfg: SceneConfig }
+
+/** 当前要高亮的通道：选中的通道；没选时接触动画「信号」阶段默认走 CH1 */
+export function activeChannel(store: SceneStore, cfg: SceneConfig): number | null {
+  if (cfg.selected !== null) return cfg.selected
+  // 减少动态效果时，接触动画直接跳到「完成」，用静态路径代替流动脉冲
+  const signalPhase = store.phase === 'signal' || (cfg.reduced && store.phase === 'done')
+  return signalPhase ? 0 : null
+}
 
 export const SceneContext = createContext<SceneContextValue | null>(null)
 

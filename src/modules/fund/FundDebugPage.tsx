@@ -106,11 +106,11 @@ function fillText(text: LText, vars: Record<string, string>): LText {
 export function FundDebugPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [note, setNote] = useState<Note>({ kicker: S.kicker, title: SUSPECTS[0].title, text: SUSPECTS[0].text })
-  const [suspect, setSuspect] = useState<SuspectId>('dut')
+  const [suspect, setSuspect] = useState<SuspectId>(SUSPECTS[0].id)
   const [answers, setAnswers] = useState<Record<string, FailKind>>({})
-  const [begin, setBegin] = useState('hw')
-  const [habit, setHabit] = useState('offline')
-  const [tool, setTool] = useState('scopeTool')
+  const [begin, setBegin] = useState(ON_TESTER[0].id)
+  const [habit, setHabit] = useState(HABITS[0].id)
+  const [tool, setTool] = useState(TOOLS[0].id)
   // 排错游戏
   const [game, setGame] = useState<Game>(() => newGame())
   const [initial, setInitial] = useState<Reading>(() => measureLeak(game, BASE_RIG))

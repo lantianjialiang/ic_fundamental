@@ -131,68 +131,71 @@ export function PmuModeFig({ mode }: { mode: PmuMode }) {
   const fv = mode === 'fvmi'
   const gold = 'var(--gold)'
   const blue = 'var(--sky)'
+  // 标签统一放在各自元件正下方（接地符号之下），源在 x=90、表在 x=250：
+  // 最长的 “Force 100 µA” 约 87 px（47–133），“Measure V” 约 65 px（217–283），中间留 80 px 以上
   return (
     <figure className="term-fig">
-      <svg viewBox="0 0 680 170" className="term-fig__svg" role="img" aria-label={t(L.modeCap)}>
-        <rect width="680" height="170" rx="10" fill="var(--well)" />
-        <rect x="20" y="16" width="300" height="140" rx="10" fill="none" stroke="var(--blue)" strokeDasharray="6 5" />
+      <svg viewBox="0 0 680 200" className="term-fig__svg" role="img" aria-label={t(L.modeCap)}>
+        <rect width="680" height="200" rx="10" fill="var(--well)" />
+        <rect x="20" y="16" width="300" height="170" rx="10" fill="none" stroke="var(--blue)" strokeDasharray="6 5" />
         <text x="32" y="34" fill="var(--blue)" fontSize="12">
           {t(L.pmu)}
         </text>
         {/* 源 */}
-        <path d="M90 72 V50 H380" fill="none" stroke="var(--text-2)" strokeWidth="2" />
-        <path d="M90 118 V130" stroke="var(--text-2)" strokeWidth="2" />
-        <Ground x={90} y={130} />
-        <circle cx="90" cy="95" r="23" fill="var(--fig-box)" stroke={gold} strokeWidth="2" />
+        <path d="M90 77 V50 H380" fill="none" stroke="var(--text-2)" strokeWidth="2" />
+        <path d="M90 123 V140" stroke="var(--text-2)" strokeWidth="2" />
+        <Ground x={90} y={140} />
+        <circle cx="90" cy="100" r="23" fill="var(--fig-box)" stroke={gold} strokeWidth="2" />
         {fv ? (
           <g fill={gold} fontSize="16" textAnchor="middle" fontFamily="var(--mono)">
-            <text x="90" y="91">
+            <text x="90" y="96">
               +
             </text>
-            <text x="90" y="111">
+            <text x="90" y="116">
               −
             </text>
           </g>
         ) : (
-          <path d="M90 108 V82 M84 89 L90 81 L96 89" fill="none" stroke={gold} strokeWidth="2" />
+          <path d="M90 113 V87 M84 94 L90 86 L96 94" fill="none" stroke={gold} strokeWidth="2" />
         )}
-        <text x="124" y="100" fill={gold} fontSize="12" fontFamily="var(--mono)">
-          {fv ? `${t(L.force)} 2.0 V` : `${t(L.force)} 100 µA`}
+        <text x="90" y="172" textAnchor="middle" fill={gold} fontSize="12" fontFamily="var(--mono)">
+          {fv ? `${t(L.force)} 3.3 V` : `${t(L.force)} 100 µA`}
         </text>
         {/* 表 */}
         {fv ? (
           <g>
-            <circle cx="240" cy="50" r="16" fill="var(--fig-box)" stroke={blue} strokeWidth="2" />
-            <text x="240" y="55" textAnchor="middle" fill={blue} fontSize="14" fontFamily="var(--mono)">
+            <circle cx="250" cy="50" r="16" fill="var(--fig-box)" stroke={blue} strokeWidth="2" />
+            <text x="250" y="55" textAnchor="middle" fill={blue} fontSize="14" fontFamily="var(--mono)">
               A
             </text>
-            <text x="240" y="84" textAnchor="middle" fill={blue} fontSize="12" fontFamily="var(--mono)">
+            <text x="250" y="88" textAnchor="middle" fill={blue} fontSize="12" fontFamily="var(--mono)">
               {`${t(L.measure)} I`}
             </text>
           </g>
         ) : (
           <g>
-            <path d="M260 50 V79 M260 111 V130" stroke="var(--text-2)" strokeWidth="2" />
-            <Ground x={260} y={130} />
-            <circle cx="260" cy="95" r="16" fill="var(--fig-box)" stroke={blue} strokeWidth="2" />
-            <text x="260" y="100" textAnchor="middle" fill={blue} fontSize="14" fontFamily="var(--mono)">
+            <path d="M250 50 V84 M250 116 V140" stroke="var(--text-2)" strokeWidth="2" />
+            <circle cx="250" cy="50" r="3.5" fill="var(--text-2)" />
+            <Ground x={250} y={140} />
+            <circle cx="250" cy="100" r="16" fill="var(--fig-box)" stroke={blue} strokeWidth="2" />
+            <text x="250" y="105" textAnchor="middle" fill={blue} fontSize="14" fontFamily="var(--mono)">
               V
             </text>
-            <text x="230" y="100" textAnchor="end" fill={blue} fontSize="12" fontFamily="var(--mono)">
+            <text x="250" y="172" textAnchor="middle" fill={blue} fontSize="12" fontFamily="var(--mono)">
               {`${t(L.measure)} V`}
             </text>
           </g>
         )}
         {/* DUT */}
-        <rect x="380" y="16" width="280" height="140" rx="10" fill="var(--fig-box)" stroke="var(--line-2)" />
+        <rect x="380" y="16" width="280" height="170" rx="10" fill="var(--fig-box)" stroke="var(--line-2)" />
         <text x="648" y="34" textAnchor="end" fill="var(--text)" fontSize="13">
           DUT
         </text>
         <circle cx="380" cy="50" r="6" fill="var(--card)" stroke="var(--text)" strokeWidth="2" />
-        <path d="M386 50 H460 V70" fill="none" stroke="var(--text-2)" strokeWidth="2" />
-        <path d="M460 70 l8 4 l-16 8 l16 8 l-16 8 l16 8 l-8 4 V130" fill="none" stroke="var(--text-2)" strokeWidth="2" />
-        <Ground x={460} y={130} />
-        <text x="486" y="100" fill="var(--muted)" fontSize="12">
+        <path d="M386 50 H460 V80" fill="none" stroke="var(--text-2)" strokeWidth="2" />
+        <path d="M460 80 l8 4 l-16 8 l16 8 l-16 8 l16 8 l-8 4 V140" fill="none" stroke="var(--text-2)" strokeWidth="2" />
+        <Ground x={460} y={140} />
+        <text x="486" y="105" fill="var(--muted)" fontSize="12">
           {t(L.dutLoad)}
         </text>
       </svg>
@@ -212,7 +215,7 @@ export function OpensMiniFig({ fault, volt }: { fault: Fault; volt: number }) {
   const good = fault === 'good'
   const verdict = judge(volt)
   const nx = (v: number) => 70 + ((v + 3.5) / 4) * 560
-  const flow = good ? 'M380 222 V200 M380 180 V135 H164' : short ? 'M300 222 V135 H164' : ''
+  const flow = good ? 'M380 222 V200 M380 180 V135 H164' : short ? 'M290 222 V135 H164' : ''
   return (
     <figure className="term-fig">
       <svg viewBox="0 0 680 320" className="term-fig__svg" role="img" aria-label={t(L.opensCap)}>
@@ -270,8 +273,10 @@ export function OpensMiniFig({ fault, volt }: { fault: Fault; volt: number }) {
         </text>
         {short ? (
           <g>
-            <path d="M300 135 V222" stroke="var(--red)" strokeWidth="2.5" />
-            <text x="292" y="238" textAnchor="end" fill="var(--red)" fontSize="12">
+            <path d="M290 135 V222" stroke="var(--red)" strokeWidth="2.5" />
+            <Ground x={290} y={222} color="var(--red)" />
+            {/* 标签夹在短路线与对地二极管之间（298–约 370，二极管从 366 起但在 y≤200） */}
+            <text x="298" y="214" fill="var(--red)" fontSize="12">
               {t(L.shortTo)}
             </text>
           </g>

@@ -96,17 +96,19 @@ const S = {
 
 const SPAN = 600
 const PERIOD = 100
+/** 30 位计数器拆成几段，'1' 表示不拆 */
+const CTR_SEGS = ['1', '2', '3', '5']
 
 export function FundFuncPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
-  const [role, setRole] = useState('mfg')
-  const [src, setSrc] = useState('scan')
+  const [role, setRole] = useState(ROLES[0].id)
+  const [src, setSrc] = useState(SOURCES[0].id)
   const [detected, setDetected] = useState(9200)
-  const [dft, setDft] = useState('scan')
-  const [segs, setSegs] = useState('1')
+  const [dft, setDft] = useState(DFT[0].id)
+  const [segs, setSegs] = useState(CTR_SEGS[0])
   const [freq, setFreq] = useState(10)
-  const [term, setTerm] = useState('fmt')
-  const [fmt, setFmt] = useState<Fmt>('SBC')
+  const [term, setTerm] = useState(TERMS[0].id)
+  const [fmt, setFmt] = useState<Fmt>(FORMATS[0].id)
   const [bits, setBits] = useState([1, 0, 0, 1, 1, 0])
   const [e1, setE1] = useState(20)
   const [e2, setE2] = useState(60)
@@ -117,7 +119,7 @@ export function FundFuncPage({ moduleId, onModuleChange }: Props) {
   const [win, setWin] = useState(20)
   const [vref, setVref] = useState(1.6)
   const [rload, setRload] = useState(150)
-  const [note, setNote] = useState<Note>({ kicker: S.kicker, title: ROLES[1].title, text: ROLES[1].text })
+  const [note, setNote] = useState<Note>({ kicker: S.kicker, title: ROLES[0].title, text: ROLES[0].text })
 
   const pick = (title: Note['title'], text: Note['text']) => setNote({ kicker: S.kicker, title, text })
 
@@ -241,7 +243,7 @@ export function FundFuncPage({ moduleId, onModuleChange }: Props) {
           <div>
             <p className="intro__note">{t(S.ctrSeg)}</p>
             <Seg
-              options={['1', '2', '3', '5'].map((id) => ({ id, label: id === '1' ? S.ctrWhole : `${id} × ${30 / Number(id)} bit` }))}
+              options={CTR_SEGS.map((id) => ({ id, label: id === '1' ? S.ctrWhole : `${id} × ${30 / Number(id)} bit` }))}
               value={segs}
               onChange={setSegs}
             />
