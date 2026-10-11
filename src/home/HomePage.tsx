@@ -17,9 +17,11 @@ export function HomePage({ onOpenTrack }: HomePageProps) {
   ]
 
   return (
-    <AppChrome title={t(ui.home.title)} goal={t(ui.home.goal)}>
-      <section className="intro__section">
-        <h2>{t(ui.home.introTitle)}</h2>
+    <AppChrome title={t(ui.home.title)} goal={t(ui.home.goal)} brand>
+      <section className="intro__section home__lead">
+        <h2>{t(ui.home.title)}</h2>
+        <p className="home__goal">{t(ui.home.goal)}</p>
+        <h3 className="home__intro-head">{t(ui.home.introTitle)}</h3>
         <p>{t(ui.home.introBody)}</p>
         <div className="home__spine">
           {ui.home.spineSteps.map((step, index) => (

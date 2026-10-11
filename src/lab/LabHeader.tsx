@@ -7,18 +7,35 @@ type LabHeaderProps = {
   title: string
   goal: string
   nav?: ReactNode
+  /** 首页：显示大号站点图标和名称 */
+  brand?: boolean
 }
 
-export function LabHeader({ title, goal, nav }: LabHeaderProps) {
+const LOGO = `${import.meta.env.BASE_URL}favicon.svg`
+
+export function LabHeader({ title, goal, nav, brand }: LabHeaderProps) {
   const { locale, setLocale, t } = useLocale()
   const { theme, setTheme } = useTheme()
 
   return (
-    <header className="lab__header">
+    <header className={`lab__header${brand ? ' lab__header--home' : ''}`}>
       <div className="lab__head-row">
         <div className="lab__titles">
-          <p className="lab__eyebrow">{t(ui.labName)}</p>
-          <h1>{title}</h1>
+          {brand ? (
+            <a className="lab__brand" href="#/">
+              <img src={LOGO} alt="" width="48" height="48" />
+              <span>
+                <b>{t(ui.labName)}</b>
+                <small>{t(ui.labTagline)}</small>
+              </span>
+            </a>
+          ) : (
+            <a className="lab__eyebrow" href="#/">
+              <img src={LOGO} alt="" width="16" height="16" />
+              {t(ui.labName)}
+            </a>
+          )}
+          {!brand ? <h1>{title}</h1> : null}
         </div>
         <div className="lab__switches">
           <div className="lab__lang" role="group" aria-label={t(ui.themeAria)}>
@@ -55,7 +72,7 @@ export function LabHeader({ title, goal, nav }: LabHeaderProps) {
           </div>
         </div>
       </div>
-      <p className="lab__goal">{goal}</p>
+      {!brand ? <p className="lab__goal">{goal}</p> : null}
       <nav className="lab__nav" aria-label={t(ui.navAria)}>
         {nav}
       </nav>

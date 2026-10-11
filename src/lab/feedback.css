@@ -41,6 +41,13 @@
   font-size: 12px;
 }
 
+.fb-aside__ai {
+  margin: 0 0 8px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
 .fb-aside__title {
   margin: 0 0 6px;
   color: var(--muted);

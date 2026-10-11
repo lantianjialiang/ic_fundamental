@@ -20,7 +20,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.lang = locale === 'zh' ? 'zh-CN' : 'en'
-    document.title = pick(loc('半导体测试实验室', 'Semiconductor Test Laboratory'), locale)
+    document.title = pick(loc('IC Test Monk · 半导体测试互动课程', 'IC Test Monk · Interactive semiconductor test lessons'), locale)
   }, [locale])
 
   const value = useMemo<LocaleContextValue>(

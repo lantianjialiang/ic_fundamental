@@ -1,7 +1,8 @@
 import { loc } from './locale'
 
 export const ui = {
-  labName: loc('半导体测试实验室', 'Semiconductor Test Laboratory'),
+  labName: loc('IC Test Monk', 'IC Test Monk'),
+  labTagline: loc('半导体测试互动课程', 'Interactive semiconductor test lessons'),
   langZh: loc('中文', '中文'),
   langEn: loc('EN', 'EN'),
   themeDark: loc('深色', 'Dark'),
@@ -11,6 +12,10 @@ export const ui = {
   navAria: loc('课程目录', 'Lessons'),
   loading: loc('加载中…', 'Loading…'),
   copyright: loc('© 2026 lantianjialiang · MIT License', '© 2026 lantianjialiang · MIT License'),
+  aiDisclaimer: loc(
+    '部分内容借助 AI 生成，可能存在错误，请仔细甄别。',
+    'Some content was produced with AI assistance; it may contain errors—please verify carefully.',
+  ),
 
   timing: {
     replay: loc('再播一次', 'Replay'),

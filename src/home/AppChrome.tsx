@@ -12,6 +12,8 @@ type AppChromeProps = {
   onHome?: () => void
   /** 当前是术语表或 FAQ 页时，顶部对应的链接高亮 */
   active?: 'glossary' | 'faq'
+  /** 首页显示大号站点图标 */
+  brand?: boolean
   children: ReactNode
 }
 
@@ -20,7 +22,7 @@ const TOOL_LINKS = [
   { id: 'faq', href: '#/faq' },
 ] as const
 
-export function AppChrome({ title, goal, onHome, active, children }: AppChromeProps) {
+export function AppChrome({ title, goal, onHome, active, brand, children }: AppChromeProps) {
   const { t } = useLocale()
 
   const nav = (
@@ -52,7 +54,7 @@ export function AppChrome({ title, goal, onHome, active, children }: AppChromePr
 
   return (
     <div className="lab lab--scroll">
-      <LabHeader title={title} goal={goal} nav={nav} />
+      <LabHeader title={title} goal={goal} nav={nav} brand={brand} />
       <div className="lab__body intro home-body">
         <main className="intro__main home">{children}</main>
       </div>

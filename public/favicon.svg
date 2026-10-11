@@ -1,7 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
-  <g stroke="#d4a64a" stroke-width="3" stroke-linecap="round">
-    <path d="M17 4v6M24 4v6M31 4v6M17 38v6M24 38v6M31 38v6M4 17h6M4 24h6M4 31h6M38 17h6M38 24h6M38 31h6"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <title>IC Test Monk</title>
+  <g stroke="#d4a64a" stroke-width="3.5" stroke-linecap="round">
+    <path d="M22 4v7M32 4v7M42 4v7M22 53v7M32 53v7M42 53v7M4 22h7M4 32h7M4 42h7M53 22h7M53 32h7M53 42h7"/>
   </g>
-  <rect x="10" y="10" width="28" height="28" rx="4" fill="#1f2630" stroke="#d4a64a" stroke-width="2"/>
-  <path d="M17 28l4-8 3 5 3-3 4 6" fill="none" stroke="#5cc8a8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="11" y="11" width="42" height="42" rx="7" fill="#1f2630" stroke="#d4a64a" stroke-width="2.5"/>
+  <circle cx="17.5" cy="17.5" r="2" fill="#d4a64a"/>
+  <circle cx="32" cy="24.5" r="10" fill="none" stroke="#5cc8a8" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="52 10.8" transform="rotate(115 32 24.5)"/>
+  <path d="M18.5 48c0-9.5 5.8-14.5 13.5-14.5S45.5 38.5 45.5 48z" fill="#e8892c"/>
+  <path d="M27 35l10 11.5" stroke="#b5611a" stroke-width="2.6" stroke-linecap="round"/>
+  <circle cx="32" cy="24.5" r="6.2" fill="#f3d2a2"/>
+  <ellipse cx="32" cy="43.2" rx="4" ry="2.4" fill="#f3d2a2"/>
 </svg>

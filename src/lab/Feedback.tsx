@@ -1,5 +1,6 @@
 import type { MouseEvent } from 'react'
 import { useLocale } from '../i18n/LocaleContext'
+import { ui } from '../i18n/ui'
 import { loc, pick, type Locale, type LText } from '../i18n/locale'
 import { SITE } from '../site'
 import { readStoredTheme } from '../theme'
@@ -149,6 +150,7 @@ export function PageFeedback({ page }: { page: string }) {
   const { t } = useLocale()
   return (
     <div className="fb-aside">
+      <p className="fb-aside__ai">{t(ui.aiDisclaimer)}</p>
       <p className="fb-aside__title">{t(FEEDBACK_TEXT.pageIssue)}</p>
       <FeedbackLinks page={page} />
     </div>

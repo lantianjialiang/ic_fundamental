@@ -8,9 +8,11 @@
     "build": "tsc && vite build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "check:i18n": "node scripts/check-i18n.mjs",
+    "export:icons": "node scripts/export-brand-icons.mjs",
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^4.7.0",
