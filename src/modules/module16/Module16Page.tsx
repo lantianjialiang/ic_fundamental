@@ -1,30 +1,41 @@
 import { useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
+import { type LText } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
+import { StepControls, useStepPlayer } from '../../lab/StepPlayer'
 import { type ModuleId } from '../catalog'
+import { Callout, Cards } from '../fund/parts'
 import { LatchupFig } from './LatchupFig'
-import { LINKS, NODES, QUIZ, TAKEAWAY, WORDS, type NodeId, type WordId } from './data/content'
+import { PARTS, PHASES, QUIZ, TAKEAWAY, TEST_NOTE, type PartId } from './data/content'
 
 type Module16PageProps = {
   moduleId: ModuleId
   onModuleChange: (id: ModuleId) => void
 }
 
-type Focus =
-  | { kind: 'word'; id: WordId }
-  | { kind: 'node'; id: NodeId }
-  | { kind: 'link'; id: string }
-  | { kind: 'takeaway' }
+type Focus = { kind: 'part' } | { kind: 'phase' } | { kind: 'takeaway' }
 
 export function Module16Page({ moduleId, onModuleChange }: Module16PageProps) {
   const { t } = useLocale()
-  const [focus, setFocus] = useState<Focus>({ kind: 'word', id: 'pnpn' })
-  const [wordId, setWordId] = useState<WordId>('pnpn')
-  const word = WORDS.find((item) => item.id === wordId)
-  const node = focus.kind === 'node' ? NODES.find((item) => item.id === focus.id) : null
-  const detail = resolveDetail(focus, t)
+  const [part, setPart] = useState<PartId>('pnpn')
+  const [focus, setFocus] = useState<Focus>({ kind: 'part' })
+  const player = useStepPlayer(PHASES.length, 1600)
+  const item = PARTS.find((x) => x.id === part) ?? PARTS[0]
+  const phase = PHASES[player.step]
+
+  const pickPart = (id: PartId) => {
+    setPart(id)
+    setFocus({ kind: 'part' })
+  }
+
+  const aside: { kicker: LText; title: LText; text: LText } =
+    focus.kind === 'takeaway'
+      ? { kicker: ui.m16.kickerTakeaway, title: ui.m16.takeawayTitle, text: TAKEAWAY }
+      : focus.kind === 'phase'
+        ? { kicker: ui.m16.kickerAnim, title: phase.title, text: phase.text }
+        : { kicker: ui.m16.kickerFig, title: item.title, text: item.text }
 
   return (
     <LessonFrame
@@ -32,78 +43,44 @@ export function Module16Page({ moduleId, onModuleChange }: Module16PageProps) {
       onModuleChange={onModuleChange}
       title={t(ui.m16.title)}
       goal={t(ui.m16.goal)}
-      kicker={detail.kicker}
-      asideTitle={detail.title}
-      asideText={detail.text}
+      kicker={t(aside.kicker)}
+      asideTitle={t(aside.title)}
+      asideText={t(aside.text)}
       asideLater={t(ui.m16.asideLater)}
       nextId="bench"
-      nextLabel={t(ui.m17.title)}
+      nextLabel={t(ui.m16.next)}
     >
       <Section title={t(ui.m16.introTitle)}>
         <p>{t(ui.m16.introBody)}</p>
       </Section>
 
-      <Section title={t(ui.m16.wordTitle)} note={t(ui.m16.wordNote)}>
-        <div className="pick pick--3">
-          {WORDS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`pick__card${focus.kind === 'word' && focus.id === item.id ? ' is-active' : ''}`}
-              onClick={() => {
-                setWordId(item.id)
-                setFocus({ kind: 'word', id: item.id })
-              }}
-            >
-              {item.title}
-            </button>
-          ))}
-        </div>
-        <LatchupFig word={wordId} t={t} />
-        {word ? (
-          <div className="term-explain">
-            {word.explain.map((para) => (
-              <p key={para.zh}>{t(para)}</p>
-            ))}
-          </div>
-        ) : null}
-      </Section>
-
       <Section title={t(ui.m16.figTitle)} note={t(ui.m16.figNote)}>
-        <div className="pnpn">
-          {NODES.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`pnpn__node pnpn__node--${item.id}${focus.kind === 'node' && focus.id === item.id ? ' is-active' : ''}`}
-              onClick={() => setFocus({ kind: 'node', id: item.id })}
-            >
-              {t(item.title)}
-            </button>
-          ))}
-        </div>
-        {node ? (
-          <div className="term-explain">
-            {node.explain.map((para) => (
-              <p key={para.zh}>{t(para)}</p>
-            ))}
-          </div>
-        ) : null}
+        <Cards items={PARTS} activeId={part} onPick={(x) => pickPart(x.id)} cols={3} />
+        <LatchupFig part={part} phase={null} onPick={pickPart} />
+        <Callout>
+          <p>
+            <b>{t(item.title)}</b> · {t(item.text)}
+          </p>
+        </Callout>
       </Section>
 
-      <Section title={t(ui.m16.linkTitle)}>
-        <div className="pick pick--3">
-          {LINKS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`pick__card${focus.kind === 'link' && focus.id === item.id ? ' is-active' : ''}`}
-              onClick={() => setFocus({ kind: 'link', id: item.id })}
-            >
-              {t(item.title)}
-            </button>
-          ))}
+      <Section title={t(ui.m16.animTitle)} note={t(ui.m16.animNote)}>
+        <div onClickCapture={() => setFocus({ kind: 'phase' })}>
+          <StepControls player={player} stepLabels={PHASES.map((x) => x.title)} />
         </div>
+        <LatchupFig part={null} phase={player.step} />
+        <Callout tone={player.step >= 3 && player.step <= 4 ? 'bad' : player.step === 5 ? 'ok' : player.step === 0 ? undefined : 'warn'}>
+          <p>
+            <b>
+              {player.step}. {t(phase.title)}
+            </b>
+          </p>
+          <p>{t(phase.text)}</p>
+        </Callout>
+      </Section>
+
+      <Section title={t(ui.m16.testTitle)}>
+        <p>{t(TEST_NOTE)}</p>
       </Section>
 
       <Section title={t(ui.m16.takeawayTitle)}>
@@ -121,20 +98,4 @@ export function Module16Page({ moduleId, onModuleChange }: Module16PageProps) {
       </Section>
     </LessonFrame>
   )
-}
-
-function resolveDetail(focus: Focus, t: (text: import('../../i18n/locale').LText | string) => string) {
-  if (focus.kind === 'takeaway') {
-    return { kicker: t(ui.m16.kickerTakeaway), title: t(ui.m16.kickerOne), text: t(TAKEAWAY) }
-  }
-  if (focus.kind === 'link') {
-    const item = LINKS.find((node) => node.id === focus.id)
-    return { kicker: t(ui.m16.kickerLink), title: item ? t(item.title) : '', text: item ? t(item.text) : '' }
-  }
-  if (focus.kind === 'node') {
-    const item = NODES.find((node) => node.id === focus.id)
-    return { kicker: t(ui.m16.kickerFig), title: item ? t(item.title) : '', text: item ? t(item.text) : '' }
-  }
-  const item = WORDS.find((node) => node.id === focus.id)
-  return { kicker: t(ui.m16.kickerWord), title: item?.title ?? '', text: item ? t(item.text) : '' }
 }

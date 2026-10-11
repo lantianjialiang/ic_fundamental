@@ -5,13 +5,13 @@ import { DFF_CYCLES, VDD, VIH, VIL, VOH, VOL, type GateId, type OhmMode } from '
 /* ---------- 欧姆定律测电阻电路 ---------- */
 
 const OL = {
-  vsrc: loc('电压源'),
-  isrc: loc('电流源'),
-  amm: loc('电流表'),
-  vm: loc('电压表'),
-  dut: loc('被测电阻'),
-  capFv: loc('加压测流：电流表串在回路里，读到的电流 I = 5 V / R。'),
-  capFi: loc('加流测压：电压表并在电阻两端，读到的压降 E = 2.5 mA × R。'),
+  vsrc: loc('电压源', 'V source'),
+  isrc: loc('电流源', 'I source'),
+  amm: loc('电流表', 'Ammeter'),
+  vm: loc('电压表', 'Voltmeter'),
+  dut: loc('被测电阻', 'Resistor'),
+  capFv: loc('加压测流：电流表串在回路里，读到的电流 I = 5 V / R。', 'Force voltage / measure current: the ammeter is in series and reads I = 5 V / R.'),
+  capFi: loc('加流测压：电压表并在电阻两端，读到的压降 E = 2.5 mA × R。', 'Force current / measure voltage: the voltmeter is across the resistor and reads E = 2.5 mA × R.'),
 }
 
 export function OhmFig({ mode, r, reading, pass }: { mode: OhmMode; r: number; reading: string; pass: boolean }) {
@@ -80,11 +80,14 @@ export function OhmFig({ mode, r, reading, pass }: { mode: OhmMode; r: number; r
 /* ---------- 逻辑电平尺 ---------- */
 
 const LL = {
-  out: loc('输出（驱动端）'),
-  inp: loc('输入（接收端）'),
-  bad: loc('无效'),
-  nm: loc('噪声容限'),
-  cap: loc('左边是驱动端输出必须达到的电平，右边是接收端输入的识别范围。两者之间的黄色带就是噪声容限。黄线是你拖动的电压。'),
+  out: loc('输出（驱动端）', 'Output (driver)'),
+  inp: loc('输入（接收端）', 'Input (receiver)'),
+  bad: loc('无效', 'Invalid'),
+  nm: loc('噪声容限', 'Noise margin'),
+  cap: loc(
+    '左边是驱动端输出必须达到的电平，右边是接收端输入的识别范围。两者之间的黄色带就是噪声容限。黄线是你拖动的电压。',
+    'Left: the levels the driving output must reach. Right: the ranges the receiving input recognizes. The yellow bands between them are the noise margins. The yellow line is the voltage you drag.',
+  ),
 }
 
 export function LevelFig({ volt }: { volt: number }) {
@@ -148,7 +151,7 @@ export function LevelFig({ volt }: { volt: number }) {
 /* ---------- 门电路符号 ---------- */
 
 const GL = {
-  click: loc('点输入端切换 0 / 1'),
+  click: loc('点输入端切换 0 / 1', 'Click an input to toggle 0 / 1'),
 }
 
 export function GateFig({
@@ -220,7 +223,10 @@ export function GateFig({
 /* ---------- D 触发器时间轴 ---------- */
 
 const DL = {
-  cap: loc('灰色虚线 Q 表示还没有被时钟采样过（未知）。点 D 那一行的格子可以改数据。黄色竖线是“现在”，走到 CLK 上升沿（↑）时 Q 才更新。'),
+  cap: loc(
+    '灰色虚线 Q 表示还没有被时钟采样过（未知）。点 D 那一行的格子可以改数据。黄色竖线是“现在”，走到 CLK 上升沿（↑）时 Q 才更新。',
+    'A gray dashed Q means it has not been clocked yet (unknown). Click cells in the D row to change the data. The yellow vertical line is "now"; Q updates only when it reaches a CLK rising edge (↑).',
+  ),
 }
 
 type Lv = 0 | 1 | 'z'

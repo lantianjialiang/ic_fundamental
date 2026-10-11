@@ -1,97 +1,82 @@
-import { loc, type LText } from '../../i18n/locale'
+import { useLocale } from '../../i18n/LocaleContext'
+import { FF_FIG } from './data/content'
 
-type T = (text: LText | string) => string
+/** 上升沿位置（x） */
+const EDGES = [280, 360, 440, 520, 600]
+const ROW = { clk: 40, d: 102, q: 164 }
+const H = 26
 
-export function FfFig({ t }: { t: T }) {
-  return (
-    <figure className="term-fig">
-      <svg viewBox="0 0 680 250" className="term-fig__svg" role="img">
-        <rect width="680" height="250" rx="6" fill="var(--well)" />
-        <text x="70" y="70" fill="var(--muted)" fontSize="13">
-          D
-        </text>
-        <line x1="88" y1="66" x2="170" y2="66" stroke="var(--blue)" strokeWidth="2" />
-        <text x="70" y="150" fill="var(--muted)" fontSize="13">
-          CLK
-        </text>
-        <line x1="88" y1="146" x2="170" y2="146" stroke="var(--gold)" strokeWidth="2" />
-        <rect x="170" y="36" width="130" height="150" rx="4" fill="var(--fig-box)" stroke="var(--blue)" />
-        <text x="235" y="100" textAnchor="middle" fill="var(--text)" fontSize="16">
-          FF
-        </text>
-        <text x="235" y="124" textAnchor="middle" fill="var(--muted)" fontSize="12">
-          Flip-Flop
-        </text>
-        <polygon points="170,136 186,146 170,156" fill="none" stroke="var(--gold)" />
-        <line x1="300" y1="80" x2="390" y2="80" stroke="var(--green)" strokeWidth="2" />
-        <text x="400" y="84" fill="var(--green)" fontSize="13">
-          Q
-        </text>
-        <text x="500" y="56" fill="var(--muted)" fontSize="12">
-          CLK
-        </text>
-        <path d="M 460 70 H 500 V 48 H 560" fill="none" stroke="var(--gold)" strokeWidth="1.6" />
-        <text x="500" y="120" fill="var(--muted)" fontSize="12">
-          D
-        </text>
-        <path d="M 460 150 H 500 V 110 H 560" fill="none" stroke="var(--blue)" strokeWidth="1.6" />
-        <text x="500" y="186" fill="var(--muted)" fontSize="12">
-          Q
-        </text>
-        <path d="M 460 210 H 520 V 170 H 560" fill="none" stroke="var(--green)" strokeWidth="1.6" />
-        <text x="340" y="236" textAnchor="middle" fill="var(--muted)" fontSize="12">
-          {t(loc('CLK 沿：Q ← D。平时 Q 保持。这就是 1 位状态。'))}
-        </text>
-      </svg>
-      <figcaption>{t(loc('边沿触发，不是组合门。Scan FF 只是在 D 前加一个 2 选 1。'))}</figcaption>
-    </figure>
-  )
+/** 按跳变点画方波：levels[i] 是 xs[i] 到 xs[i+1] 的电平 */
+function wave(xs: number[], levels: number[], top: number) {
+  const y = (v: number) => (v ? top : top + H)
+  let d = `M${xs[0]} ${y(levels[0])}`
+  for (let i = 1; i < xs.length - 1; i += 1) {
+    d += ` L${xs[i]} ${y(levels[i - 1])} L${xs[i]} ${y(levels[i])}`
+  }
+  d += ` L${xs[xs.length - 1]} ${y(levels[levels.length - 1])}`
+  return d
 }
 
-export function ScanFfFig({ t }: { t: T }) {
+export function FfFig() {
+  const { t } = useLocale()
+  const clkX = [240, 280, 320, 360, 400, 440, 480, 520, 560, 600, 640, 660]
+  const clkL = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
+  // D 在 300–340 有一个夹在两个沿之间的窄脉冲：Q 不会理它
+  const dX = [240, 300, 340, 400, 470, 560, 660]
+  const dL = [0, 1, 0, 1, 0, 1]
+  const qX = [240, 440, 520, 600, 660]
+  const qL = [0, 1, 0, 1]
   return (
     <figure className="term-fig">
-      <svg viewBox="0 0 680 220" className="term-fig__svg" role="img">
-        <rect width="680" height="220" rx="6" fill="var(--well)" />
-        <text x="36" y="58" fill="var(--muted)" fontSize="12">
-          D
-        </text>
-        <text x="36" y="118" fill="var(--sky)" fontSize="12">
-          SI
-        </text>
-        <text x="36" y="170" fill="var(--gold)" fontSize="12">
-          SE
-        </text>
-        <line x1="60" y1="54" x2="150" y2="54" stroke="var(--muted)" strokeWidth="1.6" />
-        <line x1="60" y1="114" x2="150" y2="114" stroke="var(--sky)" strokeWidth="1.6" />
-        <line x1="60" y1="166" x2="190" y2="166" stroke="var(--gold)" strokeWidth="1.6" />
-        <path d="M 150 30 L 210 54 L 150 78 Z" fill="var(--fig-box)" stroke="var(--blue)" />
-        <text x="168" y="58" fill="var(--text)" fontSize="11">
-          MUX
-        </text>
-        <line x1="210" y1="54" x2="270" y2="54" stroke="var(--blue)" strokeWidth="2" />
-        <rect x="270" y="24" width="110" height="140" rx="4" fill="var(--fig-box)" stroke="var(--blue)" />
-        <text x="325" y="90" textAnchor="middle" fill="var(--text)" fontSize="15">
+      <svg viewBox="0 0 680 216" className="term-fig__svg" role="img" aria-label={t(FF_FIG.aria)}>
+        <rect width="680" height="216" rx="10" fill="var(--well)" />
+        {/* FF 符号 */}
+        <rect x="70" y="50" width="100" height="124" rx="6" fill="var(--blue-bg)" stroke="var(--blue)" strokeWidth="1.5" />
+        <text x="120" y="118" textAnchor="middle" fill="var(--text)" fontSize="16" fontFamily="var(--mono)">
           FF
         </text>
-        <text x="325" y="112" textAnchor="middle" fill="var(--muted)" fontSize="11">
+        <line x1="24" y1="80" x2="70" y2="80" stroke="var(--blue)" strokeWidth="2" />
+        <text x="78" y="84" fill="var(--text-2)" fontSize="12" fontFamily="var(--mono)">
+          D
+        </text>
+        <line x1="24" y1="152" x2="70" y2="152" stroke="var(--gold)" strokeWidth="2" />
+        <path d="M70 144 L82 152 L70 160" fill="none" stroke="var(--gold)" strokeWidth="1.5" />
+        <text x="24" y="144" fill="var(--gold)" fontSize="11" fontFamily="var(--mono)">
           CLK
         </text>
-        <line x1="380" y1="70" x2="470" y2="70" stroke="var(--green)" strokeWidth="2" />
-        <text x="480" y="74" fill="var(--green)" fontSize="13">
-          Q / SO
+        <line x1="170" y1="80" x2="214" y2="80" stroke="var(--green)" strokeWidth="2" />
+        <text x="162" y="84" textAnchor="end" fill="var(--text-2)" fontSize="12" fontFamily="var(--mono)">
+          Q
         </text>
-        <text x="500" y="130" fill="var(--muted)" fontSize="12">
-          {t(loc('SE=0 走功能 D'))}
+
+        {/* 上升沿参考线 */}
+        {EDGES.map((x) => (
+          <line key={x} x1={x} y1={32} x2={x} y2={ROW.q + H + 6} stroke="var(--line-2)" strokeDasharray="3 4" />
+        ))}
+        <text x={EDGES[2]} y={24} textAnchor="middle" fill="var(--muted)" fontSize="11">
+          {t(FF_FIG.edge)}
         </text>
-        <text x="500" y="152" fill="var(--sky)" fontSize="12">
-          {t(loc('SE=1 走 SI'))}
+
+        <text x="232" y={ROW.clk + 18} textAnchor="end" fill="var(--gold)" fontSize="12" fontFamily="var(--mono)">
+          CLK
         </text>
-        <text x="340" y="200" textAnchor="middle" fill="var(--muted)" fontSize="12">
-          {t(loc('Scan FF = MUX + 普通 FF。串起来就是链。'))}
+        <path d={wave(clkX, clkL, ROW.clk)} fill="none" stroke="var(--gold)" strokeWidth="2" />
+        <text x="232" y={ROW.d + 18} textAnchor="end" fill="var(--blue)" fontSize="12" fontFamily="var(--mono)">
+          D
+        </text>
+        <path d={wave(dX, dL, ROW.d)} fill="none" stroke="var(--blue)" strokeWidth="2" />
+        <text x="232" y={ROW.q + 18} textAnchor="end" fill="var(--green)" fontSize="12" fontFamily="var(--mono)">
+          Q
+        </text>
+        <path d={wave(qX, qL, ROW.q)} fill="none" stroke="var(--green)" strokeWidth="2" />
+
+        {/* 被忽略的窄脉冲 */}
+        <rect x="296" y={ROW.d - 4} width="48" height={H + 8} rx="4" fill="none" stroke="var(--red)" strokeDasharray="3 3" />
+        <text x="320" y={ROW.q - 8} textAnchor="middle" fill="var(--red)" fontSize="11">
+          {t(FF_FIG.hold)}
         </text>
       </svg>
-      <figcaption>{t(loc('Muxed-D：工业界最常见的扫描触发器。'))}</figcaption>
+      <figcaption>{t(FF_FIG.cap)}</figcaption>
     </figure>
   )
 }

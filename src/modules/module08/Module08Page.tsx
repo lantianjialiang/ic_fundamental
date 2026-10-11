@@ -4,26 +4,59 @@ import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
 import { type ModuleId } from '../catalog'
+import { Callout, Cards, Knob, Readout, Seg } from '../fund/parts'
 import { TimingScope } from '../timing/TimingScope'
-import { M08_MARKS, TIMING, type TimingMark } from '../timing/glossary'
-import { PERIOD, QUIZ, TAKEAWAY, strobeKind } from './data/content'
+import { DRIVE_LEAD, TH_MIN, TIMING, TIMING_MARKS, TPD, TSU_MIN, type TimingMark } from '../timing/glossary'
+import {
+  PERIOD_1,
+  PERIOD_MAX,
+  PERIOD_MIN,
+  QUIZ,
+  STROBE_MAX,
+  TAKEAWAY,
+  acPass,
+  freqOf,
+  strobeKind,
+  type StrobeKind,
+} from './data/content'
 
 type Module08PageProps = {
   moduleId: ModuleId
   onModuleChange: (id: ModuleId) => void
 }
 
-type Focus = { kind: 'term'; id: TimingMark } | { kind: 'takeaway' }
+type Focus = { kind: 'strobe' } | { kind: 'mark'; id: TimingMark }
+
+const PRESET: Record<StrobeKind, number> = { early: 4, window: 14, late: 23 }
+const CARDS = TIMING_MARKS.map((id) => ({ id, title: TIMING[id].title, text: TIMING[id].text }))
+const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1))
 
 export function Module08Page({ moduleId, onModuleChange }: Module08PageProps) {
   const { t } = useLocale()
-  const [strobe, setStrobe] = useState(5)
-  const [focus, setFocus] = useState<Focus>({ kind: 'term', id: 'drive' })
-  const mark = focus.kind === 'term' ? focus.id : 'strobe'
+  const [strobe, setStrobe] = useState(PRESET.window)
+  const [period, setPeriod] = useState(PERIOD_MAX)
+  const [mark, setMark] = useState<TimingMark>('tpd')
+  const [focus, setFocus] = useState<Focus>({ kind: 'strobe' })
+
   const kind = strobeKind(strobe)
-  const label =
-    kind === 'early' ? t(ui.m08.early) : kind === 'late' ? t(ui.m08.late) : t(ui.m08.window)
-  const detail = resolveDetail(focus, t, label)
+  const strobeOk = kind === 'window'
+  const capS1 = kind === 'early' ? ui.m08.capEarly : kind === 'late' ? ui.m08.capLate : ui.m08.capOk
+
+  const pass = acPass(period)
+  const win = period - TPD
+  const strobe2 = (TPD + period) / 2
+  const capS2 = `Period ${fmt(period)} ns · ${t(ui.m08.outWin)} ${fmt(Math.max(win, 0))} ns · ${t(pass ? ui.m08.capPass : ui.m08.capFail)}`
+
+  const aside =
+    focus.kind === 'strobe'
+      ? { kicker: t(ui.m08.kickerStrobe), title: t(ui.m08.strobeAsideTitle), text: t(ui.m08.strobeAside) }
+      : { kicker: t(ui.m08.kickerMark), title: t(TIMING[focus.id].title), text: t(TIMING[focus.id].text) }
+
+  const verdict = (ok: boolean) => ({
+    label: ui.m08.verdict,
+    value: t(ok ? ui.m08.pass : ui.m08.fail),
+    state: ok ? ('pass' as const) : ('fail' as const),
+  })
 
   return (
     <LessonFrame
@@ -31,59 +64,114 @@ export function Module08Page({ moduleId, onModuleChange }: Module08PageProps) {
       onModuleChange={onModuleChange}
       title={t(ui.m08.title)}
       goal={t(ui.m08.goal)}
-      kicker={detail.kicker}
-      asideTitle={detail.title}
-      asideText={detail.text}
+      kicker={aside.kicker}
+      asideTitle={aside.title}
+      asideText={aside.text}
       asideLater={t(ui.m08.asideLater)}
-      nextId="ac"
+      nextId="vector"
       nextLabel={t(ui.m08.next)}
     >
       <Section title={t(ui.m08.introTitle)}>
         <p>{t(ui.m08.introBody)}</p>
       </Section>
 
-      <Section title={t(ui.m08.termsTitle)} note={t(ui.m08.termsNote)}>
-        <div className="pick pick--3">
-          {M08_MARKS.map((id) => (
-            <button
-              key={id}
-              type="button"
-              className={`pick__card${mark === id ? ' is-active' : ''}`}
-              onClick={() => setFocus({ kind: 'term', id })}
-            >
-              {TIMING[id].title}
-            </button>
-          ))}
-        </div>
-        <TimingScope mark={mark} t={t} strobeNs={strobe} replayLabel={t(ui.timing.replay)} />
+      <Section title={t(ui.m08.s1Title)} note={t(ui.m08.s1Note)}>
+        <Seg
+          options={[
+            { id: 'early' as const, label: ui.m08.early },
+            { id: 'window' as const, label: ui.m08.window },
+            { id: 'late' as const, label: ui.m08.late },
+          ]}
+          value={kind}
+          onChange={(id) => {
+            setStrobe(PRESET[id])
+            setFocus({ kind: 'strobe' })
+          }}
+        />
+        <TimingScope
+          period={PERIOD_1}
+          strobe={strobe}
+          strobeOk={strobeOk}
+          labelWindow
+          marks={['tpd']}
+          active="tpd"
+          caption={t(capS1)}
+        />
         <div className="wave">
-          <label>
-            <span>
-              Strobe {strobe.toFixed(1)} ns · {label}
-            </span>
-            <input
-              type="range"
-              min={0}
-              max={PERIOD}
-              step={0.1}
-              value={strobe}
-              onChange={(event) => {
-                setStrobe(Number(event.target.value))
-                setFocus({ kind: 'term', id: 'strobe' })
-              }}
-            />
-          </label>
+          <Knob
+            label={ui.m08.strobePos}
+            value={strobe}
+            unit="ns"
+            min={0}
+            max={STROBE_MAX}
+            step={0.5}
+            onChange={(v) => {
+              setStrobe(v)
+              setFocus({ kind: 'strobe' })
+            }}
+          />
         </div>
+        <Readout
+          items={[
+            { label: ui.m08.strobePos, value: `${fmt(strobe)} ns` },
+            { label: ui.m08.winRange, value: `${TPD} – ${PERIOD_1} ns` },
+            verdict(strobeOk),
+          ]}
+        />
+      </Section>
+
+      <Section title={t(ui.m08.s2Title)} note={t(ui.m08.s2Note)}>
+        <Cards
+          items={CARDS}
+          activeId={mark}
+          cols={4}
+          onPick={(item) => {
+            setMark(item.id)
+            setFocus({ kind: 'mark', id: item.id })
+          }}
+        />
+        <TimingScope
+          period={period}
+          strobe={strobe2}
+          strobeOk={pass}
+          marks={TIMING_MARKS}
+          active={mark}
+          caption={capS2}
+        />
+        <div className="wave">
+          <Knob
+            label={ui.m08.period}
+            value={period}
+            unit="ns"
+            min={PERIOD_MIN}
+            max={PERIOD_MAX}
+            step={0.5}
+            onChange={(v) => {
+              setPeriod(v)
+              setMark('period')
+              setFocus({ kind: 'mark', id: 'period' })
+            }}
+          />
+        </div>
+        <Readout
+          items={[
+            { label: ui.m08.freq, value: `${freqOf(period).toFixed(0)} MHz` },
+            { label: ui.m08.outWin, value: `${fmt(Math.max(win, 0))} ns`, state: pass ? 'pass' : 'fail' },
+            { label: ui.m08.tsuGiven, value: `${DRIVE_LEAD} / ≥${TSU_MIN} ns` },
+            { label: ui.m08.thGiven, value: `${fmt(period - DRIVE_LEAD)} / ≥${TH_MIN} ns` },
+            verdict(pass),
+          ]}
+        />
+        <p className="intro__note">{t(ui.m08.marginNote)}</p>
+        <Callout>{t(ui.m08.searchNote)}</Callout>
       </Section>
 
       <Section title={t(ui.m08.takeawayTitle)}>
-        <button
-          type="button"
-          className={`takeaway${focus.kind === 'takeaway' ? ' is-active' : ''}`}
-          onClick={() => setFocus({ kind: 'takeaway' })}
-        >
-          {t(TAKEAWAY)}
-        </button>
+        <Callout tone="warn">
+          {TAKEAWAY.map((item) => (
+            <p key={item.zh}>{t(item)}</p>
+          ))}
+        </Callout>
       </Section>
 
       <Section title={t(ui.m08.quizTitle)} note={t(ui.m08.quizNote)}>
@@ -91,23 +179,4 @@ export function Module08Page({ moduleId, onModuleChange }: Module08PageProps) {
       </Section>
     </LessonFrame>
   )
-}
-
-function resolveDetail(
-  focus: Focus,
-  t: (text: import('../../i18n/locale').LText | string) => string,
-  label: string,
-) {
-  if (focus.kind === 'takeaway') {
-    return { kicker: t(ui.m08.kickerTakeaway), title: t(ui.m08.kickerOne), text: t(TAKEAWAY) }
-  }
-  if (focus.id === 'strobe') {
-    return {
-      kicker: t(ui.m08.kickerWave),
-      title: `${TIMING.strobe.title} · ${label}`,
-      text: t(TIMING.strobe.text),
-    }
-  }
-  const item = TIMING[focus.id]
-  return { kicker: t(ui.m08.kickerTerm), title: item.title, text: t(item.text) }
 }

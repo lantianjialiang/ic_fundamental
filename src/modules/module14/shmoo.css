@@ -1,0 +1,14 @@
+/* D 轨 Shmoo 课专用样式 */
+
+.m14-cell {
+  cursor: pointer;
+}
+
+.m14-cell:hover {
+  stroke: var(--gold-line);
+  stroke-width: 2;
+}
+
+.m14-chips {
+  margin-bottom: 10px;
+}

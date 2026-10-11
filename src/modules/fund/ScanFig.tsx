@@ -3,22 +3,22 @@ import { loc } from '../../i18n/locale'
 import { CHAIN_N, EQUATIONS, type Bit, type CombFault, type Phase, type StuckFault, type Tri } from './data/scan'
 
 const L = {
-  comb: loc('组合逻辑'),
-  pi: loc('主输入 PI'),
-  po: loc('主输出 PO'),
-  fb: loc('反馈（次态变量）'),
-  hard: loc('反馈让测试变难'),
-  clk: loc('系统时钟 → 所有存储元件'),
-  capNone: loc('同步时序电路通用模型：组合逻辑 + 存储元件 M1…Mn。测试机只碰得到 PI 和 PO。'),
-  capNormal: loc('正常模式：黄色是此刻有效的路径——组合逻辑 → 开关 → 存储元件 → 反馈。'),
-  capScan: loc('Scan 模式：黄色是 Scan 路径——Scan Data In → M1 → M2 → … → Mn → Scan Data Out。'),
-  exp: loc('期望'),
-  act: loc('实际'),
-  clock: loc('拍'),
-  chainCap: loc('上：链上 8 个触发器此刻的值（红框是注入故障的位置）。下：每一拍之后 SDO 上的值，红色是和期望不一致的拍。'),
-  stepCap: loc('黄色是当前这一拍有效的路径。Scan 模式走链，正常模式走 D。'),
-  mScan: loc('Scan 模式'),
-  mNormal: loc('正常模式'),
+  comb: loc('组合逻辑', 'Combinational logic'),
+  pi: loc('主输入 PI', 'Primary inputs PI'),
+  po: loc('主输出 PO', 'Primary outputs PO'),
+  fb: loc('反馈（次态变量）', 'Feedback (secondary variables)'),
+  hard: loc('反馈让测试变难', 'Feedback makes testing hard'),
+  clk: loc('系统时钟 → 所有存储元件', 'System clock → all M'),
+  capNone: loc('同步时序电路通用模型：组合逻辑 + 存储元件 M1…Mn。测试机只碰得到 PI 和 PO。', 'General model of a synchronous sequential circuit: combinational logic + storage elements M1...Mn. The tester can reach only PI and PO.'),
+  capNormal: loc('正常模式：黄色是此刻有效的路径——组合逻辑 → 开关 → 存储元件 → 反馈。', 'Normal mode: yellow is the active path: combinational logic → switch → storage element → feedback.'),
+  capScan: loc('Scan 模式：黄色是 Scan 路径——Scan Data In → M1 → M2 → … → Mn → Scan Data Out。', 'Scan mode: yellow is the scan path: Scan Data In → M1 → M2 → ... → Mn → Scan Data Out.'),
+  exp: loc('期望', 'Expected'),
+  act: loc('实际', 'Actual'),
+  clock: loc('拍', 'Clock'),
+  chainCap: loc('上：链上 8 个触发器此刻的值（红框是注入故障的位置）。下：每一拍之后 SDO 上的值，红色是和期望不一致的拍。', 'Top: the present values of the 8 flip-flops on the chain (the red box marks the injected fault). Bottom: the SDO value after each clock; red marks clocks that do not match the expected value.'),
+  stepCap: loc('黄色是当前这一拍有效的路径。Scan 模式走链，正常模式走 D。', 'Yellow is the path active in this clock. Scan mode uses the chain; normal mode uses D.'),
+  mScan: loc('Scan 模式', 'Scan mode'),
+  mNormal: loc('正常模式', 'Normal mode'),
 }
 
 /* ---------------- 通用模型（可选加 Scan） ---------------- */

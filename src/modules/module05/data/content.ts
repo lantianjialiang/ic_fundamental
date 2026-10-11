@@ -1,241 +1,207 @@
 import { loc, type LText } from '../../../i18n/locale'
+import { type QuizQuestion } from '../../../lab/QuizList'
 
-export type KindId = 'power' | 'in' | 'out' | 'idd' | 'speed'
-export type FamilyId = 'dc' | 'ac'
+/** 五层主线：每层一个名字、一句副标题、一段说明 */
+export type LayerId = 'sheet' | 'spec' | 'method' | 'setup' | 'result'
 
-export const KINDS: Array<{ id: KindId; labelKey: 'kindPower' | 'kindIn' | 'kindOut' | 'kindIdd' | 'kindSpeed' }> = [
-  { id: 'power', labelKey: 'kindPower' },
-  { id: 'in', labelKey: 'kindIn' },
-  { id: 'out', labelKey: 'kindOut' },
-  { id: 'idd', labelKey: 'kindIdd' },
-  { id: 'speed', labelKey: 'kindSpeed' },
+export const LAYERS: Array<{ id: LayerId; name: string; sub: LText; text: LText }> = [
+  {
+    id: 'sheet',
+    name: 'Datasheet',
+    sub: loc('器件承诺', 'What the part promises'),
+    text: loc(
+      '规格书只写一句承诺：输入不低于 2.0 V，芯片一定认成 1。它不告诉你怎么测。',
+      'The datasheet makes one promise: any input at or above 2.0 V is read as a 1. It does not say how to test it.',
+    ),
+  },
+  {
+    id: 'spec',
+    name: 'Test Spec',
+    sub: loc('测什么、怎么判', 'What to test, how to judge'),
+    text: loc(
+      'Test Spec 把承诺写成可判定的一项：在什么条件下测，什么结果算过。条件取最坏情况：VDD 用最低值，输入 1 只给 2.0 V。',
+      'The test spec turns the promise into one judgeable item: the test conditions and the pass limit. Use the worst case: VDD at its minimum, and every input 1 driven at only 2.0 V.',
+    ),
+  },
+  {
+    id: 'method',
+    name: 'Method',
+    sub: loc('怎么施加、怎么看', 'How to apply, how to observe'),
+    text: loc(
+      'ATE 看不见芯片内部“认成了什么”。办法是跑功能向量：输入的 1 只给 2.0 V，看输出是否仍然对。门限高于 2.0 V 的芯片会把这些 1 认成 0。',
+      'ATE cannot see what the chip “thinks” the input is. So run functional vectors with every input 1 at only 2.0 V and check the outputs. A part whose threshold is above 2.0 V reads those 1s as 0s.',
+    ),
+  },
+  {
+    id: 'setup',
+    name: 'Tester Setup / Program',
+    sub: loc('机台上的设置', 'Settings on the tester'),
+    text: loc(
+      '落到机台上，就是 Level 表里的一个数：VIH = 2.0 V。程序再写上电源、跑哪个 Pattern、失败进哪个 Bin。',
+      'On the tester this becomes one number in the level table: VIH = 2.0 V. The program adds the supply, which pattern to run, and which bin a failure goes to.',
+    ),
+  },
+  {
+    id: 'result',
+    name: 'Pass / Fail',
+    sub: loc('出结果', 'The verdict'),
+    text: loc(
+      '每个 Strobe 都比对上期望值，这一项才 Pass。只要有一拍不对，就是 Fail，芯片进失败 Bin。',
+      'The item passes only if every strobe matches its expected value. One wrong strobe means Fail, and the part goes to a fail bin.',
+    ),
+  },
 ]
 
-export type SpecId = 'vdd' | 'vih' | 'vil' | 'voh' | 'vol' | 'idd' | 'fmax'
+/** 示例向量：输入位，DUT 只是把输入传到输出 */
+export const BITS: Array<0 | 1> = [1, 0, 1, 1, 0, 1, 0, 0]
 
-export const SPECS: Array<{
-  id: SpecId
-  name: string
-  limit: LText
-  kind: KindId
-  family: FamilyId
-  familyNote: LText
-  method: LText
-}> = [
-  {
-    id: 'vdd',
-    name: 'VDD',
-    limit: loc('3.3 V'),
-    kind: 'power',
-    family: 'dc',
-    familyNote: loc('DC'),
-    method: loc('先给规定电源电压，再看电流、再开后续测试。没有稳妥的 VDD，后面的 0/1 都不可信。'),
-  },
+export const VIH_SPEC = 2.0
+export const VIL_SPEC = 0.8
+
+/** 两颗示例芯片：实际输入门限 */
+export const DUTS: Array<{ id: 'good' | 'bad'; label: LText; threshold: number }> = [
+  { id: 'good', label: loc('门限 1.6 V 的芯片', 'Part with a 1.6 V threshold'), threshold: 1.6 },
+  { id: 'bad', label: loc('门限 2.15 V 的芯片', 'Part with a 2.15 V threshold'), threshold: 2.15 },
+]
+
+/** 「DC 还是 AC」小练习 */
+export type Family = 'dc' | 'ac'
+
+export const GUESS: Array<{ id: string; name: string; limit: string; family: Family; why: LText }> = [
   {
     id: 'vih',
     name: 'VIH',
-    limit: loc('≥ 2.0 V'),
-    kind: 'in',
+    limit: '≥ 2.0 V',
     family: 'dc',
-    familyNote: loc('DC'),
-    method: loc('ATE 把输入赶到规格边沿 2.0 V，看 DUT 是否仍按 Logic 1 工作。这是输入门槛，不是输出电压。'),
-  },
-  {
-    id: 'vil',
-    name: 'VIL',
-    limit: loc('≤ 0.8 V'),
-    kind: 'in',
-    family: 'dc',
-    familyNote: loc('DC'),
-    method: loc('ATE 把输入赶到 0.8 V，看 DUT 是否仍按 Logic 0 工作。和 VIH 一对，都是输入阈值。'),
+    why: loc('电压门限，与快慢无关。', 'A voltage threshold. Speed does not matter.'),
   },
   {
     id: 'voh',
-    name: 'VOH',
-    limit: loc('≥ 2.4 V'),
-    kind: 'out',
+    name: 'VOH @ IOH',
+    limit: '≥ 2.4 V @ 4 mA',
     family: 'dc',
-    familyNote: loc('DC'),
-    method: loc('让输出为 1，PMU 或 Comparator 看电压是否还够 2.4 V。测的是输出驱动，不是输入门槛。'),
-  },
-  {
-    id: 'vol',
-    name: 'VOL',
-    limit: loc('≤ 0.4 V'),
-    kind: 'out',
-    family: 'dc',
-    familyNote: loc('DC'),
-    method: loc('让输出为 0，看电压是否还压得住 0.4 V。和 VOH 一对，都是输出驱动能力。'),
+    why: loc('带负载时的输出电压，静态量。', 'Output voltage under load. A static quantity.'),
   },
   {
     id: 'idd',
     name: 'IDD',
-    limit: loc('< 20 mA'),
-    kind: 'idd',
+    limit: '< 20 mA',
     family: 'dc',
-    familyNote: loc('DC'),
-    method: loc('按规定模式供电，量电源电流。超了就是功耗不合格，不是功能 Pattern 错了一拍。'),
+    why: loc('电源电流，静态量。', 'Supply current. A static quantity.'),
+  },
+  {
+    id: 'tpd',
+    name: 'tPD',
+    limit: '≤ 8 ns',
+    family: 'ac',
+    why: loc('输入变到输出变的延迟，单位是时间。', 'Delay from input change to output change, measured in time.'),
   },
   {
     id: 'fmax',
     name: 'fMAX',
-    limit: loc('100 MHz'),
-    kind: 'speed',
+    limit: '100 MHz',
     family: 'ac',
-    familyNote: loc('AC / Functional'),
-    method: loc('提高时钟或缩短周期，看功能是否仍对。这是速度，不是静态电压门槛。'),
+    why: loc('最高工作频率，是速度。', 'Maximum operating frequency: a speed item.'),
   },
 ]
 
-export type PipeId = 'datasheet' | 'spec' | 'method' | 'setup' | 'program' | 'result'
-
-export const PIPE: Array<{ id: PipeId; title: LText; text: LText }> = [
-  {
-    id: 'datasheet',
-    title: loc('Datasheet'),
-    text: loc('器件必须满足什么。写给用户和 Test Engineer，还不是机器指令。'),
-  },
-  {
-    id: 'spec',
-    title: loc('Test Specification'),
-    text: loc('测哪些项、上下限多少、判 Pass / Fail 的依据。从 Datasheet 翻译过来。'),
-  },
-  {
-    id: 'method',
-    title: loc('Test Method'),
-    text: loc('这一项用 DC、Functional 还是 AC，Force 什么、Measure 什么。'),
-  },
-  {
-    id: 'setup',
-    title: loc('Tester Setup'),
-    text: loc('落到机器上的 Level / Timing / Pattern。还没写成完整程序。'),
-  },
-  {
-    id: 'program',
-    title: loc('Test Program'),
-    text: loc('ATE 真正执行的流程：先测什么、失败去哪个 Bin。'),
-  },
-  {
-    id: 'result',
-    title: loc('Pass / Fail'),
-    text: loc('和规格比完的结果。测试到这里才结束，不是写完代码就结束。'),
-  },
+export const TAKEAWAY: LText[] = [
+  loc(
+    '每一条规格都要走完五层：Datasheet → Test Spec → Method → Tester Setup / Program → Pass / Fail。',
+    'Every spec goes through five layers: Datasheet → Test Spec → Method → Tester Setup / Program → Pass / Fail.',
+  ),
+  loc(
+    '测门限要在规格边沿测。给舒适的 3.3 V 只能证明“够高时是 1”，证明不了 2.0 V 也是 1。',
+    'Test a threshold at the spec edge. A comfortable 3.3 V only proves “high enough is 1”, not that 2.0 V is still 1.',
+  ),
 ]
-
-export type VihStepId = 'sheet' | 'force' | 'logic' | 'look' | 'judge'
-
-export const VIH_STEPS: Array<{ id: VihStepId; title: LText; text: LText }> = [
-  {
-    id: 'sheet',
-    title: loc('Datasheet: VIH ≥ 2.0 V'),
-    text: loc('规格先说：输入至少 2.0 V 才必须被认成 1。Test Spec 把这句话收成可判定的一项。'),
-  },
-  {
-    id: 'force',
-    title: loc('ATE 给 DUT 输入 2.0 V'),
-    text: loc('测法选在规格边沿。不是随便给 3.3 V 看一眼——那测不出门槛。'),
-  },
-  {
-    id: 'logic',
-    title: loc('DUT 应识别为 Logic 1'),
-    text: loc('芯片内部应把这根脚当成 1。ATE 自己看不见“认成”，要靠后面的行为。'),
-  },
-  {
-    id: 'look',
-    title: loc('Tester 看后续输出 / 功能是否按 1 工作'),
-    text: loc('Drive 给完，还要 Compare 或测后续脚。方法已经从规格走到了 Tester Setup。'),
-  },
-  {
-    id: 'judge',
-    title: loc('PASS / FAIL'),
-    text: loc('按 1 工作就过，否则失败。DC 课会把这一条做成可拖电压的实验。'),
-  },
-]
-
-export const TAKEAWAY = loc(
-  'Test Engineer 的日常经常不是先写代码，而是把 Datasheet 译成 Test Spec，再选方法、设 Tester，最后才是 Program 和 Pass / Fail。',
-)
-
-export type QuizId = 'q1' | 'q2' | 'q3' | 'q4' | 'q5'
-
-export type QuizQuestion = {
-  id: QuizId
-  prompt: LText
-  options: Array<{ id: string; text: LText }>
-  answer: string
-  explain: LText
-}
 
 export const QUIZ: QuizQuestion[] = [
   {
     id: 'q1',
-    prompt: loc('Test Engineer 日常更常先做哪件事？'),
+    prompt: loc('Datasheet 和 Test Spec 差在哪？', 'How does a datasheet differ from a test spec?'),
     options: [
-      { id: 'code', text: loc('一上来就写 Tester 代码') },
-      { id: 'trans', text: loc('把 Datasheet 变成机器可执行的测试') },
-      { id: 'fix', text: loc('把失效芯片修好再出货') },
-      { id: 'art', text: loc('画 Load Board 的 3D 爆炸图') },
+      { id: 'same', text: loc('同一份文件，换个封面', 'Same document, different cover') },
+      {
+        id: 'ok',
+        text: loc(
+          'Datasheet 写器件承诺什么；Test Spec 写在什么条件下测、什么算过',
+          'The datasheet states what the part promises; the test spec states the test conditions and what counts as a pass',
+        ),
+      },
+      { id: 'bin', text: loc('Datasheet 是 Bin 表', 'The datasheet is the bin table') },
+      { id: 'prog', text: loc('Test Spec 就是测试程序代码', 'The test spec is the program code') },
     ],
-    answer: 'trans',
+    answer: 'ok',
     explain: loc(
-      '代码是后面的事。先有规格、方法和判定，程序才知道测什么、怎么判。',
+      '承诺是目标；Test Spec 加上条件和极限，才变成能判定的一项。',
+      'The promise is the goal. Adding conditions and limits turns it into a judgeable item.',
     ),
   },
   {
     id: 'q2',
-    prompt: loc('Datasheet 和 Test Specification 差在哪？'),
+    prompt: loc('五层主线的正确顺序是？', 'What is the correct order of the five layers?'),
     options: [
-      { id: 'same', text: loc('同一份文件，只是换个封面') },
-      { id: 'ok', text: loc('Datasheet 写必须满足什么；Test Spec 写测什么、怎么判') },
-      { id: 'bin', text: loc('Datasheet 是 Bin 号，Test Spec 是 Socket') },
-      { id: 'pmu', text: loc('Datasheet 就是 PMU') },
+      { id: 'rev', text: loc('先写 Program，再回头找 Datasheet', 'Write the program first, then look up the datasheet') },
+      {
+        id: 'ok',
+        text: loc(
+          'Datasheet → Test Spec → Method → Tester Setup / Program → Pass / Fail',
+          'Datasheet → Test Spec → Method → Tester Setup / Program → Pass / Fail',
+        ),
+      },
+      { id: 'skip', text: loc('有 Pattern 就够了，不用规格', 'A pattern is enough; no spec needed') },
+      { id: 'ate', text: loc('先设 Level，规格以后再说', 'Set levels first; the spec can wait') },
     ],
     answer: 'ok',
     explain: loc(
-      '规格是目标。Test Spec 才是测试清单：测哪些项、上下限、Pass / Fail 依据。',
+      '程序里的每个数都应该能追溯到规格里的一行。',
+      'Every number in the program should trace back to a line in the spec.',
     ),
   },
   {
     id: 'q3',
-    prompt: loc('整门课的主线，正确顺序是？'),
+    prompt: loc('测 VIH ≥ 2.0 V，为什么输入的 1 只给 2.0 V，不给 3.3 V？', 'To test VIH ≥ 2.0 V, why drive input 1s at only 2.0 V instead of 3.3 V?'),
     options: [
-      { id: 'rev', text: loc('先写 Program，再回头找 Datasheet') },
+      { id: 'easy', text: loc('3.3 V 会烧坏芯片', '3.3 V would damage the part') },
       {
-        id: 'ok',
-        text: loc('Datasheet → Test Spec → Method → Tester Setup → Program → Pass / Fail'),
+        id: 'edge',
+        text: loc('要证明在规格边沿芯片仍认成 1', 'To prove the part still reads a 1 at the spec edge'),
       },
-      { id: 'skip', text: loc('有 Pattern 就够了，不用规格') },
-      { id: 'ate', text: loc('先买 ATE，规格以后再说') },
+      { id: 'fast', text: loc('2.0 V 跑得更快', '2.0 V runs faster') },
+      { id: 'none', text: loc('无所谓，结果一样', 'It makes no difference') },
     ],
-    answer: 'ok',
+    answer: 'edge',
     explain: loc(
-      '后面讲 VIH、DC、Functional，都走这一条。不要从程序倒着学。',
+      '门限 2.15 V 的坏片，给 3.3 V 也能过；只有给 2.0 V 才会露馅。',
+      'A bad part with a 2.15 V threshold passes at 3.3 V. Only 2.0 V exposes it.',
     ),
   },
   {
     id: 'q4',
-    prompt: loc('教学表里的 IDD < 20 mA，首先是哪一类？'),
+    prompt: loc('ATE 怎么知道芯片把 2.0 V 认成了 1？', 'How does the ATE know the part read 2.0 V as a 1?'),
     options: [
-      { id: 'in', text: loc('输入阈值') },
-      { id: 'speed', text: loc('速度') },
-      { id: 'idd', text: loc('功耗') },
-      { id: 'out', text: loc('输出驱动') },
+      { id: 'look', text: loc('直接测芯片内部节点', 'It probes the internal node directly') },
+      { id: 'func', text: loc('跑功能向量，看输出是否按 1 工作', 'It runs functional vectors and checks the outputs behave as if the input were 1') },
+      { id: 'idd', text: loc('看电源电流有没有变', 'It checks whether the supply current changes') },
+      { id: 'pmu', text: loc('用 PMU 量输入脚电压', 'It measures the input pin voltage with the PMU') },
     ],
-    answer: 'idd',
-    explain: loc('IDD 是电源电流。先归到功耗，再落到 DC 测法。'),
+    answer: 'func',
+    explain: loc(
+      '“认成什么”看不见，只能从输出行为推断。所以 VIH 用功能向量来测。',
+      'What the part “thinks” is invisible; only output behaviour shows it. That is why VIH is tested with functional vectors.',
+    ),
   },
   {
     id: 'q5',
-    prompt: loc('测 VIH ≥ 2.0 V，为什么要给 2.0 V，而不是只给 3.3 V？'),
+    prompt: loc('IDD < 20 mA 属于哪一类测试？', 'Which kind of test is IDD < 20 mA?'),
     options: [
-      { id: 'easy', text: loc('3.3 V 更接近真实使用，门槛不用测') },
-      { id: 'edge', text: loc('要在规格边沿确认 DUT 仍按 Logic 1 工作') },
-      { id: 'pmu', text: loc('VIH 只能用开短路测') },
-      { id: 'mhz', text: loc('VIH 其实是频率') },
+      { id: 'dc', text: loc('DC：电源电流', 'DC: supply current') },
+      { id: 'ac', text: loc('AC：速度', 'AC: speed') },
+      { id: 'func', text: loc('只是功能测试', 'Functional test only') },
+      { id: 'none', text: loc('不需要测', 'No test needed') },
     ],
-    answer: 'edge',
-    explain: loc(
-      '舒适电压只能证明“够高时能当 1”。规格要的是：低到 2.0 V 仍然是 1。',
-    ),
+    answer: 'dc',
+    explain: loc('电流、电压这类静态量归 DC；延迟、频率归 AC。', 'Static currents and voltages are DC; delays and frequencies are AC.'),
   },
 ]

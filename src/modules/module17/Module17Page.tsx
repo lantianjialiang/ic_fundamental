@@ -7,13 +7,7 @@ import { QuizList } from '../../lab/QuizList'
 import { type ModuleId } from '../catalog'
 import { QUIZ } from './data/content'
 import { BANK, OPS, STUCKS, alu, bin4, runBank, type StuckId } from './data/pattern'
-import {
-  judgeLeak,
-  judgeTiming,
-  leakCurrentUa,
-  settleAt,
-  type TimingReason,
-} from './data/engine'
+import { judgeLeak, judgeTiming, settleAt, type TimingReason } from './data/engine'
 
 type Module17PageProps = {
   moduleId: ModuleId
@@ -24,11 +18,27 @@ type Tab = 'timing' | 'leak' | 'pattern'
 type Focus = { kind: 'timing' } | { kind: 'leak' } | { kind: 'pattern' } | { kind: 'quiz' }
 
 const REASON: Record<TimingReason, LText> = {
-  pass: loc('Strobe 落在输出已经翻转之后、下一拍之前。Compare 采到的是新值。'),
-  early: loc('Tester 在 DUT 输出稳定之前进行了 Compare。采到的是旧值。'),
-  late: loc('Strobe 已经走到下一拍。可能采到下一周期的数据。'),
-  'before-drive': loc('输入还没被 Drive，输出谈不上新值。Strobe 太靠前。'),
-  slow: loc('Drive + Delay 已经大于等于 Period。这一拍里 DUT 来不及稳定。'),
+  pass: loc('Strobe 落在输出稳定之后、本周期结束之前，比较到的是新值。', 'The strobe falls after the output settles and before the cycle ends, so it compares the new value.'),
+  early: loc('Strobe 早于 Drive + tpd：DUT 输出还没变完，比较到的是上一拍的旧值。', 'The strobe is before Drive + tpd: the DUT output has not settled, so it compares the previous value.'),
+  late: loc('Strobe 落到了周期之外。Strobe 必须在本周期内。', 'The strobe lies outside the cycle. It must stay within the cycle.'),
+  'before-drive': loc('Strobe 比 Drive 还早：本拍输入都还没给，更谈不上新输出。', 'The strobe is even before Drive: this cycle\'s inputs have not been applied yet.'),
+  slow: loc('Drive + tpd ≥ Period：这一拍里 DUT 来不及稳定，Strobe 放哪都不对。降频或换更快的芯片。', 'Drive + tpd ≥ Period: the DUT cannot settle within the cycle, so no strobe position works. Lower the frequency.'),
+}
+
+const S = {
+  delay: loc('DUT tpd', 'DUT tpd'),
+  cycle: loc('周期', 'Cycle'),
+  data: loc('输入（Drive）', 'Input (drive)'),
+  out: loc('DUT 输出', 'DUT output'),
+  window: loc('有效窗口', 'valid window'),
+  waveCap: loc(
+    '输入每拍在 Drive 时刻翻转；DUT 输出晚 tpd 跟着翻转。绿色是可以放 Strobe 的窗口，圆点是每拍的比较时刻。',
+    'The input toggles at Drive each cycle; the DUT output follows tpd later. Green: where the strobe may go. Dots: the compare point in each cycle.',
+  ),
+  measure: loc('测量', 'Measure'),
+  result: loc('结果', 'Result'),
+  exp: loc('期望', 'Exp'),
+  got: loc('实际', 'Got'),
 }
 
 export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
@@ -44,15 +54,13 @@ export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
   const [stuck, setStuck] = useState<StuckId>('none')
   const [patVecs, setPatVecs] = useState<string[]>(BANK.map((row) => row.id))
 
-  const timing = useMemo(
-    () => judgeTiming({ period, drive, delay, strobe }),
-    [period, drive, delay, strobe],
-  )
+  const timing = useMemo(() => judgeTiming({ period, drive, delay, strobe }), [period, drive, delay, strobe])
   const settle = settleAt(drive, delay)
   const leak = useMemo(() => judgeLeak(forceV, limitUa), [forceV, limitUa])
   const patRows = useMemo(() => runBank(patVecs, stuck), [patVecs, stuck])
   const patFails = patRows.filter((row) => !row.pass).length
   const stuckHint = STUCKS.find((item) => item.id === stuck)
+  const failLine = loc(`${patRows.length} 条里 ${patFails} 条 Fail。`, `${patFails} of ${patRows.length} rows fail.`)
 
   const detail =
     focus.kind === 'quiz'
@@ -61,27 +69,43 @@ export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
         ? {
             kicker: t(ui.m17.kickerPat),
             title: stuckHint ? t(stuckHint.title) : t(ui.m17.tabPat),
-            text: t(
-              stuck === 'none'
-                ? loc(`无故障。${patRows.length} 条里失败 ${patFails}。`)
-                : loc(`${patRows.length} 条里失败 ${patFails}。对照红行，就是这种 stuck 能被测到的地方。`),
-            ),
+            text: stuck === 'none' ? t(failLine) : `${t(failLine)} ${t(ui.m17.patAside)}`,
           }
-      : tab === 'leak'
-        ? {
-            kicker: t(ui.m17.kickerLeak),
-            title: leak.pass ? t(ui.m17.pass) : t(ui.m17.fail),
-            text: t(
-              leak.pass
-                ? loc(`Force ${forceV.toFixed(1)} V → 测到 ${leak.meas.toFixed(2)} μA ≤ Limit ${limitUa.toFixed(1)} μA。`)
-                : loc(`Force ${forceV.toFixed(1)} V → 测到 ${leak.meas.toFixed(2)} μA，超过 Limit ${limitUa.toFixed(1)} μA。芯片未必坏了，是规格更紧。`),
-            ),
-          }
-        : {
-            kicker: t(ui.m17.kickerTime),
-            title: timing.pass ? t(ui.m17.pass) : t(ui.m17.fail),
-            text: t(REASON[timing.reason]),
-          }
+        : tab === 'leak'
+          ? {
+              kicker: t(ui.m17.kickerLeak),
+              title: leak.pass ? 'PASS' : 'FAIL',
+              text: t(
+                leak.pass
+                  ? loc(
+                      `Force ${forceV.toFixed(1)} V → 测到 ${leak.meas.toFixed(2)} μA ≤ Limit ${limitUa.toFixed(1)} μA。`,
+                      `Force ${forceV.toFixed(1)} V → measured ${leak.meas.toFixed(2)} μA ≤ limit ${limitUa.toFixed(1)} μA.`,
+                    )
+                  : loc(
+                      `Force ${forceV.toFixed(1)} V → 测到 ${leak.meas.toFixed(2)} μA > Limit ${limitUa.toFixed(1)} μA。芯片没变，是规格更紧了。`,
+                      `Force ${forceV.toFixed(1)} V → measured ${leak.meas.toFixed(2)} μA > limit ${limitUa.toFixed(1)} μA. The chip is the same; the limit is tighter.`,
+                    ),
+              ),
+            }
+          : {
+              kicker: t(ui.m17.kickerTime),
+              title: timing.pass ? 'PASS' : 'FAIL',
+              text: t(REASON[timing.reason]),
+            }
+
+  const tabs: Array<{ id: Tab; label: LText }> = [
+    { id: 'timing', label: ui.m17.tabTime },
+    { id: 'leak', label: ui.m17.tabLeak },
+    { id: 'pattern', label: ui.m17.tabPat },
+  ]
+
+  const preset = (s: number) => {
+    setPeriod(10)
+    setDrive(2)
+    setDelay(4)
+    setStrobe(s)
+    setFocus({ kind: 'timing' })
+  }
 
   return (
     <LessonFrame
@@ -99,60 +123,33 @@ export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
       </Section>
 
       <div className="sim-tabs" role="tablist">
-        <button
-          type="button"
-          className={`sim-tabs__btn${tab === 'timing' ? ' is-active' : ''}`}
-          onClick={() => {
-            setTab('timing')
-            setFocus({ kind: 'timing' })
-          }}
-        >
-          {t(ui.m17.tabTime)}
-        </button>
-        <button
-          type="button"
-          className={`sim-tabs__btn${tab === 'leak' ? ' is-active' : ''}`}
-          onClick={() => {
-            setTab('leak')
-            setFocus({ kind: 'leak' })
-          }}
-        >
-          {t(ui.m17.tabLeak)}
-        </button>
-        <button
-          type="button"
-          className={`sim-tabs__btn${tab === 'pattern' ? ' is-active' : ''}`}
-          onClick={() => {
-            setTab('pattern')
-            setFocus({ kind: 'pattern' })
-          }}
-        >
-          {t(ui.m17.tabPat)}
-        </button>
+        {tabs.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            role="tab"
+            aria-selected={tab === item.id}
+            className={`sim-tabs__btn${tab === item.id ? ' is-active' : ''}`}
+            onClick={() => {
+              setTab(item.id)
+              setFocus({ kind: item.id })
+            }}
+          >
+            {t(item.label)}
+          </button>
+        ))}
       </div>
 
       {tab === 'timing' ? (
         <Section title={t(ui.m17.timeTitle)} note={t(ui.m17.timeNote)}>
           <div className="sim-presets">
-            <button
-              type="button"
-              className="lab__btn"
-              onClick={() => applyPreset(10, 2, 4, 3, setPeriod, setDrive, setDelay, setStrobe)}
-            >
+            <button type="button" className="lab__btn" onClick={() => preset(3)}>
               {t(ui.m17.presetEarly)}
             </button>
-            <button
-              type="button"
-              className="lab__btn"
-              onClick={() => applyPreset(10, 2, 4, 7, setPeriod, setDrive, setDelay, setStrobe)}
-            >
+            <button type="button" className="lab__btn" onClick={() => preset(7)}>
               {t(ui.m17.presetOk)}
             </button>
-            <button
-              type="button"
-              className="lab__btn"
-              onClick={() => applyPreset(10, 2, 4, 10, setPeriod, setDrive, setDelay, setStrobe)}
-            >
+            <button type="button" className="lab__btn" onClick={() => preset(10)}>
               {t(ui.m17.presetLate)}
             </button>
           </div>
@@ -182,7 +179,7 @@ export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
               }}
             />
             <Knob
-              label={`DUT Delay  ${delay.toFixed(1)} ns`}
+              label={`${t(S.delay)}  ${delay.toFixed(1)} ns`}
               min={0.5}
               max={12}
               step={0.1}
@@ -204,10 +201,9 @@ export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
               }}
             />
           </div>
-          <TimingCanvas period={period} drive={drive} strobe={strobe} settle={settle} />
-          <p className="sim-axis-note">{t(ui.m17.driveHint)}</p>
+          <TimingCanvas period={period} drive={drive} strobe={strobe} settle={settle} pass={timing.pass} />
           <p className={`sim-verdict${timing.pass ? ' is-ok' : ' is-bad'}`}>
-            {timing.pass ? '✓ PASS' : '❌ FAIL'} · {t(REASON[timing.reason])}
+            {timing.pass ? '✓ PASS' : '✗ FAIL'} · {t(REASON[timing.reason])}
           </p>
         </Section>
       ) : tab === 'leak' ? (
@@ -239,15 +235,15 @@ export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
           <div className="sim-flow">
             <FlowBox title="Force" value={`${forceV.toFixed(1)} V`} />
             <span>→</span>
-            <FlowBox title="Measure" value={`${leak.meas.toFixed(2)} μA`} />
+            <FlowBox title={t(S.measure)} value={`${leak.meas.toFixed(2)} μA`} />
             <span>→</span>
-            <FlowBox title="Limit" value={`${limitUa.toFixed(1)} μA`} />
+            <FlowBox title="Limit" value={`≤ ${limitUa.toFixed(1)} μA`} />
             <span>→</span>
-            <FlowBox title="Result" value={leak.pass ? 'PASS' : 'FAIL'} ok={leak.pass} />
+            <FlowBox title={t(S.result)} value={leak.pass ? 'PASS' : 'FAIL'} ok={leak.pass} />
           </div>
           <LeakMeter meas={leak.meas} limit={limitUa} />
           <p className={`sim-verdict${leak.pass ? ' is-ok' : ' is-bad'}`}>
-            {leak.pass ? '✓ PASS' : '❌ FAIL'} · {t(ui.m17.leakHint)} · {t({ zh: `此时 DUT 漏电 ${leakCurrentUa(forceV).toFixed(2)} μA` })}
+            {leak.pass ? '✓ PASS' : '✗ FAIL'} · {t(ui.m17.leakHint)}
           </p>
         </Section>
       ) : (
@@ -268,7 +264,7 @@ export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
             ))}
           </div>
           {stuckHint ? <p className="sim-axis-note">{t(stuckHint.hint)}</p> : null}
-          <p className="pat-legend">{t(ui.m17.patBits)}</p>
+          <p className="pat-legend">{t(ui.m17.patPick)}</p>
           <div className="vec">
             {BANK.map((row) => {
               const on = patVecs.includes(row.id)
@@ -279,20 +275,19 @@ export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
                   type="button"
                   className={`vec__row${on ? ' is-active' : ''}`}
                   onClick={() =>
-                    setPatVecs((prev) =>
-                      prev.includes(row.id) ? prev.filter((id) => id !== row.id) : [...prev, row.id],
-                    )
+                    setPatVecs((prev) => (prev.includes(row.id) ? prev.filter((id) => id !== row.id) : [...prev, row.id]))
                   }
                 >
-                  {OPS[row.op].name} A={bin4(row.a)} B={bin4(row.b)} → Y {bin4(exp.y)} C {exp.carry}
+                  {`${OPS[row.op].name} A=${bin4(row.a)} B=${bin4(row.b)} → Y ${bin4(exp.y)} C ${exp.carry}`}
                 </button>
               )
             })}
           </div>
+          <p className="pat-legend">{t(ui.m17.patBits)}</p>
           <div className="vec">
             {patRows.map((item) => (
               <p key={item.row.id} className={item.pass ? 'is-ok' : 'is-bad'}>
-                {item.label} · exp <Bits value={item.exp.y} /> C={item.exp.carry} · got{' '}
+                {item.label} · {t(S.exp)} <Bits value={item.exp.y} /> C={item.exp.carry} · {t(S.got)}{' '}
                 <Bits value={item.got.y} compare={item.exp.y} /> C=
                 <i className={item.got.carry === item.exp.carry ? '' : 'pat-bit is-bad'}>{item.got.carry}</i> ·{' '}
                 {item.pass ? 'PASS' : 'FAIL'}
@@ -300,7 +295,7 @@ export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
             ))}
           </div>
           <p className={`sim-verdict${patFails === 0 ? ' is-ok' : ' is-bad'}`}>
-            {patFails === 0 ? '✓' : '❌'} {patRows.length} {t({ zh: '条里失败' })} {patFails}
+            {patFails === 0 ? '✓' : '✗'} {t(failLine)}
           </p>
         </Section>
       )}
@@ -312,22 +307,6 @@ export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
       </Section>
     </LessonFrame>
   )
-}
-
-function applyPreset(
-  period: number,
-  drive: number,
-  delay: number,
-  strobe: number,
-  setPeriod: (n: number) => void,
-  setDrive: (n: number) => void,
-  setDelay: (n: number) => void,
-  setStrobe: (n: number) => void,
-) {
-  setPeriod(period)
-  setDrive(drive)
-  setDelay(delay)
-  setStrobe(strobe)
 }
 
 function Bits({ value, compare }: { value: number; compare?: number }) {
@@ -387,122 +366,127 @@ function FlowBox({ title, value, ok }: { title: string; value: string; ok?: bool
   )
 }
 
-/** 横轴固定 0–40 ns，Period 变大则每一拍变宽，学生能看见节拍被拉开 */
+/** 横轴固定 0–40 ns：Period 变大，每一拍就变宽 */
 const TIME_SPAN = 40
+
+/** 从 low 开始，每个边沿翻转一次的数字波形 */
+function togglePath(xAt: (ns: number) => number, edges: number[], hi: number, lo: number) {
+  let level = false
+  let d = `M ${xAt(0)} ${lo}`
+  for (const e of edges) {
+    if (e >= TIME_SPAN) break
+    level = !level
+    d += ` H ${xAt(e)} V ${level ? hi : lo}`
+  }
+  return `${d} H ${xAt(TIME_SPAN)}`
+}
 
 function TimingCanvas({
   period,
   drive,
   strobe,
   settle,
+  pass,
 }: {
   period: number
   drive: number
   strobe: number
   settle: number
+  pass: boolean
 }) {
-  const X0 = 78
+  const { t } = useLocale()
+  const X0 = 110
   const X1 = 700
   const xAt = (ns: number) => X0 + (Math.min(Math.max(ns, 0), TIME_SPAN) / TIME_SPAN) * (X1 - X0)
-  const clk = 44
-  const dat = 112
-  const out = 180
-  const hi = (y: number) => y - 16
-  const lo = (y: number) => y + 16
-  const dx = xAt(drive)
-  const sx = xAt(strobe)
-  const px = xAt(period)
+  const cycles = Array.from({ length: Math.ceil(TIME_SPAN / period) }, (_, k) => k)
+  const dat = 100
+  const out = 176
+  const h = 16
+  const sc = pass ? 'var(--green)' : 'var(--red)'
+  const dataEdges = cycles.map((k) => k * period + drive)
+  const outEdges = cycles.map((k) => k * period + settle)
 
   return (
-    <svg viewBox="0 0 720 280" className="sim-wave" role="img">
-      <rect width="720" height="280" rx="6" fill="var(--well)" />
-      {[10, 20, 30].map((ns) => (
-        <g key={ns}>
-          <line x1={xAt(ns)} y1="14" x2={xAt(ns)} y2="228" stroke="var(--fig-box-2)" />
-          <text x={xAt(ns)} y="268" textAnchor="middle" fill="var(--dim)" fontSize="11">
-            {ns} ns
+    <figure className="term-fig">
+      <svg viewBox="0 0 720 280" className="sim-wave" role="img" aria-label={t(S.waveCap)}>
+        <rect width="720" height="280" rx="10" fill="var(--well)" />
+        {/* 有效窗口 */}
+        {settle < period
+          ? cycles.map((k) => (
+              <rect
+                key={`w${k}`}
+                x={xAt(k * period + settle)}
+                y={out - h - 6}
+                width={Math.max(xAt((k + 1) * period) - xAt(k * period + settle), 0)}
+                height={2 * h + 12}
+                fill="var(--green-bg)"
+              />
+            ))
+          : null}
+        {/* 周期边界 */}
+        {cycles.map((k) => (
+          <g key={`c${k}`}>
+            <line x1={xAt(k * period)} y1="26" x2={xAt(k * period)} y2="222" stroke="var(--line-2)" strokeDasharray="4 4" />
+            {xAt(k * period) + 6 < X1 ? (
+              <text x={xAt(k * period) + 4} y="40" fill="var(--muted)" fontSize="11">
+                {`#${k + 1}`}
+              </text>
+            ) : null}
+          </g>
+        ))}
+        <text x="12" y="40" fill="var(--muted)" fontSize="11">
+          {t(S.cycle)}
+        </text>
+        <text x="12" y={dat + 4} fill="var(--sky)" fontSize="11">
+          {t(S.data)}
+        </text>
+        <text x="12" y={out + 4} fill="var(--green)" fontSize="11">
+          {t(S.out)}
+        </text>
+        <path d={togglePath(xAt, dataEdges, dat - h, dat + h)} fill="none" stroke="var(--sky)" strokeWidth="2" />
+        <path d={togglePath(xAt, outEdges, out - h, out + h)} fill="none" stroke="var(--green)" strokeWidth="2" />
+        {/* 第 1 拍标注 */}
+        <line x1={xAt(drive)} y1="50" x2={xAt(drive)} y2={out + h} stroke="var(--sky)" strokeDasharray="3 3" />
+        <text x={xAt(drive) + 4} y="62" fill="var(--sky)" fontSize="11">
+          Drive
+        </text>
+        {settle < TIME_SPAN ? (
+          <>
+            <line x1={xAt(drive)} y1={out + h + 14} x2={xAt(settle)} y2={out + h + 14} stroke="var(--muted)" />
+            <text x={(xAt(drive) + xAt(settle)) / 2} y={out + h + 28} textAnchor="middle" fill="var(--muted)" fontSize="11">
+              tpd
+            </text>
+          </>
+        ) : null}
+        {/* 每拍的 Strobe */}
+        {cycles.map((k) => {
+          const at = k * period + strobe
+          if (at >= TIME_SPAN) return null
+          return (
+            <g key={`s${k}`}>
+              <line x1={xAt(at)} y1={dat - h - 6} x2={xAt(at)} y2={out + h + 4} stroke={sc} strokeWidth={k === 0 ? 2 : 1.2} />
+              <circle cx={xAt(at)} cy={out} r="4.5" fill={sc} />
+            </g>
+          )
+        })}
+        <text x={xAt(strobe) + 4} y="78" fill={sc} fontSize="11">
+          Strobe
+        </text>
+        {settle < period ? (
+          <text x={(xAt(settle) + xAt(period)) / 2} y={out - h - 10} textAnchor="middle" fill="var(--green)" fontSize="10">
+            {t(S.window)}
           </text>
-        </g>
-      ))}
-      <text x={X0} y="268" fill="var(--dim)" fontSize="11">
-        0
-      </text>
-      <text x={X1} y="268" textAnchor="end" fill="var(--dim)" fontSize="11">
-        40 ns
-      </text>
-      <line x1={px} y1="14" x2={px} y2="228" stroke="var(--muted)" strokeDasharray="4 4" />
-      <text x={px + 4} y="24" fill="var(--muted)" fontSize="11">
-        Period {period.toFixed(1)}
-      </text>
-      <text x="10" y={clk + 4} fill="var(--muted)" fontSize="11">
-        CLK
-      </text>
-      <text x="10" y={dat + 4} fill="var(--sky)" fontSize="11">
-        DATA
-      </text>
-      <text x="10" y={out + 4} fill="var(--green)" fontSize="11">
-        OUT
-      </text>
-      <path d={clockPath(xAt, period, clk, hi, lo)} fill="none" stroke="var(--blue)" strokeWidth="2" />
-      <path d={drivenPath(xAt, period, drive, dat, hi, lo)} fill="none" stroke="var(--sky)" strokeWidth="2" />
-      <path d={drivenPath(xAt, period, settle, out, hi, lo)} fill="none" stroke="var(--green)" strokeWidth="2" />
-      <line x1={dx} y1="28" x2={dx} y2="220" stroke="var(--sky)" strokeWidth="1.5" strokeDasharray="3 3" />
-      <text x={dx + 5} y="42" fill="var(--sky)" fontSize="12">
-        Drive
-      </text>
-      <line x1={sx} y1="28" x2={sx} y2="220" stroke="var(--gold)" strokeWidth="1.8" />
-      <text x={sx + 5} y="58" fill="var(--gold)" fontSize="12">
-        Strobe
-      </text>
-    </svg>
+        ) : null}
+        {/* 时间轴 */}
+        {[0, 10, 20, 30, 40].map((ns) => (
+          <text key={ns} x={xAt(ns)} y="266" textAnchor="middle" fill="var(--dim)" fontSize="11">
+            {`${ns} ns`}
+          </text>
+        ))}
+      </svg>
+      <figcaption>{t(S.waveCap)}</figcaption>
+    </figure>
   )
-}
-
-function clockPath(
-  xAt: (ns: number) => number,
-  period: number,
-  y: number,
-  hi: (y: number) => number,
-  lo: (y: number) => number,
-) {
-  let d = `M ${xAt(0)} ${hi(y)}`
-  let t = 0
-  let high = true
-  while (t < TIME_SPAN - 1e-6) {
-    const next = Math.min(t + period / 2, TIME_SPAN)
-    d += ` H ${xAt(next)}`
-    t = next
-    if (t >= TIME_SPAN) break
-    high = !high
-    d += ` V ${high ? hi(y) : lo(y)}`
-  }
-  return d
-}
-
-function drivenPath(
-  xAt: (ns: number) => number,
-  period: number,
-  edge: number,
-  y: number,
-  hi: (y: number) => number,
-  lo: (y: number) => number,
-) {
-  let d = `M ${xAt(0)} ${hi(y)}`
-  let t = 0
-  while (t < TIME_SPAN - 1e-6) {
-    const fall = t + edge
-    const end = t + period
-    if (fall < TIME_SPAN) {
-      d += ` H ${xAt(Math.min(fall, TIME_SPAN))} V ${lo(y)}`
-    }
-    if (end >= TIME_SPAN) {
-      d += ` H ${xAt(TIME_SPAN)}`
-      break
-    }
-    d += ` H ${xAt(end)} V ${hi(y)}`
-    t = end
-  }
-  return d
 }
 
 function LeakMeter({ meas, limit }: { meas: number; limit: number }) {

@@ -6,9 +6,9 @@ import { type Hookup, type MemPat, type PkgStyle, type Res } from './data/ate'
 /* ---------- 封装示意 ---------- */
 
 const PL = {
-  top: loc('俯视图'),
-  bottom: loc('底视图'),
-  lid: loc('金属盖'),
+  top: loc('俯视图', 'Top view'),
+  bottom: loc('底视图', 'Bottom view'),
+  lid: loc('金属盖', 'Metal lid'),
   die: 'die',
 }
 
@@ -132,8 +132,11 @@ const BL = {
   cavity: 'die cavity',
   pad: 'bond pad',
   wire: 'bond wire',
-  lead: loc('封装引脚'),
-  cap: loc('die 粘在 die cavity 中央，bond wire 从每个 bond pad 拉到封装引脚。'),
+  lead: loc('封装引脚', 'Package lead'),
+  cap: loc(
+    'die 粘在 die cavity 中央，bond wire 从每个 bond pad 拉到封装引脚。',
+    'The die is attached at the center of the die cavity, and a bond wire runs from each bond pad to a package lead.',
+  ),
 }
 
 export function BondFig() {
@@ -181,16 +184,19 @@ export function BondFig() {
 /* ---------- 测试系统连接链 ---------- */
 
 const KL = {
-  pc: loc('计算机 + 测试程序'),
-  tester: loc('测试仪器'),
-  head: loc('测试头'),
-  lb: loc('负载板'),
-  pcard: loc('探针卡'),
-  socket: loc('测试座 Socket'),
-  handler: loc('分选机接触器'),
-  die: loc('晶圆上的 die'),
-  pkg: loc('封装好的芯片'),
-  cap: loc('黄色框是随测试方式变化的部分，前面四段是同一套测试系统。'),
+  pc: loc('计算机 + 测试程序', 'Computer + test program'),
+  tester: loc('测试仪器', 'Test instruments'),
+  head: loc('测试头', 'Test head'),
+  lb: loc('负载板', 'Load board'),
+  pcard: loc('探针卡', 'Probe card'),
+  socket: loc('测试座 Socket', 'Socket'),
+  handler: loc('分选机接触器', 'Handler contactor'),
+  die: loc('晶圆上的 die', 'Die on wafer'),
+  pkg: loc('封装好的芯片', 'Packaged chip'),
+  cap: loc(
+    '黄色框是随测试方式变化的部分，前面四段是同一套测试系统。',
+    'The yellow boxes change with the test setup; the first four stages are the same test system.',
+  ),
 }
 
 export function HookupFig({ mode }: { mode: Hookup }) {
@@ -253,8 +259,8 @@ export function HookupFig({ mode }: { mode: Hookup }) {
 /* ---------- 指针表 vs 数字表 ---------- */
 
 const CL = {
-  analog: loc('指针表：连续'),
-  digital: loc('数字表：按格显示'),
+  analog: loc('指针表：连续', 'Analog clock: continuous'),
+  digital: loc('数字表：按格显示', 'Digital clock: discrete steps'),
 }
 
 export function clockText(sec: number, res: Res) {

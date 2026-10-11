@@ -21,7 +21,7 @@ export function LabHeader({ title, goal, nav }: LabHeaderProps) {
           <h1>{title}</h1>
         </div>
         <div className="lab__switches">
-          <div className="lab__lang" role="group" aria-label="Theme">
+          <div className="lab__lang" role="group" aria-label={t(ui.themeAria)}>
             <button
               type="button"
               className={`lab__lang-btn${theme === 'dark' ? ' is-active' : ''}`}
@@ -37,7 +37,7 @@ export function LabHeader({ title, goal, nav }: LabHeaderProps) {
               {t(ui.themeLight)}
             </button>
           </div>
-          <div className="lab__lang" role="group" aria-label="Language">
+          <div className="lab__lang" role="group" aria-label={t(ui.langAria)}>
             <button
               type="button"
               className={`lab__lang-btn${locale === 'zh' ? ' is-active' : ''}`}
@@ -56,7 +56,7 @@ export function LabHeader({ title, goal, nav }: LabHeaderProps) {
         </div>
       </div>
       <p className="lab__goal">{goal}</p>
-      <nav className="lab__nav" aria-label="Modules">
+      <nav className="lab__nav" aria-label={t(ui.navAria)}>
         {nav}
       </nav>
     </header>

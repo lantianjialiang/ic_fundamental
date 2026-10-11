@@ -4,8 +4,10 @@ import { loc, type LText } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
+import { StepControls, useStepPlayer } from '../../lab/StepPlayer'
 import { type ModuleId } from '../catalog'
-import { AluFig, AluTimingFig } from './AluFig'
+import { Callout, Readout } from '../fund/parts'
+import { AluFig, AluRunFig, AluTimingFig } from './AluFig'
 import {
   BANK,
   DC_CHOICES,
@@ -18,28 +20,64 @@ import {
   TAKEAWAY,
   TPD,
   alu,
-  aluWithFault,
   hex4,
   judgeItems,
   judgeTiming,
   judgeVectors,
+  runVectors,
   type FaultId,
   type ItemId,
+  type RunRow,
   type VecId,
 } from './data/content'
+import './alu.css'
 
 type Module15PageProps = {
   moduleId: ModuleId
   onModuleChange: (id: ModuleId) => void
 }
 
+const S = {
+  input: loc('输入', 'Input'),
+  output: loc('输出', 'Output'),
+  power: loc('电源', 'Power'),
+  settle: loc('稳定', 'Settled'),
+  window: loc('窗口', 'Window'),
+  winOk: loc('OK', 'OK'),
+  winBad: loc('不成立', 'Invalid'),
+  strobeRule: loc('须 ≥ Drive + tpd，且 < Period', 'must be ≥ Drive + tpd and < Period'),
+  nextCycle: loc('下一拍', 'Next cycle'),
+  late: loc(
+    '第 4 步的 Strobe 落在周期之外，Timing 不合法，程序跑不起来。先回第 4 步改。',
+    'The strobe from step 4 lies outside the cycle, so the timing is illegal and the program cannot run. Fix step 4 first.',
+  ),
+  early: loc(
+    '第 4 步的 Strobe 早于输出稳定。下面每一拍都会采到上一拍的旧值，看看好芯片是怎么 Fail 的。',
+    'The strobe from step 4 is earlier than the output settles. Every cycle below reads the previous value; watch a good chip fail.',
+  ),
+  colOp: loc('OP', 'OP'),
+  colExp: loc('期望 Y / C', 'Expected Y / C'),
+  colGot: loc('实际 Y / C', 'Actual Y / C'),
+  colRes: loc('结果', 'Result'),
+  dcPick: loc('选一项即可，但必须能说清 Force / Measure。', 'Pick one, and be able to say what is forced and measured.'),
+  dcDone: loc('DC 条件已选定。量产程序里这一项要写进测试条件。', 'DC condition chosen. In a production program it goes into the test conditions.'),
+  runIdle: loc('点“下一拍”逐条执行。无故障、Timing 正确时应全 Pass。', 'Press “Next cycle” to run row by row. With no fault and correct timing, all should pass.'),
+  noFault: loc('无注入时应全 Pass。换一种故障，看哪些 OP、哪些位翻红。', 'With no fault all rows pass. Try a fault and watch which OPs and bits turn red.'),
+  causeOk: loc('根因和注入一致。失败行的规律已经指向它。', 'Root cause matches the injected fault. The failing rows already pointed to it.'),
+  causeBad: loc('再看失败的是哪些 OP、哪些位。', 'Look again at which OPs and which bits fail.'),
+}
+
 const PORTS: Array<{ name: string; dir: LText; note: LText }> = [
-  { name: 'A[3:0]', dir: loc('输入'), note: loc('操作数 A，4 位') },
-  { name: 'B[3:0]', dir: loc('输入'), note: loc('操作数 B；移位时低 2 位是移位量') },
-  { name: 'OP[2:0]', dir: loc('输入'), note: loc('000 ADD · 001 AND · 010 OR · 011 XOR · 100 SHL · 101 SHR') },
-  { name: 'Y[3:0]', dir: loc('输出'), note: loc('运算结果') },
-  { name: 'Carry', dir: loc('输出'), note: loc('ADD 进位或移位时移出的那一位') },
-  { name: 'VDD / GND', dir: loc('电源'), note: loc('3.3 V。DC / IDD 测这里') },
+  { name: 'A[3:0]', dir: S.input, note: loc('操作数 A，4 位', 'Operand A, 4 bits') },
+  { name: 'B[3:0]', dir: S.input, note: loc('操作数 B；移位时低 2 位是移位量', 'Operand B; for shifts its low 2 bits are the shift amount') },
+  {
+    name: 'OP[2:0]',
+    dir: S.input,
+    note: loc('000 ADD · 001 AND · 010 OR · 011 XOR · 100 SHL · 101 SHR', '000 ADD · 001 AND · 010 OR · 011 XOR · 100 SHL · 101 SHR'),
+  },
+  { name: 'Y[3:0]', dir: S.output, note: loc('运算结果', 'Result') },
+  { name: 'Carry', dir: S.output, note: loc('ADD 的进位，或移位时移出的那一位', 'ADD carry, or the bit shifted out') },
+  { name: 'VDD / GND', dir: S.power, note: loc('3.3 V。DC / IDD 测这里', '3.3 V. DC / IDD are measured here') },
 ]
 
 export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
@@ -53,31 +91,36 @@ export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
   const [dc, setDc] = useState<string | null>(null)
   const [fault, setFault] = useState<FaultId>('none')
   const [cause, setCause] = useState<FaultId | null>(null)
-  const [ran, setRan] = useState(false)
 
   const itemJudge = judgeItems(items)
   const vecJudge = judgeVectors(vectors)
   const timeJudge = judgeTiming(period, strobe, drive)
-  const results = BANK.filter((row) => vectors.includes(row.id)).map((row) => {
-    const exp = alu(row.a, row.b, row.op)
-    const got = aluWithFault(row.a, row.b, row.op, fault)
-    const pass = got.y === exp.y && got.carry === exp.carry
-    return { row, exp, got, pass }
-  })
-  const fails = results.filter((item) => !item.pass)
+  const early = timeJudge.kind === 'early'
+  const runRows = runVectors(vectors, 'none', early)
+  const faultRows = runVectors(vectors, fault, false)
+  const fails = faultRows.filter((item) => !item.pass).length
   const causeOk = cause !== null && cause === fault && fault !== 'none'
   const settle = drive + TPD
+  const cur = STEPS[step - 1]
+  const dcItem = DC_CHOICES.find((item) => item.id === dc)
 
-  const aside = asideOf(step, t, {
-    itemJudge,
-    vecJudge,
-    timeJudge,
-    dc,
-    ran,
-    fails: fails.length,
-    causeOk,
-    fault,
-  })
+  const asideText = (() => {
+    if (step === 2) return t(itemJudge.text)
+    if (step === 3) return t(vecJudge.text)
+    if (step === 4) return t(timeJudge.text)
+    if (step === 5) return t(dcItem ? S.dcDone : S.dcPick)
+    if (step === 6) return t(timeJudge.kind === 'late' ? S.late : early ? S.early : S.runIdle)
+    if (step === 7) {
+      if (fault === 'none') return t(S.noFault)
+      if (causeOk) return t(S.causeOk)
+      return t(
+        loc(`已注入。失败 ${fails} 条，对照红行选根因。`, `Fault injected. ${fails} rows fail; choose the cause from the red rows.`),
+      )
+    }
+    return t(cur.text)
+  })()
+
+  const toggle = <T,>(list: T[], id: T) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id])
 
   return (
     <LessonFrame
@@ -86,8 +129,8 @@ export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
       title={t(ui.m15.title)}
       goal={t(ui.m15.goal)}
       kicker={t(ui.m15.kickerStep)}
-      asideTitle={aside.title}
-      asideText={aside.text}
+      asideTitle={`${step} · ${t(cur.title)}`}
+      asideText={asideText}
       asideLater={t(ui.m15.asideLater)}
       nextId="latch"
       nextLabel={t(ui.m15.next)}
@@ -97,7 +140,7 @@ export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
       </Section>
 
       <Section title={t(ui.m15.portTitle)} note={t(ui.m15.portNote)}>
-        <AluFig t={t} />
+        <AluFig />
         <div className="spec">
           {PORTS.map((row) => (
             <div key={row.name} className="spec__row">
@@ -116,6 +159,8 @@ export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
             key={item.id}
             type="button"
             className={`wizard__tab${step === item.id ? ' is-active' : ''}`}
+            title={t(item.title)}
+            aria-label={`${item.id} · ${t(item.title)}`}
             onClick={() => setStep(item.id)}
           >
             {item.id}
@@ -123,7 +168,9 @@ export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
         ))}
       </div>
 
-      <Section title={`${t(ui.m15.step)} ${step} · ${t(STEPS[step - 1].title)}`} note={t(STEPS[step - 1].text)}>
+      <Section title={`${t(ui.m15.step)} ${step} · ${t(cur.title)}`} note={t(cur.text)}>
+        <p className="alu-ref">{t(cur.ref)}</p>
+
         {step === 1 ? (
           <div className="spec">
             {SPECS.map((row) => (
@@ -137,17 +184,13 @@ export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
 
         {step === 2 ? (
           <>
-            <div className="pick pick--2">
+            <div className="pick pick--3">
               {ITEMS.map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   className={`pick__card${items.includes(item.id) ? ' is-active' : ''}`}
-                  onClick={() =>
-                    setItems((prev) =>
-                      prev.includes(item.id) ? prev.filter((id) => id !== item.id) : [...prev, item.id],
-                    )
-                  }
+                  onClick={() => setItems((prev) => toggle(prev, item.id))}
                 >
                   {t(item.title)}
                 </button>
@@ -161,38 +204,35 @@ export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
           <div className="vec">
             {BANK.map((row) => {
               const exp = alu(row.a, row.b, row.op)
-              const on = vectors.includes(row.id)
               return (
                 <button
                   key={row.id}
                   type="button"
-                  className={`vec__row${on ? ' is-active' : ''}`}
-                  onClick={() =>
-                    setVectors((prev) =>
-                      prev.includes(row.id) ? prev.filter((id) => id !== row.id) : [...prev, row.id],
-                    )
-                  }
+                  className={`vec__row${vectors.includes(row.id) ? ' is-active' : ''}`}
+                  onClick={() => setVectors((prev) => toggle(prev, row.id))}
                 >
-                  {OPS[row.op].name} {hex4(row.a)} {hex4(row.b)} → Y {hex4(exp.y)} C {exp.carry}
+                  {`${OPS[row.op].name} ${hex4(row.a)} ${hex4(row.b)} → Y ${hex4(exp.y)} C ${exp.carry}`}
                 </button>
-              )}
-            )}
+              )
+            })}
             <p className={vecJudge.ok ? 'is-ok' : 'is-bad'}>{t(vecJudge.text)}</p>
           </div>
         ) : null}
 
         {step === 4 ? (
           <div className="meter">
-            <div className="time-readout">
-              <span>Period {period} ns</span>
-              <span>Drive {drive} ns</span>
-              <span>tpd {TPD} ns</span>
-              <span>稳定 {settle} ns</span>
-              <span>Strobe {strobe} ns</span>
-              <span className={timeJudge.ok ? 'is-ok' : 'is-bad'}>{timeJudge.ok ? '窗口 OK' : '窗口坏'}</span>
-            </div>
+            <Readout
+              items={[
+                { label: 'Period', value: `${period} ns` },
+                { label: 'Drive', value: `${drive} ns` },
+                { label: 'tpd', value: `${TPD} ns` },
+                { label: S.settle, value: `${settle} ns` },
+                { label: 'Strobe', value: `${strobe} ns`, state: timeJudge.ok ? 'pass' : 'fail' },
+                { label: S.window, value: t(timeJudge.ok ? S.winOk : S.winBad), state: timeJudge.ok ? 'pass' : 'fail' },
+              ]}
+            />
             <label>
-              <span>Period {period} ns</span>
+              <span>{`Period ${period} ns`}</span>
               <input
                 type="range"
                 min={8}
@@ -202,12 +242,12 @@ export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
                   const next = Number(event.target.value)
                   setPeriod(next)
                   setStrobe((s) => Math.min(s, next))
-                  setDrive((d) => Math.min(d, next - 1))
+                  setDrive((d) => Math.min(d, Math.max(next - TPD - 1, 0)))
                 }}
               />
             </label>
             <label>
-              <span>Drive {drive} ns</span>
+              <span>{`Drive ${drive} ns`}</span>
               <input
                 type="range"
                 min={0}
@@ -217,9 +257,7 @@ export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
               />
             </label>
             <label>
-              <span>
-                Strobe {strobe} ns（须 &gt; {settle}，且 &lt; {period}）
-              </span>
+              <span>{`Strobe ${strobe} ns · ${t(S.strobeRule)}`}</span>
               <input
                 type="range"
                 min={0}
@@ -234,33 +272,40 @@ export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
         ) : null}
 
         {step === 5 ? (
-          <div className="pick pick--2">
-            {DC_CHOICES.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                className={`pick__card${dc === item.id ? ' is-active' : ''}`}
-                onClick={() => setDc(item.id)}
-              >
-                {t(item.title)}
-              </button>
-            ))}
-          </div>
+          <>
+            <div className="pick pick--2">
+              {DC_CHOICES.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`pick__card${dc === item.id ? ' is-active' : ''}`}
+                  onClick={() => setDc(item.id)}
+                >
+                  {t(item.title)}
+                </button>
+              ))}
+            </div>
+            {dcItem ? <Callout tone="ok">{t(dcItem.how)}</Callout> : null}
+          </>
         ) : null}
 
         {step === 6 ? (
-          <div>
-            <button type="button" className="lab__btn lab__btn--primary" onClick={() => setRan(true)}>
-              {t(ui.m15.run)}
-            </button>
-            {ran ? <ResultTable results={results} empty={t(ui.m15.needVec)} /> : null}
-          </div>
+          timeJudge.kind === 'late' ? (
+            <Callout tone="bad">{t(S.late)}</Callout>
+          ) : runRows.length === 0 ? (
+            <p className="is-bad">{t(ui.m15.needVec)}</p>
+          ) : (
+            <>
+              {early ? <Callout tone="warn">{t(S.early)}</Callout> : null}
+              <AluRunPlayer key={`${vectors.join(',')}|${early}`} rows={runRows} />
+            </>
+          )
         ) : null}
 
         {step === 7 ? (
           <div>
             <p className="intro__note">{t(ui.m15.injectNote)}</p>
-            <div className="pick pick--2">
+            <div className="pick pick--3">
               {FAULTS.map((item) => (
                 <button
                   key={item.id}
@@ -275,11 +320,11 @@ export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
                 </button>
               ))}
             </div>
-            <ResultTable results={results} empty={t(ui.m15.needVec)} />
-            <p className={fails.length === 0 ? 'is-ok' : 'is-bad'}>
+            <ResultTable rows={faultRows} empty={t(ui.m15.needVec)} />
+            <p className={fails === 0 ? 'is-ok' : 'is-bad'}>
               {fault === 'none'
-                ? t({ zh: '无注入时应全 Pass。换一种故障，看哪些 OP / 哪些位翻红。' })
-                : t({ zh: `当前失败 ${fails.length} 条。对照红行再选根因，不要猜。` })}
+                ? t(S.noFault)
+                : t(loc(`失败 ${fails} / ${faultRows.length} 条。`, `${fails} of ${faultRows.length} rows fail.`))}
             </p>
             <p className="intro__note">{t(ui.m15.causeNote)}</p>
             <div className="pick pick--2">
@@ -294,21 +339,13 @@ export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
                 </button>
               ))}
             </div>
-            {cause !== null ? (
-              <p className={causeOk ? 'is-ok' : 'is-bad'}>
-                {causeOk
-                  ? t({ zh: '根因和注入一致。失败行已经说明为什么是它。' })
-                  : t({ zh: '再看失败的是哪些 OP / 哪些位。' })}
-              </p>
-            ) : null}
+            {cause !== null ? <p className={causeOk ? 'is-ok' : 'is-bad'}>{t(causeOk ? S.causeOk : S.causeBad)}</p> : null}
           </div>
         ) : null}
       </Section>
 
       <Section title={t(ui.m15.takeawayTitle)}>
-        <button type="button" className="takeaway">
-          {t(TAKEAWAY)}
-        </button>
+        <Callout tone="warn">{t(TAKEAWAY)}</Callout>
       </Section>
 
       <Section title={t(ui.m15.quizTitle)} note={t(ui.m15.quizNote)}>
@@ -318,72 +355,56 @@ export function Module15Page({ moduleId, onModuleChange }: Module15PageProps) {
   )
 }
 
-function ResultTable({
-  results,
-  empty,
-}: {
-  results: Array<{
-    row: (typeof BANK)[number]
-    exp: { y: number; carry: number }
-    got: { y: number; carry: number }
-    pass: boolean
-  }>
-  empty: string
-}) {
-  if (results.length === 0) return <p className="is-bad">{empty}</p>
+/** 逐拍播放：第 0 步是准备，第 i 步执行第 i 条向量 */
+function AluRunPlayer({ rows }: { rows: RunRow[] }) {
+  const { t } = useLocale()
+  const player = useStepPlayer(rows.length + 1, 1100)
+  const done = rows.slice(0, player.step)
+  const fails = done.filter((r) => !r.pass).length
   return (
-    <div className="vec">
-      {results.map((item) => (
-        <p key={item.row.id} className={item.pass ? 'is-ok' : 'is-bad'}>
-          {OPS[item.row.op].name} {hex4(item.row.a)} {hex4(item.row.b)} · exp {hex4(item.exp.y)}/
-          {item.exp.carry} · got {hex4(item.got.y)}/{item.got.carry} · {item.pass ? 'PASS' : 'FAIL'}
+    <>
+      <StepControls player={player} nextLabel={S.nextCycle} />
+      <AluRunFig rows={rows} cur={player.step} />
+      {player.atEnd ? (
+        <p className={fails === 0 ? 'is-ok' : 'is-bad'}>
+          {t(
+            fails === 0
+              ? loc(`${rows.length} 拍全部 Pass。`, `All ${rows.length} cycles pass.`)
+              : loc(`${rows.length} 拍里 ${fails} 拍 Fail。`, `${fails} of ${rows.length} cycles fail.`),
+          )}
         </p>
-      ))}
-    </div>
+      ) : null}
+    </>
   )
 }
 
-function asideOf(
-  step: number,
-  t: (text: import('../../i18n/locale').LText | string) => string,
-  state: {
-    itemJudge: { ok: boolean; text: LText }
-    vecJudge: { ok: boolean; text: LText }
-    timeJudge: { ok: boolean; text: LText }
-    dc: string | null
-    ran: boolean
-    fails: number
-    causeOk: boolean
-    fault: FaultId
-  },
-): { title: string; text: string } {
-  const title = t(STEPS[step - 1].title)
-  if (step === 2) return { title, text: t(state.itemJudge.text) }
-  if (step === 3) return { title, text: t(state.vecJudge.text) }
-  if (step === 4) return { title, text: t(state.timeJudge.text) }
-  if (step === 5) {
-    return {
-      title,
-      text: state.dc
-        ? t({ zh: 'DC 条件已选定。量产程序里这一项要写进 Test Condition。' })
-        : t({ zh: '选一项即可，但必须能说清 Force / Measure。' }),
-    }
-  }
-  if (step === 6) {
-    return {
-      title,
-      text: state.ran
-        ? t({ zh: `跑完。失败 ${state.fails} 条。先看是哪一个 OP。` })
-        : t({ zh: '先勾向量再运行。无故障时应全 Pass。' }),
-    }
-  }
-  if (step === 7) {
-    return {
-      title,
-      text: state.causeOk
-        ? t({ zh: '分析对上了。失败行和注入是同一件事。' })
-        : t({ zh: `已注入。失败 ${state.fails} 条。对照红行选根因。` }),
-    }
-  }
-  return { title, text: t(STEPS[0].text) }
+function ResultTable({ rows, empty }: { rows: RunRow[]; empty: string }) {
+  const { t } = useLocale()
+  if (rows.length === 0) return <p className="is-bad">{empty}</p>
+  return (
+    <table className="dtable alu-table">
+      <thead>
+        <tr>
+          <th>{t(S.colOp)}</th>
+          <th>A</th>
+          <th>B</th>
+          <th>{t(S.colExp)}</th>
+          <th>{t(S.colGot)}</th>
+          <th>{t(S.colRes)}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((item) => (
+          <tr key={item.row.id} className={item.pass ? '' : 'alu-table__fail'}>
+            <td className="mono-cell">{OPS[item.row.op].name}</td>
+            <td className="mono-cell">{hex4(item.row.a)}</td>
+            <td className="mono-cell">{hex4(item.row.b)}</td>
+            <td className="mono-cell">{`${hex4(item.exp.y)} / ${item.exp.carry}`}</td>
+            <td className="mono-cell">{`${hex4(item.got.y)} / ${item.got.carry}`}</td>
+            <td className={item.pass ? 'is-ok' : 'is-bad'}>{item.pass ? 'PASS' : 'FAIL'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
 }

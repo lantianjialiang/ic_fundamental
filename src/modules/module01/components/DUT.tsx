@@ -1,64 +1,106 @@
+import { RoundedBox } from '@react-three/drei'
+import { useMemo } from 'react'
+import { ExtrudeGeometry, MeshStandardMaterial, Shape } from 'three'
 import { useLocale } from '../../../i18n/LocaleContext'
-import { ui } from '../../../i18n/ui'
-import { BGA_COLS, DUT as DUT_LAYOUT, bgaXZ, layerY } from '../data/layout'
-import { channelForBall } from '../data/paths'
-import { SceneLabel } from './SceneLabel'
+import { useScene } from '../context/SceneContext'
+import { BGA, DUT_BASE_Y, QFP, allContacts, contactFor, qfpLeads } from '../data/layout'
+import { GEO, MAT } from '../data/materials'
+import { dutMarkTexture } from '../data/textures'
+import { T } from '../data/text'
+import { InstancedParts, type InstanceItem } from './Instanced'
+import { LayerGroup } from './LayerGroup'
 
-type DUTProps = {
-  progress: number
-  selectedChannel: number | null
-  onSelect: (channel: number) => void
+/** 鸥翼引脚侧面轮廓（u 向外、y 向上），沿 Z 拉伸成引脚宽度 */
+function gullWingGeometry(): ExtrudeGeometry {
+  const s = new Shape()
+  const upper: Array<[number, number]> = [
+    [-0.01, 0.081],
+    [0.048, 0.081],
+    [0.098, 0.012],
+    [0.18, 0.012],
+  ]
+  const lower: Array<[number, number]> = [
+    [0.18, 0],
+    [0.092, 0],
+    [0.042, 0.069],
+    [-0.01, 0.069],
+  ]
+  s.moveTo(upper[0]![0], upper[0]![1])
+  for (const [u, y] of [...upper.slice(1), ...lower]) s.lineTo(u, y)
+  s.closePath()
+  const g = new ExtrudeGeometry(s, { depth: 0.03, bevelEnabled: false })
+  g.translate(0, 0, -0.015)
+  return g
 }
 
-export function DUT({ progress, selectedChannel, onSelect }: DUTProps) {
+const markMaterials = {
+  BGA: new MeshStandardMaterial({ map: dutMarkTexture('BGA'), roughness: 0.6, metalness: 0 }),
+  QFP: new MeshStandardMaterial({ map: dutMarkTexture('QFP'), roughness: 0.6, metalness: 0 }),
+}
+
+/** DUT：BGA（基板 + 塑封 + 锡球阵列）或 QFP（塑封 + 四边鸥翼引脚），顶面带打标贴图 */
+export function DUT() {
+  const { cfg } = useScene()
   const { t } = useLocale()
-  const y = layerY(DUT_LAYOUT, progress)
-  const { w, h, d } = DUT_LAYOUT.body
-  const ballY = -h / 2 - DUT_LAYOUT.ballRadius * 0.85
+  const leadGeo = useMemo(() => gullWingGeometry(), [])
+
+  const balls = useMemo<InstanceItem[]>(
+    () => allContacts('BGA').map(([x, z]) => ({ p: [x, BGA.ballR * 0.88, z], s: [BGA.ballR, BGA.ballR * 0.92, BGA.ballR] })),
+    [],
+  )
+  const leads = useMemo<InstanceItem[]>(() => qfpLeads().map((l) => ({ p: [l.x, 0, l.z], r: [0, l.rotY, 0] })), [])
+  const marker = cfg.selected === null ? null : contactFor(cfg.pkg, cfg.selected)
+  const isBga = cfg.pkg === 'BGA'
 
   return (
-    <group position={[0, y, 0]}>
-      <mesh castShadow receiveShadow>
-        <boxGeometry args={[w, h, d]} />
-        <meshStandardMaterial color="#1c1f24" roughness={0.55} metalness={0.18} />
-      </mesh>
-      <mesh position={[-w / 2 - 0.006, 0, d / 2 - 0.16]}>
-        <boxGeometry args={[0.012, 0.07, 0.07]} />
-        <meshStandardMaterial color="#8a9098" roughness={0.45} metalness={0.15} />
-      </mesh>
-
-      {Array.from({ length: DUT_LAYOUT.grid }, (_, row) =>
-        Array.from({ length: DUT_LAYOUT.grid }, (_, col) => {
-          const [x, z] = bgaXZ(col, row)
-          const channel = channelForBall(col, row)
-          const active = channel !== null && channel === selectedChannel
-          return (
-            <mesh
-              key={`${BGA_COLS[col]}${row + 1}`}
-              position={[x, ballY, z]}
-              onClick={(event) => {
-                if (channel === null) return
-                event.stopPropagation()
-                onSelect(channel)
-              }}
-            >
-              <sphereGeometry args={[DUT_LAYOUT.ballRadius, 12, 12]} />
-              <meshStandardMaterial
-                color={active ? '#f0d56a' : '#b7bcc3'}
-                emissive={active ? '#8a7018' : '#000000'}
-                roughness={0.3}
-                metalness={0.7}
-              />
+    <LayerGroup id="dut" sub={t(isBga ? T.bgaSub : T.qfpSub)}>
+      <group position={[0, DUT_BASE_Y, 0]}>
+        {isBga ? (
+          <>
+            <InstancedParts geometry={GEO.sphere} material={MAT.solder} items={balls} />
+            <RoundedBox
+              args={[BGA.body, BGA.subTop - BGA.subBottom, BGA.body]}
+              radius={0.008}
+              smoothness={2}
+              position={[0, (BGA.subTop + BGA.subBottom) / 2, 0]}
+              material={MAT.bt}
+              castShadow
+            />
+            <RoundedBox
+              args={[BGA.mold, BGA.top - BGA.subTop, BGA.mold]}
+              radius={0.016}
+              smoothness={3}
+              position={[0, (BGA.top + BGA.subTop) / 2, 0]}
+              material={MAT.mold}
+              castShadow
+            />
+            <mesh position={[0, BGA.top + 0.0008, 0]} rotation={[-Math.PI / 2, 0, 0]} material={markMaterials.BGA}>
+              <planeGeometry args={[BGA.mold - 0.04, BGA.mold - 0.04]} />
             </mesh>
-          )
-        }),
-      )}
-
-      <SceneLabel
-        position={[0, h / 2 + 0.2, 0]}
-        title="DUT"
-        subtitle={t(ui.scene.dutSub)}
-      />
-    </group>
+          </>
+        ) : (
+          <>
+            <InstancedParts geometry={leadGeo} material={MAT.solder} items={leads} />
+            <RoundedBox
+              args={[QFP.body, QFP.top - QFP.bottom, QFP.body]}
+              radius={0.02}
+              smoothness={3}
+              position={[0, (QFP.top + QFP.bottom) / 2, 0]}
+              material={MAT.mold}
+              castShadow
+            />
+            <mesh position={[0, QFP.top + 0.0008, 0]} rotation={[-Math.PI / 2, 0, 0]} material={markMaterials.QFP}>
+              <planeGeometry args={[QFP.body - 0.05, QFP.body - 0.05]} />
+            </mesh>
+          </>
+        )}
+        {marker ? (
+          <mesh position={[marker.x, isBga ? BGA.ballR * 0.88 : 0.006, marker.z]}>
+            <sphereGeometry args={[isBga ? BGA.ballR * 1.12 : 0.03, 16, 12]} />
+            <meshBasicMaterial color="#ffd84a" transparent opacity={0.55} toneMapped={false} depthWrite={false} />
+          </mesh>
+        ) : null}
+      </group>
+    </LayerGroup>
   )
 }

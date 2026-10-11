@@ -11,16 +11,19 @@ export function fmtMa(ma: number) {
 /* ---------- PMU 加压 / 加流 ---------- */
 
 const PL = {
-  dut: loc('DUT 管脚 = 负载 RL'),
-  open: loc('开路'),
-  clampOff: loc('钳位：关'),
-  clampHit: loc('钳位生效'),
-  danger: loc('危险！'),
-  gnd: loc('地 / VSS'),
-  pass: loc('Pass 区'),
-  clamp: loc('钳位'),
-  meas: loc('读数'),
-  cap: loc('上半部分是 PMU 和负载；下面的数轴上，绿色是 Pass 区，金色是读数，红色虚线是钳位。'),
+  dut: loc('DUT 管脚 = 负载 RL', 'DUT pin = load RL'),
+  open: loc('开路', 'Open'),
+  clampOff: loc('钳位：关', 'Clamp: off'),
+  clampHit: loc('钳位生效', 'Clamp active'),
+  danger: loc('危险！', 'Danger!'),
+  gnd: loc('地 / VSS', 'Ground / VSS'),
+  pass: loc('Pass 区', 'Pass zone'),
+  clamp: loc('钳位', 'Clamp'),
+  meas: loc('读数', 'Reading'),
+  cap: loc(
+    '上半部分是 PMU 和负载；下面的数轴上，绿色是 Pass 区，金色是读数，红色虚线是钳位。',
+    'Top: the PMU and load. On the axis below, green is the pass zone, gold is the reading, and the red dashed line is the clamp.',
+  ),
 }
 
 export function PmuFig({
@@ -190,13 +193,19 @@ export function PmuFig({
 /* ---------- Kelvin 四线制 ---------- */
 
 const KL = {
-  wire: loc('导线电阻'),
-  out: loc('PMU 输出'),
-  dut: loc('DUT 上'),
-  kelvin: loc('Kelvin 连接点'),
-  local: loc('Sense 接在 PMU 出口'),
-  cap2: loc('两线制：Sense 在 PMU 内部就接到 Force 上，导线压降没人管。'),
-  cap4: loc('四线制：Sense 线一直拉到 DUT，在 Kelvin 连接点和 Force 线汇合。'),
+  wire: loc('导线电阻', 'Wire R'),
+  out: loc('PMU 输出', 'PMU out'),
+  dut: loc('DUT 上', 'At DUT'),
+  kelvin: loc('Kelvin 连接点', 'Kelvin connection'),
+  local: loc('Sense 接在 PMU 出口', 'Sense tied at PMU output'),
+  cap2: loc(
+    '两线制：Sense 在 PMU 内部就接到 Force 上，导线压降没人管。',
+    'Two-wire: Sense is tied to Force inside the PMU, so nothing corrects for the wire drop.',
+  ),
+  cap4: loc(
+    '四线制：Sense 线一直拉到 DUT，在 Kelvin 连接点和 Force 线汇合。',
+    'Four-wire: the Sense lines run all the way to the DUT and join the Force lines at the Kelvin connection.',
+  ),
 }
 
 export function KelvinFig({ four, rw, iMa, vOut, vDut }: { four: boolean; rw: number; iMa: number; vOut: number; vDut: number }) {
@@ -274,8 +283,8 @@ export function KelvinFig({ four, rw, iMa, vOut, vDut }: { four: boolean; rw: nu
 /* ---------- 量程切换毛刺 ---------- */
 
 const RL = {
-  dut: loc('DUT 管脚上的电压'),
-  spike: loc('换量程的毛刺'),
+  dut: loc('DUT 管脚上的电压', 'Voltage at DUT pin'),
+  spike: loc('换量程的毛刺', 'Range-change glitch'),
 }
 
 export function RangeFig({ volt, glitch }: { volt: number; glitch: boolean }) {

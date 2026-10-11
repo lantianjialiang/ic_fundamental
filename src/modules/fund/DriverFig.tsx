@@ -2,11 +2,14 @@ import { useLocale } from '../../i18n/LocaleContext'
 import { loc } from '../../i18n/locale'
 
 const L = {
-  pmu: loc('PMU'),
-  out: loc('输出脚'),
-  cap: loc('输出级可以看成两只开关电阻：上拉 Rp 接 VDD，下拉 Rn 接地。哪只导通由预处理向量决定；黄色是此刻电流走的路。'),
-  in: loc('灌入'),
-  outI: loc('抽出'),
+  pmu: loc('PMU', 'PMU'),
+  out: loc('输出脚', 'Output pin'),
+  cap: loc(
+    '输出级可以看成两只开关电阻：上拉 Rp 接 VDD，下拉 Rn 接地。哪只导通由预处理向量决定；黄色是此刻电流走的路。',
+    'The output stage can be modeled as two switched resistors: pull-up Rp to VDD and pull-down Rn to ground. The preconditioning vectors decide which one is on; yellow shows the current path right now.',
+  ),
+  in: loc('灌入', 'Sink'),
+  outI: loc('抽出', 'Source'),
 }
 
 /** test: 测哪一项；high: 输出实际是否为高 */

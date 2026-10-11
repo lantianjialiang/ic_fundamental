@@ -3,18 +3,18 @@ import { loc } from '../../i18n/locale'
 import { type Rig, type SuspectId } from './data/debug'
 
 const L = {
-  prog: loc('测试程序'),
-  progSub: loc('存在测试机内存里'),
-  tester: loc('测试机'),
-  pe: loc('Pin Electronics / PMU'),
-  iface: loc('接口硬件'),
-  board: loc('负载板'),
-  socket: loc('插座'),
-  empty: loc('空座'),
-  std: loc('标准品'),
-  removed: loc('已拆下'),
-  cap: loc('四个嫌疑对象，从测试程序到芯片排成一条链。点任意一块看它的解释。'),
-  capRig: loc('当前这次实验的配置：灰色虚线表示被拿掉的部分。'),
+  prog: loc('测试程序', 'Test program'),
+  progSub: loc('存在测试机内存里', 'Stored in tester memory'),
+  tester: loc('测试机', 'Tester'),
+  pe: loc('Pin Electronics / PMU', 'Pin Electronics / PMU'),
+  iface: loc('接口硬件', 'Interface hardware'),
+  board: loc('负载板', 'Load board'),
+  socket: loc('插座', 'Socket'),
+  empty: loc('空座', 'Empty'),
+  std: loc('标准品', 'Std'),
+  removed: loc('已拆下', 'removed'),
+  cap: loc('四个嫌疑对象，从测试程序到芯片排成一条链。点任意一块看它的解释。', 'The four suspects form a chain from the test program to the device. Click any block to see its explanation.'),
+  capRig: loc('当前这次实验的配置：灰色虚线表示被拿掉的部分。', 'Setup for the current experiment: gray dashed lines mark removed parts.'),
 }
 
 export function DebugFig({

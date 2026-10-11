@@ -5,15 +5,18 @@ import { DICE, DIE_BINS, WAFER } from './data/ate'
 /* ---------- 晶圆探针测试 ---------- */
 
 const WL = {
-  notch: loc('缺口'),
-  pm: loc('紫色 = process monitor die'),
-  pick: loc('点一颗 die 放大看'),
+  notch: loc('缺口', 'Notch'),
+  pm: loc('紫色 = process monitor die', 'Purple = process monitor die'),
+  pick: loc('点一颗 die 放大看', 'Click a die to magnify'),
   pad: 'bond pad',
   mark: 'probe mark',
-  untested: loc('未测'),
-  pmDie: loc('process monitor die（工艺监控片）'),
-  ink: loc('墨点'),
-  cap: loc('黄色方框是探针当前的位置。绿色是好片；坏片在“打墨点”模式下点红点，在“电子晶圆图”模式下显示 Bin 号。'),
+  untested: loc('未测', 'Untested'),
+  pmDie: loc('process monitor die（工艺监控片）', 'Process monitor die'),
+  ink: loc('墨点', 'Ink dot'),
+  cap: loc(
+    '黄色方框是探针当前的位置。绿色是好片；坏片在“打墨点”模式下点红点，在“电子晶圆图”模式下显示 Bin 号。',
+    'The yellow box is the current probe position. Green dice are good; bad dice get a red dot in "Ink dot" mode and show their bin number in "Wafer map" mode.',
+  ),
 }
 
 export function WaferFig({
@@ -172,10 +175,13 @@ export function WaferFig({
 /* ---------- 分选机分 Bin ---------- */
 
 const HL = {
-  input: loc('未测 Bin'),
-  site: loc('测试位'),
+  input: loc('未测 Bin', 'Untested bin'),
+  site: loc('测试位', 'Test site'),
   contactor: 'contactor',
-  cap: loc('分选机从未测 Bin 取一颗芯片送到测试位，测试机判完结果告诉分选机，芯片被放进对应的 Bin。'),
+  cap: loc(
+    '分选机从未测 Bin 取一颗芯片送到测试位，测试机判完结果告诉分选机，芯片被放进对应的 Bin。',
+    'The handler takes a chip from the untested bin to the test site; the tester judges it and tells the handler, and the chip is placed in the matching bin.',
+  ),
 }
 
 export type BinBox = { id: string; label: LText; count: number; good: boolean }

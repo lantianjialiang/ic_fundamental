@@ -1,0 +1,50 @@
+/* D05 从 Datasheet 到 Test Spec 专用样式 */
+
+.m05-box {
+  cursor: pointer;
+}
+
+.m05-box:focus-visible rect {
+  stroke: var(--sky);
+  stroke-width: 2;
+}
+
+.m05-guess {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.m05-guess__row {
+  display: grid;
+  grid-template-columns: 110px 140px auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  background: var(--card);
+  font-size: var(--fs);
+}
+
+.m05-guess__row b {
+  font-family: var(--mono);
+  color: var(--text);
+}
+
+.m05-guess__row span {
+  font-family: var(--mono);
+  color: var(--muted);
+}
+
+.m05-guess__row em {
+  font-style: normal;
+  color: var(--text-2);
+}
+
+@media (max-width: 720px) {
+  .m05-guess__row {
+    grid-template-columns: 1fr 1fr;
+  }
+}

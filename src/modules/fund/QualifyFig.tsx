@@ -13,10 +13,10 @@ import {
 } from './data/qualify'
 
 const L = {
-  marginAria: loc('每个参数离失效还有多少余量'),
-  pull: loc('拉偏'),
-  shmooAria: loc('四个向量的 VDD vs. VIL Shmoo 图'),
-  spec: loc('规格点'),
+  marginAria: loc('每个参数离失效还有多少余量', 'How much margin each parameter has before failing'),
+  pull: loc('拉偏', 'Push'),
+  shmooAria: loc('四个向量的 VDD vs. VIL Shmoo 图', 'VDD vs. VIL Shmoo plots for four vector sets'),
+  spec: loc('规格点', 'Spec'),
 }
 
 const MX0 = 120

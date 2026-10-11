@@ -1,110 +1,123 @@
-import { useLocale } from '../../../i18n/LocaleContext'
-import { ui } from '../../../i18n/ui'
-import { CHANNEL_COUNT, DUT, LOAD_BOARD, SOCKET, bgaXZ, channelX, layerY } from '../data/layout'
-import { ftBoardRoute } from '../data/pcbRouting'
-import { PcbCopper } from './PcbCopper'
-import { SceneLabel } from './SceneLabel'
+import { RoundedBox } from '@react-three/drei'
+import { useMemo } from 'react'
+import { MeshStandardMaterial } from 'three'
+import { useScene } from '../context/SceneContext'
+import { CHANNEL_COUNT, LB, SOCKET, allContacts, ftRoute, qfpLeads, towerPinXZ, QFP } from '../data/layout'
+import { GEO, MAT } from '../data/materials'
+import { lbSilkTexture } from '../data/textures'
+import { BoardCopper } from './BoardCopper'
+import { InstancedParts, type InstanceItem } from './Instanced'
+import { LayerGroup } from './LayerGroup'
 
-type LoadBoardProps = {
-  progress: number
-  selectedChannel: number | null
-  onSelect: (channel: number) => void
-}
+const TOP = LB.y + LB.t / 2
+const BOTTOM = LB.y - LB.t / 2
 
-export function LoadBoard({ progress, selectedChannel, onSelect }: LoadBoardProps) {
-  const { t } = useLocale()
-  const y = layerY(LOAD_BOARD, progress)
-  const { w, h, d } = LOAD_BOARD.body
-  const holeR = 0.07
-  const holeInset = 0.22
+/** Load Board / DIB：FR4 阻焊绿 + 沉金焊盘 + 丝印 + 元件；内层走线由 BoardCopper 画 */
+export function LoadBoard() {
+  const { cfg } = useScene()
+  const silk = useMemo(
+    () => new MeshStandardMaterial({ map: lbSilkTexture(), transparent: true, roughness: 0.6, depthWrite: false }),
+    [],
+  )
+
+  const routes = useMemo(() => Array.from({ length: CHANNEL_COUNT }, (_, ch) => ftRoute(cfg.pkg, ch)), [cfg.pkg])
+
+  const topPads = useMemo<InstanceItem[]>(() => {
+    if (cfg.pkg === 'BGA') return allContacts('BGA').map(([x, z]) => ({ p: [x, TOP + 0.003, z], s: [0.034, 0.006, 0.034] }))
+    return qfpLeads().map((l) => ({
+      p: [l.x + l.nx * QFP.footReach, TOP + 0.003, l.z + l.nz * QFP.footReach],
+      r: [0, l.rotY, 0],
+      s: [0.12, 0.006, 0.036],
+    }))
+  }, [cfg.pkg])
+
+  const bottomPads = useMemo<InstanceItem[]>(
+    () => towerPinXZ('FT').map(([x, z]) => ({ p: [x, BOTTOM - 0.003, z], s: [0.024, 0.006, 0.024] })),
+    [],
+  )
+
+  const { caps, terms } = useMemo(() => {
+    const caps: InstanceItem[] = []
+    const terms: InstanceItem[] = []
+    const off = SOCKET.outer / 2 + 0.2
+    for (let side = 0; side < 4; side += 1) {
+      for (let k = 0; k < 9; k += 1) {
+        const t = (k - 4) * 0.2
+        const horiz = side % 2 === 0
+        const x = horiz ? t : side === 1 ? off : -off
+        const z = horiz ? (side === 0 ? off : -off) : t
+        caps.push({ p: [x, TOP + 0.024, z], r: [0, horiz ? 0 : Math.PI / 2, 0], s: [0.09, 0.045, 0.05] })
+        const dx = horiz ? 0.04 : 0
+        const dz = horiz ? 0 : 0.04
+        terms.push({ p: [x - dx, TOP + 0.024, z - dz], s: [horiz ? 0.018 : 0.052, 0.047, horiz ? 0.052 : 0.018] })
+        terms.push({ p: [x + dx, TOP + 0.024, z + dz], s: [horiz ? 0.018 : 0.052, 0.047, horiz ? 0.052 : 0.018] })
+      }
+    }
+    return { caps, terms }
+  }, [])
+
+  const relays = useMemo<InstanceItem[]>(
+    () =>
+      Array.from({ length: 6 }, (_, i) => ({
+        p: [(i < 3 ? -1 : 1) * 1.6, TOP + 0.08, ((i % 3) - 1) * 0.42],
+        s: [0.3, 0.16, 0.2],
+      })),
+    [],
+  )
+
+  const connectors = useMemo<InstanceItem[]>(
+    () => [
+      { p: [-2.12, TOP + 0.07, -0.1], s: [0.16, 0.14, 1.3] },
+      { p: [2.12, TOP + 0.07, -0.1], s: [0.16, 0.14, 1.3] },
+    ],
+    [],
+  )
+  const connectorPins = useMemo<InstanceItem[]>(() => {
+    const out: InstanceItem[] = []
+    for (const x of [-2.12, 2.12]) {
+      for (let k = 0; k < 12; k += 1) out.push({ p: [x, TOP + 0.145, -0.65 + k * 0.1], s: [0.06, 0.012, 0.03] })
+    }
+    return out
+  }, [])
+  const sma = useMemo<InstanceItem[]>(
+    () => [-1.2, -0.4, 0.4, 1.2].map((x) => ({ p: [x, TOP + 0.06, LB.d / 2 - 0.02], r: [Math.PI / 2, 0, 0], s: [0.06, 0.16, 0.06] })),
+    [],
+  )
+  const screws = useMemo<InstanceItem[]>(
+    () =>
+      [
+        [-2.03, 1.53],
+        [2.03, 1.53],
+        [-2.03, -1.53],
+        [2.03, -1.53],
+      ].map(([x, z]) => ({ p: [x!, TOP + 0.015, z!], s: [0.05, 0.03, 0.05] })),
+    [],
+  )
 
   return (
-    <group position={[0, y, 0]}>
-      <mesh receiveShadow castShadow>
-        <boxGeometry args={[w, h, d]} />
-        <meshStandardMaterial color="#2f6b3a" roughness={0.7} metalness={0.08} transparent opacity={0.72} />
-      </mesh>
-
-      {(
-        [
-          [-w / 2 + holeInset, -d / 2 + holeInset],
-          [w / 2 - holeInset, -d / 2 + holeInset],
-          [-w / 2 + holeInset, d / 2 - holeInset],
-          [w / 2 - holeInset, d / 2 - holeInset],
-        ] as const
-      ).map(([hx, hz]) => (
-        <mesh key={`${hx}-${hz}`} position={[hx, h / 2 + 0.002, hz]}>
-          <cylinderGeometry args={[holeR, holeR, 0.02, 16]} />
-          <meshStandardMaterial color="#1a1f24" roughness={0.8} metalness={0.1} />
-        </mesh>
-      ))}
-
-      <mesh position={[0, -h / 2 - 0.03, LOAD_BOARD.connectorZ]}>
-        <boxGeometry args={[CHANNEL_COUNT * 0.2 + 0.2, 0.06, 0.28]} />
-        <meshStandardMaterial color="#2a2e34" roughness={0.45} metalness={0.3} />
-      </mesh>
-      {Array.from({ length: CHANNEL_COUNT }, (_, i) => (
-        <mesh
-          key={i}
-          position={[channelX(i), -h / 2 - 0.055, LOAD_BOARD.connectorZ]}
-          onClick={(event) => {
-            event.stopPropagation()
-            onSelect(i)
-          }}
-        >
-          <cylinderGeometry args={[0.03, 0.03, 0.04, 10]} />
-          <meshStandardMaterial
-            color={selectedChannel === i ? '#f0d56a' : '#b08d3e'}
-            emissive={selectedChannel === i ? '#8a7018' : '#000000'}
-            roughness={0.35}
-            metalness={0.5}
-          />
-        </mesh>
-      ))}
-
-      <mesh position={[0, h / 2 + 0.003, 0]}>
-        <boxGeometry args={[SOCKET.body.w + 0.18, 0.008, SOCKET.body.d + 0.18]} />
-        <meshStandardMaterial color="#245530" roughness={0.75} metalness={0.05} />
-      </mesh>
-      {Array.from({ length: DUT.grid }, (_, row) =>
-        Array.from({ length: DUT.grid }, (_, col) => {
-          const [x, z] = bgaXZ(col, row)
-          return (
-            <mesh key={`pad-${col}-${row}`} position={[x, h / 2 + 0.012, z]}>
-              <cylinderGeometry args={[0.038, 0.038, 0.018, 12]} />
-              <meshStandardMaterial color="#e0c36a" roughness={0.32} metalness={0.55} />
-            </mesh>
-          )
-        }),
-      )}
-
-      {Array.from({ length: CHANNEL_COUNT }, (_, i) => (
-        <PcbCopper
-          key={`net-${i}`}
-          nodes={ftBoardRoute(i)}
-          thickness={h}
-          selected={selectedChannel === i}
-          dimmed={selectedChannel !== null && selectedChannel !== i}
-          onSelect={() => onSelect(i)}
-        />
-      ))}
-
-      <mesh position={[-1.55, h / 2 + 0.04, -0.55]} rotation={[0, 0.2, 0]}>
-        <boxGeometry args={[0.22, 0.07, 0.1]} />
-        <meshStandardMaterial color="#3d2a1c" roughness={0.6} metalness={0.05} />
-      </mesh>
-      <mesh position={[1.45, h / 2 + 0.035, -0.4]}>
-        <boxGeometry args={[0.16, 0.06, 0.1]} />
-        <meshStandardMaterial color="#c4b48a" roughness={0.4} metalness={0.2} />
-      </mesh>
-
-      <SceneLabel
-        position={[0, h / 2 + 0.28, -d / 2 + 0.15]}
-        title="LOAD BOARD"
-        subtitle={t(ui.scene.lbSub)}
+    <LayerGroup id="loadboard">
+      <RoundedBox
+        args={[LB.w, LB.t, LB.d]}
+        radius={0.02}
+        smoothness={2}
+        position={[0, LB.y, 0]}
+        material={MAT.fr4Lb}
+        castShadow
+        receiveShadow
       />
-      <SceneLabel position={[0, -0.28, LOAD_BOARD.connectorZ + 0.28]} title={t(ui.scene.lbBottom)} />
-      <SceneLabel position={[0, 0.22, 0]} title={t(ui.scene.lbTop)} />
-    </group>
+      <mesh position={[0, TOP + 0.0015, 0]} rotation={[-Math.PI / 2, 0, 0]} material={silk}>
+        <planeGeometry args={[LB.w, LB.d]} />
+      </mesh>
+      <InstancedParts geometry={cfg.pkg === 'BGA' ? GEO.cyl : GEO.box} material={MAT.gold} items={topPads} />
+      <InstancedParts geometry={GEO.cyl} material={MAT.gold} items={bottomPads} />
+      <InstancedParts geometry={GEO.box} material={MAT.mlcc} items={caps} />
+      <InstancedParts geometry={GEO.box} material={MAT.solder} items={terms} />
+      <InstancedParts geometry={GEO.box} material={MAT.mold} items={relays} castShadow />
+      <InstancedParts geometry={GEO.box} material={MAT.mold} items={connectors} castShadow />
+      <InstancedParts geometry={GEO.box} material={MAT.gold} items={connectorPins} />
+      <InstancedParts geometry={GEO.cyl6} material={MAT.gold} items={sma} castShadow />
+      <InstancedParts geometry={GEO.cyl} material={MAT.steel} items={screws} />
+      <BoardCopper routes={routes} boardY={LB.y} thickness={LB.t} selected={cfg.selected} onSelect={cfg.onSelect} />
+    </LayerGroup>
   )
 }

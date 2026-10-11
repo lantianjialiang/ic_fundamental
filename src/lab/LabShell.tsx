@@ -4,6 +4,7 @@ import { ui } from '../i18n/ui'
 import { MODULE_IDS, type ModuleId } from '../modules/catalog'
 import { LESSON_TITLE } from '../modules/titles'
 import { lessonCode } from '../tracks/catalog'
+import { Copyright } from './Copyright'
 import { LabHeader } from './LabHeader'
 import { useLabNav } from './LabNavContext'
 
@@ -68,6 +69,7 @@ export function LabShell({
       <LabHeader title={`${lessonCode(moduleId)} · ${title}`} goal={goal} nav={nav} />
       {children}
       {footer}
+      <Copyright />
     </div>
   )
 }

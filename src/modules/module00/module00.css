@@ -1,0 +1,68 @@
+/* D01 什么是半导体测试 专用样式 */
+
+.m00-hit {
+  cursor: pointer;
+}
+
+.m00-hit:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.m00-params {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.m00-params b {
+  margin-right: 6px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.m00-terms {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 8px;
+}
+
+.m00-term {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+  color: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.m00-term:hover {
+  background: var(--card-hover);
+}
+
+.m00-term.is-active {
+  border-color: var(--gold-line);
+  background: var(--gold-bg);
+}
+
+.m00-thumb {
+  flex: none;
+  width: 44px;
+  height: 28px;
+  border-radius: 3px;
+}
+
+.m00-art {
+  max-width: 520px;
+}
+
+.m00-art figcaption b {
+  margin-right: 4px;
+  color: var(--text);
+}

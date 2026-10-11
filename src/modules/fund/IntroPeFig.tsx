@@ -14,18 +14,21 @@ import {
 } from './data/intro'
 
 const L = {
-  rvs: loc('VIH / VIL ← RVS'),
-  driver: loc('驱动器'),
-  cmp: loc('电压比较器'),
-  load: loc('电流负载'),
+  rvs: loc('VIH / VIL ← RVS', 'VIH / VIL ← RVS'),
+  driver: loc('驱动器', 'Driver'),
+  cmp: loc('电压比较器', 'Voltage comparator'),
+  load: loc('电流负载', 'Current load'),
   pmu: 'PMU',
-  icmp: loc('电流比较器'),
-  read0: loc('读成 0'),
-  read1: loc('读成 1'),
-  readX: loc('中间：三态或坏'),
-  switching: loc('切换中：先断开，再闭合'),
-  conflict: loc('I/O 冲突！'),
-  cap: loc('一个测试通道（对应教材 Figure 3-5）。金色是当前导通的路径；F1 / F2 是高速 FET 开关，K1 / K2 / K3 是继电器。'),
+  icmp: loc('电流比较器', 'Current comparator'),
+  read0: loc('读成 0', 'Reads 0'),
+  read1: loc('读成 1', 'Reads 1'),
+  readX: loc('中间：三态或坏', 'Between: tri-state or bad'),
+  switching: loc('切换中：先断开，再闭合', 'Switching: break, then make'),
+  conflict: loc('I/O 冲突！', 'I/O conflict!'),
+  cap: loc(
+    '一个测试通道（对应教材 Figure 3-5）。金色是当前导通的路径；F1 / F2 是高速 FET 开关，K1 / K2 / K3 是继电器。',
+    'One test channel (textbook Figure 3-5). Gold marks the currently conducting path; F1 / F2 are high-speed FET switches and K1 / K2 / K3 are relays.',
+  ),
 }
 
 function HSw({ x1, x2, y, on, label, color }: { x1: number; x2: number; y: number; on: boolean; label: string; color: string }) {

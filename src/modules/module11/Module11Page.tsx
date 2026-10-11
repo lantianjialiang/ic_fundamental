@@ -1,67 +1,28 @@
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
+import { StepControls, useStepPlayer } from '../../lab/StepPlayer'
+import { Callout, Seg } from '../fund/parts'
 import { type ModuleId } from '../catalog'
-import {
-  ADVANCED,
-  CHAINS,
-  FF_EXPLAIN,
-  QUIZ,
-  STEPS,
-  TAKEAWAY,
-  type AdvId,
-  type ChainId,
-  type StepId,
-} from './data/content'
-import { FfFig, ScanFfFig } from './FfFig'
-import { ScanKindFig } from './ScanKindFig'
+import { ADVANCED, BIG_STEPS, FAULTS, L, PHASE_LABEL, QUIZ, TAKEAWAY, buildFrames, type FaultId } from './data/content'
+import { FfFig } from './FfFig'
+import { ScanPlayFig } from './ScanPlayFig'
+import './scan.css'
 
 type Module11PageProps = {
   moduleId: ModuleId
   onModuleChange: (id: ModuleId) => void
 }
 
-type Focus =
-  | { kind: 'ff' }
-  | { kind: 'chain'; id: ChainId }
-  | { kind: 'step'; id: StepId }
-  | { kind: 'adv'; id: AdvId }
-  | { kind: 'takeaway' }
-
-const ORDER: StepId[] = ['shift1', 'capture', 'shift2', 'compare']
-
 export function Module11Page({ moduleId, onModuleChange }: Module11PageProps) {
   const { t } = useLocale()
-  const [focus, setFocus] = useState<Focus>({ kind: 'ff' })
-  const [advId, setAdvId] = useState<AdvId>('mux')
-  const [playing, setPlaying] = useState(false)
-  const [pulse, setPulse] = useState<StepId | null>(null)
-
-  useEffect(() => {
-    if (!playing) return
-    let step = 0
-    setPulse(ORDER[0])
-    setFocus({ kind: 'step', id: ORDER[0] })
-    const timer = window.setInterval(() => {
-      step += 1
-      if (step >= ORDER.length) {
-        window.clearInterval(timer)
-        setPlaying(false)
-        setPulse(null)
-        return
-      }
-      const id = ORDER[step]
-      setPulse(id)
-      setFocus({ kind: 'step', id })
-    }, 700)
-    return () => window.clearInterval(timer)
-  }, [playing])
-
-  const activeStep = focus.kind === 'step' ? focus.id : pulse
-  const adv = ADVANCED.find((item) => item.id === advId)
-  const detail = resolveDetail(focus, t)
+  const [fault, setFault] = useState<FaultId>('none')
+  const frames = useMemo(() => buildFrames(fault), [fault])
+  const player = useStepPlayer(frames.length, 1100)
+  const frame = frames[Math.min(player.step, frames.length - 1)]
+  const tone = frame.phase === 'compare' ? (fault === 'none' ? 'ok' : 'bad') : undefined
 
   return (
     <LessonFrame
@@ -69,131 +30,75 @@ export function Module11Page({ moduleId, onModuleChange }: Module11PageProps) {
       onModuleChange={onModuleChange}
       title={t(ui.m11.title)}
       goal={t(ui.m11.goal)}
-      kicker={detail.kicker}
-      asideTitle={detail.title}
-      asideText={detail.text}
+      kicker={t(L.kicker)}
+      asideTitle={t(PHASE_LABEL[frame.phase])}
+      asideText={t(frame.caption)}
       asideLater={t(ui.m11.asideLater)}
       nextId="program"
-      nextLabel={t(ui.m11.next)}
+      nextLabel={t(ui.m11.next) + t(ui.m12.title)}
     >
-      <Section title={t(ui.m11.introTitle)}>
-        <p>{t(ui.m11.introBody)}</p>
+      <Section title={t(L.introTitle)}>
+        <p>{t(L.introBody)}</p>
       </Section>
 
-      <Section title={t(ui.m11.ffTitle)} note={t(ui.m11.ffNote)}>
-        <button
-          type="button"
-          className={`takeaway${focus.kind === 'ff' ? ' is-active' : ''}`}
-          onClick={() => setFocus({ kind: 'ff' })}
-        >
-          {t(ui.m11.ffLead)}
-        </button>
-        <FfFig t={t} />
-        <ScanFfFig t={t} />
-        <div className="term-explain">
-          {FF_EXPLAIN.map((para) => (
-            <p key={para.zh}>{t(para)}</p>
-          ))}
+      <Section title={t(L.ffTitle)} note={t(L.ffNote)}>
+        <FfFig />
+      </Section>
+
+      <Section title={t(L.playTitle)} note={t(L.playNote)}>
+        <div className="m11-faults">
+          <Seg options={FAULTS} value={fault} onChange={setFault} />
         </div>
-      </Section>
-
-      <Section title={t(ui.m11.chainTitle)} note={t(ui.m11.chainNote)}>
-        <div className="pick pick--2">
-          {CHAINS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`pick__card${focus.kind === 'chain' && focus.id === item.id ? ' is-active' : ''}`}
-              onClick={() => setFocus({ kind: 'chain', id: item.id })}
-            >
-              <strong>{t(item.title)}</strong>
-              <span className="mono">{item.diagram}</span>
-            </button>
-          ))}
-        </div>
-      </Section>
-
-      <Section title={t(ui.m11.playTitle)} note={t(ui.m11.playNote)}>
         <div className="steps">
-          {STEPS.map((item, index) => (
+          {BIG_STEPS.map((item) => (
             <button
               key={item.id}
               type="button"
-              className={`steps__box${activeStep === item.id ? ' is-active' : ''}`}
-              onClick={() => setFocus({ kind: 'step', id: item.id })}
+              className={`steps__box${item.phases.includes(frame.phase) ? ' is-active' : ''}`}
+              onClick={() => player.goTo(frames.findIndex((f) => item.phases.includes(f.phase)))}
             >
-              {index + 1}. {item.title}
+              {t(item.label)}
             </button>
           ))}
         </div>
-        <button
-          type="button"
-          className="lab__btn lab__btn--primary"
-          disabled={playing}
-          onClick={() => setPlaying(true)}
-        >
-          {playing ? t(ui.m11.playing) : t(ui.m11.play)}
-        </button>
+        <ScanPlayFig frame={frame} fault={fault} />
+        <Callout tone={tone}>
+          <p className="m11-caption">{t(frame.caption)}</p>
+        </Callout>
+        <StepControls player={player} stepLabels={frames.map((f) => PHASE_LABEL[f.phase])} />
       </Section>
 
-      <Section title={t(ui.m11.advTitle)} note={t(ui.m11.advNote)}>
-        <div className="pick pick--3">
-          {ADVANCED.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`pick__card${focus.kind === 'adv' && focus.id === item.id ? ' is-active' : ''}`}
-              onClick={() => {
-                setAdvId(item.id)
-                setFocus({ kind: 'adv', id: item.id })
-              }}
-            >
-              {item.title}
-            </button>
-          ))}
-        </div>
-        <ScanKindFig id={advId} t={t} />
-        {adv ? (
-          <div className="term-explain">
-            {adv.explain.map((para) => (
-              <p key={para.zh}>{t(para)}</p>
+      <Section title={t(L.advTitle)} note={t(L.advNote)}>
+        <table className="dtable">
+          <thead>
+            <tr>
+              <th>{t(L.colName)}</th>
+              <th>{t(L.colWhat)}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ADVANCED.map((row) => (
+              <tr key={row.id}>
+                <td>{t(row.name)}</td>
+                <td>{t(row.what)}</td>
+              </tr>
             ))}
-          </div>
-        ) : null}
+          </tbody>
+        </table>
+        <p className="intro__note">{t(L.advMore)}</p>
       </Section>
 
-      <Section title={t(ui.m11.takeawayTitle)}>
-        <button
-          type="button"
-          className={`takeaway${focus.kind === 'takeaway' ? ' is-active' : ''}`}
-          onClick={() => setFocus({ kind: 'takeaway' })}
-        >
-          {t(TAKEAWAY)}
-        </button>
+      <Section title={t(L.takeawayTitle)}>
+        <Callout tone="warn">
+          {TAKEAWAY.map((item) => (
+            <p key={item.zh}>{t(item)}</p>
+          ))}
+        </Callout>
       </Section>
 
-      <Section title={t(ui.m11.quizTitle)} note={t(ui.m11.quizNote)}>
-        <QuizList questions={QUIZ} yes={t(ui.m11.yes)} no={t(ui.m11.no)} />
+      <Section title={t(L.quizTitle)} note={t(L.quizNote)}>
+        <QuizList questions={QUIZ} yes={t(L.yes)} no={t(L.no)} />
       </Section>
     </LessonFrame>
   )
-}
-
-function resolveDetail(focus: Focus, t: (text: import('../../i18n/locale').LText | string) => string) {
-  if (focus.kind === 'takeaway') {
-    return { kicker: t(ui.m11.kickerTakeaway), title: t(ui.m11.kickerOne), text: t(TAKEAWAY) }
-  }
-  if (focus.kind === 'ff') {
-    return { kicker: t(ui.m11.kickerFf), title: 'FF', text: t(FF_EXPLAIN[0]) }
-  }
-  if (focus.kind === 'adv') {
-    const item = ADVANCED.find((node) => node.id === focus.id)
-    return { kicker: t(ui.m11.kickerAdv), title: item?.title ?? '', text: item ? t(item.text) : '' }
-  }
-  if (focus.kind === 'step') {
-    const item = STEPS.find((node) => node.id === focus.id)
-    return { kicker: t(ui.m11.kickerStep), title: item?.title ?? '', text: item ? t(item.text) : '' }
-  }
-  const item = CHAINS.find((node) => node.id === focus.id)
-  return { kicker: t(ui.m11.kickerChain), title: item ? t(item.title) : '', text: item ? t(item.text) : '' }
 }

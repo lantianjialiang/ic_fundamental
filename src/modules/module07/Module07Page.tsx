@@ -1,50 +1,40 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
+import { StepControls, useStepPlayer } from '../../lab/StepPlayer'
+import { Callout, Readout, Seg } from '../fund/parts'
 import { type ModuleId } from '../catalog'
-import { PATTERN, QUIZ, TAKEAWAY, VECTORS, type VecId } from './data/content'
+import { FAULTS, QUIZ, TAKEAWAY, VECTORS, dutOut, type Bit, type FaultId } from './data/content'
+import { VectorRunFig } from './VectorRunFig'
+import './module07.css'
 
 type Module07PageProps = {
   moduleId: ModuleId
   onModuleChange: (id: ModuleId) => void
 }
 
-type Focus = { kind: 'xor' } | { kind: 'vec'; id: VecId } | { kind: 'pattern' } | { kind: 'takeaway' }
+const NO_FLIP = VECTORS.map(() => false)
 
 export function Module07Page({ moduleId, onModuleChange }: Module07PageProps) {
   const { t } = useLocale()
-  const [focus, setFocus] = useState<Focus>({ kind: 'vec', id: '00' })
-  const [tamper, setTamper] = useState(false)
-  const [pulse, setPulse] = useState<VecId | null>(null)
-  const [playing, setPlaying] = useState(false)
+  const player = useStepPlayer(VECTORS.length, 1500)
+  const [fault, setFault] = useState<FaultId>('none')
+  const [flipped, setFlipped] = useState<boolean[]>(NO_FLIP)
 
-  useEffect(() => {
-    if (!playing) return
-    let step = 0
-    setPulse(VECTORS[0].id)
-    setFocus({ kind: 'vec', id: VECTORS[0].id })
-    const timer = window.setInterval(() => {
-      step += 1
-      if (step >= VECTORS.length) {
-        window.clearInterval(timer)
-        setPlaying(false)
-        setPulse(null)
-        return
-      }
-      const id = VECTORS[step].id
-      setPulse(id)
-      setFocus({ kind: 'vec', id })
-    }, 550)
-    return () => window.clearInterval(timer)
-  }, [playing])
+  const expected = VECTORS.map((row, i) => (flipped[i] ? 1 - row.y : row.y) as Bit)
+  const failRows = VECTORS.map((row, i) => (dutOut(row, fault).y === expected[i] ? 0 : i + 1)).filter(
+    (n) => n > 0 && n <= player.step + 1,
+  )
+  const row = VECTORS[player.step]
+  const char = (bit: Bit) => (bit ? 'H' : 'L')
+  const tampered = flipped.some(Boolean)
+  const faultText = FAULTS.find((item) => item.id === fault)?.text
+  const asideText =
+    fault !== 'none' && faultText ? t(faultText) : tampered ? t(ui.m07.tamperNote) : t(ui.m07.rowNote)
 
-  const expected = (id: VecId, y: 0 | 1) => (tamper && id === '10' ? (y === 1 ? 0 : 1) : y)
-  const fails = VECTORS.filter((row) => expected(row.id, row.y) !== row.y).map((row) => row.id)
-  const active = focus.kind === 'vec' ? focus.id : pulse
-  const current = VECTORS.find((row) => row.id === active) ?? VECTORS[0]
-  const detail = resolveDetail(focus, t, fails)
+  const restart = () => player.reset()
 
   return (
     <LessonFrame
@@ -52,9 +42,9 @@ export function Module07Page({ moduleId, onModuleChange }: Module07PageProps) {
       onModuleChange={onModuleChange}
       title={t(ui.m07.title)}
       goal={t(ui.m07.goal)}
-      kicker={detail.kicker}
-      asideTitle={detail.title}
-      asideText={detail.text}
+      kicker={`${t(ui.m07.kickerVec)} ${player.step + 1} / ${VECTORS.length}`}
+      asideTitle={`A=${row.a} B=${row.b} → ${t(ui.m07.expectY)} ${char(expected[player.step])}`}
+      asideText={asideText}
       asideLater={t(ui.m07.asideLater)}
       nextId="timing"
       nextLabel={t(ui.m07.next)}
@@ -63,112 +53,56 @@ export function Module07Page({ moduleId, onModuleChange }: Module07PageProps) {
         <p>{t(ui.m07.introBody)}</p>
       </Section>
 
-      <Section title={t(ui.m07.xorTitle)} note={t(ui.m07.xorNote)}>
-        <button
-          type="button"
-          className={`takeaway${focus.kind === 'xor' ? ' is-active' : ''}`}
-          onClick={() => setFocus({ kind: 'xor' })}
-        >
-          {t(ui.m07.xorBody)}
-        </button>
-        <div className="truth truth--spec">
-          <div className="truth__head">
-            <span>A</span>
-            <span>B</span>
-            <span>Y</span>
-            <span>{t(ui.m07.xorMeaning)}</span>
-          </div>
-          {VECTORS.map((row) => (
-            <div key={row.id} className="truth__row truth__row--static">
-              <span>{row.a}</span>
-              <span>{row.b}</span>
-              <span>{row.y}</span>
-              <span>{row.a === row.b ? t(ui.m07.xorSame) : t(ui.m07.xorDiff)}</span>
-            </div>
-          ))}
-        </div>
-        <p>{t(ui.m07.xorVsOr)}</p>
-      </Section>
-
       <Section title={t(ui.m07.tableTitle)} note={t(ui.m07.tableNote)}>
-        <div className="truth">
-          <div className="truth__head">
-            <span>A</span>
-            <span>B</span>
-            <span>Y</span>
-            <span>{t(ui.m07.compare)}</span>
-          </div>
-          {VECTORS.map((row) => {
-            const exp = expected(row.id, row.y)
-            const fail = exp !== row.y
-            return (
-              <button
-                key={row.id}
-                type="button"
-                className={`truth__row${active === row.id ? ' is-active' : ''}${fail ? ' is-bad' : ''}`}
-                onClick={() => setFocus({ kind: 'vec', id: row.id })}
-              >
-                <span>{row.a}</span>
-                <span>{row.b}</span>
-                <span>{exp}</span>
-                <span>{fail ? t(ui.m07.fail) : t(ui.m07.pass)}</span>
-              </button>
-            )
-          })}
-        </div>
-        <div className="truth__pins">
-          <div className={`pin${active ? ' is-drive' : ''}`}>
-            <b>{t(ui.m07.drive)}</b>
-            <span>
-              A={current.a} B={current.b}
-            </span>
-          </div>
-          <div className={`pin${active ? ' is-cmp' : ''}`}>
-            <b>{t(ui.m07.compare)}</b>
-            <span>
-              Y={current.y} → {expected(current.id, current.y)}
-            </span>
-          </div>
-        </div>
+        <Seg
+          options={FAULTS.map((item) => ({ id: item.id, label: item.label }))}
+          value={fault}
+          onChange={(id) => {
+            setFault(id)
+            restart()
+          }}
+        />
+        <VectorRunFig
+          step={player.step}
+          expected={expected}
+          flipped={flipped}
+          fault={fault}
+          onPick={player.goTo}
+          onFlip={(i) => {
+            setFlipped((prev) => prev.map((v, k) => (k === i ? !v : v)))
+            player.goTo(i)
+          }}
+        />
+        <StepControls
+          player={player}
+          nextLabel={ui.m07.nextRow}
+          stepLabels={VECTORS.map((vec) => ({ zh: `A=${vec.a} B=${vec.b}`, en: `A=${vec.a} B=${vec.b}` }))}
+        />
         <div className="row-actions">
-          <button
-            type="button"
-            className="lab__btn lab__btn--primary"
-            disabled={playing}
-            onClick={() => setPlaying(true)}
-          >
-            {playing ? t(ui.m07.running) : t(ui.m07.run)}
+          <button type="button" className="lab__btn" disabled={!tampered} onClick={() => setFlipped(NO_FLIP)}>
+            {t(ui.m07.restore)}
           </button>
-          <button type="button" className="lab__btn" onClick={() => setTamper((v) => !v)}>
-            {tamper ? t(ui.m07.restore) : t(ui.m07.tamper)}
-          </button>
-          <span>
-            {t(ui.m07.result)}{' '}
-            <b className={fails.length ? 'is-bad' : 'is-ok'}>
-              {fails.length ? `${t(ui.m07.fail)} ${fails.join(', ')}` : t(ui.m07.pass)}
-            </b>
-          </span>
         </div>
-      </Section>
-
-      <Section title={t(ui.m07.patternTitle)}>
-        <button
-          type="button"
-          className={`takeaway${focus.kind === 'pattern' ? ' is-active' : ''}`}
-          onClick={() => setFocus({ kind: 'pattern' })}
-        >
-          {t(PATTERN)}
-        </button>
+        <Readout
+          items={[
+            { label: ui.m07.ran, value: `${player.step + 1} / ${VECTORS.length}` },
+            {
+              label: ui.m07.failRows,
+              value: failRows.length ? failRows.join(', ') : '—',
+              state: failRows.length ? 'fail' : 'pass',
+            },
+          ]}
+        />
+        <Callout tone={fault === 'none' && !tampered ? 'ok' : 'warn'}>{asideText}</Callout>
+        <p className="intro__note">{t(ui.m07.charsNote)}</p>
       </Section>
 
       <Section title={t(ui.m07.takeawayTitle)}>
-        <button
-          type="button"
-          className={`takeaway${focus.kind === 'takeaway' ? ' is-active' : ''}`}
-          onClick={() => setFocus({ kind: 'takeaway' })}
-        >
-          {t(TAKEAWAY)}
-        </button>
+        <Callout tone="warn">
+          {TAKEAWAY.map((item) => (
+            <p key={item.zh}>{t(item)}</p>
+          ))}
+        </Callout>
       </Section>
 
       <Section title={t(ui.m07.quizTitle)} note={t(ui.m07.quizNote)}>
@@ -176,29 +110,4 @@ export function Module07Page({ moduleId, onModuleChange }: Module07PageProps) {
       </Section>
     </LessonFrame>
   )
-}
-
-function resolveDetail(
-  focus: Focus,
-  t: (text: import('../../i18n/locale').LText | string) => string,
-  fails: VecId[],
-) {
-  if (focus.kind === 'xor') {
-    return { kicker: t(ui.m07.kickerXor), title: t(ui.m07.xorTitle), text: t(ui.m07.xorVsOr) }
-  }
-  if (focus.kind === 'takeaway') {
-    return { kicker: t(ui.m07.kickerTakeaway), title: t(ui.m07.kickerOne), text: t(TAKEAWAY) }
-  }
-  if (focus.kind === 'pattern') {
-    return { kicker: t(ui.m07.kickerPat), title: 'Pattern', text: t(PATTERN) }
-  }
-  const row = VECTORS.find((item) => item.id === focus.id)
-  return {
-    kicker: t(ui.m07.kickerVec),
-    title: row ? `${row.a}${row.b} → Y` : '',
-    text:
-      fails.length > 0
-        ? t({ zh: `当前期望被改过。失败向量：${fails.join('、')}。对照真值表就能看到是哪一行。` })
-        : t({ zh: 'Drive 给出 A/B，Compare 在这一拍看 Y。四行都对就是 Pass。' }),
-  }
 }

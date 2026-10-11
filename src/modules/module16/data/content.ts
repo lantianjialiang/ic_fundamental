@@ -1,214 +1,152 @@
 import { loc, type LText } from '../../../i18n/locale'
 import { type QuizQuestion } from '../../../lab/QuizList'
 
-export type NodeId = 'vdd' | 'gnd' | 'out' | 'pnp' | 'npn' | 'rwell' | 'rsub'
+export type PartId = 'pnp' | 'npn' | 'rwell' | 'rsub' | 'pnpn'
 
-export const NODES: Array<{ id: NodeId; title: LText; text: LText; explain: LText[] }> = [
+/** 剖面图上可点选的部分 */
+export const PARTS: Array<{ id: PartId; title: LText; text: LText }> = [
   {
-    id: 'vdd',
-    title: loc('VDD'),
-    text: loc('电源。晶闸管一旦导通，电流从这里灌到地。'),
-    explain: [loc('Latch-up 的电流不走功能数据脚，走电源轨。所以先看 IDD，不要只看哪一拍 Compare 错。')],
-  },
-  {
-    id: 'gnd',
-    title: loc('GND'),
-    text: loc('地。低阻通路的另一端。'),
-    explain: [loc('VDD–GND 被寄生晶闸管短起来。限流、掉电，再和普通 Continuity 短路区分。')],
-  },
-  {
-    id: 'out',
-    title: loc('I/O'),
-    text: loc('过冲 / 欠冲常从 I/O 灌进衬底或阱，点着寄生管。'),
-    explain: [loc('输出脚被 ESD 管、过冲钳到阱或衬底。测试夹具振铃、上电顺序错，都可能从这里灌触发电流。')],
+    id: 'pnpn',
+    title: loc('PNPN 通路', 'PNPN path'),
+    text: loc(
+      'P+（接 VDD）→ N 阱 → P 衬底 → N+（接 GND）。四层交替，就是一只寄生晶闸管（SCR）。平时它关着；一旦导通，VDD 到 GND 只剩很小的电阻。',
+      'P+ (at VDD) → N-well → P-substrate → N+ (at GND). Four alternating layers form a parasitic thyristor (SCR). Normally off; once on, VDD to GND sees almost no resistance.',
+    ),
   },
   {
     id: 'pnp',
-    title: loc('寄生 PNP'),
-    text: loc('P+（发射极）/ N 阱（基极）/ P 衬底（集电极）。不是画在原理图上的那只 PMOS。'),
-    explain: [
-      loc('CMOS 的 PMOS 做在 N 阱里。P+ 源漏、N 阱、P 衬底这三层，无意中就是一只 PNP。'),
-      loc('阱电阻上的压降一旦让发射结正偏，这只管子就打开，把电流灌进衬底。'),
-    ],
+    title: loc('寄生 PNP', 'Parasitic PNP'),
+    text: loc(
+      'PMOS 的 P+ 源（发射极）/ N 阱（基极）/ P 衬底（集电极）。原理图上没有它，是 CMOS 结构自带的。',
+      'PMOS P+ source (emitter) / N-well (base) / P-substrate (collector). Not in the schematic; it comes with the CMOS structure.',
+    ),
   },
   {
     id: 'npn',
-    title: loc('寄生 NPN'),
-    text: loc('N+（发射极）/ P 衬底（基极）/ N 阱（集电极）。和 PNP 互为正反馈。'),
-    explain: [
-      loc('NMOS 的 N+ 源漏、P 衬底、N 阱这三层，无意中就是一只 NPN。'),
-      loc('衬底电流在 Rsub 上产生压降，NPN 打开，又给 PNP 的基极供电流。两只管子互相养活。'),
-    ],
+    title: loc('寄生 NPN', 'Parasitic NPN'),
+    text: loc(
+      'NMOS 的 N+ 源（发射极）/ P 衬底（基极）/ N 阱（集电极）。它的集电极就是 PNP 的基极——两只管子交叉相连。',
+      'NMOS N+ source (emitter) / P-substrate (base) / N-well (collector). Its collector is the PNP\'s base: the two transistors are cross-coupled.',
+    ),
   },
   {
     id: 'rwell',
-    title: loc('阱电阻 Rwell'),
-    text: loc('N 阱不是理想导体。电流流过就有压降，能把寄生 PNP 的发射结正偏。'),
-    explain: [loc('版图上阱接触太稀、阱太长，Rwell 就大，更容易被触发。DFT / 工艺会加密阱接触，这是防 Latch-up，不是 Scan。')],
+    title: loc('阱电阻 Rwell', 'Well resistance Rwell'),
+    text: loc(
+      'N 阱不是理想导体。有电流流过时产生压降，压降约 0.7 V 就能让 PNP 的发射结正偏。',
+      'The N-well is not a perfect conductor. Current through it builds a voltage; about 0.7 V forward-biases the PNP emitter junction.',
+    ),
   },
   {
     id: 'rsub',
-    title: loc('衬底电阻 Rsub'),
-    text: loc('P 衬底同样有电阻。衬底电流在这里产生压降，触发寄生 NPN。'),
-    explain: [loc('和 Rwell 成对。触发电流 × 电阻 ≥ 0.7 V 量级，寄生发射结就正偏。')],
+    title: loc('衬底电阻 Rsub', 'Substrate resistance Rsub'),
+    text: loc(
+      'P 衬底同样有电阻。衬底电流在这里产生压降，能让 NPN 的发射结正偏。',
+      'The P-substrate has resistance too. Substrate current builds a voltage here that can forward-bias the NPN emitter junction.',
+    ),
   },
 ]
 
-export type WordId = 'parasitic' | 'p' | 'n' | 'pnp' | 'npn' | 'pnpn' | 'scr' | 'fb' | 'hold'
-
-export const WORDS: Array<{ id: WordId; title: string; text: LText; explain: LText[] }> = [
+/** 分步动画：0 平时 → 1 触发 → 2 正反馈 → 3 低阻通路 → 4 撤触发 → 5 掉电 */
+export const PHASES: Array<{ title: LText; text: LText }> = [
   {
-    id: 'parasitic',
-    title: '寄生',
-    text: loc('不是原理图上画的那只管子。CMOS 把 P 和 N 交替做在一起，额外长出来的结构。'),
-    explain: [
-      loc('“寄生”= 你没下单，硅里却有。PMOS / NMOS 是设计出来的；PNP / NPN / PNPN 是版图层叠的副产品。'),
-      loc('所以 Latch-up 不是功能向量写错，是这块硅的结构被点着了。'),
-    ],
+    title: loc('平时：两只寄生管都关', 'Normal: both parasitics off'),
+    text: loc('VDD 到 GND 之间没有通路，IDD 只有微安级的静态电流。', 'There is no path from VDD to GND; IDD is only a few µA of quiescent current.'),
   },
   {
-    id: 'p',
-    title: 'P',
-    text: loc('P 型半导体：空穴多。图上常见于 PMOS 的源漏（P+）和整块 P 衬底。'),
-    explain: [
-      loc('P 接电源侧多：P+ 接到 VDD（PMOS 源）。P 衬底通常接地或偏置。'),
-      loc('记住：P 不是“正电源”的缩写，是掺杂类型。'),
-    ],
+    title: loc('触发：电流注入衬底', 'Trigger: current injected into the substrate'),
+    text: loc(
+      'I/O 过冲 / 欠冲、上电顺序错或 ESD，把一股电流灌进衬底。它流过 Rsub，压降让 NPN 打开。',
+      'An I/O overshoot or undershoot, a wrong power-up order or ESD injects current into the substrate. It flows through Rsub and the drop turns the NPN on.',
+    ),
   },
   {
-    id: 'n',
-    title: 'N',
-    text: loc('N 型半导体：电子多。图上常见于 N 阱，以及 NMOS 的源漏（N+）。'),
-    explain: [
-      loc('N 阱泡在 P 衬底里，里面再做 P+，就形成 PMOS。N+ 做在 P 衬底上，就是 NMOS。'),
-      loc('P 和 N 交替出现四层，就是后面的 P-N-P-N。'),
-    ],
+    title: loc('正反馈：两只管子互相喂', 'Positive feedback: each feeds the other'),
+    text: loc(
+      'NPN 从 N 阱抽电流 → Rwell 上有压降 → PNP 打开 → PNP 把电流灌回衬底 → NPN 开得更大。环路增益 > 1，自己越转越强。',
+      'The NPN pulls current from the N-well → drop across Rwell → PNP turns on → PNP pushes current back into the substrate → NPN turns on harder. Loop gain > 1, so it builds by itself.',
+    ),
   },
   {
-    id: 'pnp',
-    title: 'PNP',
-    text: loc('三层：P–N–P。这里是寄生双极型管：发射极 P+、基极 N 阱、集电极 P 衬底。'),
-    explain: [
-      loc('双极型管靠两种载流子。发射结正偏就放大电流。'),
-      loc('阱里的压降把 P+ / N 阱结正偏，PNP 导通，电流从 VDD 灌进衬底。'),
-    ],
+    title: loc('低阻通路：IDD 飙升', 'Low-resistance path: IDD soars'),
+    text: loc(
+      'VDD → P+ → N 阱 → P 衬底 → N+ → GND 整条导通，电流只被外部电阻和电源限流挡住，可到数百 mA 甚至安培级。',
+      'VDD → P+ → N-well → P-substrate → N+ → GND conducts end to end. Only external resistance and the supply current limit hold it back: hundreds of mA up to amperes.',
+    ),
   },
   {
-    id: 'npn',
-    title: 'NPN',
-    text: loc('三层：N–P–N。寄生的另一只：发射极 N+、基极 P 衬底、集电极 N 阱。'),
-    explain: [
-      loc('衬底压降把 N+ / P 衬底结正偏，NPN 导通，电流从阱抽到地。'),
-      loc('它的集电极正好是 PNP 的基极所在的阱——两只管子交叉耦合。'),
-    ],
+    title: loc('撤掉触发：仍然锁着', 'Trigger removed: still latched'),
+    text: loc(
+      '触发电流已经没了，但电源自己在供维持电流（高于 IH），环路不需要原来的触发源。改输入不能让它恢复。',
+      'The trigger is gone, but the supply itself provides the holding current (above IH); the loop no longer needs the trigger. Changing inputs will not recover it.',
+    ),
   },
   {
-    id: 'pnpn',
-    title: 'PNPN',
-    text: loc('四层叠：P–N–P–N。就是一只寄生晶闸管。从 VDD 的 P+ 到 GND 的 N+。'),
-    explain: [
-      loc('路径：P+（VDD）→ N 阱 → P 衬底 → N+（GND）。把 PNP 和 NPN 画在一起，共用中间两层。'),
-      loc('四个字要拆开读：两只三极管，不是四个独立电源。'),
-    ],
-  },
-  {
-    id: 'scr',
-    title: '晶闸管',
-    text: loc('Thyristor / SCR。PNPN 的名字。触发后自己维持，电流降到维持电流以下才熄。'),
-    explain: [
-      loc('和功能门不同：门要时钟、要输入；晶闸管点着就锁住，改数据脚不一定回来。'),
-      loc('ATE 上通常：限流 → 掉电 → 再上电。只重跑向量当普通 Fail，可能把芯片烫坏。'),
-    ],
-  },
-  {
-    id: 'fb',
-    title: '正反馈',
-    text: loc('PNP 的电流给 NPN 当基极电流，NPN 又给 PNP 当基极电流。互相养活。'),
-    explain: [
-      loc('负反馈会停；正反馈会锁。这就是“latch”。'),
-      loc('所以只把输入改回 0 往往不够：环路已经不靠原来的触发源了。'),
-    ],
-  },
-  {
-    id: 'hold',
-    title: '触发 / 维持',
-    text: loc('触发电流点着它；维持电流（holding current）让它不灭。掉电是为了把电流降下去。'),
-    explain: [
-      loc('I/O 过冲、上电顺序、ESD 事件提供触发。一旦导通，电源自己供维持电流。'),
-      loc('规格里会写 Latch-up 电流免疫。完整实验以后补；现在先能说出这两个电流。'),
-    ],
+    title: loc('掉电：唯一的解除办法', 'Power off: the only way out'),
+    text: loc(
+      'VDD 降到 0，电流降到维持电流以下，寄生管关断。重新上电后芯片恢复正常——前提是还没被烧坏。',
+      'With VDD at 0 the current falls below the holding current and the parasitics turn off. After power-up the chip works again, if it has not burned out.',
+    ),
   },
 ]
 
-export const LINKS: Array<{ id: string; title: LText; text: LText }> = [
-  {
-    id: 'seq',
-    title: loc('上电顺序'),
-    text: loc('I/O 先于电源、或电源脚之间不同步，都可能在寄生管上灌出触发电流。'),
-  },
-  {
-    id: 'idd',
-    title: loc('IDD 飙高'),
-    text: loc('功能向量还在跑，电源电流突然像短路。先限流，不要当成普通 Fail 反复硬测。'),
-  },
-  {
-    id: 'clamp',
-    title: loc('输出被钳在异常电压'),
-    text: loc('脚被拉到不像 0 也不像 1 的电位。改输入不一定回来。'),
-  },
-]
+export const TEST_NOTE = loc(
+  '测试时：IDD 突然像短路、输出被钳在异常电压、改输入回不来，都要想到 Latch-up——先靠电源限流保护芯片，再掉电。触发方法、测试步骤和参数详见 {@fLatch}。',
+  'In test: IDD suddenly looks like a short, an output is clamped at an odd voltage, or changing inputs does not help — think latch-up. Protect the chip with the supply current limit, then power down. Trigger methods, test steps and parameters are in {@fLatch}.',
+)
 
 export const TAKEAWAY = loc(
-  'Latch-up = 寄生 PNPN 晶闸管被点着后的电源低阻通路。正反馈自己维持，通常要掉电。不是功能向量写错。',
+  'Latch-up = CMOS 里寄生的 PNPN 被触发后，正反馈把 VDD–GND 锁成低阻通路；撤掉触发也不熄，只有掉电才解除。',
+  'Latch-up: once the parasitic PNPN in CMOS is triggered, positive feedback locks VDD–GND into a low-resistance path; it stays on after the trigger is removed and only power-down clears it.',
 )
 
 export const QUIZ: QuizQuestion[] = [
   {
     id: 'q1',
-    prompt: loc('Latch-up 是功能向量写错了吗？'),
+    prompt: loc('Latch-up 是功能向量写错了吗？', 'Is latch-up caused by wrong functional vectors?'),
     options: [
-      { id: 'yes', text: loc('是，改期望就能好') },
-      { id: 'no', text: loc('不是。是寄生 PNPN 被触发后的电源低阻通路') },
-      { id: 'scan', text: loc('是扫描链太长') },
-      { id: 'bin', text: loc('是 Bin 号冲突') },
+      { id: 'yes', text: loc('是，改期望值就能好', 'Yes; fix the expected values') },
+      { id: 'no', text: loc('不是。是寄生 PNPN 被触发后形成的电源低阻通路', 'No. It is a low-resistance supply path from a triggered parasitic PNPN') },
+      { id: 'scan', text: loc('是扫描链太长', 'The scan chain is too long') },
+      { id: 'bin', text: loc('是 Bin 号冲突', 'A bin number conflict') },
     ],
     answer: 'no',
-    explain: loc('向量错会按拍 Fail。Latch-up 是电流和电压失控，甚至要掉电。'),
+    explain: loc('向量错只会让某几拍比较失败；Latch-up 是电源电流失控。', 'A wrong vector fails a few compares; latch-up is a runaway supply current.'),
   },
   {
     id: 'q2',
-    prompt: loc('“寄生 PNPN”里的“寄生”指什么？'),
+    prompt: loc('寄生 NPN 的集电极连到哪里？', 'Where does the parasitic NPN\'s collector connect?'),
     options: [
-      { id: 'bug', text: loc('软件里的寄生电容模型') },
-      { id: 'extra', text: loc('CMOS 版图里 P/N 交替多出来的结构，不是原理图上那只管子') },
-      { id: 'esd', text: loc('就是 ESD 二极管的别名') },
-      { id: 'ff', text: loc('就是 Flip-Flop') },
+      { id: 'well', text: loc('N 阱，也就是 PNP 的基极', 'The N-well, which is the PNP\'s base') },
+      { id: 'gnd', text: loc('直接接 GND', 'Directly to GND') },
+      { id: 'gate', text: loc('NMOS 的栅极', 'The NMOS gate') },
+      { id: 'io', text: loc('只连 I/O 脚', 'Only the I/O pin') },
     ],
-    answer: 'extra',
-    explain: loc('P+ / N 阱 / P 衬底 / N+ 四层叠在一起，无意中就是晶闸管。'),
+    answer: 'well',
+    explain: loc('NPN 的集电极 = PNP 的基极，PNP 的集电极 = NPN 的基极。正是这种交叉相连形成正反馈。', 'NPN collector = PNP base, PNP collector = NPN base. This cross-coupling creates positive feedback.'),
   },
   {
     id: 'q3',
-    prompt: loc('触发之后，只把输入改回 0，一定恢复吗？'),
+    prompt: loc('触发之后撤掉触发电流，芯片会恢复吗？', 'After latch-up, does removing the trigger current recover the chip?'),
     options: [
-      { id: 'yes', text: loc('一定立刻恢复') },
-      { id: 'no', text: loc('不一定。正反馈自己维持，通常要掉电') },
-      { id: 'heat', text: loc('吹一下就好') },
-      { id: 'xor', text: loc('再跑一遍 XOR 就好') },
+      { id: 'yes', text: loc('会，立刻恢复', 'Yes, immediately') },
+      { id: 'no', text: loc('不会。电源自己供维持电流，必须掉电', 'No. The supply sustains the holding current; power must be removed') },
+      { id: 'xor', text: loc('再跑一遍向量就好', 'Rerun the vectors') },
+      { id: 'cool', text: loc('等它冷却就好', 'Wait for it to cool down') },
     ],
     answer: 'no',
-    explain: loc('holding current 还在，晶闸管不灭。ATE 上要限流、掉电，再和短路区分。'),
+    explain: loc('只要电流高于维持电流 IH，环路就不灭。掉电让电流降到 IH 以下才能解除。', 'As long as current stays above the holding current IH the loop stays on. Only power-down brings it below IH.'),
   },
   {
     id: 'q4',
-    prompt: loc('测试时哪些现象要想到 Latch-up？'),
+    prompt: loc('测试中出现哪种现象要先想到 Latch-up？', 'Which symptom in test should make you think of latch-up first?'),
     options: [
-      { id: 'one', text: loc('只有某一拍 Compare 错') },
-      { id: 'ok', text: loc('上电顺序、IDD 突然飙高、输出钳在异常电压') },
-      { id: 'name', text: loc('芯片丝印不清') },
-      { id: 'fmax', text: loc('只有 fMAX 规格写了 100 MHz') },
+      { id: 'one', text: loc('只有某一拍比较错', 'One cycle fails a compare') },
+      { id: 'ok', text: loc('IDD 突然像短路，改输入也回不来', 'IDD suddenly looks like a short and changing inputs does not help') },
+      { id: 'name', text: loc('芯片丝印不清', 'The marking is unreadable') },
+      { id: 'fmax', text: loc('fMAX 稍低', 'fMAX is slightly low') },
     ],
     answer: 'ok',
-    explain: loc('完整实验以后补。现在先能把它和普通功能 Fail、普通短路分开。'),
+    explain: loc('先靠电源限流保护芯片，再掉电；完整的闩锁测试在 {@fLatch}。', 'Protect the chip with the supply current limit, then power down. The full latch-up test is in {@fLatch}.'),
   },
 ]

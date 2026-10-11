@@ -48,54 +48,60 @@ import './debug.css'
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
 const S = {
-  kicker: loc('排错'),
-  later: loc('排错能力也是程序验证的基础：下一课要在交付前，把程序在各种条件下都跑一遍。'),
-  suspectTitle: loc('四个嫌疑对象'),
-  kindTitle: loc('读 Datalog：限值失效还是灾难性失效'),
-  kindNote: loc('每行点一个判断，看线索解释。'),
-  colTest: loc('测试项'),
-  colPin: loc('管脚'),
-  colVal: loc('实测值'),
-  colLimit: loc('限值'),
-  colYou: loc('你的判断'),
-  limit: loc('限值失效'),
-  cata: loc('灾难性失效'),
-  beginTitle: loc('从哪里开始'),
-  onTester: loc('在机台上，按这个顺序试'),
-  habits: loc('离开机台也要做的事'),
-  gameTitle: loc('动手：IIL/IIH 排错游戏'),
-  gameNote: loc('故障原因已经随机藏好了。点动作做实验，每个动作花不同的机台时间。觉得有把握了，就在最下面下结论。'),
-  order: loc('工单'),
-  orderVal: loc('产品 L17279B · 84 脚封装 · 封装测试'),
-  first: loc('初始 Datalog'),
-  limitLbl: loc('限值'),
-  reloadLbl: loc('重新加载：程序名'),
-  pkgLbl: loc('封装'),
-  pin84: loc('84 脚'),
-  pin64: loc('64 脚'),
-  steps: loc('已做实验'),
-  time: loc('机台时间'),
-  minUnit: loc('分钟'),
-  colNo: loc('#'),
-  colAct: loc('动作'),
-  colRead: loc('读数'),
-  colRes: loc('结果'),
-  colClue: loc('线索'),
-  noLog: loc('还没做实验。先想想：哪个动作最便宜，又能告诉你最多信息？'),
-  judgeTitle: loc('我判断是……'),
-  right: loc('判对了！'),
-  wrong: loc('判错了。真正的原因是：'),
-  again: loc('再来一局'),
-  reloaded: loc('已重新加载 {name}（{pkg} 脚）。重测一下看看效果。'),
-  overRange: loc('（量程顶格）'),
-  toolTitle: loc('调试工具'),
-  toolNote: loc('点一张卡片看用法。'),
+  kicker: loc('排错', 'Troubleshooting'),
+  later: loc('排错能力也是程序验证的基础：下一课要在交付前，把程序在各种条件下都跑一遍。', 'Troubleshooting skill is also the basis for qualifying the test program: next lesson, run the program under all conditions before release.'),
+  suspectTitle: loc('四个嫌疑对象', 'Four suspects'),
+  kindTitle: loc('读 Datalog：限值失效还是灾难性失效', 'Reading the datalog: limit or catastrophic failure'),
+  kindNote: loc('每行点一个判断，看线索解释。', 'Pick a verdict on each row to see the clue explained.'),
+  colTest: loc('测试项', 'Test'),
+  colPin: loc('管脚', 'Pin'),
+  colVal: loc('实测值', 'Measured'),
+  colLimit: loc('限值', 'Limit'),
+  colYou: loc('你的判断', 'Your call'),
+  limit: loc('限值失效', 'Limit failure'),
+  cata: loc('灾难性失效', 'Catastrophic'),
+  beginTitle: loc('从哪里开始', 'Where to begin'),
+  onTester: loc('在机台上，按这个顺序试', 'At the tester, try in this order'),
+  habits: loc('离开机台也要做的事', 'Habits away from the tester'),
+  gameTitle: loc('动手：IIL/IIH 排错游戏', 'Hands-on: IIL/IIH troubleshooting game'),
+  gameNote: loc('故障原因已经随机藏好了。点动作做实验，每个动作花不同的机台时间。觉得有把握了，就在最下面下结论。', 'The cause of the failure has been hidden at random. Click actions to run experiments; each costs a different amount of tester time. When you feel sure, give your verdict at the bottom.'),
+  order: loc('工单', 'Work order'),
+  orderVal: loc('产品 L17279B · 84 脚封装 · 封装测试', 'Product L17279B · 84-pin package · Final test'),
+  first: loc('初始 Datalog', 'Initial datalog'),
+  limitLbl: loc('限值', 'Limit'),
+  reloadLbl: loc('重新加载：程序名', 'Reload: program name'),
+  pkgLbl: loc('封装', 'Package'),
+  pin84: loc('84 脚', '84-pin'),
+  pin64: loc('64 脚', '64-pin'),
+  steps: loc('已做实验', 'Experiments'),
+  time: loc('机台时间', 'Tester time'),
+  minUnit: loc('分钟', 'min'),
+  colNo: loc('#', '#'),
+  colAct: loc('动作', 'Action'),
+  colRead: loc('读数', 'Reading'),
+  colRes: loc('结果', 'Result'),
+  colClue: loc('线索', 'Clue'),
+  noLog: loc('还没做实验。先想想：哪个动作最便宜，又能告诉你最多信息？', 'No experiments yet. Think first: which action is cheapest and tells you the most?'),
+  judgeTitle: loc('我判断是……', 'My verdict...'),
+  right: loc('判对了！', 'Correct!'),
+  wrong: loc('判错了。真正的原因是：', 'Wrong. The real cause: '),
+  again: loc('再来一局', 'Play again'),
+  reloaded: loc('已重新加载 {name}（{pkg} 脚）。重测一下看看效果。', 'Reloaded {name} ({pkg}-pin). Retest to see the effect.'),
+  overRange: loc('（量程顶格）', ' (full scale)'),
+  toolTitle: loc('调试工具', 'Debug tools'),
+  toolNote: loc('点一张卡片看用法。', 'Click a card to see how it is used.'),
 }
 
 const KIND_LABEL: Record<FailKind, LText> = { limit: S.limit, cata: S.cata }
 const BASE_RIG: Rig = { dut: 'bad', iface: true, tester: 'A' }
 
-type LogEntry = { n: number; action: ActionId; reading?: Reading; pass?: boolean; text: string; min: number }
+type LogEntry = { n: number; action: ActionId; reading?: Reading; pass?: boolean; text: LText; min: number }
+
+/** 中英两版都填占位符，日志切换语言后照样跟着变 */
+function fillText(text: LText, vars: Record<string, string>): LText {
+  const fill = (s: string) => Object.entries(vars).reduce((acc, [k, v]) => acc.replaceAll(`{${k}}`, v), s)
+  return loc(fill(text.zh), text.en === undefined ? undefined : fill(text.en))
+}
 
 export function FundDebugPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
@@ -146,17 +152,17 @@ export function FundDebugPage({ moduleId, onModuleChange }: Props) {
       const prog = progName === PROG_WRONG ? 'wrongName' : pkg === PKG_WRONG ? 'wrongPkg' : 'ok'
       setGame({ ...game, prog })
       setRig(BASE_RIG)
-      entry = { n, action: id, text: t(S.reloaded).replace('{name}', progName).replace('{pkg}', pkg), min: act.min }
+      entry = { n, action: id, text: fillText(S.reloaded, { name: progName, pkg }), min: act.min }
     } else if (id === 'diag') {
       const bad = game.cause === 'tester'
-      entry = { n, action: id, pass: !bad, text: t(bad ? DIAG_FAIL : DIAG_PASS), min: act.min }
+      entry = { n, action: id, pass: !bad, text: bad ? DIAG_FAIL : DIAG_PASS, min: act.min }
     } else {
       const r = act.rig ?? BASE_RIG
       const reading = measureLeak(game, r)
       const pass = readingPass(reading)
       setRig(r)
       const clue = CLUE[id]
-      entry = { n, action: id, reading, pass, text: t(reading.garbage ? GARBAGE : pass ? clue.pass : clue.fail), min: act.min }
+      entry = { n, action: id, reading, pass, text: reading.garbage ? GARBAGE : pass ? clue.pass : clue.fail, min: act.min }
     }
     setLog([...log, entry])
     setNote({ kicker: S.kicker, title: act.label, text: entry.text })
@@ -347,7 +353,7 @@ export function FundDebugPage({ moduleId, onModuleChange }: Props) {
                     <td>{act ? t(act.label) : ''}</td>
                     <td className="mono-cell">{e.reading ? fmtRead(e.reading) : '—'}</td>
                     <td className="verdict">{e.pass === undefined ? '—' : e.pass ? 'PASS' : 'FAIL'}</td>
-                    <td className="clue">{e.text}</td>
+                    <td className="clue">{t(e.text)}</td>
                   </tr>
                 )
               })}

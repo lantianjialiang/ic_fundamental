@@ -1,82 +1,77 @@
 import { OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { ATE } from './components/ATE'
-import { ChannelInterface } from './components/ChannelInterface'
-import { ConnectionPaths } from './components/ConnectionPaths'
+import { AnimationDriver } from './components/AnimationDriver'
+import { CameraRig } from './components/CameraRig'
+import { Chuck, ProberBase } from './components/Chuck'
 import { DUT } from './components/DUT'
+import { FocusBox } from './components/FocusBox'
+import { Handler } from './components/Handler'
 import { LoadBoard } from './components/LoadBoard'
+import { Mainframe } from './components/Mainframe'
+import { PogoTower } from './components/PogoTower'
 import { ProbeCard } from './components/ProbeCard'
-import { ProbeNeedles } from './components/ProbeNeedles'
+import { SignalFlow } from './components/SignalFlow'
 import { Socket } from './components/Socket'
+import { Stage } from './components/Stage'
+import { TestHead } from './components/TestHead'
 import { Wafer } from './components/Wafer'
-import { CAMERA, type TestFlow } from './data/layout'
+import { SceneContext, type SceneConfig, type SceneStore } from './context/SceneContext'
+import { CAMERA_PRESET, type ContactPhase } from './data/layout'
+import { useSceneTheme } from './hooks/useSceneTheme'
 
 type SceneProps = {
-  progress: number
-  flow: TestFlow
-  selectedChannel: number | null
-  onSelect: (channel: number | null) => void
+  store: SceneStore
+  cfg: SceneConfig
+  resetKey: number
+  onPhase: (phase: ContactPhase) => void
 }
 
-export function Scene({ progress, flow, selectedChannel, onSelect }: SceneProps) {
-  const isFT = flow === 'FT'
+export function Scene({ store, cfg, resetKey, onPhase }: SceneProps) {
+  const theme = useSceneTheme()
+  const isFT = cfg.flow === 'FT'
+  const preset = CAMERA_PRESET[cfg.flow]
+  const ctx = { store, cfg }
 
   return (
     <Canvas
       shadows
-      camera={{ position: CAMERA.position, fov: CAMERA.fov }}
+      dpr={[1, 2]}
+      camera={{ position: preset.position, fov: 40, near: 0.05, far: 120 }}
       gl={{ antialias: true }}
-      onPointerMissed={() => onSelect(null)}
+      onCreated={({ gl }) => {
+        gl.localClippingEnabled = true
+      }}
+      onPointerMissed={() => cfg.onSelect(null)}
     >
-      <color attach="background" args={['#1a1d23']} />
-      <ambientLight intensity={0.72} />
-      <directionalLight
-        position={[5.5, 8.5, 4.5]}
-        intensity={1.35}
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-      />
-      <hemisphereLight args={['#d8dde3', '#2a2d32', 0.28]} />
+      <SceneContext.Provider value={ctx}>
+        <Stage theme={theme} flow={cfg.flow} />
+        <AnimationDriver onPhase={onPhase} />
 
-      <ATE progress={progress} flow={flow} selectedChannel={selectedChannel} onSelect={onSelect} />
-      {progress < 0.35 ? <ChannelInterface progress={progress} flow={flow} /> : null}
+        {isFT ? (
+          <>
+            <Handler />
+            <DUT />
+            <Socket />
+            <LoadBoard />
+          </>
+        ) : (
+          <>
+            <ProbeCard />
+            <Wafer />
+            <Chuck />
+            <ProberBase />
+          </>
+        )}
+        <PogoTower />
+        <TestHead />
+        <Mainframe />
 
-      {isFT ? (
-        <>
-          <LoadBoard progress={progress} selectedChannel={selectedChannel} onSelect={onSelect} />
-          <Socket progress={progress} />
-          <DUT progress={progress} selectedChannel={selectedChannel} onSelect={onSelect} />
-        </>
-      ) : (
-        <>
-          <ProbeCard progress={progress} selectedChannel={selectedChannel} onSelect={onSelect} />
-          <ProbeNeedles progress={progress} />
-          <Wafer progress={progress} />
-        </>
-      )}
+        <SignalFlow theme={theme} />
+        <FocusBox color={theme.gold} />
 
-      <ConnectionPaths
-        flow={flow}
-        progress={progress}
-        selectedChannel={selectedChannel}
-        onSelect={onSelect}
-      />
-
-      <gridHelper args={[14, 28, '#3a3f46', '#2a2e34']} position={[0, -2.4, 0]} />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2.401, 0]} receiveShadow>
-        <planeGeometry args={[14, 14]} />
-        <meshStandardMaterial color="#16191d" roughness={1} metalness={0} />
-      </mesh>
-
-      <OrbitControls
-        makeDefault
-        target={CAMERA.target}
-        enableDamping
-        dampingFactor={0.12}
-        minDistance={3}
-        maxDistance={16}
-      />
+        <OrbitControls makeDefault enableDamping dampingFactor={0.12} minDistance={0.6} maxDistance={26} maxPolarAngle={Math.PI * 0.49} />
+        <CameraRig resetKey={resetKey} />
+      </SceneContext.Provider>
     </Canvas>
   )
 }

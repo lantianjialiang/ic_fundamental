@@ -1,304 +1,133 @@
 import { useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
-import { type LText } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
-import { LabShell } from '../../lab/LabShell'
+import { LessonFrame, Section } from '../../lab/LessonFrame'
+import { QuizList } from '../../lab/QuizList'
 import { type ModuleId } from '../catalog'
+import { Callout, Cards, Knob, Readout, Seg, type Note } from '../fund/parts'
 import {
-  CONTINUITY,
-  PARAMS,
+  FAULTS,
+  FORCE_UA,
+  INTRO,
+  MODES,
+  OPENS_SETUP,
+  PMU_MORE,
   QUIZ,
+  SIDES,
   TAKEAWAY,
-  VIH,
-  VIL,
+  VERDICT,
   VMAX,
-  logicOf,
-  type ContId,
-  type ParamId,
-  type QuizId,
+  judge,
+  zoneOf,
+  type Fault,
+  type PinSide,
+  type PmuMode,
 } from './data/content'
+import { LevelFig, OpensMiniFig, PmuModeFig } from './Module04Figs'
+import './module04.css'
 
 type Module04PageProps = {
   moduleId: ModuleId
   onModuleChange: (id: ModuleId) => void
 }
 
-type Focus =
-  | { kind: 'scale' }
-  | { kind: 'param'; id: ParamId }
-  | { kind: 'cont'; id: ContId }
-  | { kind: 'takeaway' }
-
 export function Module04Page({ moduleId, onModuleChange }: Module04PageProps) {
   const { t } = useLocale()
+  const [side, setSide] = useState<PinSide>('input')
   const [volts, setVolts] = useState(1.2)
-  const [focus, setFocus] = useState<Focus>({ kind: 'scale' })
-  const [answers, setAnswers] = useState<Partial<Record<QuizId, string>>>({})
+  const [mode, setMode] = useState<PmuMode>('fimv')
+  const [fault, setFault] = useState<Fault>('good')
+  const [note, setNote] = useState<Note>({ kicker: ui.m04.kickerScale, title: SIDES.input.label, text: SIDES.input.text })
 
-  const logic = logicOf(volts)
-  const logicLabel = logic === '1' ? t(ui.m04.high) : logic === '0' ? t(ui.m04.low) : t(ui.m04.mid)
-  const detail = resolveDetail(focus, t)
+  const s = SIDES[side]
+  const zone = zoneOf(side, volts)
+  const zoneText = zone === 'mid' ? (side === 'input' ? ui.m04.midIn : ui.m04.midOut) : null
+  const faultItem = FAULTS.find((f) => f.id === fault) ?? FAULTS[0]
+  const verdict = judge(faultItem.volt)
 
   return (
-    <LabShell
+    <LessonFrame
       moduleId={moduleId}
       onModuleChange={onModuleChange}
       title={t(ui.m04.title)}
       goal={t(ui.m04.goal)}
-      scroll
+      kicker={t(note.kicker)}
+      asideTitle={t(note.title)}
+      asideText={t(note.text)}
+      nextId="spec"
+      nextLabel={t(ui.m04.next)}
     >
-      <div className="lab__body intro">
-        <main className="intro__main">
-          <section className="intro__section">
-            <h2>{t(ui.m04.introTitle)}</h2>
-            <p>{t(ui.m04.introBody)}</p>
-          </section>
+      <Section title={t(ui.m04.introTitle)}>
+        <p>{t(INTRO)}</p>
+      </Section>
 
-          <section className="intro__section">
-            <h2>{t(ui.m04.scaleTitle)}</h2>
-            <p className="intro__note">{t(ui.m04.scaleNote)}</p>
-            <div className="scale">
-              <button
-                type="button"
-                className={`scale__pane${focus.kind === 'scale' ? ' is-active' : ''}`}
-                onClick={() => setFocus({ kind: 'scale' })}
-              >
-                <p className="scale__label">{t(ui.m04.digital)}</p>
-                <VoltageBar volts={volts} mode="digital" now={t(ui.m04.now)} />
-                <p className="scale__read">
-                  {t(ui.m04.logic)} {logicLabel}
-                </p>
-                <p className="scale__hint">{t(ui.m04.digitalHint)}</p>
-              </button>
-              <button
-                type="button"
-                className={`scale__pane${focus.kind === 'scale' ? ' is-active' : ''}`}
-                onClick={() => setFocus({ kind: 'scale' })}
-              >
-                <p className="scale__label">{t(ui.m04.parametric)}</p>
-                <VoltageBar volts={volts} mode="param" now={t(ui.m04.now)} />
-                <p className="scale__read">
-                  {t(ui.m04.volts)} {volts.toFixed(2)} V
-                </p>
-                <p className="scale__hint">{t(ui.m04.paramHint)}</p>
-              </button>
-            </div>
-            <label className="scale__slider">
-              <span>
-                {t(ui.m04.now)} {volts.toFixed(2)} V
-              </span>
-              <input
-                type="range"
-                min={0}
-                max={VMAX}
-                step={0.05}
-                value={volts}
-                onChange={(event) => {
-                  setVolts(Number(event.target.value))
-                  setFocus({ kind: 'scale' })
-                }}
-              />
-            </label>
-          </section>
+      <Section title={t(ui.m04.scaleTitle)} note={t(ui.m04.scaleNote)}>
+        <Seg
+          options={(['input', 'output'] as PinSide[]).map((id) => ({ id, label: SIDES[id].label }))}
+          value={side}
+          onChange={(id) => {
+            setSide(id)
+            setNote({ kicker: ui.m04.kickerScale, title: SIDES[id].label, text: SIDES[id].text })
+          }}
+        />
+        <LevelFig side={side} volts={volts} />
+        <div className="knob-row">
+          <Knob label={ui.m04.pinVolt} value={Number(volts.toFixed(2))} unit="V" min={0} max={VMAX} step={0.05} onChange={setVolts} />
+        </div>
+        <Callout tone={zone === 'mid' ? 'bad' : 'ok'}>
+          {zoneText
+            ? t(zoneText)
+            : `${t(ui.m04.reads)} ${zone === 'lo' ? s.sym[0] : s.sym[1]} (${zone === 'lo' ? `≤ ${s.loName} ${s.lo} V` : `≥ ${s.hiName} ${s.hi} V`})`}
+        </Callout>
+      </Section>
 
-          <section className="intro__section">
-            <h2>{t(ui.m04.paramsTitle)}</h2>
-            <p className="intro__note">{t(ui.m04.paramsNote)}</p>
-            <div className="param">
-              {PARAMS.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`param__card${focus.kind === 'param' && focus.id === item.id ? ' is-active' : ''}`}
-                  onClick={() => setFocus({ kind: 'param', id: item.id })}
-                >
-                  {item.title}
-                </button>
-              ))}
-            </div>
-          </section>
+      <Section title={t(ui.m04.pmuTitle)} note={t(ui.m04.pmuNote)}>
+        <Cards
+          items={MODES}
+          activeId={mode}
+          cols={2}
+          onPick={(item) => {
+            setMode(item.id)
+            setNote({ kicker: ui.m04.kickerPmu, title: item.title, text: item.text })
+          }}
+        />
+        <PmuModeFig mode={mode} />
+        <p className="intro__note">{t(PMU_MORE)}</p>
+      </Section>
 
-          <section className="intro__section">
-            <h2>{t(ui.m04.contTitle)}</h2>
-            <p className="intro__note">{t(ui.m04.contNote)}</p>
-            <div className="cont">
-              {CONTINUITY.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`cont__card${focus.kind === 'cont' && focus.id === item.id ? ' is-active' : ''}`}
-                  onClick={() => setFocus({ kind: 'cont', id: item.id })}
-                >
-                  <strong>{item.id === 'open' ? t(ui.m04.open) : t(ui.m04.short)}</strong>
-                  <span>
-                    {t(ui.m04.force)} 100 µA → {t(ui.m04.measure)} {item.volts.toFixed(2)} V
-                  </span>
-                  <em>{t(item.verdict)}</em>
-                </button>
-              ))}
-            </div>
-          </section>
+      <Section title={t(ui.m04.opensTitle)} note={t(ui.m04.opensNote)}>
+        <Seg
+          options={FAULTS.map((f) => ({ id: f.id, label: f.label }))}
+          value={fault}
+          onChange={(id) => {
+            setFault(id)
+            const f = FAULTS.find((item) => item.id === id)
+            if (f) setNote({ kicker: ui.m04.kickerOpens, title: f.label, text: f.text })
+          }}
+        />
+        <OpensMiniFig fault={fault} volt={faultItem.volt} />
+        <Readout
+          items={[
+            { label: ui.m04.forced, value: `${FORCE_UA} µA` },
+            { label: ui.m04.read, value: `${faultItem.volt.toFixed(3)} V`, state: verdict === 'pass' ? 'pass' : 'fail' },
+            { label: ui.m04.verdict, value: verdict === 'pass' ? 'PASS' : 'FAIL', state: verdict === 'pass' ? 'pass' : 'fail' },
+          ]}
+        />
+        <Callout tone={verdict === 'pass' ? 'ok' : 'bad'}>{t(VERDICT[verdict])}</Callout>
+        <p className="intro__note">{t(OPENS_SETUP)}</p>
+      </Section>
 
-          <section className="intro__section">
-            <h2>{t(ui.m04.takeawayTitle)}</h2>
-            <button
-              type="button"
-              className={`takeaway${focus.kind === 'takeaway' ? ' is-active' : ''}`}
-              onClick={() => setFocus({ kind: 'takeaway' })}
-            >
-              {t(TAKEAWAY)}
-            </button>
-          </section>
+      <Section title={t(ui.m04.takeawayTitle)}>
+        <Callout tone="warn">
+          {TAKEAWAY.map((item) => (
+            <p key={item.zh}>{t(item)}</p>
+          ))}
+        </Callout>
+      </Section>
 
-          <section className="intro__section">
-            <h2>{t(ui.m04.quizTitle)}</h2>
-            <p className="intro__note">{t(ui.m04.quizNote)}</p>
-            <div className="quiz">
-              {QUIZ.map((question, index) => (
-                <QuizCard
-                  key={question.id}
-                  index={index + 1}
-                  question={question}
-                  picked={answers[question.id]}
-                  yes={t(ui.m04.yes)}
-                  no={t(ui.m04.no)}
-                  onPick={(optionId) =>
-                    setAnswers((prev) => ({ ...prev, [question.id]: optionId }))
-                  }
-                />
-              ))}
-            </div>
-          </section>
-        </main>
-
-        <aside className="legend intro__aside">
-          <h2>{detail.kicker}</h2>
-          <p className="legend__path-title">{detail.title}</p>
-          <p className="legend__hint">{detail.text}</p>
-          <p className="legend__hint">{t(ui.m04.asideLater)}</p>
-          <button
-            type="button"
-            className="lab__btn lab__btn--primary"
-            onClick={() => onModuleChange('spec')}
-          >
-            {t(ui.m04.next)}
-          </button>
-        </aside>
-      </div>
-    </LabShell>
+      <Section title={t(ui.m04.quizTitle)} note={t(ui.m04.quizNote)}>
+        <QuizList questions={QUIZ} yes={t(ui.m04.yes)} no={t(ui.m04.no)} />
+      </Section>
+    </LessonFrame>
   )
-}
-
-function VoltageBar({
-  volts,
-  mode,
-  now,
-}: {
-  volts: number
-  mode: 'digital' | 'param'
-  now: string
-}) {
-  const { t } = useLocale()
-  const pct = (volts / VMAX) * 100
-  const vilPct = (VIL / VMAX) * 100
-  const vihPct = (VIH / VMAX) * 100
-
-  return (
-    <div className={`vbar vbar--${mode}`} aria-hidden="true">
-      {mode === 'digital' ? (
-        <>
-          <span className="vbar__zone vbar__zone--lo" style={{ width: `${vilPct}%` }} />
-          <span className="vbar__zone vbar__zone--x" style={{ width: `${vihPct - vilPct}%` }} />
-          <span className="vbar__zone vbar__zone--hi" style={{ width: `${100 - vihPct}%` }} />
-          <span className="vbar__tick" style={{ left: `${vilPct}%` }} title={t(ui.m04.vilLine)} />
-          <span className="vbar__tick" style={{ left: `${vihPct}%` }} title={t(ui.m04.vihLine)} />
-        </>
-      ) : (
-        <span className="vbar__zone vbar__zone--param" />
-      )}
-      <span className="vbar__needle" style={{ left: `${pct}%` }} title={`${now} ${volts.toFixed(2)} V`} />
-    </div>
-  )
-}
-
-function QuizCard({
-  index,
-  question,
-  picked,
-  yes,
-  no,
-  onPick,
-}: {
-  index: number
-  question: (typeof QUIZ)[number]
-  picked?: string
-  yes: string
-  no: string
-  onPick: (id: string) => void
-}) {
-  const { t } = useLocale()
-  const judged = picked !== undefined
-  const correct = picked === question.answer
-  return (
-    <div className="quiz__card">
-      <p className="quiz__prompt">
-        {index}. {t(question.prompt)}
-      </p>
-      <div className="quiz__options">
-        {question.options.map((option) => {
-          const isPicked = picked === option.id
-          const isAnswer = option.id === question.answer
-          let state = ''
-          if (judged && isAnswer) state = ' is-right'
-          else if (judged && isPicked && !isAnswer) state = ' is-wrong'
-          return (
-            <button
-              key={option.id}
-              type="button"
-              className={`quiz__option${isPicked ? ' is-picked' : ''}${state}`}
-              onClick={() => onPick(option.id)}
-            >
-              {t(option.text)}
-            </button>
-          )
-        })}
-      </div>
-      {judged ? (
-        <p className={`quiz__explain${correct ? ' is-ok' : ' is-bad'}`}>
-          {correct ? yes : no}
-          {t(question.explain)}
-        </p>
-      ) : null}
-    </div>
-  )
-}
-
-function resolveDetail(
-  focus: Focus,
-  t: (text: LText | string) => string,
-): { kicker: string; title: string; text: string } {
-  if (focus.kind === 'takeaway') {
-    return { kicker: t(ui.m04.kickerTakeaway), title: t(ui.m04.kickerOne), text: t(TAKEAWAY) }
-  }
-  if (focus.kind === 'param') {
-    const item = PARAMS.find((node) => node.id === focus.id)
-    return {
-      kicker: t(ui.m04.kickerParam),
-      title: item?.title ?? '',
-      text: item ? t(item.text) : '',
-    }
-  }
-  if (focus.kind === 'cont') {
-    const item = CONTINUITY.find((node) => node.id === focus.id)
-    return {
-      kicker: t(ui.m04.kickerCont),
-      title: focus.id === 'open' ? t(ui.m04.open) : t(ui.m04.short),
-      text: item ? t(item.text) : '',
-    }
-  }
-  return {
-    kicker: t(ui.m04.kickerScale),
-    title: `${t(ui.m04.digital)} / ${t(ui.m04.parametric)}`,
-    text: t(ui.m04.scaleNote),
-  }
 }

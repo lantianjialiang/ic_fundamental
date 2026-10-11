@@ -1,95 +1,122 @@
+import { RoundedBox } from '@react-three/drei'
+import { useMemo } from 'react'
+import { MeshStandardMaterial } from 'three'
 import { useLocale } from '../../../i18n/LocaleContext'
-import { ui } from '../../../i18n/ui'
-import { CHANNEL_COUNT, PROBE_CARD, channelX, layerY } from '../data/layout'
-import { cpBoardRoute } from '../data/pcbRouting'
-import { PcbCopper } from './PcbCopper'
+import { useScene } from '../context/SceneContext'
+import { CHANNEL_COUNT, PC, cpRoute, towerPinXZ } from '../data/layout'
+import { GEO, MAT } from '../data/materials'
+import { annulusGeometry } from '../data/shapes'
+import { T } from '../data/text'
+import { pcSilkTexture } from '../data/textures'
+import { BoardCopper } from './BoardCopper'
+import { InstancedParts, type InstanceItem } from './Instanced'
+import { LayerGroup } from './LayerGroup'
+import { Needles } from './Needles'
 import { SceneLabel } from './SceneLabel'
 
-type ProbeCardProps = {
-  progress: number
-  selectedChannel: number | null
-  onSelect: (channel: number) => void
-}
-
-export function ProbeCard({ progress, selectedChannel, onSelect }: ProbeCardProps) {
+/** 探针卡：金属加强板 + 大圆 PCB（边缘 pogo 焊盘圈）+ 中央空间转换器 + 探针 */
+export function ProbeCard() {
+  const { cfg } = useScene()
   const { t } = useLocale()
-  const y = layerY(PROBE_CARD, progress)
-  const h = PROBE_CARD.thickness
-  const r = PROBE_CARD.radius
+  const silk = useMemo(
+    () => new MeshStandardMaterial({ map: pcSilkTexture(), transparent: true, roughness: 0.6, depthWrite: false }),
+    [],
+  )
+  const geos = useMemo(
+    () => ({
+      stiffRing: annulusGeometry(1.0, 1.35, PC.stiffTop - PC.top),
+      needleRing: annulusGeometry(0.44, 0.64, PC.stBottom - 0.17),
+      epoxy: annulusGeometry(0.42, 0.66, 0.04, 48),
+    }),
+    [],
+  )
+  const routes = useMemo(() => Array.from({ length: CHANNEL_COUNT }, (_, ch) => cpRoute(ch)), [])
+
+  const edgePads = useMemo<InstanceItem[]>(
+    () => towerPinXZ('CP').map(([x, z]) => ({ p: [x, PC.top + 0.003, z], s: [0.022, 0.006, 0.022] })),
+    [],
+  )
+  const spokes = useMemo<InstanceItem[]>(
+    () =>
+      Array.from({ length: 4 }, (_, i) => {
+        const a = Math.PI / 4 + (i * Math.PI) / 2
+        return { p: [Math.cos(a) * 0.78, PC.top + 0.05, Math.sin(a) * 0.78], r: [0, -a, 0], s: [0.5, 0.1, 0.16] }
+      }),
+    [],
+  )
+  const caps = useMemo<InstanceItem[]>(() => {
+    const out: InstanceItem[] = []
+    for (let i = 0; i < 20; i += 1) {
+      const a = (i / 20) * Math.PI * 2 + 0.08
+      out.push({ p: [Math.cos(a) * 1.48, PC.top + 0.022, Math.sin(a) * 1.48], r: [0, -a, 0], s: [0.05, 0.04, 0.09] })
+      out.push({ p: [Math.cos(a) * 0.8, PC.bottom - 0.02, Math.sin(a) * 0.8], r: [0, -a, 0], s: [0.05, 0.04, 0.09] })
+    }
+    return out
+  }, [])
+  const posts = useMemo<InstanceItem[]>(
+    () =>
+      [
+        [-0.22, -0.22],
+        [0.22, -0.22],
+        [0.22, 0.22],
+        [-0.22, 0.22],
+      ].map(([x, z]) => ({ p: [x!, (PC.upperGuide + PC.lowerGuide) / 2, z!], s: [0.018, PC.upperGuide - PC.lowerGuide, 0.018] })),
+    [],
+  )
+  const vertical = cfg.probe === 'vertical'
 
   return (
-    <group position={[0, y, 0]}>
-      <mesh receiveShadow castShadow>
-        <cylinderGeometry args={[r, r, h, 48]} />
-        <meshStandardMaterial color="#3a5a32" roughness={0.7} metalness={0.08} transparent opacity={0.7} />
+    <LayerGroup id="probecard">
+      <mesh position={[0, PC.y, 0]} material={MAT.fr4Pc} castShadow receiveShadow>
+        <cylinderGeometry args={[PC.r, PC.r, PC.t, 96]} />
       </mesh>
-
-      {Array.from({ length: 8 }, (_, i) => {
-        const a = (i / 8) * Math.PI * 2 + Math.PI / 8
-        const hr = r - 0.16
-        return (
-          <mesh key={i} position={[Math.cos(a) * hr, h / 2 + 0.002, Math.sin(a) * hr]}>
-            <cylinderGeometry args={[0.06, 0.06, 0.02, 14]} />
-            <meshStandardMaterial color="#1a1f24" roughness={0.8} metalness={0.1} />
-          </mesh>
-        )
-      })}
-
-      <mesh position={[0, h / 2 + 0.03, PROBE_CARD.connectorZ]}>
-        <boxGeometry args={[CHANNEL_COUNT * 0.2 + 0.2, 0.06, 0.28]} />
-        <meshStandardMaterial color="#2a2e34" roughness={0.45} metalness={0.3} />
+      <mesh position={[0, PC.top + 0.0015, 0]} rotation={[-Math.PI / 2, 0, 0]} material={silk}>
+        <circleGeometry args={[PC.r, 96]} />
       </mesh>
-      {Array.from({ length: CHANNEL_COUNT }, (_, i) => (
-        <mesh
-          key={i}
-          position={[channelX(i), h / 2 + 0.055, PROBE_CARD.connectorZ]}
-          onClick={(event) => {
-            event.stopPropagation()
-            onSelect(i)
-          }}
-        >
-          <cylinderGeometry args={[0.03, 0.03, 0.04, 10]} />
-          <meshStandardMaterial
-            color={selectedChannel === i ? '#f0d56a' : '#b08d3e'}
-            emissive={selectedChannel === i ? '#8a7018' : '#000000'}
-            roughness={0.35}
-            metalness={0.5}
-          />
-        </mesh>
-      ))}
+      <InstancedParts geometry={GEO.cyl} material={MAT.gold} items={edgePads} />
+      <InstancedParts geometry={GEO.box} material={MAT.mlcc} items={caps} />
 
-      {Array.from({ length: CHANNEL_COUNT }, (_, i) => (
-        <PcbCopper
-          key={`net-${i}`}
-          nodes={cpBoardRoute(i)}
-          thickness={h}
-          selected={selectedChannel === i}
-          dimmed={selectedChannel !== null && selectedChannel !== i}
-          onSelect={() => onSelect(i)}
-        />
-      ))}
+      <mesh geometry={geos.stiffRing} position={[0, PC.top, 0]} material={MAT.steelClip} castShadow />
+      <mesh position={[0, PC.top + (PC.stiffTop - PC.top) / 2, 0]} material={MAT.steelClip} castShadow>
+        <cylinderGeometry args={[0.55, 0.55, PC.stiffTop - PC.top, 48]} />
+      </mesh>
+      <InstancedParts geometry={GEO.box} material={MAT.steelClip} items={spokes} castShadow />
 
-      {Array.from({ length: CHANNEL_COUNT }, (_, i) => {
-        const pad = cpBoardRoute(i).find((node) => node.kind === 'pad' && node.layer === 'bottom')
-        if (!pad) return null
-        return (
-          <mesh key={`bpad-${i}`} position={[pad.x, -h / 2 - 0.008, pad.z]}>
-            <cylinderGeometry args={[PROBE_CARD.padRadius, PROBE_CARD.padRadius, 0.016, 12]} />
-            <meshStandardMaterial
-              color={selectedChannel === i ? '#f0d56a' : '#e0c36a'}
-              roughness={0.32}
-              metalness={0.55}
-            />
-          </mesh>
-        )
-      })}
-
-      <SceneLabel
-        position={[0, h / 2 + 0.28, -r + 0.25]}
-        title="PROBE CARD"
-        subtitle={t(ui.scene.pcSub)}
+      <RoundedBox
+        args={[PC.stSize, PC.bottom - PC.stBottom, PC.stSize]}
+        radius={0.015}
+        smoothness={2}
+        position={[0, (PC.bottom + PC.stBottom) / 2, 0]}
+        material={MAT.ceramicClip}
+        castShadow
       />
-      <SceneLabel position={[0, 0.22, PROBE_CARD.connectorZ + 0.28]} title={t(ui.scene.pcTop)} />
-    </group>
+
+      {vertical ? (
+        <>
+          <mesh position={[0, PC.upperGuide, 0]} material={MAT.ceramicClip}>
+            <boxGeometry args={[0.5, 0.02, 0.5]} />
+          </mesh>
+          <mesh position={[0, PC.lowerGuide, 0]} material={MAT.ceramicClip}>
+            <boxGeometry args={[0.5, 0.02, 0.5]} />
+          </mesh>
+          <InstancedParts geometry={GEO.cyl} material={MAT.steel} items={posts} />
+        </>
+      ) : (
+        <>
+          <mesh geometry={geos.needleRing} position={[0, 0.17, 0]} material={MAT.aluminumClip} />
+          <mesh geometry={geos.epoxy} position={[0, 0.13, 0]} material={MAT.epoxy} />
+        </>
+      )}
+
+      <Needles />
+      <BoardCopper routes={routes} boardY={PC.y} thickness={PC.t} selected={cfg.selected} onSelect={cfg.onSelect} />
+
+      {cfg.showLabels ? (
+        <>
+          <SceneLabel position={[-0.6, PC.stBottom, 0.6]} title={t(T.st)} />
+          <SceneLabel position={[-1.2, PC.stiffTop + 0.05, -0.4]} title={t(T.stiffener)} />
+        </>
+      ) : null}
+    </LayerGroup>
   )
 }

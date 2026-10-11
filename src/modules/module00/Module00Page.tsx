@@ -1,18 +1,14 @@
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
-import { type LText } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
-import { LabShell } from '../../lab/LabShell'
+import { LessonFrame, Section } from '../../lab/LessonFrame'
+import { QuizList } from '../../lab/QuizList'
 import { type ModuleId } from '../catalog'
-import {
-  CHAIN,
-  CHIP_TYPES,
-  DIAGRAM,
-  TERMS,
-  type ChainId,
-  type DiagramId,
-  type TermId,
-} from './data/content'
+import { Callout, Cards, type Note } from '../fund/parts'
+import { CHAIN, CHIP_TYPES, QUIZ, SYS, TAKEAWAY, TERMS, WHAT, type ChainId, type SysId, type TermId } from './data/content'
+import { GlossaryArt } from './GlossaryArt'
+import { ChainFig, SysFig } from './IntroFigs'
+import './module00.css'
 
 type Module00PageProps = {
   moduleId: ModuleId
@@ -20,203 +16,111 @@ type Module00PageProps = {
   onOpenConnection: () => void
 }
 
-type Focus =
-  | { kind: 'chain'; id: ChainId }
-  | { kind: 'term'; id: TermId }
-  | { kind: 'chip'; id: string }
-  | { kind: 'diagram'; id: DiagramId }
-
 export function Module00Page({ moduleId, onModuleChange, onOpenConnection }: Module00PageProps) {
-  const [focus, setFocus] = useState<Focus>({ kind: 'chain', id: 'cp' })
   const { t } = useLocale()
-  const detail = resolveDetail(focus, t)
+  const [chain, setChain] = useState<ChainId | null>('cp')
+  const [chip, setChip] = useState('digital')
+  const [term, setTerm] = useState<TermId>('cp')
+  const [sys, setSys] = useState<SysId | null>(null)
+  const [note, setNote] = useState<Note>({ kicker: ui.m01.kickerChain, title: CHAIN[1].title, text: CHAIN[1].text })
+
+  const termItem = TERMS.find((item) => item.id === term) ?? TERMS[0]
+  const chipItem = CHIP_TYPES.find((item) => item.id === chip) ?? CHIP_TYPES[0]
 
   return (
-    <LabShell
+    <LessonFrame
       moduleId={moduleId}
       onModuleChange={onModuleChange}
       title={t(ui.m01.title)}
       goal={t(ui.m01.goal)}
-      scroll
+      kicker={t(note.kicker)}
+      asideTitle={t(note.title)}
+      asideText={t(note.text)}
+      extra={
+        <button type="button" className="lab__btn lab__btn--primary" onClick={onOpenConnection}>
+          {t(ui.m01.next)}
+        </button>
+      }
     >
-      <div className="lab__body intro">
-        <main className="intro__main">
-          <section className="intro__section">
-            <h2>{t(ui.m01.whatTitle)}</h2>
-            <p>{t(ui.m01.whatBody)}</p>
-          </section>
+      <Section title={t(ui.m01.whatTitle)}>
+        {WHAT.map((para) => (
+          <p key={para.zh}>{t(para)}</p>
+        ))}
+      </Section>
 
-          <section className="intro__section">
-            <h2>{t(ui.m01.chainTitle)}</h2>
-            <div className="chain">
-              {CHAIN.map((step, index) => (
-                <div key={step.id} className="chain__item">
-                  {index > 0 ? <div className="chain__arrow" aria-hidden="true">↓</div> : null}
-                  <button
-                    type="button"
-                    className={`chain__node${focus.kind === 'chain' && focus.id === step.id ? ' is-active' : ''}${step.id === 'cp' || step.id === 'ft' ? ' is-test' : ''}`}
-                    onClick={() => setFocus({ kind: 'chain', id: step.id })}
-                  >
-                    <strong>{step.title}</strong>
-                    <span>{t(step.subtitle)}</span>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section>
+      <Section title={t(ui.m01.chainTitle)} note={t(ui.m01.chainNote)}>
+        <ChainFig
+          active={chain}
+          onPick={(id) => {
+            setChain(id)
+            const step = CHAIN.find((item) => item.id === id)
+            if (step) setNote({ kicker: ui.m01.kickerChain, title: step.title, text: step.text })
+          }}
+        />
+      </Section>
 
-          <section className="intro__section">
-            <h2>{t(ui.m01.chipsTitle)}</h2>
-            <div className="chips">
-              {CHIP_TYPES.map((chip) => (
-                <button
-                  key={chip.id}
-                  type="button"
-                  className={`chips__card${focus.kind === 'chip' && focus.id === chip.id ? ' is-active' : ''}`}
-                  onClick={() => setFocus({ kind: 'chip', id: chip.id })}
-                >
-                  <span className="chips__en">{chip.name}</span>
-                  <strong>{t(chip.title)}</strong>
-                  <span className="chips__ex">{t(chip.examples)}</span>
-                </button>
-              ))}
-            </div>
-          </section>
+      <Section title={t(ui.m01.chipsTitle)} note={t(ui.m01.chipsNote)}>
+        <Cards
+          items={CHIP_TYPES}
+          activeId={chip}
+          cols={4}
+          onPick={(item) => {
+            setChip(item.id)
+            setNote({ kicker: ui.m01.kickerChip, title: item.title, text: item.text })
+          }}
+        />
+        <p className="m00-params">
+          <b>{t(ui.m01.chipParams)}</b>
+          {chipItem.params.map((p) => t(p)).join(' · ')}
+        </p>
+      </Section>
 
-          <section className="intro__section">
-            <h2>{t(ui.m01.termsTitle)}</h2>
-            <div className="terms">
-              {TERMS.map((term) => (
-                <button
-                  key={term.id}
-                  type="button"
-                  className={`terms__item${focus.kind === 'term' && focus.id === term.id ? ' is-active' : ''}`}
-                  onClick={() => setFocus({ kind: 'term', id: term.id })}
-                >
-                  <img src={term.image} alt="" className="terms__thumb" />
-                  {term.name}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <section className="intro__section">
-            <h2>{t(ui.m01.diagramTitle)}</h2>
-            <p className="intro__note">{t(ui.m01.diagramNote)}</p>
-            <div className="sys">
-              <DiagramBox id="program" focus={focus} onFocus={setFocus} />
-              <div className="sys__arrow">↓</div>
-              <div className="sys__row">
-                <DiagramBox id="controller" focus={focus} onFocus={setFocus} />
-                <span className="sys__link">→</span>
-                <DiagramBox id="ate" focus={focus} onFocus={setFocus} />
-              </div>
-              <div className="sys__arrow">↓</div>
-              <div className="sys__split">
-                <DiagramBox id="pe" focus={focus} onFocus={setFocus} />
-                <DiagramBox id="pmu" focus={focus} onFocus={setFocus} />
-              </div>
-              <div className="sys__arrow">↓</div>
-              <DiagramBox id="loadboard" focus={focus} onFocus={setFocus} />
-              <div className="sys__arrow">↓</div>
-              <DiagramBox id="socket" focus={focus} onFocus={setFocus} />
-              <div className="sys__arrow">↓</div>
-              <DiagramBox id="dut" focus={focus} onFocus={setFocus} />
-              <div className="sys__arrow">↓</div>
-              <DiagramBox id="result" focus={focus} onFocus={setFocus} />
-            </div>
-          </section>
-        </main>
-
-        <aside className="legend intro__aside">
-          <h2>{detail.kicker}</h2>
-          <p className="legend__path-title">{detail.title}</p>
-          <p className="legend__hint">{detail.text}</p>
-          {detail.extra}
-          <button type="button" className="lab__btn lab__btn--primary" onClick={onOpenConnection}>
-            {t(ui.m01.next)}
-          </button>
-        </aside>
-      </div>
-    </LabShell>
-  )
-}
-
-function DiagramBox({
-  id,
-  focus,
-  onFocus,
-}: {
-  id: DiagramId
-  focus: Focus
-  onFocus: (focus: Focus) => void
-}) {
-  const item = DIAGRAM.find((node) => node.id === id)
-  if (!item) return null
-  return (
-    <button
-      type="button"
-      className={`sys__box${focus.kind === 'diagram' && focus.id === id ? ' is-active' : ''}`}
-      onClick={() => onFocus({ kind: 'diagram', id })}
-    >
-      {item.title}
-    </button>
-  )
-}
-
-function resolveDetail(
-  focus: Focus,
-  t: (text: LText | string) => string,
-): {
-  kicker: string
-  title: string
-  text: string
-  extra?: ReactNode
-} {
-  if (focus.kind === 'chain') {
-    const step = CHAIN.find((item) => item.id === focus.id)
-    return { kicker: t(ui.m01.kickerChain), title: step?.title ?? '', text: step ? t(step.text) : '' }
-  }
-  if (focus.kind === 'term') {
-    const term = TERMS.find((item) => item.id === focus.id)
-    return {
-      kicker: t(ui.m01.kickerTerm),
-      title: term ? `${term.name} · ${t(term.full)}` : '',
-      text: term ? t(term.text) : '',
-      extra: term ? (
-        <figure className="glossary-fig">
-          <img src={term.image} alt={t(term.caption)} />
+      <Section title={t(ui.m01.termsTitle)} note={t(ui.m01.termsNote)}>
+        <div className="m00-terms">
+          {TERMS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={`m00-term${term === item.id ? ' is-active' : ''}`}
+              onClick={() => {
+                setTerm(item.id)
+                setNote({ kicker: ui.m01.kickerTerm, title: `${item.name} · ${t(item.full)}`, text: item.text })
+              }}
+            >
+              <GlossaryArt id={item.id} small />
+              <span>{item.name}</span>
+            </button>
+          ))}
+        </div>
+        <figure className="term-fig m00-art">
+          <GlossaryArt id={termItem.id} label={t(termItem.caption)} />
           <figcaption>
-            {t(term.caption)}
-            <span>{t(term.credit)}</span>
+            <b>{termItem.name}</b> {t(termItem.caption)}
           </figcaption>
         </figure>
-      ) : null,
-    }
-  }
-  if (focus.kind === 'chip') {
-    const chip = CHIP_TYPES.find((item) => item.id === focus.id)
-    if (!chip) return { kicker: t(ui.m01.kickerChip), title: '', text: '' }
-    return {
-      kicker: t(ui.m01.kickerChip),
-      title: `${chip.name} · ${t(chip.title)}`,
-      text: t(chip.theory),
-      extra: (
-        <div>
-          <p className="legend__hint">{t(ui.m01.chipParams)}</p>
-          <ul>
-            {chip.params.map((param) => (
-              <li key={t(param)}>{t(param)}</li>
-            ))}
-          </ul>
-        </div>
-      ),
-    }
-  }
-  const node = DIAGRAM.find((item) => item.id === focus.id)
-  return {
-    kicker: t(ui.m01.kickerDiagram),
-    title: node?.title ?? '',
-    text: node ? t(node.text) : '',
-  }
+      </Section>
+
+      <Section title={t(ui.m01.diagramTitle)} note={t(ui.m01.diagramNote)}>
+        <SysFig
+          active={sys}
+          onPick={(id) => {
+            setSys(id)
+            setNote({ kicker: ui.m01.kickerDiagram, title: SYS[id].title, text: SYS[id].text })
+          }}
+        />
+      </Section>
+
+      <Section title={t(ui.m01.takeawayTitle)}>
+        <Callout tone="warn">
+          {TAKEAWAY.map((item) => (
+            <p key={item.zh}>{t(item)}</p>
+          ))}
+        </Callout>
+      </Section>
+
+      <Section title={t(ui.m01.quizTitle)} note={t(ui.m01.quizNote)}>
+        <QuizList questions={QUIZ} yes={t(ui.m01.yes)} no={t(ui.m01.no)} />
+      </Section>
+    </LessonFrame>
+  )
 }

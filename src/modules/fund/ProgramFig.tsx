@@ -3,13 +3,13 @@ import { loc } from '../../i18n/locale'
 import { LATCH_MARGIN, sampleAt, type PState, type Sample } from './data/program'
 
 const L = {
-  vin: loc('输入 VIH'),
-  out: loc('输出 / 外部'),
-  init: loc('初始'),
-  limit: loc('VDD + 0.5 V'),
-  latch: loc('可能闩锁'),
-  float: loc('悬空'),
-  aria: loc('上电下电电压随时间变化'),
+  vin: loc('输入 VIH', 'Input VIH'),
+  out: loc('输出 / 外部', 'Output / ext'),
+  init: loc('初始', 'Init'),
+  limit: loc('VDD + 0.5 V', 'VDD + 0.5 V'),
+  latch: loc('可能闩锁', 'Possible latch-up'),
+  float: loc('悬空', 'floating'),
+  aria: loc('上电下电电压随时间变化', 'Power-up / power-down voltages over time'),
 }
 
 const X0 = 130

@@ -1,0 +1,40 @@
+/* D 轨 Scan 课专用样式 */
+
+.m11-tok {
+  transition: transform 0.45s ease;
+}
+
+.m11-tok__body {
+  animation: m11-pop 0.45s ease;
+}
+
+@keyframes m11-pop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.m11-caption {
+  min-height: 3em;
+  margin: 8px 0 0;
+}
+
+.m11-faults {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m11-tok {
+    transition: none;
+  }
+  .m11-tok__body {
+    animation: none;
+  }
+}

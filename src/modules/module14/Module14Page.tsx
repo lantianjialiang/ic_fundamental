@@ -3,22 +3,69 @@ import { useLocale } from '../../i18n/LocaleContext'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
+import { Callout, Readout, Seg } from '../fund/parts'
 import { type ModuleId } from '../catalog'
-import { FREQS, QUIZ, TAKEAWAY, VOLTS, YIELD, cellPass, cellText } from './data/content'
+import {
+  CELL_TEXT,
+  CHIPS,
+  FREQS,
+  L,
+  QUIZ,
+  SPEC,
+  SPEC_TEXT,
+  TAKEAWAY,
+  VOLTS,
+  cellKind,
+  inSpec,
+  isPass,
+  type ChipId,
+  type ChipModel,
+} from './data/content'
+import { ShmooGridFig, type Cell } from './ShmooGridFig'
+import './shmoo.css'
 
 type Module14PageProps = {
   moduleId: ModuleId
   onModuleChange: (id: ModuleId) => void
 }
 
-type Cell = { v: number; f: number }
-
-type Focus = { kind: 'cell'; cell: Cell } | { kind: 'yield' } | { kind: 'takeaway' }
+/** 从 Shmoo 格子里读出的几个数 */
+function summarize(chip: ChipModel) {
+  let failsInSpec = 0
+  VOLTS.forEach((v) =>
+    FREQS.forEach((f) => {
+      if (inSpec(v, f) && !isPass(cellKind(chip, v, f))) failsInSpec += 1
+    }),
+  )
+  let fmax = 0
+  for (const f of FREQS) {
+    if (!isPass(cellKind(chip, SPEC.vMin, f))) break
+    fmax = f
+  }
+  const vmin = VOLTS.find((v) => isPass(cellKind(chip, v, FREQS[0])))
+  return { failsInSpec, fmax, margin: fmax - SPEC.fMax, vmin }
+}
 
 export function Module14Page({ moduleId, onModuleChange }: Module14PageProps) {
   const { t } = useLocale()
-  const [focus, setFocus] = useState<Focus>({ kind: 'cell', cell: { v: 1.0, f: 90 } })
-  const detail = resolveDetail(focus, t)
+  const [chipId, setChipId] = useState<ChipId>('good')
+  const [cell, setCell] = useState<Cell | null>({ v: 1.0, f: 300 })
+  const [focus, setFocus] = useState<'cell' | 'chip'>('chip')
+  const chip = CHIPS.find((c) => c.id === chipId) ?? CHIPS[0]
+  const sum = summarize(chip)
+
+  let aside = { kicker: t(L.kickerChip), title: t(chip.label), text: t(chip.text) }
+  if (focus === 'cell' && cell) {
+    const kind = cellKind(chip, cell.v, cell.f)
+    const pass = isPass(kind)
+    const spec = inSpec(cell.v, cell.f)
+    const specText = spec ? (pass ? SPEC_TEXT.inPass : SPEC_TEXT.inFail) : pass ? SPEC_TEXT.outPass : SPEC_TEXT.outFail
+    aside = {
+      kicker: t(L.kickerCell),
+      title: `${cell.v.toFixed(2)} V · ${cell.f} MHz · ${pass ? 'PASS' : 'FAIL'}`,
+      text: `${t(CELL_TEXT[kind])} ${t(specText)}`,
+    }
+  }
 
   return (
     <LessonFrame
@@ -26,107 +73,64 @@ export function Module14Page({ moduleId, onModuleChange }: Module14PageProps) {
       onModuleChange={onModuleChange}
       title={t(ui.m14.title)}
       goal={t(ui.m14.goal)}
-      kicker={detail.kicker}
-      asideTitle={detail.title}
-      asideText={detail.text}
+      kicker={aside.kicker}
+      asideTitle={aside.title}
+      asideText={aside.text}
       asideLater={t(ui.m14.asideLater)}
       nextId="alu"
-      nextLabel={t(ui.m14.next)}
+      nextLabel={t(ui.m14.next) + t(ui.m15.title)}
     >
-      <Section title={t(ui.m14.introTitle)}>
-        <p>{t(ui.m14.introBody)}</p>
+      <Section title={t(L.introTitle)}>
+        <p>{t(L.introBody)}</p>
       </Section>
 
-      <Section title={t(ui.m14.gridTitle)} note={t(ui.m14.gridNote)}>
-        <div className="shmoo">
-          <div className="shmoo__grid" style={{ gridTemplateColumns: `48px repeat(${FREQS.length}, 1fr)` }}>
-            <span />
-            {FREQS.map((f) => (
-              <span key={f} className="shmoo__h">
-                {f}
-              </span>
-            ))}
-            {[...VOLTS].reverse().map((v) => (
-              <ShmooRow
-                key={v}
-                v={v}
-                active={focus.kind === 'cell' ? focus.cell : null}
-                onPick={(cell) => setFocus({ kind: 'cell', cell })}
-              />
-            ))}
-          </div>
-          <p className="intro__note">Voltage ↑ · Frequency →</p>
+      <Section title={t(L.gridTitle)} note={t(L.gridNote)}>
+        <div className="m14-chips">
+          <Seg
+            options={CHIPS.map((c) => ({ id: c.id, label: c.label }))}
+            value={chipId}
+            onChange={(id) => {
+              setChipId(id)
+              setFocus('chip')
+            }}
+          />
         </div>
+        <ShmooGridFig
+          chip={chip}
+          active={focus === 'cell' ? cell : null}
+          onPick={(c) => {
+            setCell(c)
+            setFocus('cell')
+          }}
+        />
+        <Readout
+          items={[
+            { label: L.rdFails, value: `${sum.failsInSpec} ${t(L.cells)}`, state: sum.failsInSpec > 0 ? 'fail' : 'pass' },
+            { label: L.rdFmax, value: `${sum.fmax} MHz` },
+            { label: L.rdMargin, value: `${sum.margin >= 0 ? '+' : ''}${sum.margin} MHz`, state: sum.margin >= 100 ? 'pass' : 'fail' },
+            { label: L.rdVmin, value: sum.vmin === undefined ? '—' : `${sum.vmin.toFixed(2)} V` },
+          ]}
+        />
+        <Callout tone={chip.id === 'good' ? 'ok' : chip.id === 'marginal' ? 'warn' : 'bad'}>
+          <p>{t(chip.text)}</p>
+        </Callout>
       </Section>
 
-      <Section title={t(ui.m14.yieldTitle)}>
-        <button
-          type="button"
-          className={`takeaway${focus.kind === 'yield' ? ' is-active' : ''}`}
-          onClick={() => setFocus({ kind: 'yield' })}
-        >
-          {t(YIELD)}
-        </button>
+      <Section title={t(L.yieldTitle)}>
+        <p>{t(L.yieldBody)}</p>
       </Section>
 
-      <Section title={t(ui.m14.takeawayTitle)}>
-        <button
-          type="button"
-          className={`takeaway${focus.kind === 'takeaway' ? ' is-active' : ''}`}
-          onClick={() => setFocus({ kind: 'takeaway' })}
-        >
-          {t(TAKEAWAY)}
-        </button>
+      <Section title={t(L.takeawayTitle)}>
+        <Callout tone="warn">
+          {TAKEAWAY.map((line) => (
+            <p key={line.zh}>{t(line)}</p>
+          ))}
+        </Callout>
       </Section>
 
-      <Section title={t(ui.m14.quizTitle)} note={t(ui.m14.quizNote)}>
-        <QuizList questions={QUIZ} yes={t(ui.m14.yes)} no={t(ui.m14.no)} />
+      <Section title={t(L.quizTitle)} note={t(L.quizNote)}>
+        <QuizList questions={QUIZ} yes={t(L.yes)} no={t(L.no)} />
       </Section>
     </LessonFrame>
   )
-}
-
-function ShmooRow({
-  v,
-  active,
-  onPick,
-}: {
-  v: number
-  active: Cell | null
-  onPick: (cell: Cell) => void
-}) {
-  return (
-    <>
-      <span className="shmoo__v">{v.toFixed(1)}</span>
-      {FREQS.map((f) => {
-        const pass = cellPass(v, f)
-        const isActive = active?.v === v && active.f === f
-        return (
-          <button
-            key={f}
-            type="button"
-            className={`shmoo__cell${pass ? ' is-pass' : ' is-fail'}${isActive ? ' is-active' : ''}`}
-            onClick={() => onPick({ v, f })}
-          >
-            {pass ? 'P' : 'F'}
-          </button>
-        )
-      })}
-    </>
-  )
-}
-
-function resolveDetail(focus: Focus, t: (text: import('../../i18n/locale').LText | string) => string) {
-  if (focus.kind === 'takeaway') {
-    return { kicker: t(ui.m14.kickerTakeaway), title: t(ui.m14.kickerOne), text: t(TAKEAWAY) }
-  }
-  if (focus.kind === 'yield') {
-    return { kicker: t(ui.m14.kickerYield), title: 'Yield / Bin', text: t(YIELD) }
-  }
-  const pass = cellPass(focus.cell.v, focus.cell.f)
-  return {
-    kicker: t(ui.m14.kickerCell),
-    title: `${focus.cell.v.toFixed(1)} V · ${focus.cell.f} MHz · ${pass ? 'P' : 'F'}`,
-    text: t(cellText(focus.cell.v, focus.cell.f, pass)),
-  }
 }

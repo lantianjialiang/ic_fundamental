@@ -3,15 +3,15 @@ import { loc } from '../../i18n/locale'
 import { type Fault } from './data/opens'
 
 const L = {
-  pmu: loc('PMU'),
-  chip: loc('芯片内部'),
-  core: loc('内部电路'),
-  pin: loc('被测脚'),
-  vdd: loc('VDD = 0 V'),
-  vss: loc('VSS = 0 V'),
-  nb: loc('相邻脚 = 0 V'),
-  short: loc('短路 → 0 V'),
-  cap: loc('黄色是此刻导通的路径。负电流走下面的对地二极管，正电流走上面的对 VDD 二极管。'),
+  pmu: loc('PMU', 'PMU'),
+  chip: loc('芯片内部', 'Inside the chip'),
+  core: loc('内部电路', 'Core logic'),
+  pin: loc('被测脚', 'DUT pin'),
+  vdd: loc('VDD = 0 V', 'VDD = 0 V'),
+  vss: loc('VSS = 0 V', 'VSS = 0 V'),
+  nb: loc('相邻脚 = 0 V', 'Neighbor = 0 V'),
+  short: loc('短路 → 0 V', 'Short → 0 V'),
+  cap: loc('黄色是此刻导通的路径。负电流走下面的对地二极管，正电流走上面的对 VDD 二极管。', 'Yellow marks the path conducting right now. Negative current flows through the lower diode to ground; positive current through the upper diode to VDD.'),
 }
 
 export function OpensFig({ fault, pos, volt }: { fault: Fault; pos: boolean; volt: number }) {

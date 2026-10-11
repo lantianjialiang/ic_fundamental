@@ -4,12 +4,12 @@ import { loc } from '../../i18n/locale'
 import { AC_SPAN, type AcKind } from './data/char'
 
 const L = {
-  ref: loc('参考沿'),
-  res: loc('搜索结果'),
-  valid: loc('有效'),
-  drag: loc('拖动圆点'),
-  cap: loc('蓝色是参考沿（程序里设定，固定），金色是搜索移动的那条沿。拖下面的圆点改变它们的位置。'),
-  shCap: loc('Y 轴 VDD 从上到下 5.5 → 3.5 V；X 轴 VIL 从左到右 2.0 → 0 V。悬停或点击格子看坐标。'),
+  ref: loc('参考沿', 'Ref edge'),
+  res: loc('搜索结果', 'Search result'),
+  valid: loc('有效', 'Valid'),
+  drag: loc('拖动圆点', 'Drag the dots'),
+  cap: loc('蓝色是参考沿（程序里设定，固定），金色是搜索移动的那条沿。拖下面的圆点改变它们的位置。', 'Blue is the reference edge (set in the program, fixed); gold is the edge the search moves. Drag the dots below to change their positions.'),
+  shCap: loc('Y 轴 VDD 从上到下 5.5 → 3.5 V；X 轴 VIL 从左到右 2.0 → 0 V。悬停或点击格子看坐标。', 'Y axis: VDD 5.5 → 3.5 V from top to bottom; X axis: VIL 2.0 → 0 V from left to right. Hover or click a cell to see its coordinates.'),
 }
 
 const X0 = 90

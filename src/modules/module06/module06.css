@@ -1,0 +1,26 @@
+/* D06 DC Test 专用样式 */
+
+.m06-flow {
+  stroke-dasharray: 3 11;
+  animation: m06-flow 1s linear infinite;
+  opacity: 0.7;
+}
+
+@keyframes m06-flow {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m06-flow {
+    animation: none;
+  }
+}
+
+.m06-ctrl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}

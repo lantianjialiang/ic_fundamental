@@ -3,15 +3,15 @@ import { loc } from '../../i18n/locale'
 import { PIPE, STAGES } from './data/vector'
 
 const L = {
-  raw: loc('“生”数据'),
-  exp: loc('期望'),
-  act: loc('实际'),
-  noCmp: loc('不比较'),
-  drive: loc('驱动沿'),
-  logic: loc('逻辑'),
-  cap: loc('一行向量依次经过 Time Set、格式、电平变成管脚波形；输出在 Strobe 时刻和存储的期望字符比较。'),
-  cbCap: loc('当前 8 个地址在存储阵列里的样子：每行一个地址，每格一位。蓝 = 1，暗 = 0。'),
-  addr: loc('地址'),
+  raw: loc('“生”数据', '"Raw" data'),
+  exp: loc('期望', 'Exp'),
+  act: loc('实际', 'Act'),
+  noCmp: loc('不比较', 'no compare'),
+  drive: loc('驱动沿', 'Drive edge'),
+  logic: loc('逻辑', 'Logic'),
+  cap: loc('一行向量依次经过 Time Set、格式、电平变成管脚波形；输出在 Strobe 时刻和存储的期望字符比较。', 'A vector row passes through the time set, format and levels to become a pin waveform; the output is compared with the stored expected character at the strobe.'),
+  cbCap: loc('当前 8 个地址在存储阵列里的样子：每行一个地址，每格一位。蓝 = 1，暗 = 0。', 'The current 8 addresses as they sit in the memory array: one address per row, one bit per cell. Blue = 1, dark = 0.'),
+  addr: loc('地址', 'Address'),
 }
 
 const W0 = 100

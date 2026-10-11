@@ -1,0 +1,17 @@
+/* D04 为什么测试不只是 0 和 1 专用样式 */
+
+.m04-flow {
+  animation: m04-dash 0.7s linear infinite;
+}
+
+@keyframes m04-dash {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m04-flow {
+    animation: none;
+  }
+}

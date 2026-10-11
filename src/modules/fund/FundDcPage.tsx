@@ -39,59 +39,63 @@ import { Callout, Cards, Explain, Knob, Readout, Seg, Steps, fmtOhm, fmtV, type 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
 const S = {
-  wordTitle: loc('先立四个词'),
-  binTitle: loc('Bin 表示例'),
-  binNote: loc('软 Bin 记录“哪一项挂了”，硬 Bin 决定“放进哪个料盒”。'),
-  colSoft: loc('软 Bin'),
-  colItem: loc('失败项'),
-  colHard: loc('硬 Bin'),
-  colMeaning: loc('含义'),
-  summaryTitle: loc('测试总结（Test Summary）'),
-  flowTitle: loc('测试顺序影响平均测试时间'),
-  flowNote: loc('遇到第一项 Fail 就停。坏片越早停下，平均时间越短；良品永远要跑完全程。'),
-  flowBook: loc('教科书顺序'),
-  flowSorted: loc('按失败率重排'),
-  flowAvg: loc('平均每颗'),
-  flowGood: loc('良品每颗'),
-  flowFail: loc('失败率'),
-  flowDep: loc('开短路必须第一，粗功能必须在 DC 前——有依赖的项不能为了省时间乱排。'),
-  ohmTitle: loc('每条规格背后的电阻'),
-  ohmCalc: loc('自己算：'),
-  colName: loc('项目'),
-  colV: loc('电压'),
-  colI: loc('电流'),
-  colR: loc('R = V / I'),
-  voxTitle: loc('VOH / VOL：串行静态测法'),
-  voxLab: loc('动手：让 VOH / VOL 通过或失败'),
-  voxLabNote: loc('改驱动强度，或者故意让预处理放错状态，看读数和诊断怎么变。'),
-  testVol: loc('测 VOL'),
-  testVoh: loc('测 VOH'),
-  stateOk: loc('预处理正确'),
-  stateBad: loc('预处理放错状态'),
-  rn: loc('下拉电阻 Rn'),
-  rp: loc('上拉电阻 Rp'),
-  read: loc('读数'),
-  limit: loc('极限'),
-  iddTitle: loc('IDD 的四种测法'),
-  iddqLab: loc('IDDQ：在 8 个向量停点量静态电流（纵轴为对数刻度）'),
-  iddqGood: loc('良品'),
-  iddqBad: loc('有桥接缺陷'),
-  iddqLimit: loc('极限'),
-  inTitle: loc('IIL / IIH：串行、并行、并联'),
-  inNote: loc('12 个输入脚，其中 A5 漏 35 µA（极限 ±10 µA）。每次 PMU 量测约 2 ms，IIL、IIH 各量一次。'),
-  inTime: loc('测试时间'),
-  inResult: loc('结果'),
-  inGangLimit: loc('并联极限 = 12 × 10 µA'),
-  inFound: loc('找到 A5'),
-  inMissed: loc('漏掉 A5'),
-  colPin: loc('管脚'),
-  colIih: loc('IIH'),
-  colVerdict: loc('判定'),
-  total: loc('总和'),
-  otherTitle: loc('其他 DC 项'),
-  iosTitle: loc('IOS：不热切换的步骤'),
-  kicker: loc('DC 参数'),
-  later: loc('DC 都过了，下一课用向量跑功能。'),
+  wordTitle: loc('先立四个词', 'Four terms first'),
+  binTitle: loc('Bin 表示例', 'Example bin table'),
+  binNote: loc('软 Bin 记录“哪一项挂了”，硬 Bin 决定“放进哪个料盒”。', 'Soft bins record "which test failed"; hard bins decide "which tray it goes in".'),
+  colSoft: loc('软 Bin', 'Soft bin'),
+  colItem: loc('失败项', 'Failing test'),
+  colHard: loc('硬 Bin', 'Hard bin'),
+  colMeaning: loc('含义', 'Meaning'),
+  summaryTitle: loc('测试总结（Test Summary）', 'Test summary'),
+  flowTitle: loc('测试顺序影响平均测试时间', 'Test order affects average test time'),
+  flowNote: loc('遇到第一项 Fail 就停。坏片越早停下，平均时间越短；良品永远要跑完全程。', 'Stop at the first Fail. The earlier bad parts stop, the shorter the average time; good parts always run the full flow.'),
+  flowBook: loc('教科书顺序', 'Textbook order'),
+  flowSorted: loc('按失败率重排', 'Sorted by fail rate'),
+  flowAvg: loc('平均每颗', 'Average per part'),
+  flowGood: loc('良品每颗', 'Per good part'),
+  flowFail: loc('失败率', 'fail rate'),
+  flowDep: loc('开短路必须第一，粗功能必须在 DC 前——有依赖的项不能为了省时间乱排。', 'Opens/shorts must be first and gross functional must precede DC - dependent tests cannot be reordered just to save time.'),
+  ohmTitle: loc('每条规格背后的电阻', 'The resistance behind each spec'),
+  ohmCalc: loc('自己算：', 'Try it:'),
+  colName: loc('项目', 'Item'),
+  colV: loc('电压', 'Voltage'),
+  colI: loc('电流', 'Current'),
+  colR: loc('R = V / I', 'R = V / I'),
+  voxTitle: loc('VOH / VOL：串行静态测法', 'VOH / VOL: serial static method'),
+  voxLab: loc('动手：让 VOH / VOL 通过或失败', 'Hands-on: make VOH / VOL pass or fail'),
+  voxLabNote: loc('改驱动强度，或者故意让预处理放错状态，看读数和诊断怎么变。', 'Change the drive strength, or deliberately precondition the wrong state, and watch the reading and diagnosis change.'),
+  testVol: loc('测 VOL', 'Test VOL'),
+  testVoh: loc('测 VOH', 'Test VOH'),
+  stateOk: loc('预处理正确', 'Correct precondition'),
+  stateBad: loc('预处理放错状态', 'Wrong state'),
+  rn: loc('下拉电阻 Rn', 'Pull-down Rn'),
+  rp: loc('上拉电阻 Rp', 'Pull-up Rp'),
+  read: loc('读数', 'Reading'),
+  limit: loc('极限', 'Limit'),
+  iddTitle: loc('IDD 的四种测法', 'Four ways to test IDD'),
+  iddqLab: loc('IDDQ：在 8 个向量停点量静态电流（纵轴为对数刻度）', 'IDDQ: quiescent current at 8 vector stops (log scale)'),
+  iddqGood: loc('良品', 'Good part'),
+  iddqBad: loc('有桥接缺陷', 'Bridging defect'),
+  iddqLimit: loc('极限', 'Limit'),
+  inTitle: loc('IIL / IIH：串行、并行、并联', 'IIL / IIH: serial, parallel, ganged'),
+  inNote: loc('12 个输入脚，每脚极限 ±10 µA。每次 PMU 量测约 2 ms，IIL、IIH 各量一次。切换良品和 A5 漏 35 µA 的坏片，比较三种测法的时间。', '12 input pins, each with a ±10 µA limit. Each PMU measurement takes about 2 ms; IIL and IIH are each measured once. Switch between a good part and a bad part whose A5 leaks 35 µA, and compare the test time of the three methods.'),
+  inGood: loc('良品', 'Good part'),
+  inBad: loc('A5 漏电', 'A5 leaks'),
+  inTime: loc('测试时间', 'Test time'),
+  inResult: loc('结果', 'Result'),
+  inGangLimit: loc('并联极限 = 单脚极限', 'Ganged limit = single-pin limit'),
+  inAllPass: loc('全部 PASS', 'All PASS'),
+  inFound: loc('找到 A5', 'A5 found'),
+  inRetest: loc('并联超限，逐脚串行复测：', 'Ganged limit exceeded; serial retest pin by pin:'),
+  inGangPass: loc('总电流没超过单脚极限，所有脚一次判 PASS，不用复测。', 'The total stays under the single-pin limit, so every pin passes in one measurement and no retest is needed.'),
+  colPin: loc('管脚', 'Pin'),
+  colIih: loc('IIH', 'IIH'),
+  colVerdict: loc('判定', 'Verdict'),
+  total: loc('总和', 'Total'),
+  otherTitle: loc('其他 DC 项', 'Other DC tests'),
+  iosTitle: loc('IOS：不热切换的步骤', 'IOS: steps without hot switching'),
+  kicker: loc('DC 参数', 'DC parameters'),
+  later: loc('DC 都过了，下一课用向量跑功能。', 'With DC passed, the next lesson runs functional vectors.'),
 }
 
 export function FundDcPage({ moduleId, onModuleChange }: Props) {
@@ -108,6 +112,7 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
   const [idd, setIdd] = useState('iddq')
   const [iddqBad, setIddqBad] = useState(false)
   const [inMethod, setInMethod] = useState<InMethod>('serial')
+  const [inLeaky, setInLeaky] = useState(true)
   const [other, setOther] = useState('ios')
   const [note, setNote] = useState<Note>({ kicker: S.kicker, title: WORDS[3].title, text: WORDS[3].text })
 
@@ -124,11 +129,13 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
   const iddq = iddqBad ? IDDQ_BAD : IDDQ_GOOD
   const iddqPass = iddq.every((value) => value <= IDDQ_LIMIT)
 
-  const leaks = IN_PINS.map((pin) => IN_LEAK[pin] ?? 0.05 + (pin.length % 3) * 0.02)
+  const leaks = IN_PINS.map((pin) => (inLeaky ? IN_LEAK[pin] : undefined) ?? 0.05 + (pin.length % 3) * 0.02)
   const gangTotal = leaks.reduce((sum, value) => sum + value, 0)
-  const gangLimit = IN_PINS.length * IN_LIMIT
-  const inMs = inMethod === 'serial' ? 2 * IN_PINS.length * IN_MEAS_MS : 2 * IN_MEAS_MS
-  const inFound = inMethod !== 'gang'
+  const gangFail = gangTotal > IN_LIMIT
+  const serialMs = 2 * IN_PINS.length * IN_MEAS_MS
+  const inMs =
+    inMethod === 'serial' ? serialMs : inMethod === 'parallel' ? 2 * IN_MEAS_MS : 2 * IN_MEAS_MS + (gangFail ? serialMs : 0)
+  const showPins = inMethod !== 'gang' || gangFail
 
   return (
     <LessonFrame
@@ -326,34 +333,48 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
         </div>
         <Callout tone={iddqPass ? 'ok' : 'bad'}>
           {iddqPass
-            ? t(loc('8 个停点都在几 µA。PASS。'))
-            : t(loc('V3、V6 两个状态电流跳到 160 µA 以上：某两根线在这两个状态下被驱动成相反电平，桥接点导通。功能可能是对的，但 IDDQ 判 FAIL。'))}
+            ? t(loc('8 个停点都在几 µA。PASS。', 'All 8 stops are at a few µA. PASS.'))
+            : t(loc('V3、V6 两个状态电流跳到 160 µA 以上：某两根线在这两个状态下被驱动成相反电平，桥接点导通。功能可能是对的，但 IDDQ 判 FAIL。', 'In states V3 and V6 the current jumps above 160 µA: two wires are driven to opposite levels in these states and the bridge conducts. Function may be correct, but IDDQ judges FAIL.'))}
         </Callout>
       </Section>
 
       <Section title={t(S.inTitle)} note={t(S.inNote)}>
         <Seg options={IN_METHODS.map((m) => ({ id: m.id, label: m.label }))} value={inMethod} onChange={setInMethod} />
+        <Seg
+          options={[
+            { id: 'good', label: S.inGood },
+            { id: 'bad', label: S.inBad },
+          ]}
+          value={inLeaky ? 'bad' : 'good'}
+          onChange={(id) => setInLeaky(id === 'bad')}
+        />
         <p>{t(IN_METHODS.find((m) => m.id === inMethod)?.text ?? '')}</p>
         <Readout
           items={[
             { label: S.inTime, value: `${inMs} ms` },
-            { label: S.inResult, value: t(inFound ? S.inFound : S.inMissed), state: inFound ? 'pass' : 'fail' },
+            {
+              label: S.inResult,
+              value: t(inLeaky ? S.inFound : S.inAllPass),
+              state: inLeaky ? 'fail' : 'pass',
+            },
           ]}
         />
         {inMethod === 'gang' ? (
           <table className="dtable">
             <tbody>
-              <tr className="is-pass">
+              <tr className={gangFail ? 'is-fail' : 'is-pass'}>
                 <td>{t(S.total)} IIH</td>
                 <td className="mono-cell">{gangTotal.toFixed(1)} µA</td>
                 <td className="mono-cell">
-                  {t(S.inGangLimit)} = {gangLimit} µA
+                  {t(S.inGangLimit)} = {IN_LIMIT} µA
                 </td>
-                <td className="verdict">PASS</td>
+                <td className="verdict">{gangFail ? 'FAIL' : 'PASS'}</td>
               </tr>
             </tbody>
           </table>
-        ) : (
+        ) : null}
+        {inMethod === 'gang' ? <p>{t(gangFail ? S.inRetest : S.inGangPass)}</p> : null}
+        {showPins ? (
           <table className="dtable">
             <thead>
               <tr>
@@ -375,7 +396,7 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
               })}
             </tbody>
           </table>
-        )}
+        ) : null}
       </Section>
 
       <Section title={t(S.otherTitle)}>

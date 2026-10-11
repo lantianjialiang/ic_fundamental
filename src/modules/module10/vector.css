@@ -1,0 +1,20 @@
+/* D 轨测试向量课专用样式 */
+
+.m10-bar {
+  transform-box: fill-box;
+  transform-origin: left center;
+  transition: transform 0.45s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m10-bar {
+    transition: none;
+  }
+}
+
+.m10-sub {
+  margin: 22px 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}

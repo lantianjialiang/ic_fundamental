@@ -1,0 +1,215 @@
+/* D02「DUT 如何接到 ATE？」专用样式，配色全部走站点 CSS 变量 */
+
+.m01-toolbar {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+.m01-toolbar .lab__modes {
+  margin-right: 0;
+}
+
+.m01-hint {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.m01-stage {
+  position: relative;
+  overflow: hidden;
+}
+
+.m01-overlay {
+  position: absolute;
+  margin: 0;
+  pointer-events: none;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.m01-overlay--note {
+  top: 10px;
+  left: 12px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+
+.m01-overlay--phase {
+  left: 50%;
+  bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  max-width: min(640px, calc(100% - 24px));
+  padding: 8px 16px;
+  transform: translateX(-50%);
+  color: var(--text);
+  font-size: 13.5px;
+  text-align: center;
+}
+
+.m01-overlay__step {
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.m01-overlay__sub {
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+/* 3D 标注 */
+.m01-label {
+  display: flex;
+  flex-direction: column;
+  padding: 3px 9px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--gold);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--panel) 90%, transparent);
+  color: var(--text);
+  white-space: nowrap;
+  user-select: none;
+  transform: translate(6px, -50%);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.18);
+}
+
+.m01-label.is-active {
+  border-color: var(--gold);
+}
+
+.m01-label__title {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.m01-label__sub {
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+/* 侧栏 */
+.m01-layers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.m01-layers__btn {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  background: var(--card);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.m01-layers__btn:hover {
+  border-color: var(--line-2);
+  background: var(--card-hover);
+}
+
+.m01-layers__btn.is-active {
+  border-color: var(--gold-line);
+  background: var(--gold-bg);
+}
+
+.m01-layers__name {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.m01-layers__desc {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+
+.m01-note {
+  margin: 0 0 18px;
+  padding: 6px 10px;
+  border-left: 3px solid var(--gold-line);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.legend .m01-phases {
+  margin: 0 0 18px;
+  padding-left: 20px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.m01-phases li.is-done {
+  color: var(--text-2);
+}
+
+.m01-phases li.is-active {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.m01-channels {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0 0 18px;
+}
+
+.m01-channels__btn {
+  appearance: none;
+  padding: 4px 0;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--card);
+  color: var(--text-2);
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.m01-channels__btn:hover {
+  background: var(--card-hover);
+}
+
+.m01-channels__btn.is-active {
+  border-color: var(--gold-line);
+  background: var(--gold-bg);
+  color: var(--text);
+}
+
+@media (max-width: 900px) {
+  .m01-toolbar {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .m01-hint {
+    flex-basis: 100%;
+    order: 10;
+    margin-left: 0;
+  }
+
+  .m01-overlay--phase {
+    font-size: 12.5px;
+  }
+}

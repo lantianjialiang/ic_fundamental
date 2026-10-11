@@ -1,0 +1,21 @@
+/* D 轨「测试程序与排错」课专用样式 */
+
+.m12-chip {
+  transition: transform 0.5s ease;
+}
+
+.m12-pick {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: var(--fs);
+  color: var(--text-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m12-chip {
+    transition: none;
+  }
+}

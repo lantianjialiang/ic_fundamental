@@ -1,4 +1,111 @@
 import { loc, type LText } from '../../../i18n/locale'
+import { type QuizQuestion } from '../../../lab/QuizList'
+
+export const WHAT: LText[] = [
+  loc(
+    '芯片从晶圆到出货，每一步都可能做出坏片。测试用 ATE 自动给每一颗 DUT 加信号、测响应、判 Pass / Fail，坏的挑出来，好的才往下走。',
+    'From wafer to shipment, every step can produce bad parts. Test uses ATE to stimulate each DUT, measure the response, and judge Pass / Fail. Bad parts are pulled out; only good ones move on.',
+  ),
+  loc(
+    '测试只做判断，不修芯片。它保护的是出货质量和后面工序的成本。',
+    'Test only judges; it does not repair. It protects outgoing quality and the cost of later steps.',
+  ),
+]
+
+export type ChainId = 'wafer' | 'cp' | 'pkg' | 'ft' | 'ship'
+
+export const CHAIN: Array<{ id: ChainId; title: LText; sub: LText; text: LText; test?: boolean }> = [
+  {
+    id: 'wafer',
+    title: loc('Wafer', 'Wafer'),
+    sub: loc('晶圆', 'Wafer'),
+    text: loc(
+      'Fab 把电路做到硅片上，一片晶圆上有成千上万颗还没切开的 die。此时谁好谁坏还不知道。',
+      'The fab builds the circuit on silicon. One wafer holds thousands of undiced dies. Nobody knows yet which ones work.',
+    ),
+  },
+  {
+    id: 'cp',
+    title: loc('CP', 'CP'),
+    sub: loc('晶圆测试', 'Wafer sort'),
+    test: true,
+    text: loc(
+      'Circuit Probe。封装前，用探针扎晶圆上的 pad，把坏 die 标出来，省掉封装坏片的钱。',
+      'Circuit Probe. Before packaging, needles touch the pads on the wafer and bad dies are marked, so nobody pays to package them.',
+    ),
+  },
+  {
+    id: 'pkg',
+    title: loc('Packaging', 'Packaging'),
+    sub: loc('封装', 'Assembly'),
+    text: loc(
+      '晶圆切开，好 die 装进封装、打线，长出引脚或焊球，变成常见的芯片样子。',
+      'The wafer is diced; good dies are packaged and bonded and get pins or balls — the chip shape people recognize.',
+    ),
+  },
+  {
+    id: 'ft',
+    title: loc('FT', 'FT'),
+    sub: loc('成品测试', 'Final test'),
+    test: true,
+    text: loc(
+      'Final Test。封装后的器件放进 Socket，做更完整的功能、DC、AC 测试，决定能不能出货。封装本身也可能做坏，所以还要再测。',
+      'Final Test. Packaged devices sit in a socket and get fuller functional, DC, and AC tests that decide shipment. Assembly itself can break parts, so they are tested again.',
+    ),
+  },
+  {
+    id: 'ship',
+    title: loc('Ship', 'Ship'),
+    sub: loc('出货', 'Shipment'),
+    text: loc(
+      '通过 FT 的器件按 Bin 分好，装盘或编带，交给客户。',
+      'Parts that pass FT are sorted by Bin, packed in trays or on tape, and sent to customers.',
+    ),
+  },
+]
+
+export const CHIP_TYPES: Array<{ id: string; title: LText; sub: LText; text: LText; params: LText[] }> = [
+  {
+    id: 'digital',
+    title: loc('数字芯片', 'Digital ICs'),
+    sub: loc('MCU、SoC、FPGA、逻辑 ASIC', 'MCU, SoC, FPGA, logic ASIC'),
+    text: loc(
+      '大量依赖测试向量（Pattern）：一拍一拍地给 0/1、比 0/1。本轨道主要讲它。',
+      'Relies on test vectors (patterns): drive 0/1 and compare 0/1 cycle by cycle. This track is mostly about it.',
+    ),
+    params: [loc('VIH / VIL、VOH / VOL', 'VIH / VIL, VOH / VOL'), loc('IDD、漏电', 'IDD, leakage'), loc('功能 Pattern', 'Functional patterns'), loc('Setup / Hold', 'Setup / Hold')],
+  },
+  {
+    id: 'analog',
+    title: loc('模拟芯片', 'Analog ICs'),
+    sub: loc('LDO、运放、ADC / DAC、电源管理', 'LDO, op-amp, ADC / DAC, power management'),
+    text: loc(
+      '测连续量的精度和噪声，主要靠精密源表和采样，而不是海量 Pattern。',
+      'Measures accuracy and noise of continuous values, mostly with precision source-measure and sampling, not huge patterns.',
+    ),
+    params: [loc('Offset、Gain', 'Offset, Gain'), loc('INL / DNL', 'INL / DNL'), loc('Iq', 'Iq'), loc('PSRR', 'PSRR')],
+  },
+  {
+    id: 'memory',
+    title: loc('存储芯片', 'Memory ICs'),
+    sub: loc('DRAM、SRAM、Flash', 'DRAM, SRAM, Flash'),
+    text: loc(
+      '大阵列、按地址读写，用 March 等算法；坏单元还能用冗余修复，测试时间很长。',
+      'Large arrays read and written by address with March-type algorithms; bad cells can be repaired with redundancy. Test time is long.',
+    ),
+    params: [loc('March 算法', 'March algorithms'), loc('Retention', 'Retention'), loc('地址译码', 'Address decode'), loc('Repair', 'Repair')],
+  },
+  {
+    id: 'rf',
+    title: loc('射频芯片', 'RF ICs'),
+    sub: loc('PA、LNA、收发器', 'PA, LNA, transceivers'),
+    text: loc(
+      '看高频功率、阻抗和调制质量，需要 RF 仪器和校准，数字 Channel 替代不了。',
+      'Looks at RF power, impedance, and modulation quality. It needs RF instruments and calibration; a digital channel cannot replace them.',
+    ),
+    params: [loc('功率', 'Power'), loc('S 参数', 'S-parameters'), loc('噪声系数', 'Noise figure'), loc('EVM', 'EVM')],
+  },
+]
 
 export type TermId =
   | 'cp'
@@ -15,218 +122,126 @@ export type TermId =
   | 'bin'
   | 'yield'
 
-export type ChainId = 'wafer' | 'fab' | 'cp' | 'pkg' | 'ft' | 'product'
-
-export const CHAIN: Array<{ id: ChainId; title: string; subtitle: LText; text: LText }> = [
-  {
-    id: 'wafer',
-    title: 'Wafer',
-    subtitle: loc('晶圆', 'Wafer'),
-    text: loc(
-      '硅片上已经做出成千上万颗尚未分割的芯片。这时看到的还不是一颗封装好的 IC，而是整片晶圆。',
-      'The silicon already holds thousands of undiced chips. You are not looking at a packaged IC yet — it is still a whole wafer.',
-    ),
-  },
-  {
-    id: 'fab',
-    title: 'Wafer Fab',
-    subtitle: loc('晶圆制造', 'Wafer fabrication'),
-    text: loc(
-      'Fab 把电路做到晶圆上。制造完成后，并不知道每一颗 die 是否好用，所以必须测试。',
-      'The fab puts the circuit on the wafer. After manufacturing, nobody yet knows which dies work, so they must be tested.',
-    ),
-  },
-  {
-    id: 'cp',
-    title: 'Wafer Sort / CP',
-    subtitle: loc('晶圆测试', 'Wafer test'),
-    text: loc(
-      'Circuit Probe。在封装前用探针接触晶圆上的 pad，筛掉明显失效的 die，避免把坏 die 送去封装。',
-      'Circuit Probe. Probes touch pads on the wafer before packaging, so obviously bad dies are not sent to assembly.',
-    ),
-  },
-  {
-    id: 'pkg',
-    title: 'Packaging',
-    subtitle: loc('封装', 'Assembly'),
-    text: loc(
-      '把合格 die 封成可以焊接、可以插入 Socket 的器件。封装后才出现引脚、焊球，外形变成学生常见的芯片。',
-      'Good dies are packaged so they can be soldered or inserted into a socket. Only then do pins or balls appear — the chip students usually recognize.',
-    ),
-  },
-  {
-    id: 'ft',
-    title: 'FT',
-    subtitle: loc('成品测试', 'Final test'),
-    text: loc(
-      'Final Test。对封装后的器件做更完整的功能、直流、交流测试，决定能不能出货。',
-      'Final Test. Packaged devices get fuller functional, DC, and AC tests that decide whether they may ship.',
-    ),
-  },
-  {
-    id: 'product',
-    title: 'Final Product',
-    subtitle: loc('成品', 'Product'),
-    text: loc(
-      '通过 FT、打上 Bin 的器件才能进入系统或卖给客户。测试的目的是保证出货质量，不是把芯片“修好”。',
-      'Only devices that pass FT and receive a Bin enter a system or go to a customer. Test protects outgoing quality; it does not “repair” the chip.',
-    ),
-  },
-]
-
 export type Term = {
   id: TermId
   name: string
-  full: LText | string
+  full: LText
+  /** 侧栏：这个词是什么意思 */
   text: LText
-  image: string
+  /** 图注：图里画的是什么 */
   caption: LText
-  credit: LText | string
 }
 
 export const TERMS: Term[] = [
   {
     id: 'cp',
     name: 'CP',
-    full: 'Circuit Probe / Wafer Sort',
-    text: loc(
-      '封装前的晶圆测试。DUT 是晶圆上的 die，接触件是 Probe Card 和探针，没有 Socket。',
-      'Wafer test before packaging. The DUT is a die on the wafer. The contact is a probe card and needles — no socket.',
-    ),
-    image: '/glossary/cp.jpg',
+    full: loc('Circuit Probe / Wafer Sort', 'Circuit Probe / Wafer Sort'),
+    text: loc('封装前的晶圆测试。DUT 是晶圆上的一颗 die。', 'Wafer test before packaging. The DUT is one die on the wafer.'),
     caption: loc(
-      '晶圆探针台：中间是放晶圆的 chuck，上方是显微镜。量产 CP 用更大的 Wafer Prober，但接触方式一样——探针扎 pad，不是插 Socket。',
-      'A wafer probe station: the chuck holds the wafer, the microscope sits above. Production CP uses a larger prober, but contact is the same — needles on pads, not a socket.',
+      '探针卡压在晶圆上方，探针扎在 die 的 pad 上。晶圆放在可移动的 chuck 上，测完一颗挪到下一颗。',
+      'The probe card sits over the wafer and its needles land on a die’s pads. The wafer rides on a moving chuck that steps to the next die.',
     ),
-    credit: 'Wikimedia Commons · Micromanipulator P300J Wafer Probe Station · CC BY-SA',
   },
   {
     id: 'ft',
     name: 'FT',
-    full: 'Final Test',
-    text: loc(
-      '封装后的成品测试。DUT 是 packaged device，通常经过 Handler、Load Board 和 Socket 接到 ATE。',
-      'Final test after packaging. The DUT is a packaged device, usually reached through a handler, load board, and socket.',
-    ),
-    image: '/glossary/ft.svg',
+    full: loc('Final Test', 'Final Test'),
+    text: loc('封装后的成品测试。DUT 是封装好的芯片。', 'Test after packaging. The DUT is the packaged chip.'),
     caption: loc(
-      'FT 叠层：DUT 在上，经过 Socket 和 Load Board 接到下方 ATE。测的是已封装器件，没有晶圆，也没有 Probe Card。',
-      'FT stack: DUT on top, through socket and load board to the ATE below. The DUT is packaged. No wafer, no probe card.',
+      '封装芯片被压进 Socket，Socket 焊在 Load Board 上，下面接测试头。',
+      'The packaged chip is pressed into a socket mounted on the load board, with the test head below.',
     ),
-    credit: loc('本课示意图，对应下一课 3D 叠层', 'Lesson diagram, matches the next 3D stack'),
   },
   {
     id: 'ate',
     name: 'ATE',
-    full: 'Automatic Test Equipment',
+    full: loc('Automatic Test Equipment', 'Automatic Test Equipment'),
     text: loc(
-      '自动测试设备。按 Test Program 产生激励、测量响应、控制时序，并给出 Pass / Fail。它不是示波器，也不是万用表。',
-      'Automatic Test Equipment. It applies stimulus, measures response, controls timing, and issues Pass / Fail from a test program. It is not a scope and not a DMM.',
+      '自动测试设备。按测试程序给 DUT 加信号、测量响应、判 Pass / Fail。',
+      'Automatic Test Equipment. It follows the test program to stimulate the DUT, measure the response, and judge Pass / Fail.',
     ),
-    image: '/glossary/ate.svg',
     caption: loc(
-      '量产 ATE 是机柜 + 测试头。DUT 不插在机柜上，而是经 Test Head → Load Board → Socket（或 Probe Card）到达。',
-      'A production ATE is a cabinet plus a test head. The DUT does not plug into the cabinet; it is reached through Test Head → Load Board → Socket (or Probe Card).',
-    ),
-    credit: loc(
-      '本课示意图。开放图库几乎没有可授权的量产 ATE 照片，不用实验室源表或 1960 年代展台冒充。',
-      'Lesson diagram. Freely licensed production ATE photos are rare; we do not fake them with a lab SMU or a 1960s booth.',
+      '量产 ATE = 主机柜 + 测试头。电缆把主机里的资源接到测试头，DUT 在测试头上方。',
+      'A production ATE = mainframe + test head. Cables bring the mainframe resources to the head; the DUT sits on top of the head.',
     ),
   },
   {
     id: 'dut',
     name: 'DUT',
-    full: 'Device Under Test',
+    full: loc('Device Under Test', 'Device Under Test'),
     text: loc(
-      '正在被测的对象。CP 时是晶圆上的 die；FT 时是封装后的芯片。不要把 DUT 理解成“裸芯片永远等于封装器件”。',
-      'The device being tested. In CP it is a die on the wafer; in FT it is a packaged chip. DUT is not always “the packaged IC”.',
+      '正在被测的器件。CP 时是晶圆上的 die，FT 时是封装好的芯片。',
+      'The device being tested: a die on the wafer in CP, a packaged chip in FT.',
     ),
-    image: '/glossary/dut.jpg',
     caption: loc(
-      '一颗封装 IC。在 FT 里它就是 DUT；在 CP 里 DUT 则是晶圆上的那一颗 die。',
-      'A packaged IC. In FT this is the DUT. In CP the DUT is that one die on the wafer.',
+      '一颗 QFP 封装芯片，四边是引脚，圆点标出 1 号脚。',
+      'A QFP packaged chip with pins on four sides; the dot marks pin 1.',
     ),
-    credit: 'Wikimedia Commons · Integrated circuit on microchip',
   },
   {
     id: 'tester',
     name: 'Tester',
-    full: loc('测试机 / ATE 主机', 'Tester / ATE mainframe'),
+    full: loc('测试机', 'Tester'),
     text: loc(
-      '工业界常把 ATE 主机叫 Tester。它提供 Channel、电源、测时和测压能力。DUT 并不直接插在 Tester 机箱上。',
-      'Industry often calls the ATE mainframe the Tester. It provides channels, supplies, timing, and voltage measurement. The DUT does not plug into that box.',
+      '工厂里对 ATE 的常用叫法。它为每个管脚提供一路测试通道（Channel）。',
+      'The usual shop-floor name for the ATE. It gives every pin its own test channel.',
     ),
-    image: '/glossary/tester.png',
     caption: loc(
-      '测试头接口特写：密密的弹簧针和通道孔。Channel 从这里出去，再接到 Load Board，而不是直接扎到芯片上。',
-      'Test-head interface: dense pogo pins and channel holes. Channels leave here to the load board; they do not stab the chip directly.',
-    ),
-    credit: loc(
-      '教学示意：测试头弹簧针 / 通道孔接口，不是实验室台式源表',
-      'Teaching image: test-head pogo / channel interface, not a bench SMU',
+      '测试头内部插着一排通道板，每块板有若干 Channel，顶面的弹簧针把信号送到 Load Board。',
+      'Inside the test head sits a row of channel boards, each with several channels. Pogo pins on top carry signals up to the load board.',
     ),
   },
   {
     id: 'loadboard',
     name: 'Load Board',
-    full: loc('测试负载板', 'DUT interface board'),
+    full: loc('负载板', 'Load board'),
     text: loc(
-      '专门为测试设计的 PCB。把 Tester Channel 布线到 DUT 引脚，并提供电源、地和必要外围电路。',
-      'A PCB designed for test. It routes tester channels to DUT pins and provides power, ground, and needed support circuitry.',
+      '为这颗芯片专门做的 PCB，把测试头的通道布线到 Socket 的每个管脚。',
+      'A PCB made for this one device. It routes test-head channels to every pin of the socket.',
     ),
-    image: '/glossary/loadboard.svg',
     caption: loc(
-      'Load Board 不是普通产品主板。一侧是 Tester 连接器，中间是 Socket 焊盘，黄线是走线，蓝点是过孔到内层。',
-      'A load board is not a product motherboard. One side is the tester connector, the center is the socket site, gold lines are tracks, blue dots are vias.',
+      '四周是接测试头的焊盘，金色走线汇到中间的 Socket 位置，圆点是换层的过孔。',
+      'Pads around the edge meet the test head; gold traces run to the socket site in the middle; dots are vias.',
     ),
-    credit: loc('本课示意图，对应下一课多层 PCB 走线', 'Lesson diagram, matches the multilayer PCB path'),
   },
   {
     id: 'socket',
     name: 'Socket',
     full: loc('测试插座', 'Test socket'),
     text: loc(
-      'FT 用的机械 + 电气接口。让封装器件可以反复插拔，并把 pin / ball 可靠地接到 Load Board。',
-      'The mechanical and electrical interface for FT. A packaged device can be inserted many times, and pins or balls meet the load board reliably.',
+      'FT 用的插座。不用焊接就能让芯片反复插拔、可靠接触。',
+      'The FT socket. It lets chips be inserted again and again with reliable contact and no soldering.',
     ),
-    image: '/glossary/socket.png',
     caption: loc(
-      '翻盖式芯片插座。量产 FT Socket 结构更复杂，但目的相同：反复接触封装引脚，而不焊接。',
-      'A clamshell IC socket. Production FT sockets are more complex, but the job is the same: repeatable contact without soldering.',
+      '剖面：底座里是一排弹簧针，芯片的焊球压在针上，盖子合上把芯片压紧。',
+      'Cross-section: spring pins in the base, the chip’s balls rest on them, and the lid closes to press the chip down.',
     ),
-    credit: 'Wikimedia Commons · M4050 Clamshell Socket',
   },
   {
     id: 'probecard',
     name: 'Probe Card',
     full: loc('探针卡', 'Probe card'),
     text: loc(
-      'CP 用的接口板。它代替 Socket：一端接 Tester，另一端用探针扎到晶圆 pad 上。',
-      'The CP interface board. It replaces the socket: one side meets the tester, the other side needles the wafer pads.',
+      'CP 用的接口板，作用相当于 FT 的 Load Board + Socket。',
+      'The CP interface board; it does the job of the FT load board plus socket.',
     ),
-    image: '/glossary/probecard.jpg',
     caption: loc(
-      'CIS 探针卡针区：每个圆窗里是一丛探针。针朝向晶圆，板的另一面再接到 Tester。',
-      'CIS probe-card needle field: each window holds a bundle of probes. Needles face the wafer; the other side of the card meets the tester.',
+      '俯视：圆形 PCB，四周接测试头，中间窗口里探针向中心排开，针尖对准 die 的 pad。',
+      'Top view: a round PCB that meets the test head at the rim. In the center window, needles point inward to the die pads.',
     ),
-    credit: 'Wikimedia Commons · CIS probe card · CC BY-SA 4.0 · Jasycheng',
   },
   {
     id: 'handler',
     name: 'Handler',
     full: loc('分选机', 'Handler'),
     text: loc(
-      'FT 产线设备。自动把器件送进 Socket、测试完按 Bin 分拣。教学上先记住：Handler 负责“搬运和分类”，ATE 负责“测量和判定”。',
-      'FT floor equipment. It loads devices into the socket and sorts them by Bin after test. Remember: the handler moves and sorts; the ATE measures and judges.',
+      'FT 的搬运设备：把芯片送进 Socket，测完按 Bin 分拣。它只搬运，不测量。',
+      'The FT material-moving machine: it puts chips into the socket and sorts them by Bin after test. It moves parts; it does not measure.',
     ),
-    image: '/glossary/handler.svg',
     caption: loc(
-      'Handler 从料盘抓取 DUT、压进 Socket，再按 Bin 1 / 2 / 6 分到不同出口。它不测电，只搬运和分类。',
-      'The handler picks a DUT from a tray, presses it into the socket, then sorts to Bin 1 / 2 / 6. It does not measure; it only moves and classifies.',
-    ),
-    credit: loc(
-      '本课示意图。开放图库没有可授权的量产分选机照片。',
-      'Lesson diagram. No freely licensed production-handler photo was available.',
+      '从进料盘取芯片 → 压进测试位 → 按 ATE 给的 Bin 放进不同出料盘。',
+      'Pick from the input tray → press into the test site → drop into an output tray by the Bin the ATE reports.',
     ),
   },
   {
@@ -234,210 +249,185 @@ export const TERMS: Term[] = [
     name: 'Test Program',
     full: loc('测试程序', 'Test program'),
     text: loc(
-      '跑在 Tester / 工控机上的程序。它决定测什么、用哪个 Channel、限值是多少、失败进哪个 Bin。没有 Test Program，ATE 只是一台不会自己思考的机器。',
-      'The program on the tester or workstation. It chooses tests, channels, limits, and fail bins. Without it the ATE does not decide anything.',
+      '告诉 ATE 测什么、按什么顺序、限值多少、失败进哪个 Bin。',
+      'Tells the ATE what to test, in what order, against which limits, and which Bin a failure goes to.',
     ),
-    image: '/glossary/testprogram.svg',
     caption: loc(
-      '测试程序界面示意：左边是测试项，中间是限值和测量值，右边是 Bin。程序跑在工控机上，不在 DUT 里。',
-      'A test-program UI: items on the left, limits and measured values in the center, bins on the right. The program runs on the controller, not inside the DUT.',
+      '程序按顺序跑一串测试项，每项有测量值和限值，第一个失败项决定 Bin。',
+      'The program runs a list of tests in order. Each has a measured value and limits; the first failing test decides the Bin.',
     ),
-    credit: loc('本课示意图', 'Lesson diagram'),
   },
   {
     id: 'testpattern',
-    name: 'Test Pattern',
-    full: loc('测试向量 / 图形', 'Test vectors / pattern'),
+    name: 'Pattern',
+    full: loc('测试向量', 'Test vectors'),
     text: loc(
-      '数字测试里发给 DUT 的 0/1 序列，以及期望的输出。Pattern 描述“这一拍各 pin 是驱动还是比较”，不是波形图本身。',
-      'The 0/1 sequence driven to the DUT, plus the expected outputs. A pattern says, per cycle, which pins drive and which compare. It is not the waveform picture itself.',
+      '一拍一行的表：每根输入脚给 0 还是 1，每根输出脚期望 H 还是 L。',
+      'A table, one row per cycle: drive 0 or 1 on each input, expect H or L on each output.',
     ),
-    image: '/glossary/pattern.svg',
     caption: loc(
-      '每一行是一个 cycle。1/0 = 驱动，H/L = 期望比较，X = 不比较。真实 Pattern 文件更长，逻辑就是这样。',
-      'Each row is one cycle. 1/0 = drive, H/L = expect, X = mask. Real pattern files are longer; the idea is the same.',
+      '1 / 0 = 驱动，H / L = 期望，X = 这一拍不比较。高亮的是正在执行的那一行。',
+      '1 / 0 = drive, H / L = expect, X = do not compare this cycle. The highlighted row is the one running now.',
     ),
-    credit: loc('本课示意图', 'Lesson diagram'),
   },
   {
     id: 'bin',
     name: 'Bin',
-    full: loc('分档 / 分选结果', 'Sort result'),
+    full: loc('分档', 'Bin'),
     text: loc(
-      '每颗 DUT 测完会得到一个 Bin 号。例如 Pass、功能失败、直流失败。Handler 按 Bin 把器件分到不同料管或托盘。',
-      'Each DUT gets a Bin number: Pass, functional fail, DC fail, and so on. The handler sorts parts into tubes or trays by that number.',
+      '测完后给每颗 DUT 的分类号，例如 Bin 1 = 好品，Bin 5 = 功能失败。',
+      'The category number each DUT gets after test, e.g. Bin 1 = good, Bin 5 = functional fail.',
     ),
-    image: '/glossary/bin.svg',
     caption: loc(
-      '晶圆 Bin 图：绿 = Pass，红 = 功能失败，黄 = 直流失败。颜色是判定结果，不是芯片外观。',
-      'Wafer bin map: green = Pass, red = functional fail, yellow = DC fail. Colors are decisions, not the look of the silicon.',
+      '晶圆 Bin 图：每个格子是一颗 die，颜色是它的 Bin。',
+      'Wafer bin map: each square is one die, colored by its Bin.',
     ),
-    credit: loc('本课示意图', 'Lesson diagram'),
   },
   {
     id: 'yield',
     name: 'Yield',
     full: loc('良率', 'Yield'),
     text: loc(
-      '合格数量 / 测试数量。CP Yield 看晶圆上好 die 比例；FT Yield 看封装后还能过测试的比例。Yield 是质量与成本的核心指标。',
-      'Pass count / tested count. CP yield is good dies on the wafer; FT yield is packaged parts that still pass. Yield is a core quality and cost number.',
+      '好品数 ÷ 测试数。是质量和成本最直接的数字。',
+      'Good count ÷ tested count — the most direct quality and cost number.',
     ),
-    image: '/glossary/yield.svg',
     caption: loc(
-      '同一张 Bin 图加上数字：Yield = 合格数 / 测试数。格子是 die，颜色是判定，百分比才是良率。',
-      'The same bin map with a number: Yield = pass / tested. Squares are dies, colors are decisions, the percentage is yield.',
+      '同一张 Bin 图数一数：绿色格子数 ÷ 全部格子数 = 良率。',
+      'Count the same bin map: green squares ÷ all squares = yield.',
     ),
-    credit: loc('本课示意图。对照词条 Bin 看颜色含义。', 'Lesson diagram. See Bin for what the colors mean.'),
   },
 ]
 
-export const CHIP_TYPES = [
-  {
-    id: 'digital',
-    name: 'Digital',
-    title: loc('数字芯片', 'Digital ICs'),
-    examples: loc('MCU、SoC、FPGA、逻辑 ASIC', 'MCU, SoC, FPGA, logic ASIC'),
-    params: [
-      loc('VIH / VIL'),
-      loc('VOH / VOL'),
-      loc('Idd'),
-      loc('功能 Pattern', 'Functional pattern'),
-      loc('Setup / Hold（后续）', 'Setup / Hold (later)'),
-    ],
-    theory: loc(
-      '逻辑电平、时序、扫描/DFT 以后再学。先建立：数字测试大量依赖 Pattern。',
-      'Logic levels, timing, and scan/DFT come later. First idea: digital test leans on patterns.',
-    ),
-  },
-  {
-    id: 'analog',
-    name: 'Analog',
-    title: loc('模拟芯片', 'Analog ICs'),
-    examples: loc('LDO、运放、ADC / DAC、电源管理', 'LDO, op-amp, ADC / DAC, power management'),
-    params: [loc('Offset'), loc('Gain'), loc('INL / DNL'), loc('Iq'), loc('纹波 / PSRR', 'Ripple / PSRR')],
-    theory: loc(
-      '连续量、精度和噪声。主要用直流源表和采样，而不是大海量数字 Pattern。',
-      'Continuous values, accuracy, and noise. Mostly DC source-measure and sampling, not huge digital patterns.',
-    ),
-  },
-  {
-    id: 'memory',
-    name: 'Memory',
-    title: loc('存储芯片', 'Memory ICs'),
-    examples: loc('DRAM、SRAM、Flash、EEPROM'),
-    params: [
-      loc('March 算法', 'March algorithms'),
-      loc('Retention'),
-      loc('漏电', 'Leakage'),
-      loc('地址译码', 'Address decode'),
-      loc('Repair / 冗余', 'Repair / redundancy'),
-    ],
-    theory: loc(
-      '阵列、地址、良率修复。测试时间和解法与逻辑芯片很不一样。',
-      'Arrays, addresses, and yield repair. Time and methods differ from logic chips.',
-    ),
-  },
-  {
-    id: 'rf',
-    name: 'RF',
-    title: loc('射频芯片', 'RF ICs'),
-    examples: loc('PA、LNA、Transceiver、Wi-Fi / 5G RF'),
-    params: [
-      loc('功率', 'Power'),
-      loc('EVM'),
-      loc('S 参数', 'S-parameters'),
-      loc('噪声系数', 'Noise figure'),
-      loc('频率 / 谐波', 'Frequency / harmonics'),
-    ],
-    theory: loc(
-      '高频路径、阻抗和调制质量。需要 RF 仪器与校准，不是普通数字 Channel 能直接替代。',
-      'RF paths, impedance, and modulation quality. You need RF instruments and calibration; a digital channel is not a substitute.',
-    ),
-  },
-] as const
-
-export type DiagramId =
+export type SysId =
   | 'program'
   | 'controller'
   | 'ate'
   | 'pe'
   | 'pmu'
+  | 'dps'
+  | 'head'
   | 'loadboard'
   | 'socket'
   | 'dut'
   | 'result'
 
-export const DIAGRAM: Array<{ id: DiagramId; title: string; text: LText }> = [
-  {
-    id: 'program',
-    title: 'Test Program',
+export const SYS: Record<SysId, { title: LText; text: LText }> = {
+  program: {
+    title: loc('Test Program', 'Test Program'),
+    text: loc('一切从这里开始：工程师写好程序，决定整台系统怎么动。', 'Everything starts here: the engineer’s program decides what the whole system does.'),
+  },
+  controller: {
+    title: loc('工作站', 'Workstation'),
+    text: loc('加载并运行测试程序，把命令发给 ATE 主机，收回结果。', 'Loads and runs the test program, sends commands to the mainframe, and collects results.'),
+  },
+  ate: {
+    title: loc('ATE 主机', 'ATE mainframe'),
     text: loc(
-      '告诉 Tester 测哪些项目、限值、时序和 Bin。本节只建立它的位置：程序在最上面指挥整台系统。',
-      'Tells the tester which items, limits, timing, and bins to use. This lesson only places it: the program sits at the top and commands the system.',
+      '装着所有测量资源：每个管脚一路 Pin Electronics，加上 PMU 和给 DUT 供电的 DPS。',
+      'Holds all the measurement resources: pin electronics for every pin, plus PMUs and the DPS that powers the DUT.',
     ),
   },
-  {
-    id: 'controller',
-    title: 'PC / Test Controller',
+  pe: {
+    title: loc('Pin Electronics', 'Pin Electronics'),
     text: loc(
-      '工控机或工作站加载 Test Program，把命令发给 ATE。学生先记住：人写程序，控制器执行，不是在 DUT 里写程序。',
-      'A workstation loads the test program and sends commands to the ATE. People write the program; the controller runs it. It is not written inside the DUT.',
+      '管脚电子：每根数字管脚的驱动和比较电路，0/1 从这里进出。内部结构见 {@ate}，完整电路见 {@fIntro}。',
+      'Pin electronics: the drive and compare circuit behind each digital pin; 0/1 go in and out here. Inside view in {@ate}; full circuit in {@fIntro}.',
     ),
   },
-  {
-    id: 'ate',
-    title: 'ATE',
+  pmu: {
+    title: loc('PMU', 'PMU'),
     text: loc(
-      '测试主机。内部至少有两类资源：Pin Electronics（数字通道）和 PMU（精密测电压/电流）。细节下一阶段再讲。',
-      'The tester mainframe. It has at least two resources: Pin Electronics (digital channels) and a PMU (precision V/I). Details come later.',
+      '精密测量单元：加电压测电流，或加电流测电压。原理见 {@pmu} 和 {@fIntro}。',
+      'Parametric measurement unit: force voltage and measure current, or the reverse. See {@pmu} and {@fIntro}.',
     ),
   },
+  dps: {
+    title: loc('DPS', 'DPS'),
+    text: loc('Device Power Supply：给 DUT 的 VDD 供电，同时能测电源电流。', 'Device Power Supply: powers the DUT’s VDD and can measure supply current.'),
+  },
+  head: {
+    title: loc('Test Head', 'Test Head'),
+    text: loc('测试头：通道板装在这里，尽量靠近 DUT，信号路径越短越好。', 'The test head holds the channel boards as close to the DUT as possible; shorter signal paths are better.'),
+  },
+  loadboard: {
+    title: loc('Load Board', 'Load Board'),
+    text: loc('压在测试头上，把每一路通道接到 Socket 的对应管脚。', 'Sits on the test head and connects every channel to the matching socket pin.'),
+  },
+  socket: {
+    title: loc('Socket / Probe Card', 'Socket / Probe Card'),
+    text: loc('FT 用 Socket 夹住封装芯片；CP 换成 Probe Card 扎晶圆。路径细节见 {@connection}。', 'FT uses a socket to hold the packaged chip; CP swaps in a probe card on the wafer. Path details in {@connection}.'),
+  },
+  dut: {
+    title: loc('DUT', 'DUT'),
+    text: loc('被加信号、被测量的那颗芯片或 die。', 'The chip or die being stimulated and measured.'),
+  },
+  result: {
+    title: loc('Pass / Fail → Bin', 'Pass / Fail → Bin'),
+    text: loc('每一项和限值比完，工作站给出 Bin 号，Handler 或 Prober 按它分拣。', 'After every test is compared to its limits, the workstation assigns a Bin; the handler or prober sorts by it.'),
+  },
+}
+
+export const TAKEAWAY: LText[] = [
+  loc('测试 = 自动加信号、测响应、判 Pass / Fail；只判断，不修理。', 'Test = automatically stimulate, measure, and judge Pass / Fail. It judges; it does not repair.'),
+  loc('测两次：封装前 CP 测 die，封装后 FT 测成品。', 'Test twice: CP tests dies before packaging, FT tests finished parts after.'),
+  loc('CP 用 Probe Card 扎晶圆；FT 用 Load Board + Socket 接芯片，Handler 负责搬运分拣。', 'CP needles the wafer through a probe card; FT reaches the chip through a load board and socket, with a handler moving and sorting.'),
+  loc('结果是 Bin 号；好品数 ÷ 测试数 = 良率。', 'The result is a Bin number; good count ÷ tested count = yield.'),
+]
+
+export const QUIZ: QuizQuestion[] = [
   {
-    id: 'pe',
-    title: 'Pin Electronics',
-    text: loc(
-      '每个数字 Channel 的驱动/比较电路。现在只要知道：数字 pin 的 0/1 从这里进出。不要先学 Strobe、Timing。',
-      'Drive and compare circuits for each digital channel. For now: digital 0/1 enter and leave here. Do not learn Strobe or Timing yet.',
-    ),
+    id: 'q1',
+    prompt: loc('CP 和 FT 时，DUT 分别是什么？', 'What is the DUT in CP and in FT?'),
+    options: [
+      { id: 'a', text: loc('CP：晶圆上的 die；FT：封装好的芯片', 'CP: a die on the wafer; FT: the packaged chip') },
+      { id: 'b', text: loc('两次都是封装好的芯片', 'The packaged chip both times') },
+      { id: 'c', text: loc('CP：整片晶圆当一个 DUT；FT：一盘芯片', 'CP: the whole wafer as one DUT; FT: a whole tray') },
+    ],
+    answer: 'a',
+    explain: loc('CP 在封装前，测的是晶圆上一颗一颗的 die；FT 在封装后，测的是成品。', 'CP comes before packaging and tests dies one by one on the wafer; FT comes after and tests finished parts.'),
   },
   {
-    id: 'pmu',
-    title: 'PMU',
-    text: loc(
-      'Parametric Measurement Unit，精密源表。用来测漏电、电压、电流等直流参数。现在只要知道它和 Pin Electronics 并列存在。',
-      'Parametric Measurement Unit — a precision source-measure unit for leakage, voltage, and current. For now, just know it sits beside Pin Electronics.',
-    ),
+    id: 'q2',
+    prompt: loc('为什么封装前要先做 CP？', 'Why run CP before packaging?'),
+    options: [
+      { id: 'a', text: loc('CP 能把坏 die 修好', 'CP repairs bad dies') },
+      { id: 'b', text: loc('先挑掉坏 die，不花钱封装坏片', 'Pull out bad dies first so nobody pays to package them') },
+      { id: 'c', text: loc('CP 测过就不用 FT 了', 'After CP, FT is not needed') },
+    ],
+    answer: 'b',
+    explain: loc('测试不修芯片。封装也可能做坏，所以 FT 还要再测。', 'Test never repairs. Packaging can break parts too, so FT tests again.'),
   },
   {
-    id: 'loadboard',
-    title: 'Load Board',
-    text: loc(
-      '把 ATE 的 Channel / PMU 接到 DUT 封装。没有这块板，Tester 到不了芯片引脚。',
-      'Connects ATE channels and the PMU to the DUT package. Without this board the tester never reaches the pins.',
-    ),
+    id: 'q3',
+    prompt: loc('CP 时，用什么接触 DUT？', 'In CP, what contacts the DUT?'),
+    options: [
+      { id: 'a', text: loc('Socket', 'A socket') },
+      { id: 'b', text: loc('Probe Card 上的探针', 'Needles on a probe card') },
+      { id: 'c', text: loc('Handler 的吸嘴', 'The handler’s pick-up nozzle') },
+    ],
+    answer: 'b',
+    explain: loc('die 还在晶圆上，没有引脚可插，只能用探针扎 pad。', 'The die is still on the wafer with no pins to insert, so needles land on its pads.'),
   },
   {
-    id: 'socket',
-    title: 'Socket',
-    text: loc(
-      'FT 时 DUT 坐在 Socket 里。CP 没有 Socket，这一层会换成 Probe Card。',
-      'In FT the DUT sits in a socket. CP has no socket; this layer becomes a probe card.',
-    ),
+    id: 'q4',
+    prompt: loc('Handler 和 ATE 怎么分工？', 'How do the handler and the ATE split the work?'),
+    options: [
+      { id: 'a', text: loc('Handler 测量，ATE 搬运', 'The handler measures; the ATE moves parts') },
+      { id: 'b', text: loc('Handler 搬运和分拣，ATE 测量和判定', 'The handler moves and sorts; the ATE measures and judges') },
+      { id: 'c', text: loc('两者做同一件事', 'They do the same job') },
+    ],
+    answer: 'b',
+    explain: loc('ATE 给出 Bin 号，Handler 照着把芯片放进对应的料盘。', 'The ATE reports the Bin; the handler drops the chip into the matching tray.'),
   },
   {
-    id: 'dut',
-    title: 'DUT',
-    text: loc(
-      '被测器件。它被激励、被测量，然后得到 Pass / Fail，而不是“被修理”。',
-      'The device under test. It is stimulated and measured, then judged Pass / Fail — not repaired.',
-    ),
-  },
-  {
-    id: 'result',
-    title: 'Pass / Fail',
-    text: loc(
-      '比较测量结果和限值后的判定。Fail 会进入某个 Bin。这是测试的输出，不是波形本身。',
-      'The decision after comparing a measurement to a limit. Fail goes to a Bin. This is the output of test, not the waveform itself.',
-    ),
+    id: 'q5',
+    prompt: loc('一片晶圆测了 200 颗 die，180 颗是 Bin 1，良率是多少？', 'A wafer has 200 dies tested and 180 land in Bin 1. What is the yield?'),
+    options: [
+      { id: 'a', text: loc('90%', '90%') },
+      { id: 'b', text: loc('10%', '10%') },
+      { id: 'c', text: loc('180%', '180%') },
+    ],
+    answer: 'a',
+    explain: loc('良率 = 好品数 ÷ 测试数 = 180 ÷ 200 = 90%。', 'Yield = good ÷ tested = 180 ÷ 200 = 90%.'),
   },
 ]

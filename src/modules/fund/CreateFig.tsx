@@ -3,9 +3,9 @@ import { loc } from '../../i18n/locale'
 import { LB_CHAIN, LB_NODES, type LbNodeId } from './data/create'
 
 const L = {
-  aria: loc('负载板测试流程图'),
-  pass: loc('Pass'),
-  fail: loc('Fail'),
+  aria: loc('负载板测试流程图', 'Load board test flowchart'),
+  pass: loc('Pass', 'Pass'),
+  fail: loc('Fail', 'Fail'),
 }
 
 const BX = 140

@@ -3,23 +3,65 @@ import { useLocale } from '../../i18n/LocaleContext'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
+import { StepControls, useStepPlayer } from '../../lab/StepPlayer'
 import { type ModuleId } from '../catalog'
-import { CompareFig, ConceptFig } from './ConceptFig'
-import { CONCEPTS, POW2, QUIZ, TAKEAWAY, type ConceptId } from './data/content'
+import { Callout, Cards, Knob, Readout, Seg } from '../fund/parts'
+import { AndFaultFig, ExplodeFig, SourceFig, TRAN_STEPS, TransitionFig } from './ConceptFig'
+import {
+  FAULTS,
+  N_MAX,
+  QUIZ,
+  SOURCES,
+  S_MAX,
+  TAKEAWAY,
+  VECTORS,
+  countText,
+  secondsOf,
+  sup,
+  timeParts,
+  type FaultId,
+  type SourceId,
+} from './data/content'
+import './vector.css'
 
 type Module10PageProps = {
   moduleId: ModuleId
   onModuleChange: (id: ModuleId) => void
 }
 
-type Focus = { kind: 'exp'; bits: number } | { kind: 'concept'; id: ConceptId } | { kind: 'vs' } | { kind: 'takeaway' }
+type Focus = { kind: 'explode' } | { kind: 'source'; id: SourceId } | { kind: 'fault'; id: FaultId } | { kind: 'tran' }
 
 export function Module10Page({ moduleId, onModuleChange }: Module10PageProps) {
   const { t } = useLocale()
-  const [focus, setFocus] = useState<Focus>({ kind: 'concept', id: 'func' })
-  const [conceptId, setConceptId] = useState<ConceptId>('func')
-  const active = CONCEPTS.find((item) => item.id === conceptId)
-  const detail = resolveDetail(focus, t)
+  const [n, setN] = useState(20)
+  const [s, setS] = useState(10)
+  const [source, setSource] = useState<SourceId>('atpg')
+  const [fault, setFault] = useState<FaultId>('A0')
+  const [vec, setVec] = useState('10')
+  const [tried, setTried] = useState<string[]>(['10'])
+  const [focus, setFocus] = useState<Focus>({ kind: 'explode' })
+  const tran = useStepPlayer(TRAN_STEPS.length, 1600)
+
+  const cur = VECTORS.find((v) => v.id === vec) ?? VECTORS[0]
+  const time = (bits: number) => {
+    const tp = timeParts(secondsOf(bits))
+    return `${tp.value} ${t(tp.unit)}`
+  }
+
+  const aside = (() => {
+    if (focus.kind === 'source') {
+      const item = SOURCES.find((x) => x.id === focus.id) ?? SOURCES[0]
+      return { kicker: t(ui.m10.kickerSource), title: t(item.title), text: t(item.text) }
+    }
+    if (focus.kind === 'fault') {
+      const item = FAULTS.find((x) => x.id === focus.id) ?? FAULTS[0]
+      return { kicker: t(ui.m10.kickerFault), title: t(item.label), text: t(item.text) }
+    }
+    if (focus.kind === 'tran') {
+      return { kicker: t(ui.m10.kickerFault), title: t(ui.m10.tranTitle), text: t(ui.m10.tranAside) }
+    }
+    return { kicker: t(ui.m10.kickerExplode), title: t(ui.m10.explodeAsideTitle), text: t(ui.m10.explodeAside) }
+  })()
 
   return (
     <LessonFrame
@@ -27,9 +69,9 @@ export function Module10Page({ moduleId, onModuleChange }: Module10PageProps) {
       onModuleChange={onModuleChange}
       title={t(ui.m10.title)}
       goal={t(ui.m10.goal)}
-      kicker={detail.kicker}
-      asideTitle={detail.title}
-      asideText={detail.text}
+      kicker={aside.kicker}
+      asideTitle={aside.title}
+      asideText={aside.text}
       asideLater={t(ui.m10.asideLater)}
       nextId="scan"
       nextLabel={t(ui.m10.next)}
@@ -38,67 +80,102 @@ export function Module10Page({ moduleId, onModuleChange }: Module10PageProps) {
         <p>{t(ui.m10.introBody)}</p>
       </Section>
 
-      <Section title={t(ui.m10.expTitle)} note={t(ui.m10.expNote)}>
-        <div className="pick pick--4">
-          {POW2.map((item) => (
-            <button
-              key={item.bits}
-              type="button"
-              className={`pick__card${focus.kind === 'exp' && focus.bits === item.bits ? ' is-active' : ''}`}
-              onClick={() => setFocus({ kind: 'exp', bits: item.bits })}
-            >
-              <strong>2^{item.bits}</strong>
-              <span>{item.count}</span>
-            </button>
-          ))}
+      <Section title={t(ui.m10.explodeTitle)} note={t(ui.m10.explodeNote)}>
+        <div className="knob-row">
+          <Knob
+            label={ui.m10.knobN}
+            value={n}
+            unit=""
+            min={1}
+            max={N_MAX}
+            step={1}
+            onChange={(v) => {
+              setN(v)
+              setFocus({ kind: 'explode' })
+            }}
+          />
+          <Knob
+            label={ui.m10.knobS}
+            value={s}
+            unit=""
+            min={0}
+            max={S_MAX}
+            step={1}
+            onChange={(v) => {
+              setS(v)
+              setFocus({ kind: 'explode' })
+            }}
+          />
         </div>
+        <ExplodeFig n={n} s={s} />
+        <Readout
+          items={[
+            { label: `2${sup(n)}`, value: countText(n) },
+            { label: ui.m10.timeIn, value: time(n) },
+            { label: `2${sup(n + s)}`, value: countText(n + s) },
+            { label: ui.m10.timeState, value: time(n + s) },
+          ]}
+        />
+        <Callout tone="warn">{t(ui.m10.explodeSo)}</Callout>
       </Section>
 
-      <Section title={t(ui.m10.conceptsTitle)} note={t(ui.m10.conceptsNote)}>
-        <div className="pick pick--3">
-          {CONCEPTS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`pick__card${focus.kind === 'concept' && focus.id === item.id ? ' is-active' : ''}`}
-              onClick={() => {
-                setConceptId(item.id)
-                setFocus({ kind: 'concept', id: item.id })
-              }}
-            >
-              {item.title}
-            </button>
-          ))}
-        </div>
-        <ConceptFig id={conceptId} t={t} />
-        {active ? (
-          <div className="term-explain">
-            {active.explain.map((para) => (
-              <p key={para.zh}>{t(para)}</p>
-            ))}
-          </div>
-        ) : null}
+      <Section title={t(ui.m10.sourceTitle)} note={t(ui.m10.sourceNote)}>
+        <Cards
+          items={SOURCES}
+          activeId={source}
+          onPick={(item) => {
+            setSource(item.id)
+            setFocus({ kind: 'source', id: item.id })
+          }}
+        />
+        <SourceFig active={source} />
       </Section>
 
-      <Section title={t(ui.m10.vsTitle)} note={t(ui.m10.vsNote)}>
-        <button
-          type="button"
-          className={`takeaway${focus.kind === 'vs' ? ' is-active' : ''}`}
-          onClick={() => setFocus({ kind: 'vs' })}
-        >
-          {t(ui.m10.vsLead)}
-        </button>
-        <CompareFig t={t} />
+      <Section title={t(ui.m10.faultTitle)} note={t(ui.m10.faultNote)}>
+        <Seg
+          options={FAULTS.map((f) => ({ id: f.id, label: f.label }))}
+          value={fault}
+          onChange={(id) => {
+            setFault(id)
+            setTried([vec])
+            setFocus({ kind: 'fault', id })
+          }}
+        />
+        <div className="row-actions">
+          <span className="intro__note">{t(ui.m10.pickVec)}</span>
+          <Seg
+            options={VECTORS.map((v) => ({ id: v.id, label: v.id }))}
+            value={vec}
+            onChange={(id) => {
+              setVec(id)
+              setTried((list) => (list.includes(id) ? list : [...list, id]))
+              setFocus({ kind: 'fault', id: fault })
+            }}
+          />
+        </div>
+        <AndFaultFig a={cur.a} b={cur.b} fault={fault} tried={tried} />
+
+        <h3 className="m10-sub">{t(ui.m10.tranTitle)}</h3>
+        <p className="intro__note">{t(ui.m10.tranNote)}</p>
+        <div onClickCapture={() => setFocus({ kind: 'tran' })}>
+          <StepControls player={tran} stepLabels={TRAN_STEPS} />
+        </div>
+        <TransitionFig step={tran.step} />
+      </Section>
+
+      <Section title={t(ui.m10.moreTitle)}>
+        <Callout>
+          <p>{t(ui.m10.scanNote)}</p>
+          <p>{t(ui.m10.moreNote)}</p>
+        </Callout>
       </Section>
 
       <Section title={t(ui.m10.takeawayTitle)}>
-        <button
-          type="button"
-          className={`takeaway${focus.kind === 'takeaway' ? ' is-active' : ''}`}
-          onClick={() => setFocus({ kind: 'takeaway' })}
-        >
-          {t(TAKEAWAY)}
-        </button>
+        <Callout tone="warn">
+          {TAKEAWAY.map((item) => (
+            <p key={item.zh}>{t(item)}</p>
+          ))}
+        </Callout>
       </Section>
 
       <Section title={t(ui.m10.quizTitle)} note={t(ui.m10.quizNote)}>
@@ -106,23 +183,4 @@ export function Module10Page({ moduleId, onModuleChange }: Module10PageProps) {
       </Section>
     </LessonFrame>
   )
-}
-
-function resolveDetail(focus: Focus, t: (text: import('../../i18n/locale').LText | string) => string) {
-  if (focus.kind === 'takeaway') {
-    return { kicker: t(ui.m10.kickerTakeaway), title: t(ui.m10.kickerOne), text: t(TAKEAWAY) }
-  }
-  if (focus.kind === 'vs') {
-    return { kicker: t(ui.m10.kickerVs), title: t(ui.m10.vsTitle), text: t(ui.m10.vsLead) }
-  }
-  if (focus.kind === 'concept') {
-    const item = CONCEPTS.find((node) => node.id === focus.id)
-    return { kicker: t(ui.m10.kickerConcept), title: item?.title ?? '', text: item ? t(item.text) : '' }
-  }
-  const item = POW2.find((node) => node.bits === focus.bits)
-  return {
-    kicker: t(ui.m10.kickerExp),
-    title: item ? `2^${item.bits} = ${item.count}` : '',
-    text: item ? t(item.note) : '',
-  }
 }

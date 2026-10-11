@@ -1,230 +1,226 @@
-import { useState } from 'react'
-import { loc, type LText } from '../../i18n/locale'
-import { TIMING, type TimingMark } from './glossary'
+import { useId, useState } from 'react'
+import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
+import { ui } from '../../i18n/ui'
+import { DRIVE_LEAD, TPD, type TimingMark } from './glossary'
 
 type TimingScopeProps = {
-  mark: TimingMark
-  t: (text: LText | string) => string
-  /** {@timing}：Strobe 位置，单位 ns，0–10 */
-  strobeNs?: number
-  replayLabel: string
+  /** CLK 周期，ns */
+  period: number
+  /** Strobe 位置（相对第 n 拍 CLK 沿，ns）；不传就不画 */
+  strobe?: number
+  /** Strobe 能否采到第 n 拍的有效值：决定圆点和窗口的颜色 */
+  strobeOk?: boolean
+  /** 在 OUT 下方标出「有效窗口」字样 */
+  labelWindow?: boolean
+  /** 要画的尺寸标注 */
+  marks?: TimingMark[]
+  /** 高亮的那一条尺寸 */
+  active?: TimingMark
+  caption: string
 }
 
-const X0 = 88
-const X1 = 640
-const CLK = 52
-const DAT = 132
-const OUT = 212
-const CLK1 = 280
-const CLK2 = 560
-const DRV0 = 160
-const DRV1 = 196
-const HOLD = 400
-const FALL = 436
-const OUT_AT = 380
-const WIN_R = 500
+const L = {
+  window: loc('有效窗口', 'valid window'),
+  strobe: loc('Strobe', 'Strobe'),
+}
 
-export function TimingScope({ mark, t, strobeNs = 5, replayLabel }: TimingScopeProps) {
+/** 横轴：-6 ns 到 30 ns，第 n 拍的 CLK 上升沿在 0 */
+const T0 = -6
+const T1 = 30
+const X0 = 72
+const X1 = 660
+const CLK_HI = 44
+const CLK_LO = 76
+const DAT_T = 124
+const DAT_B = 156
+const OUT_T = 204
+const OUT_B = 236
+const H = 300
+const SWEEP = '2.6s'
+
+const xs = (t: number) => X0 + ((t - T0) * (X1 - X0)) / (T1 - T0)
+const fmt = (n: number) => (Number.isInteger(n) ? String(n) : n.toFixed(1))
+const lab = (k: number) => (k === 0 ? 'n' : k > 0 ? `n+${k}` : `n−${-k}`)
+
+export function TimingScope({ period, strobe, strobeOk = true, labelWindow, marks = [], active, caption }: TimingScopeProps) {
+  const { t } = useLocale()
   const [play, setPlay] = useState(0)
-  const strobeX = CLK1 + (strobeNs / 10) * (CLK2 - CLK1)
-  const item = TIMING[mark]
-  const outName = mark === 'ctq' ? 'Q' : 'OUT'
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
+  const clipId = `ts-clip-${uid}-${play}`
+  const hatchId = `ts-hatch-${uid}`
+  const still = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  const P = period
+  const winOk = P > TPD
+  const tone = strobeOk ? 'green' : 'red'
 
   return (
-    <figure className={`term-fig term-fig--${mark}`}>
+    <figure className="term-fig">
       <div className="term-fig__bar">
         <button type="button" className="lab__btn" onClick={() => setPlay((n) => n + 1)}>
-          {replayLabel}
+          {t(ui.timing.replay)}
         </button>
       </div>
-      <svg
-        key={play}
-        viewBox="0 0 680 300"
-        className="term-fig__svg"
-        role="img"
-        aria-label={t(item.caption)}
-      >
+      <svg key={play} viewBox={`0 0 680 ${H}`} className="term-fig__svg" role="img" aria-label={caption}>
         <defs>
-          <marker id={`arr-${mark}-${play}`} markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-            <path d="M0 0 L7 3.5 L0 7 Z" fill="var(--gold)" />
-          </marker>
+          <pattern id={hatchId} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="6" stroke="var(--muted)" strokeWidth="1.2" />
+          </pattern>
+          {still ? null : (
+            <clipPath id={clipId}>
+              <rect x="0" y="0" width="0" height={H}>
+                <animate attributeName="width" from="0" to="680" dur={SWEEP} fill="freeze" />
+              </rect>
+            </clipPath>
+          )}
         </defs>
-        <rect x="0" y="0" width="680" height="300" rx="6" fill="var(--well)" />
-        {ticks()}
-        {railName('CLK', CLK)}
-        {railName('DATA', DAT)}
-        {railName(outName, OUT)}
-        {canonicalWaves(mark)}
-        {highlights(mark, strobeX, t, `arr-${mark}-${play}`)}
-        <line className="term-fig__now" x1={X0} y1="20" x2={X0} y2="248" stroke="var(--gold)" strokeWidth="1.5">
-          <animate attributeName="x1" from={X0} to={X1} dur="3.4s" repeatCount="indefinite" />
-          <animate attributeName="x2" from={X0} to={X1} dur="3.4s" repeatCount="indefinite" />
-        </line>
-      </svg>
-      <figcaption>{t(item.caption)}</figcaption>
-    </figure>
-  )
-}
+        <rect width="680" height={H} rx="10" fill="var(--well)" />
 
-function ticks() {
-  return (
-    <g stroke="var(--fig-box-2)" strokeWidth="1">
-      {[160, 240, 320, 400, 480, 560].map((x) => (
-        <line key={x} x1={x} y1="20" x2={x} y2="248" />
-      ))}
-    </g>
+        {/* 第 n 拍和第 n+1 拍的 CLK 沿：所有时间都从这里量 */}
+        {[0, P].map((tt) => (
+          <line key={tt} x1={xs(tt)} y1="36" x2={xs(tt)} y2="250" stroke="var(--line-2)" strokeDasharray="4 4" />
+        ))}
+        {railName('CLK', (CLK_HI + CLK_LO) / 2)}
+        {railName('DATA', (DAT_T + DAT_B) / 2)}
+        {railName('OUT', (OUT_T + OUT_B) / 2)}
+
+        <g clipPath={still ? undefined : `url(#${clipId})`}>
+          {winOk && strobe !== undefined ? (
+            <rect
+              x={xs(TPD)}
+              y={OUT_T - 8}
+              width={xs(P) - xs(TPD)}
+              height={OUT_B - OUT_T + 16}
+              rx="4"
+              fill={`var(--${tone}-bg)`}
+              stroke={`var(--${tone}-line)`}
+            />
+          ) : null}
+          <path d={clkPath(P)} fill="none" stroke="var(--blue)" strokeWidth="2.2" strokeLinejoin="round" />
+          {dataSegs(P).map(([a, b, k]) => bus(a, b, DAT_T, DAT_B, lab(k), `d${k}`))}
+          <rect x={X0} y={OUT_T} width={X1 - X0} height={OUT_B - OUT_T} fill={`url(#${hatchId})`} opacity="0.55" />
+          {outSegs(P).map(([a, b, k]) => bus(a, b, OUT_T, OUT_B, lab(k), `o${k}`))}
+        </g>
+
+        {labelWindow && winOk ? (
+          <text x={xs(P) - 4} y={OUT_B + 18} textAnchor="end" fill={`var(--${tone})`} fontSize="12">
+            {t(L.window)}
+          </text>
+        ) : null}
+
+        {marks.includes('period') ? dim(0, P, 26, `Period ${fmt(P)} ns`, active === 'period') : null}
+        {marks.includes('setup') ? dim(-DRIVE_LEAD, 0, 180, `tSU ${fmt(DRIVE_LEAD)} ns`, active === 'setup') : null}
+        {marks.includes('hold') ? dim(0, P - DRIVE_LEAD, 180, `tH ${fmt(P - DRIVE_LEAD)} ns`, active === 'hold') : null}
+        {marks.includes('tpd') ? dim(0, TPD, 274, `tPD ${fmt(TPD)} ns`, active === 'tpd') : null}
+
+        {strobe !== undefined ? strobeMark(strobe, strobeOk, t(L.strobe)) : null}
+
+        {still ? null : (
+          <line x1={X0} y1="36" x2={X0} y2="250" stroke="var(--gold)" strokeWidth="1.5" opacity="0.8">
+            <animate attributeName="x1" from={X0} to={X1} dur={SWEEP} fill="freeze" />
+            <animate attributeName="x2" from={X0} to={X1} dur={SWEEP} fill="freeze" />
+            <animate attributeName="opacity" values="0.8;0.8;0" keyTimes="0;0.96;1" dur={SWEEP} fill="freeze" />
+          </line>
+        )}
+      </svg>
+      <figcaption>{caption}</figcaption>
+    </figure>
   )
 }
 
 function railName(name: string, y: number) {
   return (
-    <text x="16" y={y + 4} fill="var(--muted)" fontSize="13" fontFamily="Segoe UI, Microsoft YaHei, sans-serif">
+    <text x="16" y={y + 4} fill="var(--muted)" fontSize="13" fontFamily="var(--mono)">
       {name}
     </text>
   )
 }
 
-function yOf(rail: number, high: boolean) {
-  return high ? rail - 16 : rail + 16
+/** CLK：kP 上升，kP + P/2 下降 */
+function clkPath(P: number) {
+  const edges: number[] = []
+  for (let k = Math.floor(T0 / P) - 1; k * P <= T1; k += 1) edges.push(k * P, k * P + P / 2)
+  const inside = edges.filter((e) => e > T0 && e < T1).sort((a, b) => a - b)
+  let high = ((T0 % P) + P) % P < P / 2
+  let d = `M ${xs(T0)} ${high ? CLK_HI : CLK_LO}`
+  for (const e of inside) {
+    high = !high
+    d += ` H ${xs(e)} V ${high ? CLK_HI : CLK_LO}`
+  }
+  return `${d} H ${xs(T1)}`
 }
 
-/** 两课同一张：CLK 两拍，DATA 带斜边，OUT/Q 晚于输入 */
-function canonicalWaves(mark: TimingMark) {
-  const clk = `
-    M ${X0} ${yOf(CLK, false)}
-    H ${CLK1} V ${yOf(CLK, true)}
-    H ${420} V ${yOf(CLK, false)}
-    H ${CLK2} V ${yOf(CLK, true)}
-    H ${X1}
-  `
-  const slopeClass = mark === 'edge' ? 'term-fig__slope' : undefined
-  const data = `
-    M ${X0} ${yOf(DAT, false)}
-    H ${DRV0}
-    L ${DRV1} ${yOf(DAT, true)}
-    H ${HOLD}
-    L ${FALL} ${yOf(DAT, false)}
-    H ${X1}
-  `
-  const out = `
-    M ${X0} ${yOf(OUT, false)}
-    H ${OUT_AT} V ${yOf(OUT, true)}
-    H ${X1}
-  `
+/** DATA：测试机在每个沿前 DRIVE_LEAD 换数据，第 k 段在第 k 个沿被采进去 */
+function dataSegs(P: number): Array<[number, number, number]> {
+  const out: Array<[number, number, number]> = []
+  for (let k = Math.floor((T0 + DRIVE_LEAD) / P) - 1; k * P - DRIVE_LEAD < T1; k += 1) {
+    const a = Math.max(k * P - DRIVE_LEAD, T0)
+    const b = Math.min((k + 1) * P - DRIVE_LEAD, T1)
+    if (b > a) out.push([a, b, k])
+  }
+  return out
+}
+
+/** OUT：第 k 个沿后 tPD 才稳定，到下一个沿为止；其余时间在变（斜线底纹） */
+function outSegs(P: number): Array<[number, number, number]> {
+  const out: Array<[number, number, number]> = []
+  for (let k = Math.floor(T0 / P) - 1; k * P + TPD < T1; k += 1) {
+    const a = Math.max(k * P + TPD, T0)
+    const b = Math.min((k + 1) * P, T1)
+    if (b > a) out.push([a, b, k])
+  }
+  return out
+}
+
+/** 总线画法：两头斜切的六边形，表示「这一段值稳定」 */
+function bus(a: number, b: number, top: number, bot: number, label: string, key: string) {
+  const xa = xs(a)
+  const xb = xs(b)
+  const mid = (top + bot) / 2
+  const ha = a > T0 ? Math.min(5, (xb - xa) / 2) : 0
+  const hb = b < T1 ? Math.min(5, (xb - xa) / 2) : 0
+  const d = `M ${xa} ${mid} L ${xa + ha} ${top} H ${xb - hb} L ${xb} ${mid} L ${xb - hb} ${bot} H ${xa + ha} Z`
   return (
-    <g fill="none" stroke="var(--blue)" strokeWidth="2.2" strokeLinejoin="round">
-      <path d={clk} />
-      <path d={data} className={slopeClass} />
-      <path d={out} className={mark === 'ctq' ? 'term-fig__q' : undefined} />
+    <g key={key}>
+      <path d={d} fill="var(--blue-bg)" stroke="var(--blue)" strokeWidth="1.8" strokeLinejoin="round" />
+      {xb - xa > 30 ? (
+        <text x={(xa + xb) / 2} y={mid + 4} textAnchor="middle" fill="var(--text)" fontSize="12" fontFamily="var(--mono)">
+          {label}
+        </text>
+      ) : null}
     </g>
   )
 }
 
-function dim(x1: number, x2: number, y: number, label: string, marker: string) {
+function dim(t1: number, t2: number, y: number, label: string, on: boolean) {
+  const x1 = xs(t1)
+  const x2 = xs(t2)
+  const c = on ? 'var(--gold)' : 'var(--muted)'
+  const w = on ? 2 : 1.2
+  const head = Math.min(6, Math.abs(x2 - x1) / 2)
   return (
-    <g>
-      <line x1={x1} y1={y} x2={x2} y2={y} stroke="var(--gold)" strokeWidth="1.6" markerEnd={`url(#${marker})`} />
-      <line x1={x1} y1={y - 8} x2={x1} y2={y + 8} stroke="var(--gold)" strokeWidth="1.4" />
-      <line x1={x2} y1={y - 8} x2={x2} y2={y + 8} stroke="var(--gold)" strokeWidth="1.4" />
-      <text
-        x={(x1 + x2) / 2}
-        y={y - 10}
-        textAnchor="middle"
-        fill="var(--gold)"
-        fontSize="13"
-        fontFamily="Segoe UI, Microsoft YaHei, sans-serif"
-      >
+    <g opacity={on ? 1 : 0.7}>
+      <line x1={x1} y1={y} x2={x2} y2={y} stroke={c} strokeWidth={w} />
+      <path d={`M ${x1} ${y} l ${head} -4 v 8 z M ${x2} ${y} l ${-head} -4 v 8 z`} fill={c} />
+      <line x1={x1} y1={y - 7} x2={x1} y2={y + 7} stroke={c} strokeWidth={w} />
+      <line x1={x2} y1={y - 7} x2={x2} y2={y + 7} stroke={c} strokeWidth={w} />
+      <text x={(x1 + x2) / 2} y={y - 8} textAnchor="middle" fill={c} fontSize="12" fontWeight={on ? 600 : 400} fontFamily="var(--mono)">
         {label}
       </text>
     </g>
   )
 }
 
-function edgeMark(x: number, y: number, label: string) {
-  return (
-    <g className="term-fig__edge">
-      <line x1={x} y1={y - 28} x2={x} y2={y + 28} stroke="var(--gold)" strokeWidth="1.4" strokeDasharray="3 3" />
-      <text x={x + 8} y={y - 32} fill="var(--gold)" fontSize="13">
-        {label}
-      </text>
-    </g>
-  )
-}
-
-function highlights(
-  mark: TimingMark,
-  strobeX: number,
-  t: (text: LText | string) => string,
-  marker: string,
-) {
-  if (mark === 'drive') {
-    return (
-      <g>
-        {edgeMark(DRV0, DAT, t(loc('Drive')))}
-        {dim(X0, DRV0, 268, t(loc('还没驱动')), marker)}
-      </g>
-    )
-  }
-  if (mark === 'strobe') {
-    return (
-      <g>
-        <rect className="term-fig__win" x={OUT_AT} y={OUT - 22} width={WIN_R - OUT_AT} height="44" />
-        {edgeMark(strobeX, OUT, t(loc('Strobe')))}
-        {dim(OUT_AT, WIN_R, 268, t(loc('有效窗口')), marker)}
-        <circle className="term-fig__dot" cx={strobeX} cy={yOf(OUT, true)} r="5" fill="var(--gold)" />
-      </g>
-    )
-  }
-  if (mark === 'period' || mark === 'fmax') {
-    return (
-      <g>
-        {edgeMark(CLK1, CLK, t(loc('沿 1')))}
-        {edgeMark(CLK2, CLK, t(loc('沿 2')))}
-        {dim(CLK1, CLK2, 268, t(loc(mark === 'fmax' ? 'Period → 再短就 Fail' : 'Period = 一拍')), marker)}
-      </g>
-    )
-  }
-  if (mark === 'setup') {
-    return (
-      <g>
-        {edgeMark(DRV1, DAT, t(loc('数据稳住')))}
-        {edgeMark(CLK1, CLK, t(loc('CLK 沿')))}
-        {dim(DRV1, CLK1, 268, t(loc('tSU')), marker)}
-      </g>
-    )
-  }
-  if (mark === 'hold') {
-    return (
-      <g>
-        {edgeMark(CLK1, CLK, t(loc('CLK 沿')))}
-        {edgeMark(HOLD, DAT, t(loc('数据才变')))}
-        {dim(CLK1, HOLD, 268, t(loc('tH')), marker)}
-      </g>
-    )
-  }
-  if (mark === 'tpd') {
-    return (
-      <g>
-        {edgeMark(DRV0, DAT, t(loc('DATA 变')))}
-        {edgeMark(OUT_AT, OUT, t(loc('OUT 才变')))}
-        {dim(DRV0, OUT_AT, 268, t(loc('tPD')), marker)}
-      </g>
-    )
-  }
-  if (mark === 'edge') {
-    return (
-      <g>
-        {dim(DRV0, DRV1, DAT - 36, t(loc('tr 上升')), marker)}
-        {dim(HOLD, FALL, DAT + 40, t(loc('tf 下降')), marker)}
-        {dim(DRV0, FALL, 268, t(loc('沿不是一条竖线')), marker)}
-      </g>
-    )
-  }
+function strobeMark(s: number, ok: boolean, label: string) {
+  const x = xs(s)
+  const right = x > X1 - 70
   return (
     <g>
-      {edgeMark(CLK1, CLK, t(loc('CLK 沿')))}
-      {edgeMark(OUT_AT, OUT, t(loc('Q 有效')))}
-      {dim(CLK1, OUT_AT, 268, t(loc('tCQ')), marker)}
+      <line x1={x} y1="36" x2={x} y2="250" stroke="var(--gold)" strokeWidth="1.8" strokeDasharray="5 3" />
+      <circle cx={x} cy={(OUT_T + OUT_B) / 2} r="6" fill={ok ? 'var(--green)' : 'var(--red)'} stroke="var(--well)" strokeWidth="2" />
+      <text x={right ? x - 6 : x + 6} y={OUT_T - 12} textAnchor={right ? 'end' : 'start'} fill="var(--gold)" fontSize="12" fontFamily="var(--mono)">
+        {label}
+      </text>
     </g>
   )
 }

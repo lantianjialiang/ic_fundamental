@@ -1,113 +1,135 @@
 import { loc, type LText } from '../../../i18n/locale'
 import { type QuizQuestion } from '../../../lab/QuizList'
 
-export type GroupId = 'in' | 'out' | 'cur'
-
-export const GROUPS: Array<{
-  id: GroupId
-  title: LText
-  items: string
-  text: LText
-}> = [
+/** 三组 DC 参数：一张短表 */
+export const GROUPS: Array<{ id: string; group: LText; items: string; ask: LText; how: LText }> = [
   {
     id: 'in',
-    title: loc('输入'),
+    group: loc('输入', 'Input'),
     items: 'VIH · VIL',
-    text: loc('问 DUT 把多高认成 1、多低认成 0。ATE 把输入赶到规格边沿，再看功能是否仍对。'),
+    ask: loc('多高认成 1、多低认成 0', 'How high reads as 1, how low reads as 0'),
+    how: loc('输入给在门限边沿，跑功能向量', 'Drive inputs at the threshold edge and run functional vectors'),
   },
   {
     id: 'out',
-    title: loc('输出'),
+    group: loc('输出', 'Output'),
     items: 'VOH · VOL',
-    text: loc('问 DUT 吐出来的电压。必须带着规定电流看：VOH @ IOH、VOL @ IOL。'),
+    ask: loc('带着规定电流时，输出电压够不够', 'Is the output voltage good enough at the specified current?'),
+    how: loc('PMU Force 电流，Measure 电压', 'PMU forces current, measures voltage'),
   },
   {
     id: 'cur',
-    title: loc('电流'),
-    items: 'IIH · IIL · IOH · IOL · Leakage',
-    text: loc('输入漏电、输出驱动电流、不该导通时的漏电。Continuity 也是电流/电压，不是 Pattern。'),
+    group: loc('电流', 'Current'),
+    items: 'IIH · IIL · IOZ · IDD',
+    ask: loc('漏电和电源电流超没超', 'Are leakage and supply current within limits?'),
+    how: loc('PMU Force 电压，Measure 电流', 'PMU forces voltage, measures current'),
   },
 ]
 
-export type IoId = 'source' | 'sink'
+export type Mode = 'voh' | 'vol'
+export type Drive = 'good' | 'weak'
 
-export const IO: Array<{ id: IoId; title: LText; dir: string; text: LText }> = [
-  {
-    id: 'source',
-    title: loc('Source'),
-    dir: 'Tester → DUT',
-    text: loc('电流从 Tester 流向 DUT。测 IIL、某些 Leakage 时常见。箭头向外给。'),
-  },
-  {
-    id: 'sink',
-    title: loc('Sink'),
-    dir: 'Tester ← DUT',
-    text: loc('电流从 DUT 流进 Tester。测 VOH @ IOH 时，Tester 在“拉”这段电流，电压还得够高。'),
-  },
-]
-
-export const VOH_LIMIT = 2.4
 export const VDD = 3.3
 
-export function vohAt(iohMa: number): number {
-  return Math.max(0, VDD - iohMa * 0.12)
+/** 每种测法的规格与输出管等效电阻（Ω） */
+export const MODES: Record<
+  Mode,
+  { limit: number; specMa: number; ron: Record<Drive, number> }
+> = {
+  voh: { limit: 2.4, specMa: 4, ron: { good: 150, weak: 260 } },
+  vol: { limit: 0.4, specMa: 8, ron: { good: 40, weak: 70 } },
 }
 
-export const CONT = loc(
-  '开路：灌一小电流，电压被顶高。短路：同样电流，电压掉到接近 0。DC 流程通常先做这一项，确认 Pin 接到了再测 VIH / VOH。',
-)
+/** VOH = VDD − IOH × R_on；VOL = IOL × R_on */
+export function outVolt(mode: Mode, ma: number, ron: number): number {
+  const drop = (ma / 1000) * ron
+  return mode === 'voh' ? Math.max(0, VDD - drop) : Math.min(VDD, drop)
+}
 
-export const TAKEAWAY = loc(
-  'VOH @ IOH 不是孤立数字。输出高电平要在规定灌/拉电流下仍满足电压。电流方向先分清 Source / Sink。',
-)
+export function isPass(mode: Mode, volt: number): boolean {
+  return mode === 'voh' ? volt >= MODES.voh.limit : volt <= MODES.vol.limit
+}
+
+export const TAKEAWAY: LText[] = [
+  loc(
+    '输出规格是“带负载的电压”：VOH @ IOH、VOL @ IOL。不带电流测，坏的驱动也能过。',
+    'Output specs are voltages under load: VOH @ IOH and VOL @ IOL. Without the current, a weak driver still passes.',
+  ),
+  loc(
+    '输出管可以看成一个导通电阻 R_on。电流越大，VOH 掉得越多、VOL 抬得越高。',
+    'An output transistor acts like an on-resistance R_on. More current pulls VOH down further and pushes VOL up further.',
+  ),
+  loc(
+    '先分清电流方向：测 VOH 时 DUT Source、PMU 吸电流；测 VOL 时 PMU 灌电流、DUT Sink。',
+    'Know the current direction: for VOH the DUT sources and the PMU draws current; for VOL the PMU pushes current in and the DUT sinks it.',
+  ),
+]
 
 export const QUIZ: QuizQuestion[] = [
   {
     id: 'q1',
-    prompt: loc('DC Test 的第一项通常是什么？'),
+    prompt: loc('为什么 Datasheet 写 VOH @ IOH，而不是只写 VOH？', 'Why does the datasheet say VOH @ IOH instead of just VOH?'),
     options: [
-      { id: 'scan', text: loc('先跑 Scan') },
-      { id: 'cont', text: loc('Continuity（开短路），确认 Pin 接到了') },
-      { id: 'fmax', text: loc('先测 fMAX') },
-      { id: 'bin', text: loc('先写 Bin 号') },
+      { id: 'font', text: loc('排版习惯', 'Formatting habit') },
+      { id: 'load', text: loc('输出电压必须在规定电流下仍达标', 'The output voltage must still meet the limit at the specified current') },
+      { id: 'time', text: loc('IOH 是时间', 'IOH is a time') },
+      { id: 'scan', text: loc('IOH 是扫描链长度', 'IOH is a scan chain length') },
     ],
-    answer: 'cont',
-    explain: loc('没接上就测 VIH，失败原因是接触，不是门槛。PMU 灌电流看电压。'),
+    answer: 'load',
+    explain: loc(
+      '空载时 VOH 几乎等于 VDD。一拉电流，R_on 上有压降，才看得出驱动够不够。',
+      'With no load VOH is almost VDD. Only under current does R_on drop voltage and reveal whether the drive is strong enough.',
+    ),
   },
   {
     id: 'q2',
-    prompt: loc('Sink current 的方向是？'),
+    prompt: loc('测 VOH 时，电流往哪个方向流？', 'During a VOH test, which way does current flow?'),
     options: [
-      { id: 'out', text: loc('Tester → DUT') },
-      { id: 'in', text: loc('Tester ← DUT') },
-      { id: 'none', text: loc('没有电流') },
-      { id: 'clk', text: loc('只存在于时钟脚') },
+      { id: 'out', text: loc('从 DUT 流出，进 PMU（DUT Source）', 'Out of the DUT into the PMU (DUT sources)') },
+      { id: 'in', text: loc('从 PMU 流进 DUT（DUT Sink）', 'From the PMU into the DUT (DUT sinks)') },
+      { id: 'none', text: loc('没有电流', 'No current') },
+      { id: 'clk', text: loc('只在时钟脚有电流', 'Only on the clock pin') },
     ],
-    answer: 'in',
-    explain: loc('Sink 是 Tester 把 DUT 吐出的电流“接住”。VOH @ IOH 就是在拉电流。'),
+    answer: 'out',
+    explain: loc(
+      '输出为高，上拉管把 VDD 接到管脚，电流从 DUT 流出。测 VOL 时方向相反。',
+      'The output is high, so the pull-up connects VDD to the pin and current flows out of the DUT. VOL is the opposite direction.',
+    ),
   },
   {
     id: 'q3',
-    prompt: loc('为什么 Datasheet 写 VOH @ IOH，而不是只写 VOH？'),
+    prompt: loc('上拉 R_on = 150 Ω，VDD = 3.3 V，IOH = 4 mA。VOH 是多少？', 'Pull-up R_on = 150 Ω, VDD = 3.3 V, IOH = 4 mA. What is VOH?'),
     options: [
-      { id: 'font', text: loc('只是排版习惯') },
-      { id: 'load', text: loc('输出电压必须在规定电流负载下仍达标') },
-      { id: 'time', text: loc('IOH 是时间') },
-      { id: 'scan', text: loc('IOH 是扫描链长度') },
+      { id: 'a', text: loc('3.30 V', '3.30 V') },
+      { id: 'b', text: loc('2.70 V', '2.70 V') },
+      { id: 'c', text: loc('0.60 V', '0.60 V') },
+      { id: 'd', text: loc('2.40 V', '2.40 V') },
     ],
-    answer: 'load',
-    explain: loc('空载时电压看起来很高。一拉电流，VOH 掉下去，才知道驱动够不够。'),
+    answer: 'b',
+    explain: loc('压降 4 mA × 150 Ω = 0.6 V，VOH = 3.3 − 0.6 = 2.7 V，高于 2.4 V，Pass。', 'Drop = 4 mA × 150 Ω = 0.6 V, so VOH = 3.3 − 0.6 = 2.7 V, above 2.4 V: Pass.'),
   },
   {
     id: 'q4',
-    prompt: loc('VIH / VIL 和 VOH / VOL 这一课怎么分组？'),
+    prompt: loc('一颗芯片 VOL 测出 0.56 V（极限 ≤ 0.4 V @ 8 mA），最可能是什么问题？', 'A part reads VOL = 0.56 V (limit ≤ 0.4 V @ 8 mA). What is the most likely problem?'),
     options: [
-      { id: 'ok', text: loc('VIH/VIL 输入门槛；VOH/VOL 输出驱动') },
-      { id: 'swap', text: loc('VIH 是输出，VOH 是输入') },
-      { id: 'ac', text: loc('四者都是频率') },
-      { id: 'same', text: loc('四个符号同一个意思') },
+      { id: 'weak', text: loc('下拉管太弱，R_on 偏大', 'The pull-down is weak; R_on is too high') },
+      { id: 'vih', text: loc('输入门限太高', 'Input threshold too high') },
+      { id: 'speed', text: loc('时钟太快', 'Clock too fast') },
+      { id: 'ok', text: loc('没问题，0.56 V 也算低电平', 'No problem; 0.56 V still counts as low') },
+    ],
+    answer: 'weak',
+    explain: loc('VOL = IOL × R_on。0.56 V ÷ 8 mA = 70 Ω，比正常的 40 Ω 大，驱动不够。', 'VOL = IOL × R_on. 0.56 V ÷ 8 mA = 70 Ω, larger than the normal 40 Ω: not enough drive.'),
+  },
+  {
+    id: 'q5',
+    prompt: loc('VIH / VIL 和 VOH / VOL 怎么分？', 'How do VIH / VIL differ from VOH / VOL?'),
+    options: [
+      { id: 'ok', text: loc('VIH / VIL 是输入门限；VOH / VOL 是输出驱动', 'VIH / VIL are input thresholds; VOH / VOL are output drive') },
+      { id: 'swap', text: loc('VIH 是输出，VOH 是输入', 'VIH is an output, VOH is an input') },
+      { id: 'ac', text: loc('四个都是 AC 参数', 'All four are AC parameters') },
+      { id: 'same', text: loc('四个是同一个意思', 'They all mean the same thing') },
     ],
     answer: 'ok',
-    explain: loc('I 是 Input，O 是 Output。电流另属一组。'),
+    explain: loc('I 是 Input，O 是 Output。电流类（IIH、IIL、IDD）另成一组。', 'I is input, O is output. Currents (IIH, IIL, IDD) form a separate group.'),
   },
 ]

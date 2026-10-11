@@ -1,41 +1,11 @@
-import { useMemo, useState, type ComponentType } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState, type ComponentType } from 'react'
 import { HomePage } from './home/HomePage'
 import { TrackPage } from './home/TrackPage'
+import { useLocale } from './i18n/LocaleContext'
+import { ui } from './i18n/ui'
 import { LabNavProvider } from './lab/LabNavContext'
-import { Module00Page } from './modules/module00/Module00Page'
-import { Module01Page } from './modules/module01/Module01Page'
-import { Module03Page } from './modules/module03/Module03Page'
-import { Module04Page } from './modules/module04/Module04Page'
-import { Module05Page } from './modules/module05/Module05Page'
-import { Module06Page } from './modules/module06/Module06Page'
-import { Module07Page } from './modules/module07/Module07Page'
-import { Module08Page } from './modules/module08/Module08Page'
-import { Module09Page } from './modules/module09/Module09Page'
-import { Module10Page } from './modules/module10/Module10Page'
-import { Module11Page } from './modules/module11/Module11Page'
-import { Module12Page } from './modules/module12/Module12Page'
-import { Module13Page } from './modules/module13/Module13Page'
-import { Module14Page } from './modules/module14/Module14Page'
-import { Module15Page } from './modules/module15/Module15Page'
-import { Module16Page } from './modules/module16/Module16Page'
-import { Module17Page } from './modules/module17/Module17Page'
-import { FundAcPage } from './modules/fund/FundAcPage'
-import { FundAtePage } from './modules/fund/FundAtePage'
-import { FundBasicsPage } from './modules/fund/FundBasicsPage'
-import { FundCharPage } from './modules/fund/FundCharPage'
-import { FundCreatePage } from './modules/fund/FundCreatePage'
-import { FundDcPage } from './modules/fund/FundDcPage'
-import { FundDebugPage } from './modules/fund/FundDebugPage'
-import { FundFuncPage } from './modules/fund/FundFuncPage'
-import { FundIntroPage } from './modules/fund/FundIntroPage'
-import { FundLatchPage } from './modules/fund/FundLatchPage'
-import { FundOpensPage } from './modules/fund/FundOpensPage'
-import { FundProgramPage } from './modules/fund/FundProgramPage'
-import { FundQualifyPage } from './modules/fund/FundQualifyPage'
-import { FundScanPage } from './modules/fund/FundScanPage'
-import { FundSpecPage } from './modules/fund/FundSpecPage'
-import { FundVectorPage } from './modules/fund/FundVectorPage'
 import { type ModuleId } from './modules/catalog'
+import { parseHash, screenHash, type Screen } from './route'
 import { type TrackId, trackById, trackOfLesson } from './tracks/catalog'
 
 type LessonProps = {
@@ -43,47 +13,67 @@ type LessonProps = {
   onModuleChange: (id: ModuleId) => void
 }
 
-const LESSONS: Partial<Record<ModuleId, ComponentType<LessonProps>>> = {
-  ate: Module03Page,
-  pmu: Module04Page,
-  spec: Module05Page,
-  dc: Module06Page,
-  func: Module07Page,
-  timing: Module08Page,
-  ac: Module09Page,
-  vector: Module10Page,
-  scan: Module11Page,
-  program: Module12Page,
-  debug: Module13Page,
-  shmoo: Module14Page,
-  alu: Module15Page,
-  latch: Module16Page,
-  bench: Module17Page,
-  fBasics: FundBasicsPage,
-  fAte: FundAtePage,
-  fIntro: FundIntroPage,
-  fSpec: FundSpecPage,
-  fOpens: FundOpensPage,
-  fDc: FundDcPage,
-  fFunc: FundFuncPage,
-  fAc: FundAcPage,
-  fChar: FundCharPage,
-  fVector: FundVectorPage,
-  fProgram: FundProgramPage,
-  fCreate: FundCreatePage,
-  fDebug: FundDebugPage,
-  fQualify: FundQualifyPage,
-  fLatch: FundLatchPage,
-  fScan: FundScanPage,
+type IntroProps = LessonProps & { onOpenConnection: () => void }
+
+/** 每课单独打包，进入时才加载；three.js 只跟着 3D 课走 */
+function page<P>(load: () => Promise<Record<string, unknown>>, name: string) {
+  return lazy(async () => ({ default: (await load())[name] as ComponentType<P> }))
 }
 
-type Screen =
-  | { kind: 'home' }
-  | { kind: 'track'; track: TrackId }
-  | { kind: 'lesson'; track: TrackId; moduleId: ModuleId }
+const Module00Page = page<IntroProps>(() => import('./modules/module00/Module00Page'), 'Module00Page')
+
+const LESSONS: Record<Exclude<ModuleId, 'intro'>, ComponentType<LessonProps>> = {
+  connection: page(() => import('./modules/module01/Module01Page'), 'Module01Page'),
+  ate: page(() => import('./modules/module03/Module03Page'), 'Module03Page'),
+  pmu: page(() => import('./modules/module04/Module04Page'), 'Module04Page'),
+  spec: page(() => import('./modules/module05/Module05Page'), 'Module05Page'),
+  dc: page(() => import('./modules/module06/Module06Page'), 'Module06Page'),
+  func: page(() => import('./modules/module07/Module07Page'), 'Module07Page'),
+  timing: page(() => import('./modules/module08/Module08Page'), 'Module08Page'),
+  vector: page(() => import('./modules/module10/Module10Page'), 'Module10Page'),
+  scan: page(() => import('./modules/module11/Module11Page'), 'Module11Page'),
+  program: page(() => import('./modules/module12/Module12Page'), 'Module12Page'),
+  shmoo: page(() => import('./modules/module14/Module14Page'), 'Module14Page'),
+  alu: page(() => import('./modules/module15/Module15Page'), 'Module15Page'),
+  latch: page(() => import('./modules/module16/Module16Page'), 'Module16Page'),
+  bench: page(() => import('./modules/module17/Module17Page'), 'Module17Page'),
+  fBasics: page(() => import('./modules/fund/FundBasicsPage'), 'FundBasicsPage'),
+  fAte: page(() => import('./modules/fund/FundAtePage'), 'FundAtePage'),
+  fIntro: page(() => import('./modules/fund/FundIntroPage'), 'FundIntroPage'),
+  fSpec: page(() => import('./modules/fund/FundSpecPage'), 'FundSpecPage'),
+  fOpens: page(() => import('./modules/fund/FundOpensPage'), 'FundOpensPage'),
+  fDc: page(() => import('./modules/fund/FundDcPage'), 'FundDcPage'),
+  fFunc: page(() => import('./modules/fund/FundFuncPage'), 'FundFuncPage'),
+  fAc: page(() => import('./modules/fund/FundAcPage'), 'FundAcPage'),
+  fChar: page(() => import('./modules/fund/FundCharPage'), 'FundCharPage'),
+  fVector: page(() => import('./modules/fund/FundVectorPage'), 'FundVectorPage'),
+  fProgram: page(() => import('./modules/fund/FundProgramPage'), 'FundProgramPage'),
+  fCreate: page(() => import('./modules/fund/FundCreatePage'), 'FundCreatePage'),
+  fDebug: page(() => import('./modules/fund/FundDebugPage'), 'FundDebugPage'),
+  fQualify: page(() => import('./modules/fund/FundQualifyPage'), 'FundQualifyPage'),
+  fLatch: page(() => import('./modules/fund/FundLatchPage'), 'FundLatchPage'),
+  fScan: page(() => import('./modules/fund/FundScanPage'), 'FundScanPage'),
+}
+
+function Loading() {
+  const { t } = useLocale()
+  return <p className="app-loading">{t(ui.loading)}</p>
+}
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>({ kind: 'home' })
+  const [screen, setScreenState] = useState<Screen>(() => parseHash(window.location.hash))
+
+  useEffect(() => {
+    const onHash = () => setScreenState(parseHash(window.location.hash))
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+
+  const setScreen = (next: Screen) => {
+    const hash = screenHash(next)
+    if (window.location.hash === hash) setScreenState(next)
+    else window.location.hash = hash
+  }
 
   const openLesson = (moduleId: ModuleId, track?: TrackId) => {
     setScreen({ kind: 'lesson', track: trackOfLesson(moduleId, track), moduleId })
@@ -117,23 +107,17 @@ export default function App() {
   }
 
   const onModuleChange = (id: ModuleId) => openLesson(id, screen.track)
-  let page
-  if (screen.moduleId === 'intro') {
-    page = (
-      <Module00Page
-        moduleId={screen.moduleId}
-        onModuleChange={onModuleChange}
-        onOpenConnection={() => openLesson('connection', screen.track)}
-      />
-    )
-  } else {
-    const Lesson = LESSONS[screen.moduleId]
-    page = Lesson ? (
-      <Lesson moduleId={screen.moduleId} onModuleChange={onModuleChange} />
-    ) : (
-      <Module01Page moduleId={screen.moduleId} onModuleChange={onModuleChange} />
-    )
-  }
+  const Lesson = screen.moduleId === 'intro' ? null : LESSONS[screen.moduleId]
+  const lesson = Lesson ? (
+    <Lesson moduleId={screen.moduleId} onModuleChange={onModuleChange} />
+  ) : (
+    <Module00Page
+      moduleId={screen.moduleId}
+      onModuleChange={onModuleChange}
+      onOpenConnection={() => openLesson('connection', screen.track)}
+    />
+  )
 
-  return navValue ? <LabNavProvider value={navValue}>{page}</LabNavProvider> : page
+  const content = <Suspense fallback={<Loading />}>{lesson}</Suspense>
+  return navValue ? <LabNavProvider value={navValue}>{content}</LabNavProvider> : content
 }

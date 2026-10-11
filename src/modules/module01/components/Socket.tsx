@@ -1,60 +1,64 @@
-import { useLocale } from '../../../i18n/LocaleContext'
-import { ui } from '../../../i18n/ui'
-import { DUT, SOCKET, bgaXZ, layerY } from '../data/layout'
-import { SceneLabel } from './SceneLabel'
+import { useFrame } from '@react-three/fiber'
+import { useMemo, useRef } from 'react'
+import type { Group } from 'three'
+import { useScene } from '../context/SceneContext'
+import { PIN_FREE_TOP, SOCKET, allContacts } from '../data/layout'
+import { GEO, MAT } from '../data/materials'
+import { socketHousingGeometry } from '../data/shapes'
+import { InstancedParts, type InstanceItem } from './Instanced'
+import { LayerGroup } from './LayerGroup'
 
-type SocketProps = {
-  progress: number
-}
+const BARREL_TOP = SOCKET.baseTop - 0.015
+const CROWN_H = 0.012
 
-export function Socket({ progress }: SocketProps) {
-  const { t } = useLocale()
-  const y = layerY(SOCKET, progress)
-  const { w, h, d } = SOCKET.body
-  const boardPinY = -h / 2 - SOCKET.boardPinLength / 2
-  const dutContactY = h / 2 + 0.024
+/** Socket：带定位槽的阳极氧化壳体 + Torlon 针板 + 弹簧针阵列（实例化，柱塞随压缩下移） */
+export function Socket() {
+  const { store, cfg } = useScene()
+  const plungers = useRef<Group>(null)
+  const housing = useMemo(
+    () => socketHousingGeometry(SOCKET.outer, SOCKET.pocket, SOCKET.top - SOCKET.bottom - 0.024),
+    [],
+  )
+
+  const contacts = useMemo(() => allContacts(cfg.pkg), [cfg.pkg])
+  const barrels = useMemo<InstanceItem[]>(() => {
+    const h = BARREL_TOP - SOCKET.bottom - 0.002
+    return contacts.map(([x, z]) => ({ p: [x, SOCKET.bottom + 0.002 + h / 2, z], s: [0.02, h, 0.02] }))
+  }, [contacts])
+  const rods = useMemo<InstanceItem[]>(() => {
+    const h = PIN_FREE_TOP - CROWN_H - BARREL_TOP + 0.01
+    return contacts.map(([x, z]) => ({ p: [x, BARREL_TOP - 0.01 + h / 2, z], s: [0.011, h, 0.011] }))
+  }, [contacts])
+  const crowns = useMemo<InstanceItem[]>(
+    () => contacts.map(([x, z]) => ({ p: [x, PIN_FREE_TOP - CROWN_H / 2, z], s: [0.015, CROWN_H, 0.015] })),
+    [contacts],
+  )
+  const screws = useMemo<InstanceItem[]>(() => {
+    const r = (SOCKET.outer / 2 + SOCKET.pocket / 2) / 2
+    return [
+      [-r, -r],
+      [r, -r],
+      [r, r],
+      [-r, r],
+    ].map(([x, z]) => ({ p: [x!, SOCKET.top - 0.004, z!], s: [0.045, 0.02, 0.045] }))
+  }, [])
+
+  useFrame(() => {
+    if (plungers.current) plungers.current.position.y = -store.pose.pinComp
+  })
 
   return (
-    <group position={[0, y, 0]}>
-      <mesh castShadow receiveShadow>
-        <boxGeometry args={[w, h, d]} />
-        <meshStandardMaterial color="#3e444c" roughness={0.5} metalness={0.22} />
+    <LayerGroup id="socket">
+      <mesh geometry={housing} position={[0, SOCKET.bottom, 0]} material={MAT.anodized} castShadow receiveShadow />
+      <mesh position={[0, (SOCKET.bottom + SOCKET.baseTop) / 2, 0]} material={MAT.torlon} receiveShadow>
+        <boxGeometry args={[SOCKET.pocket - 0.04, SOCKET.baseTop - SOCKET.bottom, SOCKET.pocket - 0.04]} />
       </mesh>
-      {/* DUT 从上方装入 */}
-      <mesh position={[0, h / 2 - 0.02, 0]}>
-        <boxGeometry args={[w * 0.78, 0.03, d * 0.78]} />
-        <meshStandardMaterial color="#2a2f36" roughness={0.65} metalness={0.15} />
-      </mesh>
-
-      {Array.from({ length: DUT.grid }, (_, row) =>
-        Array.from({ length: DUT.grid }, (_, col) => {
-          const [x, z] = bgaXZ(col, row)
-          return (
-            <group key={`${col}-${row}`}>
-              {/* 板侧：pin 朝下插入 Load Board 顶面焊盘 */}
-              <mesh position={[x, boardPinY, z]}>
-                <cylinderGeometry
-                  args={[SOCKET.boardPinRadius, SOCKET.boardPinRadius * 0.75, SOCKET.boardPinLength, 8]}
-                />
-                <meshStandardMaterial color="#d4b45a" roughness={0.3} metalness={0.6} />
-              </mesh>
-              {/* DUT 侧：触点朝上接触 BGA */}
-              <mesh position={[x, dutContactY, z]}>
-                <cylinderGeometry
-                  args={[SOCKET.contactRadius, SOCKET.contactRadius * 0.65, 0.05, 10]}
-                />
-                <meshStandardMaterial color="#c9b07a" roughness={0.35} metalness={0.55} />
-              </mesh>
-            </group>
-          )
-        }),
-      )}
-
-      <SceneLabel
-        position={[w / 2 + 0.42, 0.16, 0]}
-        title="SOCKET"
-        subtitle={t(ui.scene.socketSub)}
-      />
-    </group>
+      <InstancedParts geometry={GEO.cyl} material={MAT.steel} items={screws} />
+      <InstancedParts geometry={GEO.cyl} material={MAT.gold} items={barrels} />
+      <group ref={plungers}>
+        <InstancedParts geometry={GEO.cyl} material={MAT.steel} items={rods} />
+        <InstancedParts geometry={GEO.cone} material={MAT.gold} items={crowns} />
+      </group>
+    </LayerGroup>
   )
 }

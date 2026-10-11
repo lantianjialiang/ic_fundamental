@@ -4,15 +4,15 @@ import { loc } from '../../i18n/locale'
 type Kind = 'design' | 'test' | 'device' | string
 
 const L = {
-  design: loc('设计规格'),
-  circuit: loc('电路设计 / 仿真'),
-  chip: loc('芯片'),
-  device: loc('数据手册'),
-  test: loc('测试规格'),
-  program: loc('测试程序'),
-  ate: loc('ATE 判 Pass / Fail'),
-  contract: loc('合同：客户照它设计系统，出货芯片必须满足'),
-  cap: loc('设计规格驱动芯片；数据手册是对外承诺；测试规格把承诺翻译成测试程序，在 ATE 上逐颗兑现。'),
+  design: loc('设计规格', 'Design spec'),
+  circuit: loc('电路设计 / 仿真', 'Circuit design / sim'),
+  chip: loc('芯片', 'Chip'),
+  device: loc('数据手册', 'Data sheet'),
+  test: loc('测试规格', 'Test spec'),
+  program: loc('测试程序', 'Test program'),
+  ate: loc('ATE 判 Pass / Fail', 'ATE: Pass / Fail'),
+  contract: loc('合同：客户照它设计系统，出货芯片必须满足', 'Contract: customers design to it; shipped chips must meet it'),
+  cap: loc('设计规格驱动芯片；数据手册是对外承诺；测试规格把承诺翻译成测试程序，在 ATE 上逐颗兑现。', 'The design spec drives the chip; the data sheet is the external promise; the test spec turns that promise into a test program that the ATE enforces chip by chip.'),
 }
 
 export function SpecFlowFig({ active }: { active: Kind }) {

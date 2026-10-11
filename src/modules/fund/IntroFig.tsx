@@ -75,8 +75,8 @@ export function PinSymbol({ kind, active }: { kind: PinKind; active: boolean }) 
 /* ---------- 分 Bin 频率轴 ---------- */
 
 const BL = {
-  fail: loc('Fail'),
-  cap: loc('拖动芯片的最高工作频率，看它落在哪个 Bin。'),
+  fail: loc('Fail', 'Fail'),
+  cap: loc('拖动芯片的最高工作频率，看它落在哪个 Bin。', "Drag the chip's maximum operating frequency to see which bin it lands in."),
 }
 
 export function BinFig({ fmax }: { fmax: number }) {
@@ -120,22 +120,22 @@ export function BinFig({ fmax }: { fmax: number }) {
 /* ---------- 测试系统框图（对应 Figure 3-1） ---------- */
 
 const SL = {
-  dc: loc('DC 子系统'),
-  bus: loc('系统总线'),
-  cpuSub: loc('硬盘 / 网络 / 显示器'),
-  vec: loc('向量存储器'),
-  timing: loc('时序子系统'),
+  dc: loc('DC 子系统', 'DC subsystem'),
+  bus: loc('系统总线', 'System bus'),
+  cpuSub: loc('硬盘 / 网络 / 显示器', 'Disk / network / display'),
+  vec: loc('向量存储器', 'Vector memory'),
+  timing: loc('时序子系统', 'Timing subsystem'),
   timingSub: 'Format / Mask / Time Set',
-  opt: loc('特殊选件'),
-  clk: loc('系统时钟'),
-  ext: loc('外部接口'),
-  head: loc('测试头'),
-  card: loc('管脚电子卡'),
-  lb: loc('负载板'),
-  handler: loc('分选机 / 探针台'),
-  levels: loc('电平 / PMU'),
-  power: loc('DPS → 电源脚'),
-  cap: loc('点任意一块，右侧栏解释它的作用。'),
+  opt: loc('特殊选件', 'Special options'),
+  clk: loc('系统时钟', 'System clocks'),
+  ext: loc('外部接口', 'External interfaces'),
+  head: loc('测试头', 'Test head'),
+  card: loc('管脚电子卡', 'Pin electronics card'),
+  lb: loc('负载板', 'Load board'),
+  handler: loc('分选机 / 探针台', 'Handler / prober'),
+  levels: loc('电平 / PMU', 'Levels / PMU'),
+  power: loc('DPS → 电源脚', 'DPS → power pins'),
+  cap: loc('点任意一块，右侧栏解释它的作用。', 'Click any block and the side panel explains what it does.'),
 }
 
 type BoxDef = { id: BlockId; x: number; y: number; w: number; h: number; label: LText | string; sub?: LText | string }
@@ -260,9 +260,9 @@ export function SystemFig({ active, onPick }: { active: BlockId; onPick: (id: Bl
 /* ---------- 共享资源 vs tester per pin ---------- */
 
 const AL = {
-  pin: loc('管脚'),
-  own: loc('独立电平 + 时序'),
-  cap: loc('左边是测试机资源，右边是 8 个测试通道。'),
+  pin: loc('管脚', 'Pin'),
+  own: loc('独立电平 + 时序', 'Own levels + timing'),
+  cap: loc('左边是测试机资源，右边是 8 个测试通道。', 'Tester resources on the left, 8 test channels on the right.'),
 }
 
 export function ArchFig({ mode }: { mode: ArchId }) {

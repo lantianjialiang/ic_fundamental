@@ -1,64 +1,49 @@
 import { loc, type LText } from '../../i18n/locale'
 
-/** {@timing} / {@ac} 共用：一张 CLK / DATA / OUT 上的全部标注 */
-export type TimingMark =
-  | 'drive'
-  | 'strobe'
-  | 'period'
-  | 'setup'
-  | 'hold'
-  | 'tpd'
-  | 'edge'
-  | 'ctq'
-  | 'fmax'
+/** {@timing} 课用的教学数值（单位 ns），图、判题、复习题都从这里取，保证自洽 */
+export const TPD = 8
+/** 测试机在每个 CLK 沿之前多少 ns 换 DATA */
+export const DRIVE_LEAD = 4
+export const TSU_MIN = 3
+export const TH_MIN = 1
+/** Strobe 需要的最小窗口：测试机边沿精度 + 沿本身的上升时间 */
+export const MARGIN = 2
 
-export const TIMING: Record<TimingMark, { title: string; text: LText; caption: LText }> = {
-  drive: {
-    title: 'Drive Edge',
-    text: loc('Tester 把输入拉到新电平的边沿。图上 DATA 开始上升的那一点。输入从这一刻算新值。'),
-    caption: loc('黄线扫到 DATA 上升沿 = Drive。太晚，后面的 Setup 可能不够。'),
-  },
-  strobe: {
-    title: 'Strobe',
-    text: loc('Tester 在这一拍“看一眼”输出的时刻，也叫 Receive / Compare。必须落在 OUT 已经稳定的窗口里。'),
-    caption: loc('黄竖线落到 OUT 上就是 Strobe。窗口外：太早采旧值，太晚可能采到下一拍。'),
-  },
-  period: {
-    title: 'Period',
-    text: loc('相邻两个 CLK 上升沿之间的时间。一拍有多长。缩短 Period = 提高频率，fMAX 就是它的下限。'),
-    caption: loc('沿 1 到沿 2 就是 Period。{@ac} 会把 Period 往短里拖，直到功能 Fail。'),
-  },
+export type TimingMark = 'setup' | 'hold' | 'tpd' | 'period'
+
+export const TIMING_MARKS: TimingMark[] = ['setup', 'hold', 'tpd', 'period']
+
+export const TIMING: Record<TimingMark, { title: LText; short: LText; text: LText }> = {
   setup: {
-    title: 'Setup Time',
-    text: loc('CLK 沿到来之前，DATA 必须已经稳住的最短时间（tSU）。不够，触发器可能采到亚稳态或错值。'),
-    caption: loc('DATA 稳住 → CLK 沿，这段是 tSU。Period 缩短时，Setup 往往最先被吃掉。'),
+    title: loc('Setup Time（tSU）', 'Setup Time (tSU)'),
+    short: loc('tSU', 'tSU'),
+    text: loc(
+      'CLK 沿到来之前，DATA 必须已经稳定的最短时间。图中测试机在沿前 4 ns 换数据，规格要求 ≥ 3 ns，够。',
+      'The minimum time DATA must be stable before the CLK edge. Here the tester changes DATA 4 ns before the edge; the spec asks for ≥ 3 ns, so it is met.',
+    ),
   },
   hold: {
-    title: 'Hold Time',
-    text: loc('CLK 沿过后，DATA 还不能立刻变的最短时间（tH）。和 Setup 一前一后，都是相对时钟说的。'),
-    caption: loc('CLK 沿 → DATA 才允许再变，这段是 tH。沿后马上改数据，这一拍会错。'),
+    title: loc('Hold Time（tH）', 'Hold Time (tH)'),
+    short: loc('tH', 'tH'),
+    text: loc(
+      'CLK 沿过后，DATA 还要保持不变的最短时间。规格 ≥ 1 ns。图中下一拍数据在下一个沿前 4 ns 才换，所以提供的是 Period − 4 ns。',
+      'The minimum time DATA must stay unchanged after the CLK edge. The spec is ≥ 1 ns. Here the next data arrives 4 ns before the next edge, so the hold provided is Period − 4 ns.',
+    ),
   },
   tpd: {
-    title: 'Propagation Delay',
-    text: loc('组合逻辑：输入沿到输出沿的延迟（tPD）。IN/DATA 先变，OUT 过一会儿才跟。Strobe 必须晚于它。'),
-    caption: loc('DATA 变 → OUT 才变，金色括号是 tPD。这就是 Strobe 不能贴着 Drive 的原因。'),
+    title: loc('Propagation Delay（tPD）', 'Propagation Delay (tPD)'),
+    short: loc('tPD', 'tPD'),
+    text: loc(
+      'CLK 沿到 OUT 稳定的延迟，本例 8 ns。沿后到 tPD 之间 OUT 正在变（斜线区），在这里采样会出错。组合逻辑的 tPD 从输入沿量起，道理相同。',
+      'The delay from the CLK edge until OUT is stable: 8 ns here. Between the edge and tPD, OUT is still changing (hatched area); sampling there gives wrong data. For combinational logic, tPD is measured from the input edge in the same way.',
+    ),
   },
-  edge: {
-    title: 'Rise / Fall Time',
-    text: loc('沿自己从低爬到高（tr）或从高降到低（tf）要花的时间。不是瞬间。沿越慢，有效窗口越窄。'),
-    caption: loc('DATA 斜边在动：10%→90% 是 tr，反过来是 tf。方波只是理想画法。'),
-  },
-  ctq: {
-    title: 'Clock-to-Q',
-    text: loc('寄存器：CLK 沿到 Q 输出有效的时间（tCQ）。组合看 tPD，触发器看 tCQ。'),
-    caption: loc('CLK 上升沿之后，Q 才跟上。金色括号是 tCQ。不要和组合 tPD 混成一个词。'),
-  },
-  fmax: {
-    title: 'fMAX',
-    text: loc('功能仍对的最高时钟。Period 再短，同一套向量就开始 Fail。教学门槛对接 {@spec} 的 100 MHz。'),
-    caption: loc('Period 必须装得下 tCQ（或 tPD）+ tSU。再短，不是真值表反了，是来不及。'),
+  period: {
+    title: loc('Period / fMAX', 'Period / fMAX'),
+    short: loc('Period', 'Period'),
+    text: loc(
+      '两个 CLK 上升沿之间的时间，频率 = 1 / Period。Period 变短，输出窗口 = Period − tPD 跟着变窄；装不下 Strobe 就 Fail。功能仍正确的最高频率就是 fMAX。',
+      'The time between two rising CLK edges; frequency = 1 / Period. As Period shrinks, the output window (Period − tPD) narrows. When the strobe no longer fits, the test fails. The highest frequency that still passes is fMAX.',
+    ),
   },
 }
-
-export const M08_MARKS: TimingMark[] = ['drive', 'strobe', 'period', 'setup', 'hold', 'tpd']
-export const M09_MARKS: TimingMark[] = ['tpd', 'edge', 'setup', 'hold', 'ctq', 'fmax']

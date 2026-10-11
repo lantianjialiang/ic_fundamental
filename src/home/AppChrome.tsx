@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { useLocale } from '../i18n/LocaleContext'
 import { ui } from '../i18n/ui'
+import { Copyright } from '../lab/Copyright'
 import { LabHeader } from '../lab/LabHeader'
 
 type AppChromeProps = {
@@ -25,6 +26,7 @@ export function AppChrome({ title, goal, onHome, children }: AppChromeProps) {
       <div className="lab__body intro home-body">
         <main className="intro__main home">{children}</main>
       </div>
+      <Copyright />
     </div>
   )
 }

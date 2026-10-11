@@ -1,0 +1,30 @@
+/* D03 ATE 里面有什么 专用样式 */
+
+.m03-step {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 10px 0;
+  padding: 10px 14px;
+  min-height: 74px;
+  border: 1px solid var(--gold-line);
+  border-radius: var(--r-l);
+  background: var(--gold-bg);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.m03-step b {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--gold);
+}
+
+.m03-ok {
+  color: var(--green-2);
+}
+
+.m03-bad {
+  color: var(--red-2);
+}

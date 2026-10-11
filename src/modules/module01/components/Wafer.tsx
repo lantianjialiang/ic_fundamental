@@ -1,103 +1,103 @@
-import { useMemo } from 'react'
-import { ExtrudeGeometry, Shape } from 'three'
+import { useFrame } from '@react-three/fiber'
+import { useMemo, useRef } from 'react'
+import { ExtrudeGeometry, MeshBasicMaterial, MeshStandardMaterial, Shape, type InstancedMesh } from 'three'
 import { useLocale } from '../../../i18n/LocaleContext'
-import { ui } from '../../../i18n/ui'
-import { CHANNEL_COUNT, WAFER, dieCells, layerY, needleXZ } from '../data/layout'
+import { useScene } from '../context/SceneContext'
+import { DIE, DIE_PADS, PAD_TOP, WAFER, dieCells, padIndexFor } from '../data/layout'
+import { GEO, MAT } from '../data/materials'
+import { frameGeometry } from '../data/shapes'
+import { T } from '../data/text'
+import { dieTexture } from '../data/textures'
+import { InstancedParts, writeInstance, type InstanceItem } from './Instanced'
+import { LayerGroup } from './LayerGroup'
 import { SceneLabel } from './SceneLabel'
 
-type WaferProps = {
-  progress: number
-}
-
-function createWaferGeometry(): ExtrudeGeometry {
-  const radius = WAFER.radius
-  const flatX = radius - WAFER.flatDepth
-  const half = Math.sqrt(Math.max(0, radius * radius - flatX * flatX))
-  const aTop = Math.atan2(half, flatX)
-  let aBot = Math.atan2(-half, flatX)
-  if (aBot <= aTop) aBot += Math.PI * 2
-
-  const shape = new Shape()
-  shape.moveTo(flatX, -half)
-  shape.lineTo(flatX, half)
-  const steps = 56
-  for (let i = 1; i <= steps; i += 1) {
-    const a = aTop + ((aBot - aTop) * i) / steps
-    shape.lineTo(Math.cos(a) * radius, Math.sin(a) * radius)
-  }
-
-  return new ExtrudeGeometry(shape, {
-    depth: WAFER.thickness,
-    bevelEnabled: false,
-    curveSegments: 8,
+/** 带 notch 的晶圆外形（notch 朝 +Z，即朝向镜头） */
+function waferGeometry(): ExtrudeGeometry {
+  const r = WAFER.r
+  const half = 0.045
+  const a0 = Math.asin(half / r)
+  const s = new Shape()
+  // Shape 的 -Y 在 rotateX(-90°) 后对应世界 +Z
+  const start = -Math.PI / 2 + a0
+  const end = -Math.PI / 2 - a0 + Math.PI * 2
+  s.moveTo(Math.cos(start) * r, Math.sin(start) * r)
+  s.absarc(0, 0, r, start, end, false)
+  s.lineTo(0, -r + WAFER.notch)
+  s.closePath()
+  const g = new ExtrudeGeometry(s, {
+    depth: WAFER.t - 0.012,
+    bevelEnabled: true,
+    bevelThickness: 0.006,
+    bevelSize: 0.006,
+    bevelSegments: 2,
+    curveSegments: 96,
   })
+  g.rotateX(-Math.PI / 2)
+  g.translate(0, -WAFER.t + 0.006, 0)
+  return g
 }
 
-export function Wafer({ progress }: WaferProps) {
+const dieMat = new MeshStandardMaterial({ map: dieTexture(), metalness: 0.35, roughness: 0.32 })
+const outlineMat = new MeshBasicMaterial({ color: '#ffcf4a', toneMapped: false })
+
+/** 晶圆：数百颗 die（实例化）+ 被测 die 高亮 + pad + 扎针后的 scrub 痕 */
+export function Wafer() {
+  const { store, cfg } = useScene()
   const { t } = useLocale()
-  const y = layerY(WAFER, progress)
-  const dies = useMemo(() => dieCells(), [])
-  const geometry = useMemo(() => createWaferGeometry(), [WAFER.radius, WAFER.flatDepth, WAFER.thickness])
-  const padY = WAFER.thickness / 2 + 0.008
-  const flatWorldX = WAFER.radius - WAFER.flatDepth
-  const flatHalf = Math.sqrt(Math.max(0, WAFER.radius ** 2 - flatWorldX ** 2))
+  const scrubRef = useRef<InstancedMesh>(null)
+  const lastScrub = useRef(-1)
+  const geos = useMemo(() => ({ wafer: waferGeometry(), outline: frameGeometry(0.2, 0.2, 0.168, 0.168, 0.002) }), [])
+
+  const dies = useMemo<InstanceItem[]>(
+    () =>
+      dieCells().map((d) => ({
+        p: [d.x, DIE.h / 2, d.z],
+        s: [DIE.size, DIE.h, DIE.size],
+        c: d.isDut ? '#ffe2a0' : '#ffffff',
+      })),
+    [],
+  )
+  const pads = useMemo<InstanceItem[]>(
+    () =>
+      DIE_PADS.map((p, i) => ({
+        p: [p.x, DIE.h + 0.0015, p.z],
+        s: [0.022, 0.003, 0.022],
+        c: cfg.selected !== null && padIndexFor(cfg.selected) === i ? '#ffd84a' : '#d7dbe0',
+      })),
+    [cfg.selected],
+  )
+
+  useFrame(() => {
+    const mesh = scrubRef.current
+    if (!mesh) return
+    const len = store.scrubMax * (cfg.probe === 'cantilever' ? 0.8 : 0.2)
+    if (Math.abs(len - lastScrub.current) < 1e-5) return
+    lastScrub.current = len
+    DIE_PADS.forEach((p, i) => {
+      const l = Math.max(0.0001, len)
+      writeInstance(mesh, i, {
+        p: [p.x + p.nx * l * 0.5 - p.nx * 0.002, PAD_TOP + 0.0004, p.z + p.nz * l * 0.5 - p.nz * 0.002],
+        s: [p.nx !== 0 ? l + 0.004 : 0.007, 0.0008, p.nz !== 0 ? l + 0.004 : 0.007],
+      })
+    })
+    mesh.visible = len > 0.0005
+    mesh.instanceMatrix.needsUpdate = true
+  })
 
   return (
-    <group position={[0, y, 0]}>
-      <mesh
-        geometry={geometry}
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, -WAFER.thickness / 2, 0]}
-        receiveShadow
-      >
-        <meshStandardMaterial color="#c9c4b4" roughness={0.38} metalness={0.12} />
-      </mesh>
-
-      {dies.map((die) => (
-        <mesh
-          key={`${die.col}-${die.row}`}
-          position={[die.x, padY, die.z]}
-        >
-          <boxGeometry args={[WAFER.dieSize, 0.012, WAFER.dieSize]} />
-          <meshStandardMaterial
-            color={die.isDut ? '#4a5a6a' : '#6e6a5e'}
-            roughness={0.45}
-            metalness={0.12}
-          />
-        </mesh>
-      ))}
-
-      {Array.from({ length: CHANNEL_COUNT }, (_, i) => {
-        const [x, z] = needleXZ(i)
-        return (
-          <mesh key={`pad-${i}`} position={[x, padY + 0.01, z]}>
-            <boxGeometry args={[0.032, 0.008, 0.032]} />
-            <meshStandardMaterial color="#d4af37" roughness={0.35} metalness={0.45} />
-          </mesh>
-        )
-      })}
-
-      {/* 直线定位边描边，避免被看成整圆 */}
-      <mesh position={[flatWorldX, 0.004, 0]}>
-        <boxGeometry args={[0.03, 0.02, flatHalf * 2]} />
-        <meshStandardMaterial color="#7a766c" roughness={0.55} metalness={0.08} />
-      </mesh>
-
-      <mesh position={[0, -WAFER.thickness / 2 - 0.06, 0]}>
-        <cylinderGeometry args={[1.2, 1.32, 0.1, 32]} />
-        <meshStandardMaterial color="#3a4048" roughness={0.55} metalness={0.2} />
-      </mesh>
-
-      <SceneLabel
-        position={[0, -0.34, 0]}
-        title="WAFER (DUT)"
-        subtitle={t(ui.scene.waferSub)}
-      />
-      <SceneLabel
-        position={[flatWorldX + 0.22, 0.16, 0]}
-        title={t(ui.scene.flat)}
-        subtitle={t(ui.scene.flatSub)}
-      />
-    </group>
+    <LayerGroup id="wafer">
+      <mesh geometry={geos.wafer} material={MAT.silicon} receiveShadow castShadow />
+      <InstancedParts geometry={GEO.box} material={dieMat} items={dies} receiveShadow />
+      <mesh geometry={geos.outline} position={[0, DIE.h, 0]} material={outlineMat} />
+      <InstancedParts geometry={GEO.box} material={MAT.trackWhite} items={pads} />
+      <instancedMesh ref={scrubRef} args={[GEO.box, MAT.scrub, DIE_PADS.length]} frustumCulled={false} />
+      {cfg.showLabels ? (
+        <>
+          <SceneLabel position={[0, 0.02, WAFER.r + 0.1]} title={t(T.notch)} />
+          <SceneLabel position={[0.35, 0.04, -0.2]} title={t(T.dutDie)} />
+        </>
+      ) : null}
+    </LayerGroup>
   )
 }
