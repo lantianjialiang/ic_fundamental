@@ -75,10 +75,14 @@ export function ScanPlayFig({ frame, fault }: { frame: Frame; fault: FaultId }) 
   const capturing = prep || edge
   const shifting = scan && frame.se === 1 && phase !== 'compare'
   const scanColor = shifting ? hot : dim
+  /* Capture 时 Q、D 两类线用蓝 / 橙区分（色盲友好的配对），D 再加虚线，不靠颜色也能分 */
+  const qHot = 'var(--blue)'
+  const dHot = 'var(--gold)'
+  const dDash = capturing ? '6 3' : undefined
   /** Q → 组合逻辑：Capture 准备时这些 Q 正是逻辑的输入 */
-  const fbColor = plain ? 'var(--text-2)' : prep ? hot : dim
+  const fbColor = plain ? 'var(--text-2)' : prep ? qHot : dim
   /** 组合逻辑 → D → MUX：Capture 两帧都在用 */
-  const dColor = plain ? 'var(--text-2)' : capturing ? hot : dim
+  const dColor = plain ? 'var(--text-2)' : capturing ? dHot : dim
   const showTable = capturing || phase === 'shiftOut' || phase === 'compare'
   const isBad = (i: number) => fault === 'd2sa0' && i === FAULT_AT
 
@@ -106,6 +110,18 @@ export function ScanPlayFig({ frame, fault }: { frame: Frame; fault: FaultId }) 
         <text x={LOGIC.x + 12} y={LOGIC.y + 16} fill="var(--muted)" fontSize="11">
           {`${t(L.comb)} · ${t(L.combSub)}`}
         </text>
+        {capturing ? (
+          <g fontSize="11" fontFamily="var(--mono)">
+            <line x1={LOGIC.x + LOGIC.w - 150} y1={LOGIC.y + 12} x2={LOGIC.x + LOGIC.w - 128} y2={LOGIC.y + 12} stroke={qHot} strokeWidth="2.5" />
+            <text x={LOGIC.x + LOGIC.w - 123} y={LOGIC.y + 16} fill={qHot}>
+              {t(L.legQ)}
+            </text>
+            <line x1={LOGIC.x + LOGIC.w - 76} y1={LOGIC.y + 12} x2={LOGIC.x + LOGIC.w - 54} y2={LOGIC.y + 12} stroke={dHot} strokeWidth="2.5" strokeDasharray="6 3" />
+            <text x={LOGIC.x + LOGIC.w - 49} y={LOGIC.y + 16} fill={dHot}>
+              {t(L.legD)}
+            </text>
+          </g>
+        ) : null}
 
         {/* Q → 算式格的连线（画在格子下面，先画） */}
         {EQS.map((eq, e) =>
@@ -135,14 +151,14 @@ export function ScanPlayFig({ frame, fault }: { frame: Frame; fault: FaultId }) 
                 height={CELL_H}
                 rx="6"
                 fill="var(--fig-box-2)"
-                stroke={bad ? red : prep ? hot : 'var(--line-2)'}
+                stroke={bad ? red : prep ? 'var(--text-2)' : 'var(--line-2)'}
                 strokeWidth={prep || bad ? 1.6 : 1}
               />
               <text x={dX(i)} y={CELL_Y + 15} textAnchor="middle" fill="var(--text-2)" fontSize="11" fontFamily="var(--mono)">
                 {`${eq.name} = ${eq.expr}`}
               </text>
               {frame.q ? (
-                <text x={dX(i)} y={CELL_Y + 31} textAnchor="middle" fill={prep ? hot : 'var(--muted)'} fontSize="11" fontFamily="var(--mono)">
+                <text x={dX(i)} y={CELL_Y + 31} textAnchor="middle" fill={prep ? 'var(--text)' : 'var(--muted)'} fontSize="11" fontFamily="var(--mono)">
                   {`= ${eq.sub(frame.q)} = ${eq.fn(frame.q)}`}
                 </text>
               ) : null}
@@ -174,11 +190,11 @@ export function ScanPlayFig({ frame, fault }: { frame: Frame; fault: FaultId }) 
           return (
             <g key={i}>
               {/* D：算式格 → MUX 的 0 端（普通 FF 直接进 FF） */}
-              <line x1={dX(i)} y1={PIN_Y} x2={dX(i)} y2={scan ? MUX_T : FF_Y} stroke={dLine} strokeWidth="2" />
+              <line x1={dX(i)} y1={PIN_Y} x2={dX(i)} y2={scan ? MUX_T : FF_Y} stroke={dLine} strokeWidth="2" strokeDasharray={dDash} />
               <text
                 x={dX(i) + 4}
                 y={TAG_Y}
-                fill={bad && capturing ? red : capturing ? hot : 'var(--muted)'}
+                fill={bad && capturing ? red : capturing ? dHot : 'var(--muted)'}
                 fontSize="11"
                 fontWeight={capturing ? 600 : 400}
                 fontFamily="var(--mono)"
@@ -191,7 +207,7 @@ export function ScanPlayFig({ frame, fault }: { frame: Frame; fault: FaultId }) 
                 </text>
               ) : null}
               {/* Q 回到组合逻辑处的标签：Capture 准备时写出当前值 */}
-              <text x={qX(i) + 4} y={TAG_Y} fill={prep ? hot : 'var(--muted)'} fontSize="11" fontWeight={prep ? 600 : 400} fontFamily="var(--mono)">
+              <text x={qX(i) + 4} y={TAG_Y} fill={prep ? qHot : 'var(--muted)'} fontSize="11" fontWeight={prep ? 600 : 400} fontFamily="var(--mono)">
                 {prep && frame.q ? `Q${i + 1}=${frame.q[i]}` : `Q${i + 1}`}
               </text>
 
@@ -214,7 +230,15 @@ export function ScanPlayFig({ frame, fault }: { frame: Frame; fault: FaultId }) 
                   </text>
                   {/* SE 接到 MUX 的选择端 */}
                   <line x1={x0 + 55} y1={SE_Y} x2={x0 + 55} y2={MUX_B - 6} stroke={frame.se ? 'var(--purple)' : 'var(--dim)'} strokeWidth="1.2" />
-                  <line x1={x0 + 35} y1={MUX_B} x2={x0 + 35} y2={FF_Y} stroke={capturing || shifting ? hot : dim} strokeWidth="2" />
+                  <line
+                    x1={x0 + 35}
+                    y1={MUX_B}
+                    x2={x0 + 35}
+                    y2={FF_Y}
+                    stroke={capturing ? dHot : shifting ? hot : dim}
+                    strokeWidth="2"
+                    strokeDasharray={dDash}
+                  />
                 </>
               ) : null}
 

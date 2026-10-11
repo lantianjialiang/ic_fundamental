@@ -544,7 +544,7 @@ export const TERMS: GlossaryTerm[] = [
       '第一项测试，确认每路通道真的接到了每个管脚：所有脚接 0 V，PMU 打 −100 µA，正常读到约 −0.65 V；开路撞钳位，短路接近 0 V。',
       'The first test, confirming every channel really reaches every pin: all pins at 0 V, the PMU forces −100 µA; a good pin reads about −0.65 V, an open hits the clamp, a short reads near 0 V.',
     ),
-    lessons: ['pmu', 'program', 'fOpens', 'fCreate'],
+    lessons: ['pmu', 'program', 'vate', 'fOpens', 'fCreate'],
   },
   {
     id: 'protection-diode',
@@ -554,7 +554,7 @@ export const TERMS: GlossaryTerm[] = [
       '每个信号脚对 VSS、对 VDD 各有一只。开短路就是让它正偏，读一个二极管压降（约 0.65 V）；管脚电压超出电源轨时它导通，可能把电流注入衬底触发闩锁。',
       'Every signal pin has one to VSS and one to VDD. Opens / shorts forward-biases it and reads one diode drop (about 0.65 V); a pin driven beyond the rails turns it on and can inject current that triggers latch-up.',
     ),
-    lessons: ['pmu', 'fOpens', 'fLatch'],
+    lessons: ['pmu', 'vate', 'fOpens', 'fLatch'],
   },
   {
     id: 'clamp',
@@ -564,7 +564,7 @@ export const TERMS: GlossaryTerm[] = [
       '限制 PMU 输出电压或电流的电路，保护操作员、硬件和 DUT。加流设电压钳位，加压设电流钳位；钳位值要设在 Fail 极限之外，否则这条测试永远不会 Fail。',
       'A circuit limiting the PMU’s output voltage or current to protect the operator, hardware and DUT. Forcing current needs a voltage clamp, forcing voltage a current clamp; set it beyond the fail limit or the test can never fail.',
     ),
-    lessons: ['pmu', 'fIntro', 'fOpens'],
+    lessons: ['pmu', 'vate', 'fIntro', 'fOpens'],
   },
   {
     id: 'kelvin',
@@ -594,7 +594,7 @@ export const TERMS: GlossaryTerm[] = [
       '芯片静止、不翻转时的电源电流。正常只有微安级，偏大说明有漏电或缺陷；闩锁测试也用它作基准。',
       'The supply current while the chip is static. Normally only microamps; a high value points to leakage or defects. Latch-up testing uses it as a reference.',
     ),
-    lessons: ['pmu', 'fDc', 'fLatch'],
+    lessons: ['pmu', 'vate', 'fDc', 'fLatch'],
   },
 
   /* ---------------- D05 从 Datasheet 到 Test Spec ---------------- */
@@ -1244,7 +1244,7 @@ export const TERMS: GlossaryTerm[] = [
       '电源输出电流的上限。测试中 IDD 突然像短路时，先靠它保护芯片，再掉电。',
       'The ceiling on supply output current. When IDD suddenly looks like a short in test, it protects the chip until power is removed.',
     ),
-    lessons: ['latch', 'fLatch'],
+    lessons: ['latch', 'vate', 'fLatch'],
   },
   {
     id: 'esd',
@@ -1275,6 +1275,48 @@ export const TERMS: GlossaryTerm[] = [
       'A process that builds P-channel and N-channel MOS together, isolated by wells; static current is tiny, but the structure hides a parasitic PNPN.',
     ),
     lessons: ['latch', 'fBasics', 'fLatch'],
+  },
+
+  /* ---------------- D16 虚拟 ATE 操作系统 ---------------- */
+  {
+    id: 'contact-resistance',
+    term: 'Contact Resistance',
+    name: loc('接触电阻', 'Contact resistance'),
+    def: loc(
+      '探针或 Socket 弹片和管脚之间的电阻。正常不到几欧；脏了、磨损了会到几百欧甚至几千欧，开短路读数变成二极管压降 + I × R，窗口可能放它过去，只能靠和好片比较发现。',
+      'The resistance between a probe or socket contact and the pin. Normally a few ohms at most; when dirty or worn it reaches hundreds or thousands of ohms, so the opens / shorts reading becomes diode drop + I × R. The window may let it through; comparing with a good chip catches it.',
+    ),
+    lessons: ['vate'],
+  },
+  {
+    id: 'settling-time',
+    term: 'Settling Time',
+    name: loc('等待稳定时间', 'Settling time'),
+    def: loc(
+      '施加条件后等多久再测。IDDQ 刚换向量时去耦电容和内部节点还在充电，电流按 exp(−t/τ) 衰减；等得太短，读数里混着瞬态电流，好片也会 FAIL。',
+      'How long to wait after applying a condition before measuring. Right after an IDDQ vector the decoupling capacitors and internal nodes are still charging and the current decays as exp(−t/τ); wait too little and transient current inflates the reading, so even a good chip fails.',
+    ),
+    lessons: ['vate'],
+  },
+  {
+    id: 'measure-range',
+    term: 'Measurement Range',
+    name: loc('测量量程', 'Measurement range'),
+    def: loc(
+      '仪器这一档能读到的满量程。超过满量程是 OVER RANGE，读数无效；量程太大则分辨率粗，接近限值时判不准。自动量程会选能装下读数的最小一档。',
+      'The full-scale value the instrument can read on a given range. Beyond full scale is OVER RANGE and the reading is invalid; too large a range gives coarse resolution and unreliable judging near the limit. Auto range picks the smallest range that holds the reading.',
+    ),
+    lessons: ['vate'],
+  },
+  {
+    id: 'bridging-fault',
+    term: 'Bridging Fault',
+    name: loc('桥接缺陷', 'Bridging fault'),
+    def: loc(
+      '两个本该分开的节点被一段电阻连在一起。只有向量把两端置成不同电平时才有电流，所以 IDDQ 要跑多个静态向量才能暴露它。',
+      'Two nodes that should be separate are joined by a resistance. Current flows only when the vector drives the two ends to different levels, so IDDQ needs several static vectors to expose it.',
+    ),
+    lessons: ['vate'],
   },
 
   /* ---------------- F01 电学与数字逻辑基础 ---------------- */
@@ -1502,7 +1544,7 @@ export const TERMS: GlossaryTerm[] = [
       '超过就可能损坏芯片的极限条件。表征往上搜 VDD 时也不能越过它。',
       'Conditions beyond which the chip may be damaged. Even an upward VDD search in characterization must not cross it.',
     ),
-    lessons: ['fSpec', 'fChar'],
+    lessons: ['vate', 'fSpec', 'fChar'],
   },
 
   /* ---------------- F05 开短路 ---------------- */
@@ -1524,7 +1566,7 @@ export const TERMS: GlossaryTerm[] = [
       '每个测试项的实测值和判定记录。看开短路要把相邻脚放在一起看；样品的 Datalog 还要带序列号、程序版本、测试机和日期。',
       'The record of measured values and verdicts per test. For opens / shorts read adjacent pins together; sample datalogs also carry the serial number, program revision, tester and date.',
     ),
-    lessons: ['fOpens', 'fChar', 'fDebug', 'fQualify'],
+    lessons: ['vate', 'fOpens', 'fChar', 'fDebug', 'fQualify'],
   },
 
   /* ---------------- F06 DC 参数 ---------------- */

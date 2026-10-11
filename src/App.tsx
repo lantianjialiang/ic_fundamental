@@ -41,6 +41,7 @@ const LESSONS: Record<Exclude<ModuleId, 'intro'>, ComponentType<LessonProps>> = 
   alu: page(() => import('./modules/module15/Module15Page'), 'Module15Page'),
   latch: page(() => import('./modules/module16/Module16Page'), 'Module16Page'),
   bench: page(() => import('./modules/module17/Module17Page'), 'Module17Page'),
+  vate: page(() => import('./modules/vate/VatePage'), 'VatePage'),
   fBasics: page(() => import('./modules/fund/FundBasicsPage'), 'FundBasicsPage'),
   fAte: page(() => import('./modules/fund/FundAtePage'), 'FundAtePage'),
   fIntro: page(() => import('./modules/fund/FundIntroPage'), 'FundIntroPage'),

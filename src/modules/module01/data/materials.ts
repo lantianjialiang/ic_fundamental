@@ -9,10 +9,19 @@ import {
   SphereGeometry,
   Vector3,
   type MeshStandardMaterialParameters,
+  type Texture,
 } from 'three'
-import { registerDim } from './dim'
-import type { Pkg } from './layout'
-import { lbBottomTextures, lbEdgeTextures, lbSectionTexture, lbTopTextures, relayTopTexture } from './textures'
+import { registerBoardFade } from './fade'
+import { LB_SPEC, PC_SPEC, type Pkg } from './layout'
+import {
+  lbBottomTextures,
+  lbCopperTexture,
+  lbEdgeTextures,
+  lbSectionTexture,
+  lbTopTextures,
+  pcCopperTexture,
+  relayTopTexture,
+} from './textures'
 
 /**
  * 物体本身的物理材质（FR4 绿、沉金、铜、塑封、金属……），不跟随站点主题。
@@ -104,7 +113,8 @@ export const MAT = {
   relayBody: std('#20252c', 0.05, 0.4),
 }
 
-for (const [key, mat] of Object.entries(MAT)) registerDim(mat, key === 'fr4Lb' || key === 'fr4Pc')
+registerBoardFade(MAT.fr4Lb)
+registerBoardFade(MAT.fr4Pc)
 
 /** Load Board 板体材质：四周侧面是叠层截面贴图，顶 / 底面是绿油 + 丝印 + 焊盘贴图；按封装缓存 */
 type LbMaterials = { side: MeshStandardMaterial; top: MeshStandardMaterial; bottom: MeshStandardMaterial; cap: MeshStandardMaterial }
@@ -116,22 +126,20 @@ export function lbMaterials(pkg: Pkg): LbMaterials {
   if (hit) return hit
   if (!lbSide) {
     const t = lbEdgeTextures()
-    lbSide = registerDim(clipped(new MeshStandardMaterial({ map: t.map, roughnessMap: t.orm, metalnessMap: t.orm, roughness: 1, metalness: 1 })), true)
+    lbSide = registerBoardFade(clipped(new MeshStandardMaterial({ map: t.map, roughnessMap: t.orm, metalnessMap: t.orm, roughness: 1, metalness: 1 })))
   }
   const top = lbTopTextures(pkg)
   const bottom = lbBottomTextures(pkg)
   const mats: LbMaterials = {
     side: lbSide,
-    top: registerDim(
+    top: registerBoardFade(
       clipped(new MeshStandardMaterial({ map: top.map, roughnessMap: top.orm, metalnessMap: top.orm, roughness: 1, metalness: 1 })),
-      true,
     ),
-    bottom: registerDim(
+    bottom: registerBoardFade(
       clipped(new MeshStandardMaterial({ map: bottom.map, roughnessMap: bottom.orm, metalnessMap: bottom.orm, roughness: 1, metalness: 1 })),
-      true,
     ),
-    // 剖切截面：不随「板子半透明」变淡，剖开后一直看得清各层
-    cap: registerDim(new MeshStandardMaterial({ map: lbSectionTexture(pkg), roughness: 0.55, metalness: 0.15 })),
+    // 剖切截面：不随板子半透明变淡，剖开后一直看得清各层
+    cap: new MeshStandardMaterial({ map: lbSectionTexture(pkg), roughness: 0.55, metalness: 0.15 }),
   }
   lbCache.set(pkg, mats)
   return mats
@@ -139,9 +147,48 @@ export function lbMaterials(pkg: Pkg): LbMaterials {
 
 let relayTop: MeshStandardMaterial | null = null
 export function relayTopMaterial(): MeshStandardMaterial {
-  if (!relayTop) relayTop = registerDim(new MeshStandardMaterial({ map: relayTopTexture(), roughness: 0.45, metalness: 0.05 }))
+  if (!relayTop) relayTop = new MeshStandardMaterial({ map: relayTopTexture(), roughness: 0.45, metalness: 0.05 })
   return relayTop
 }
+
+/**
+ * PCB 分层展开用的铜层材质：贴图透明处挖空（alphaTest），露出下面的层。
+ * GND / PWR 整片铜皮半透明，否则会把下面的信号层完全挡住。
+ */
+const copperCache = new Map<string, MeshStandardMaterial>()
+export function copperSheetMaterial(key: string, map: Texture, plane: boolean): MeshStandardMaterial {
+  const hit = copperCache.get(key)
+  if (hit) return hit
+  const mat = clipped(
+    new MeshStandardMaterial({
+      map,
+      metalness: 0.7,
+      roughness: 0.34,
+      alphaTest: 0.3,
+      transparent: plane,
+      opacity: plane ? 0.62 : 1,
+      depthWrite: !plane,
+    }),
+  )
+  copperCache.set(key, mat)
+  return mat
+}
+
+export function lbCopperMaterials(pkg: Pkg): MeshStandardMaterial[] {
+  return LB_SPEC.layers.map((kind, i) => copperSheetMaterial(`lb-${pkg}-${i}`, lbCopperTexture(pkg, i), kind !== 'SIG'))
+}
+
+export function pcCopperMaterials(): MeshStandardMaterial[] {
+  return PC_SPEC.layers.map((kind, i) => copperSheetMaterial(`pc-${i}`, pcCopperTexture(i), kind !== 'SIG'))
+}
+
+/** 探针卡分层展开时的阻焊面（两面可见，随板体一起半透明） */
+export const PC_MASK_MAT = registerBoardFade(clipped(std('#1d6a3a', 0, 0.42)))
+
+/** FR4 介质薄片：玻纤环氧本身是半透明的淡黄色 */
+export const DIELECTRIC_MAT = clipped(
+  new MeshStandardMaterial({ color: '#d2c184', roughness: 0.6, metalness: 0, transparent: true, opacity: 0.3, depthWrite: false }),
+)
 
 export const COPPER_COLOR = {
   top: '#dcb45c',

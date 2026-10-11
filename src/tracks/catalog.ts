@@ -32,8 +32,8 @@ export const TRACKS: Array<{
     id: 'digital',
     title: loc('基础 / 数字', 'Basics / Digital'),
     blurb: loc(
-      '先认名词、看动画：测什么、接到哪，再到 DC、功能、时序、Scan 和程序。现课 {@intro}–{@latch}，实验 {@bench}。',
-      'Names and animations first: what is tested and how it connects, then DC, functional, timing, Scan and the program. Lessons {@intro}–{@latch}, lab {@bench}.',
+      '先认名词、看动画：测什么、接到哪，再到 DC、功能、时序、Scan 和程序。现课 {@intro}–{@latch}，实验 {@bench}–{@vate}。',
+      'Names and animations first: what is tested and how it connects, then DC, functional, timing, Scan and the program. Lessons {@intro}–{@latch}, labs {@bench}–{@vate}.',
     ),
     ready: true,
     lessons: [
@@ -52,6 +52,7 @@ export const TRACKS: Array<{
       'alu',
       'latch',
       'bench',
+      'vate',
     ],
     knowledge: [
       {
@@ -109,8 +110,8 @@ export const TRACKS: Array<{
       {
         title: loc('交互实验', 'Interactive lab'),
         text: loc(
-          '{@bench}。自己设 Period / Drive / Delay / Strobe，以及 Leakage 限流。',
-          '{@bench}. Set period / drive / delay / strobe yourself, plus the leakage current limit.',
+          '{@bench}。自己设 Period / Drive / Delay / Strobe，以及 Leakage 限流。{@vate} 是一台虚拟 ATE 工作站：IDDQ 与开短路，Run、看 Datalog、诊断故障。',
+          '{@bench}. Set period / drive / delay / strobe yourself, plus the leakage current limit. {@vate} is a virtual ATE workstation: IDDQ and opens / shorts, run, read the datalog, diagnose the fault.',
         ),
       },
     ],
@@ -243,11 +244,11 @@ export const TRACKS: Array<{
     id: 'bench',
     title: loc('交互实验', 'Interactive lab'),
     blurb: loc(
-      '时序、Leakage、Pattern / Stuck。自己拧旋钮，立刻 Pass / Fail。现课 {@bench}。',
-      'Timing, leakage, pattern / stuck. Turn the knobs and see pass / fail at once. Lesson {@bench}.',
+      '时序、Leakage、Pattern / Stuck；再到一台虚拟 ATE 工作站跑 IDDQ 和开短路。自己拧旋钮，立刻 Pass / Fail。现课 {@bench}–{@vate}。',
+      'Timing, leakage, pattern / stuck; then a virtual ATE workstation running IDDQ and opens / shorts. Turn the knobs and see pass / fail at once. Lessons {@bench}–{@vate}.',
     ),
     ready: true,
-    lessons: ['bench'],
+    lessons: ['bench', 'vate'],
     knowledge: [
       {
         title: loc('时序模拟器', 'Timing simulator'),
@@ -264,10 +265,17 @@ export const TRACKS: Array<{
         ),
       },
       {
+        title: loc('虚拟 ATE 工作站', 'Virtual ATE workstation'),
+        text: loc(
+          '{@vate}。IDDQ：选 DUT、VDD、向量、等待时间、量程，看读数为什么 PASS / FAIL / 无效。开短路：注入开路、短路、接触电阻，跑完自己定位故障。',
+          '{@vate}. IDDQ: pick the DUT, VDD, vector, settling time and range, and see why the reading passes, fails or is invalid. Opens / shorts: inject opens, shorts and contact resistance, then locate the fault yourself.',
+        ),
+      },
+      {
         title: loc('和讲义的关系', 'How this relates to the lessons'),
         text: loc(
-          '词在 {@pmu} / {@timing}。这里不讲新名词，只让你亲手把 Pass 拧成 Fail。',
-          'The terms are in {@pmu} / {@timing}. No new names here: you turn a pass into a fail yourself.',
+          '词在 {@pmu} / {@timing} / {@dc}。这里不讲新名词，只让你亲手把 Pass 拧成 Fail，再自己说出原因。',
+          'The terms are in {@pmu} / {@timing} / {@dc}. No new names here: you turn a pass into a fail yourself, then say why.',
         ),
       },
     ],

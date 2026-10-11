@@ -805,10 +805,11 @@ export type PeMode = 'drive' | 'compare' | 'pmu' | 'leak'
 
 export type PeSwitch = { f1: boolean; f2: boolean; k1: boolean; k2: boolean; k3: boolean }
 
+/** F1、F2 由同一根“高速 I/O 切换”信号控制，F2 前面有一个反相器，所以两者总是一开一关 */
 export function peSwitch(mode: PeMode): PeSwitch {
   return {
     f1: mode === 'drive',
-    f2: mode === 'compare',
+    f2: mode !== 'drive',
     k1: mode === 'drive' || mode === 'compare',
     k2: mode === 'pmu',
     k3: mode === 'leak',
@@ -892,12 +893,33 @@ export const CMP_TEXT: Record<CmpRead, LText> = {
   ),
 }
 
-/** 返回负载电流（mA，正 = 从测试机流入 DUT） */
-export function loadCurrent(v: number, vref: number) {
-  if (v < vref) return IOL_MA
-  if (v > vref) return -IOH_MA
-  return 0
+/** 二极管热电压 n·kT/q（V）：决定两路分流的过渡宽度 */
+const DIODE_VT = 0.026
+/** |Vout − VREF| 小于它时算“过渡区”，代码面板高亮第三个分支 */
+export const LOAD_BAND = 0.1
+
+export type LoadBranch = 'iol' | 'ioh' | 'mid'
+
+/**
+ * 电流负载 = 二极管桥 + 两个恒流源。
+ * 上节点 A 由 IOL 源灌入电流，下节点 B 由 IOH 源抽走电流；左节点接 VREF 缓冲器，右节点经 F2 接 DUT。
+ *   D1：A → DUT   D2：A → VREF   D3：VREF → B   D4：DUT → B
+ * A 的电压由左右两点中较低的那点决定，IOL 主要走阴极更低的那只二极管；B 同理，IOH 主要从阳极更高的那点抽。
+ * 两只并联二极管的电流比 = exp(ΔV / VT)，所以 Vout 离 VREF 几个 VT 以外就几乎全走一边。
+ * 返回各支路电流（mA），iDut 正 = 从测试机流入 DUT。
+ */
+export function bridge(v: number, vref: number) {
+  const toDut = 1 / (1 + Math.exp((v - vref) / DIODE_VT))
+  const d1 = IOL_MA * toDut
+  const d2 = IOL_MA - d1
+  const d4 = IOH_MA * (1 - toDut)
+  const d3 = IOH_MA - d4
+  const branch: LoadBranch = v < vref - LOAD_BAND ? 'iol' : v > vref + LOAD_BAND ? 'ioh' : 'mid'
+  return { d1, d2, d3, d4, iDut: d1 - d4, branch }
 }
+
+/** DUT 输出高阻时没有别的电流通路，引脚停在 iDut = 0 的点：VREF + VT·ln(IOL / IOH)，只比 VREF 高几十 mV */
+export const HIZ_OFFSET = DIODE_VT * Math.log(IOL_MA / IOH_MA)
 
 export const LOAD_TEXT: LText[] = [
   loc(
@@ -912,7 +934,39 @@ export const LOAD_TEXT: LText[] = [
     'IOL：输出 0 时 DUT 必须“吸”进的电流；IOH：输出 1 时 DUT 必须“送”出的电流。VREF 设定切换点：输出比 VREF 低，流 IOL；比 VREF 高，流 IOH。',
     'IOL: the current the DUT must sink when outputting 0; IOH: the current the DUT must source when outputting 1. VREF sets the switch point: below VREF the load draws IOL, above VREF it draws IOH.',
   ),
+  loc(
+    '电路上它是一个二极管桥：上端由 IOL 恒流源往里灌电流，下端由 IOH 恒流源往外抽电流，左端接 VREF，右端经 F2 接 DUT。不需要任何控制信号，DUT 的电压自己决定二极管谁导通：输出比 VREF 低，D1 导通，IOL 流进 DUT，同时 D3 导通，IOH 由 VREF 那边提供；输出比 VREF 高，D2 把 IOL 引到 VREF，D4 从 DUT 抽走 IOH。真实二极管在 VREF 附近几十 mV 内是两路分流，净电流从 +IOL 平滑过渡到 −IOH。',
+    'In circuit terms it is a diode bridge: an IOL current source pushes current into the top node, an IOH current source pulls current out of the bottom node, the left node is tied to VREF and the right node reaches the DUT through F2. No control signal is needed; the DUT voltage itself decides which diodes conduct. Below VREF, D1 conducts and IOL flows into the DUT, while D3 conducts and IOH is supplied from the VREF side. Above VREF, D2 steers IOL into VREF and D4 pulls IOH out of the DUT. Real diodes share the current within a few tens of mV of VREF, so the net current moves smoothly from +IOL to −IOH.',
+  ),
+  loc(
+    '三态（高阻）测试就靠它：DUT 输出高阻时没有别的电流通路，桥把引脚拉到净电流为 0 的那一点，也就是约等于 VREF。VREF 设在 VOL 和 VOH 之间，比较器就读到“中间”，测试机由此判出这只脚确实是高阻。',
+    'Tri-state (high-impedance) testing relies on this. With the DUT output in high impedance there is no other current path, so the bridge pulls the pin to the point where the net current is zero, which is about VREF. Set VREF between VOL and VOH, and the comparators read "between", which is how the tester confirms the pin really is high impedance.',
+  ),
   loc('电流负载还用在三态功能测试和功能式开短路测试里。', 'The current load is also used in tri-state functional tests and functional opens/shorts tests.'),
+]
+
+/** 代码面板：把二极管桥写成程序。on 表示该行属于哪个分支（不写 = 常亮）；code 只含 ASCII，变量值运行时填入 */
+export const LOAD_CODE: Array<{ code: string; cm?: LText; on?: LoadBranch; fill?: 'iol' | 'ioh' | 'vref' }> = [
+  { code: '', cm: loc('测试程序里只设三个数', 'The test program sets only three numbers') },
+  { code: 'load.IOL  = ', fill: 'iol', cm: loc('DUT 输出 0 时要吸的电流', 'current the DUT must sink at 0') },
+  { code: 'load.IOH  = ', fill: 'ioh', cm: loc('DUT 输出 1 时要送的电流', 'current the DUT must source at 1') },
+  { code: 'load.VREF = ', fill: 'vref', cm: loc('切换点', 'switch point') },
+  { code: '' },
+  { code: '', cm: loc('二极管桥每一刻都在做的事（硬件自动完成，不用写）', 'What the diode bridge does at every instant (done by hardware, not written)') },
+  { code: 'function currentLoad(Vout) {' },
+  { code: '  const band = 0.1', cm: loc('V：二极管从全通到全断只需约 4 个热电压', 'V: a diode goes from fully on to off within about 4 thermal voltages') },
+  { code: '  if (Vout < VREF - band) {', on: 'iol' },
+  { code: '    return +IOL', on: 'iol', cm: loc('D1 导通：IOL 流入 DUT；D3 导通：IOH 由 VREF 提供', 'D1 on: IOL into the DUT; D3 on: IOH supplied by VREF') },
+  { code: '  }', on: 'iol' },
+  { code: '  if (Vout > VREF + band) {', on: 'ioh' },
+  { code: '    return -IOH', on: 'ioh', cm: loc('D2 导通：IOL 流进 VREF；D4 导通：IOH 从 DUT 抽出', 'D2 on: IOL into VREF; D4 on: IOH pulled out of the DUT') },
+  { code: '  }', on: 'ioh' },
+  {
+    code: '  return share(IOL, IOH)',
+    on: 'mid',
+    cm: loc('VREF 附近：两路分流，净电流在 +IOL 和 −IOH 之间', 'Near VREF: both paths share, net current between +IOL and −IOH'),
+  },
+  { code: '}' },
 ]
 
 export const CONFLICT_TEXT = loc(

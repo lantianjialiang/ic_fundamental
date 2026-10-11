@@ -117,6 +117,8 @@ export function Module17Page({ moduleId, onModuleChange }: Module17PageProps) {
       asideTitle={detail.title}
       asideText={detail.text}
       asideLater={t(ui.m17.asideLater)}
+      nextId="vate"
+      nextLabel={t(ui.m17.next)}
     >
       <Section title={t(ui.m17.introTitle)}>
         <p>{t(ui.m17.introBody)}</p>

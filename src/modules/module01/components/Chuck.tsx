@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import { BufferGeometry, TorusGeometry, type Group } from 'three'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
-import { useScene } from '../context/SceneContext'
+import { layerVisible, useScene } from '../context/SceneContext'
 import { CHUCK, FLOOR_Y } from '../data/layout'
 import { MAT } from '../data/materials'
 import { LayerGroup } from './LayerGroup'
@@ -38,13 +38,14 @@ export function Chuck() {
 
 /** 探针台底座（静止）+ XY 台（只跟随 chuck 的水平移动） */
 export function ProberBase() {
-  const { store } = useScene()
+  const { store, cfg } = useScene()
   const stage = useRef<Group>(null)
   useFrame(() => {
     if (stage.current) stage.current.position.x = store.pose.x.chuck
   })
+  // 底座和 XY 台跟 Chuck 一起显示 / 隐藏
   return (
-    <group>
+    <group visible={layerVisible(cfg, 'chuck')}>
       <RoundedBox
         args={[4.8, 0.9, 4.6]}
         radius={0.05}

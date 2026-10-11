@@ -574,8 +574,17 @@ export const ui = {
     kickerPat: loc('向量', 'Vectors'),
     kickerQuiz: loc('复习', 'Review'),
     asideLater: loc('Setup / Hold / tpd 的定义在 {@timing}。这里只问：你把比较点放在哪。', 'Setup / hold / tpd are defined in {@timing}. Here the only question is where you put the compare point.'),
+    next: loc('下一课：虚拟 ATE 操作系统', 'Next: Virtual ATE Training System'),
     yes: loc('对。', 'Correct. '),
     no: loc('不对。', 'Not quite. '),
+  },
+
+  vate: {
+    title: loc('虚拟 ATE 操作系统', 'Virtual ATE Training System'),
+    goal: loc(
+      '像操作真机一样：配测试条件、选资源、Run、读 Datalog，并说清芯片为什么 PASS、FAIL 或读数无效。',
+      'Work it like a real tester: set conditions, pick resources, run, read the datalog, and explain why the chip passes, fails or gives an invalid reading.',
+    ),
   },
 
   fund: {

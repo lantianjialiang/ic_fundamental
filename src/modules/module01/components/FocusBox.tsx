@@ -2,7 +2,7 @@ import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import { BoxGeometry, EdgesGeometry, LineBasicMaterial, type LineSegments } from 'three'
 import { useScene } from '../context/SceneContext'
-import { LAYER_BOX } from '../data/layout'
+import { layerBox } from '../data/layout'
 
 /** 侧栏点选某层时，在 3D 中用金色线框框出该层（跟随分解位移） */
 export function FocusBox({ color }: { color: string }) {
@@ -15,7 +15,7 @@ export function FocusBox({ color }: { color: string }) {
   useFrame(({ clock }) => {
     const line = ref.current
     if (!line) return
-    const box = cfg.focus ? LAYER_BOX[cfg.flow][cfg.focus] : undefined
+    const box = cfg.focus ? layerBox(cfg.flow, cfg.focus, store.pose.spread) : undefined
     line.visible = !!box
     if (!box || !cfg.focus) return
     line.position.set(box.c[0] + store.pose.x[cfg.focus], box.c[1] + store.pose.y[cfg.focus], box.c[2])

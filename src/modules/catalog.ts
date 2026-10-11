@@ -18,6 +18,7 @@ export const MODULE_IDS = [
   'alu',
   'latch',
   'bench',
+  'vate',
   'fBasics',
   'fAte',
   'fIntro',

@@ -84,7 +84,7 @@ export function WaveRows({ span, period, rows, strobe, window, edges = [], ariaL
         const y = (level: Seg['level']) => (level === 'z' ? mid : level ? hi : lo)
         const color = row.color ?? 'var(--sky)'
         return (
-          <g key={row.name}>
+          <g key={r}>
             <text x={12} y={mid + 4} fill="var(--text-2)" fontSize="12" fontFamily="monospace">
               {row.name}
             </text>

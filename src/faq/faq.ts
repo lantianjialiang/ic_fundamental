@@ -107,6 +107,27 @@ export const FAQ_GROUPS: FaqGroup[] = [
         lessons: ['ate', 'timing', 'fAc'],
       },
       {
+        id: 'window-strobe',
+        q: loc(
+          '窗口 Strobe 是怎么实现的？是在窗口里多次采样吗？毛刺出现时刚好没采到怎么办？',
+          'How is a window strobe implemented? Does it sample many times inside the window, and what if a glitch falls between samples?',
+        ),
+        a: loc(
+          '不是多次采样。VOH / VOL 两个电压比较器是模拟电路，输出一直跟着引脚电压连续变化，并不只在某个时刻才工作。窗口 Strobe 是时序电路在窗口开始沿打开一个“失效锁存器”、在结束沿关上：窗口打开期间，比较器结果只要有一瞬和期望值不符，锁存器就被置位并保持住，到窗口结束时再读出 Pass / Fail。所以它没有“两次采样之间”的空档，窗口内的毛刺不靠运气碰。它也会漏，但漏的原因不一样：一是毛刺太窄，比较器来不及翻转（每台测试机都规定比较器能分辨的最小脉宽，一般在亚纳秒到纳秒级）；二是毛刺幅度没越过 VOH / VOL 门槛；三是毛刺落在窗口外面。有些低成本测试机没有真正的窗口比较，只能在一拍里放几个边沿 Strobe（Multi-strobe）来近似，这时确实会漏掉落在两次采样之间的毛刺。对策是把 Strobe 放密一些，或者在不同拍里扫动 Strobe 的位置，并且查清楚这台机器的窗口是硬件锁存还是多点采样。见 {@fFunc}。',
+          'No, it does not sample many times. The VOH / VOL comparators are analog circuits whose outputs follow the pin voltage continuously; they do not only work at one instant. A window strobe is timing logic that opens a "fail latch" at the window-open edge and closes it at the window-close edge: while the window is open, if the comparator result disagrees with the expected value even for an instant, the latch is set and stays set, and Pass / Fail is read when the window closes. So there is no gap "between two samples", and a glitch inside the window is not caught by luck. It can still miss, but for different reasons: the glitch is too narrow for the comparator to toggle (every tester specifies the minimum pulse width its comparators can resolve, usually sub-nanosecond to a few nanoseconds); the glitch does not cross the VOH / VOL threshold; or the glitch falls outside the window. Some low-cost testers have no true window compare and approximate it with several edge strobes in one cycle (multi-strobe); then a glitch between two samples really can be missed. The remedy is to place the strobes closer together or sweep the strobe position across cycles, and to find out whether your tester\'s window is a hardware latch or multi-point sampling. See {@fFunc}.',
+        ),
+        lessons: ['fFunc'],
+      },
+      {
+        id: 'open-drain-source',
+        q: loc('什么叫开漏（Open drain）和开源（Open source）？', 'What are open-drain and open-source outputs?'),
+        a: loc(
+          '普通 CMOS 输出有两只管：PMOS 上拉、NMOS 下拉。开漏输出只保留 NMOS，它的漏极直接接到管脚、上面“开着”不接东西：输出 0 时 NMOS 导通，把管脚拉低；输出 1 时 NMOS 关断，管脚是高阻，高电平要靠外接上拉电阻拉到 VDD。开源反过来，只保留上面那只上拉管，管脚接在它的源极上（类似双极型的射极跟随），只能往外供电流：输出 1 时拉高，输出 0 时是高阻，要靠外接下拉电阻。双极型电路里对应的叫开集电极（Open collector）和开发射极（Open emitter）。这样设计的好处是几个输出可以直接并在一根线上做“线与”，并且上拉可以接到和芯片不同的电压做电平转换，I²C 总线就是开漏。测试时：开漏脚的期望写 L 和 Z（或者接上拉负载后写 L 和 H），一定要有上拉，可以用管脚电子的电流负载把 VREF 设在 VOH 以上来当上拉；VOL / IOL 照常测；没有 VOH 可测，高电平那一态改测关断漏电（IOZH / IOH 漏电）。开源脚全部镜像过来。见 {@fFunc}。',
+          'A normal CMOS output has two transistors: a PMOS pull-up and an NMOS pull-down. An open-drain output keeps only the NMOS, with its drain wired straight to the pin and nothing above it: driving 0 turns the NMOS on and pulls the pin low; driving 1 turns it off and the pin is high-Z, so the high level must come from an external pull-up resistor to VDD. Open source is the reverse: only a high-side transistor remains, with the pin on its source terminal (like a bipolar emitter follower), so it can only source current. Driving 1 pulls high, driving 0 leaves the pin high-Z, and an external pull-down is needed. The bipolar equivalents are open collector and open emitter. The benefits: several outputs can share one wire as a "wired-AND", and the pull-up can go to a different voltage than the chip for level shifting; the I²C bus is open-drain. When testing: expect L and Z on an open-drain pin (or L and H with a pull-up load), and a pull-up is mandatory; the pin electronics current load with VREF set above VOH can serve as one. VOL / IOL is tested as usual; there is no VOH to test, so the high state is checked for off-state leakage (IOZH / IOH leakage) instead. Open-source pins are the mirror image. See {@fFunc}.',
+        ),
+        lessons: ['fFunc', 'fCreate'],
+      },
+      {
         id: 'in-between-fail',
         q: loc('输出电压在 VOL 和 VOH 之间，为什么直接判 Fail？', 'Why is an output between VOL and VOH a straight fail?'),
         a: loc(
@@ -164,8 +185,8 @@ export const FAQ_GROUPS: FaqGroup[] = [
         id: 'voh-with-current',
         q: loc('输出电压为什么要带电流测？', 'Why must output voltage be measured under current?'),
         a: loc(
-          '输出级导通的 MOS 管相当于一个导通电阻 R_on。不带负载时没有电流，R_on 上没有压降，哪怕驱动变弱了读数也是 VDD 或 0 V。只有拉出 / 灌入规定的 IOH / IOL，压降 I × R_on 才显现。{@dc} 的例子：VOL @ 8 mA，正常 40 Ω 得 0.32 V Pass，偏弱 70 Ω 得 0.56 V Fail；空载时两颗都读 0 V，分不出来。',
-          'The MOS transistor that is on in the output stage acts like an on-resistance R_on. With no load there is no current and no drop across R_on, so even a weak driver reads VDD or 0 V. Only when the specified IOH / IOL is drawn does the I × R_on drop appear. In {@dc}: VOL @ 8 mA gives 0.32 V (pass) with a normal 40 Ω and 0.56 V (fail) with a weak 70 Ω; unloaded, both read 0 V and cannot be told apart.',
+          '输出级导通的那个 MOS 管相当于一个导通电阻 R_on。不带负载时没有电流流过 R_on，上面没有压降，输出就是 VDD 或 0 V；哪怕 R_on 变大了（驱动变弱、管子有缺陷、工艺偏差），读数也一模一样。只有拉出 / 灌入规定的 IOH / IOL 电流，压降 I × R_on 才显现：VOH = VDD − |IOH| × R_on，VOL = IOL × R_on。{@dc} 的例子（VDD = 3.0 V）：VOL @ 8 mA，正常下拉 40 Ω → 0.32 V Pass，偏弱 70 Ω → 0.56 V Fail；VOH @ 4 mA，正常上拉 100 Ω → 2.60 V Pass，偏弱 200 Ω → 2.20 V Fail。空载（0 mA）时两颗都读 0 V / 3.00 V，分不出来。',
+          'The MOS transistor that is on in the output stage acts like an on-resistance R_on. With no load, no current flows through R_on, so there is no drop across it and the output is simply VDD or 0 V — even if R_on has grown (weaker drive, a defective transistor, process variation), the reading is identical. Only when the specified IOH / IOL is pulled out or pushed in does the drop I × R_on appear: VOH = VDD − |IOH| × R_on, VOL = IOL × R_on. In {@dc} (VDD = 3.0 V): VOL @ 8 mA gives 0.32 V (pass) with a normal 40 Ω pull-down and 0.56 V (fail) with a weak 70 Ω one; VOH @ 4 mA gives 2.60 V (pass) with a normal 100 Ω pull-up and 2.20 V (fail) with a weak 200 Ω one. Unloaded (0 mA), both read 0 V / 3.00 V and cannot be told apart.',
         ),
         lessons: ['dc', 'fDc'],
       },
@@ -191,6 +212,27 @@ export const FAQ_GROUPS: FaqGroup[] = [
         lessons: ['fOpens'],
       },
       {
+        id: 'power-pin-os',
+        q: loc('电源管脚（VDD / VSS）怎么做开短路？', 'How do you run opens/shorts on power pins (VDD / VSS)?'),
+        a: loc(
+          '电源脚后面没有单独的一对保护二极管，测的是 P 衬底（接 VSS）和 N 阱（接 VDD）之间的 PN 结，以及电源 ESD 钳位里的二极管。做法：VSS 和所有信号脚接 0 V，同名的其它 VDD 脚断开 DPS 继电器悬空，PMU 对被测 VDD 脚强加 −100 µA、钳位 −3 V，读约 −0.6 V 为正常，接近 0 V 为 VDD 对 VSS 短路，撞到钳位为这只脚开路。只打负电流：正电流等于从这只脚给芯片上电，读数没有特征值。其它 VDD 脚必须悬空、逐脚测，因为同名脚在芯片里连在同一条总线上，接着 0 V 会把电流引走，读数像短路，也会掩盖真正断开的那只。VSS 脚方向相反：VDD 接 0 V，打 +100 µA，读约 +0.6 V。另一个线索：信号脚的 +100 µA 全部撞钳位、−100 µA 全正常，多半是 VDD 脚没接上。上电后的 Gross IDD 再兜底拦住电源对地的硬短路。见 {@fDc} 的等效电路一节和 {@fOpens}。',
+          'A power pin has no dedicated pair of protection diodes behind it; what you test is the PN junction between the P substrate (on VSS) and the N wells (on VDD), plus the diode in the supply ESD clamp. Method: VSS and all signal pins at 0 V, the other VDD pins of the same net disconnected from the DPS and left floating, and the PMU forcing −100 µA into the VDD pin under test with a −3 V clamp. About −0.6 V is good, near 0 V is a VDD-to-VSS short, and hitting the clamp means this pin is open. Force only negative current: positive current would power the chip through this pin, and the reading has no signature value. The other VDD pins must float and each pin is tested on its own, because pins of the same net share one bus inside the chip; holding them at 0 V would steal the current, make the reading look like a short, and mask the pin that is really open. VSS pins are the mirror image: VDD at 0 V, force +100 µA, expect about +0.6 V. Another clue: if every signal pin hits the clamp at +100 µA while every −100 µA result is fine, the VDD pin is most likely not connected. Gross IDD after power-up is the backstop for a hard supply-to-ground short. See the equivalent-circuit section of {@fDc} and {@fOpens}.',
+        ),
+        lessons: ['fOpens', 'fDc'],
+      },
+      {
+        id: 'diode-vs-resistor',
+        q: loc(
+          '为什么测开短路时等效电路是两只二极管，测 VOL / VOH 时却是两只电阻？',
+          'Why is the equivalent circuit two diodes for opens/shorts but two resistors for VOL / VOH?',
+        ),
+        a: loc(
+          '两只保护二极管和两只输出管一直都在同一只管脚上，等效电路只画“这个偏置条件下真正导通的部分”。开短路时芯片不上电、所有脚接 0 V，输出管没有栅压、沟道不存在，只有 PN 结能导电：ESD 二极管，以及与它并联、方向相同的漏极–衬底结；PMU 把引脚推到 0 V 以外约 0.65 V，其中一只正偏，所以看到的是二极管。测 VOL / VOH 时芯片上电，预处理让一只输出管导通、工作在线性区，电压和电流成正比，就是一只电阻；另一只关断；引脚被钉在 0 V 和 VDD 之间，两只二极管都反偏，不导电，从图里拿掉。反过来，VOL 预处理错了、输出其实是高，PMU 灌电流把引脚顶到 VDD 以上，二极管又导通，读到 VDD + 0.7 V。开短路特意测二极管，是因为不上电最安全，而且约 0.65 V 的压降几乎不随工艺和电流变，开路、短路、正常三种读数离得很远。见 {@fDc}。',
+          'The two protection diodes and the two output transistors are always on the same pin; an equivalent circuit only draws what actually conducts under the given bias. In opens/shorts the chip is unpowered with every pin at 0 V, so the output transistors have no gate voltage and no channel; only PN junctions can conduct - the ESD diodes and the drain–body junctions in parallel with them, pointing the same way. The PMU pushes the pin about 0.65 V beyond 0 V, one of them is forward-biased, and you see a diode. In VOL / VOH the chip is powered and preconditioning turns one output transistor on in its linear region, where voltage is proportional to current - a resistor - while the other is off. The pin is held between 0 V and VDD, both diodes are reverse-biased and carry nothing, so they drop out of the picture. Conversely, if VOL preconditioning is wrong and the output is actually high, the PMU pushes the pin above VDD, the diode conducts again, and you read VDD + 0.7 V. Opens/shorts deliberately tests the diode because no power is safest, and its roughly 0.65 V drop hardly varies with process or current, keeping open, short and good readings far apart. See {@fDc}.',
+        ),
+        lessons: ['fOpens', 'fDc'],
+      },
+      {
         id: 'ganged-limit',
         q: loc(
           '并联测 IIL / IIH，为什么极限还用单脚的 10 µA？',
@@ -210,6 +252,54 @@ export const FAQ_GROUPS: FaqGroup[] = [
           'It depends on what the spec limits. If the limit is a current (leakage IIL / IIH, IOZ, IDD), force voltage and measure current (FVMI). If the limit is a voltage (VOH @ IOH, VOL @ IOL, the opens/shorts diode drop), force current and measure voltage (FIMV). The PMU can do both; see {@pmu} and {@fIntro}.',
         ),
         lessons: ['pmu', 'dc', 'fIntro'],
+      },
+    ],
+  },
+  {
+    id: 'pmu-pe',
+    title: loc('PMU 与管脚电子', 'PMU and pin electronics'),
+    items: [
+      {
+        id: 'kelvin-compensate',
+        q: loc('四线制（Kelvin）连接为什么可以自动补偿电压？', 'Why does a four-wire (Kelvin) connection compensate the voltage automatically?'),
+        a: loc(
+          'PMU 的施加端是一个带负反馈的运放：它不停地调自己的输出，直到“反馈端看到的电压”等于程序设定值。两线制时反馈取在 PMU 出口，出口准了，导线上的压降 I × R 却落在 DUT 身上。四线制把反馈改成 Sense 线，从 DUT 引脚旁边取电压，导线压降就被包进了反馈环：DUT 上少了多少，运放就把输出抬高多少，电流变了它也跟着变，不用人算。{@fIntro} 的例子：设定 5 V、电流 200 mA、每根 Force 线 0.5 Ω，PMU 出口自动升到 5.2 V，DUT 上正好 5.0 V。前提是 PMU 还有余量把出口抬上去；压降太大，输出顶到量程或电压上限，就补不上了。',
+          'The PMU force side is an op-amp with negative feedback: it keeps adjusting its output until the voltage at its feedback input equals the programmed value. In a two-wire connection the feedback is taken at the PMU output, so the output is right but the wire drop I × R lands on the DUT. In a four-wire connection the feedback comes from the Sense line, picked up right next to the DUT pin, so the wire drop is inside the feedback loop: however much the DUT is short, the op-amp raises its output by that much, and it follows when the current changes, with nothing to calculate. Example from {@fIntro}: 5 V programmed, 200 mA, 0.5 Ω per Force line, so the PMU output rises to 5.2 V by itself and the DUT sees exactly 5.0 V. This assumes the PMU has headroom to raise its output; if the drop is too large and the output hits the range or voltage limit, it can no longer compensate.',
+        ),
+        lessons: ['pmu', 'fIntro'],
+      },
+      {
+        id: 'kelvin-sense-current',
+        q: loc('四线制（Kelvin）里，为什么 Sense 线几乎没有电流？', 'In a four-wire (Kelvin) connection, why does almost no current flow in the Sense line?'),
+        a: loc(
+          'Sense 线的另一头接的是电压测量放大器的输入端，输入阻抗极高（GΩ 级），只吸 pA 到 nA 量级的偏置电流。电流几乎为 0，Sense 线自身的电阻上就几乎没有压降（I × R ≈ 0），所以 Sense 端读到的电压就等于 DUT 引脚上的电压，哪怕 Sense 线也有零点几欧。负载电流全部走 Force 线。这也是 Sense 要尽量靠近 DUT 引脚接（例如接在 Load Board 上 Socket 旁边）的原因：接点以后的那段 Force 线压降才会被量到并补偿。Sense 线断了，反馈环就丢了，PMU 会把输出一路推到钳位，所以很多测试机有 Sense 断线检测。',
+          'The far end of the Sense line goes into the input of a voltage-measuring amplifier with extremely high input impedance (GΩ class), which draws only pA to nA of bias current. With almost no current, the Sense line’s own resistance drops almost no voltage (I × R ≈ 0), so the voltage read at the Sense end equals the voltage at the DUT pin even if the Sense line has a few tenths of an ohm. All the load current flows in the Force line. This is also why Sense is connected as close to the DUT pin as possible (for example on the load board next to the socket): only the Force-line drop up to that point is measured and compensated. If the Sense line breaks, the feedback loop is lost and the PMU drives its output all the way to the clamp, which is why many testers have sense-loss detection.',
+        ),
+        lessons: ['pmu', 'fIntro'],
+      },
+      {
+        id: 'cmos-floating-input',
+        q: loc(
+          'CMOS 芯片有一个用不到的输入脚，程序里没管它，让它悬空，怎么让它悬空？',
+          'A CMOS chip has an input pin that is not used. If the program ignores it and leaves it floating, how does it end up floating?',
+        ),
+        a: loc(
+          '“程序里没管它”本身就是让它悬空的方式：这只脚没写进 Pin List，或者写了但在向量里一直是 Off / 高阻状态，它对应的测试通道 K1 断开、驱动器不输出；Load Board 上这只脚又没有上拉 / 下拉电阻，于是引脚什么都没接，电压由漏电和串扰随便决定，这就是悬空。可这恰恰是守则禁止的（{@fIntro}）：CMOS 输入是 MOS 管的栅极，几乎不吸电流，悬空时电压容易漂到中间电平，上下两只管子同时半导通，产生直通电流，IDD / IDDQ 变大、读数不稳，严重时会振荡甚至触发 Latch-up（{@latch}）。正确做法是给它一个确定电平：在程序里把它加进 Pin List，所有向量都驱动固定的 0 或 1（静态脚）；或者在 Load Board 上用电阻上拉到 VDD 或下拉到 GND。做 IDDQ 时尤其要这样，否则一只悬空脚就能让好芯片 Fail。',
+          '"The program ignores it" is exactly how it ends up floating: the pin is not in the pin list, or it is listed but stays Off / high-Z in every vector, so its tester channel has K1 open and the driver off. If the load board has no pull-up or pull-down on that pin either, nothing is connected to it and its voltage is set at random by leakage and crosstalk. That is floating. It is also exactly what the rules forbid ({@fIntro}). A CMOS input is a MOS gate and draws almost no current, so a floating input easily drifts to a middle level where both the upper and lower transistors are half on. That creates shoot-through current, raises IDD / IDDQ and makes readings unstable; in bad cases it oscillates or even triggers latch-up ({@latch}). The right way is to give it a defined level: add it to the pin list and drive a fixed 0 or 1 in every vector (a static pin), or pull it up to VDD or down to GND with a resistor on the load board. This matters most for IDDQ, where one floating pin can make a good chip fail.',
+        ),
+        lessons: ['fIntro', 'latch', 'fLatch'],
+      },
+      {
+        id: 'range-limit-clamp',
+        q: loc(
+          '解释一下 Range Settings / Limit Settings / Clamp Settings 的区别',
+          'What is the difference between Range Settings, Limit Settings and Clamp Settings?',
+        ),
+        a: loc(
+          '三者管的是三件不同的事。Range（量程）是仪器的刻度：施加量程决定 PMU 最多能加多大，测量量程决定能读到多大、分辨率多细；量程太小读数被截在上限，太大则分辨率不够，它影响的是“量得准不准”。Limit（判定限）是规格换来的 Pass / Fail 门槛（Fail GT / Fail LT），测完以后在软件里比较，不改变任何实际流过的电流或电压，它影响的是“判成什么”。Clamp（钳位）是施加时对另一个量的硬件保护：加压测流时限制最大电流，加流测压时限制最大电压，坏芯片短路或开路时，PMU 最多只给到钳位值，保护 DUT、探针和 Socket，它影响的是“会不会烧东西”。三者的大小关系一般是：Limit < Clamp ≤ Range。Clamp 必须设在 Limit 之外，否则读数永远到不了上限，这条测试永远不会 Fail（{@fIntro} 的 PMU 模拟器可以试）；Clamp 和读数又都要落在 Range 里。例：输入漏电 IIH 上限 10 µA，钳位 100 µA，测量量程选 100 µA 档。',
+          'They control three different things. Range is the instrument scale: the force range sets the most the PMU can apply, and the measure range sets the largest value it can read and how fine the resolution is. Too small and the reading is cut off at the top; too large and the resolution is poor. It decides whether the measurement is accurate. Limit is the pass / fail threshold derived from the spec (Fail GT / Fail LT). It is compared in software after the measurement and changes nothing that actually flows; it decides what the result is called. Clamp is hardware protection on the other quantity while forcing: the maximum current when forcing voltage, the maximum voltage when forcing current. With a shorted or open bad part, the PMU delivers no more than the clamp, protecting the DUT, probes and socket; it decides whether anything gets damaged. The usual order is Limit < Clamp ≤ Range. The clamp must be outside the limit, or the reading can never pass the limit and the test can never fail (try it in the PMU simulator in {@fIntro}); and both the clamp and the reading must fit inside the range. Example: input leakage IIH limit 10 µA, clamp 100 µA, measure range 100 µA.',
+        ),
+        lessons: ['pmu', 'fIntro', 'fDc'],
       },
     ],
   },

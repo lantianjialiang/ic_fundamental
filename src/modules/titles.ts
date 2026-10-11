@@ -18,6 +18,7 @@ export const LESSON_TITLE: Record<ModuleId, LText> = {
   alu: ui.m15.title,
   latch: ui.m16.title,
   bench: ui.m17.title,
+  vate: ui.vate.title,
   fBasics: ui.fBasics.title,
   fAte: ui.fAte.title,
   fIntro: ui.fIntro.title,

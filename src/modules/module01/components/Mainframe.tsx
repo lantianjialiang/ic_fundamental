@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import { CatmullRomCurve3, TubeGeometry, Vector3, type Mesh } from 'three'
 import { useLocale } from '../../../i18n/LocaleContext'
-import { useScene } from '../context/SceneContext'
+import { isolatedLayers, useScene } from '../context/SceneContext'
 import { FLOOR_Y, TH, TH_DOCK_Y, type Vec3 } from '../data/layout'
 import { GEO, MAT } from '../data/materials'
 import { T } from '../data/text'
@@ -57,8 +57,11 @@ export function Mainframe() {
     mesh.geometry = new TubeGeometry(curve, 64, 0.08, 10, false)
   })
 
+  // 「隐藏其它部件」生效时主机柜也算「其它部件」
+  const visible = !isolatedLayers(cfg)
+
   return (
-    <group>
+    <group visible={visible}>
       <RoundedBox
         args={[SIZE.w, SIZE.h, SIZE.d]}
         radius={0.05}
@@ -70,7 +73,8 @@ export function Mainframe() {
       />
       <InstancedParts geometry={GEO.box} material={MAT.led} items={leds} />
       <mesh ref={cable} material={MAT.cable} castShadow />
-      {cfg.showLabels ? (
+      {/* 分解后镜头拉远，机柜标签会投影到叠层正中，挡住各层标注 */}
+      {cfg.showLabels && visible && !cfg.exploded ? (
         cfg.flow === 'FT' ? (
           <SceneLabel
             position={[POS[0] + SIZE.w / 2 + 0.2, POS[1] + SIZE.h - 0.3, POS[2] + SIZE.d / 2]}

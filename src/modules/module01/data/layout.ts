@@ -19,6 +19,12 @@ export const LAYERS: Record<TestFlow, LayerId[]> = {
   CP: ['testhead', 'pogo', 'probecard', 'wafer', 'chuck'],
 }
 
+/** 一路通道真正经过的部件（Handler 压头、Chuck 不在信号路径上） */
+export const CHANNEL_LAYERS: Record<TestFlow, LayerId[]> = {
+  FT: ['dut', 'socket', 'loadboard', 'pogo', 'testhead'],
+  CP: ['testhead', 'pogo', 'probecard', 'wafer'],
+}
+
 export const PHASES: Record<TestFlow, ContactPhase[]> = {
   FT: ['load', 'press', 'compress', 'signal', 'done'],
   CP: ['align', 'rise', 'overdrive', 'signal', 'done'],
@@ -361,6 +367,8 @@ export type Pose = {
   pinComp: number
   /** 探针当前被顶起的量 */
   needleDefl: number
+  /** PCB 分层展开进度 0..1（随分解） */
+  spread: number
 }
 
 const ZERO: Record<LayerId, number> = {
@@ -378,7 +386,7 @@ const ZERO: Record<LayerId, number> = {
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
 
 export function computePose(flow: TestFlow, a: AnimValues, out?: Pose): Pose {
-  const pose = out ?? { y: { ...ZERO }, x: { ...ZERO }, pinComp: 0, needleDefl: 0 }
+  const pose = out ?? { y: { ...ZERO }, x: { ...ZERO }, pinComp: 0, needleDefl: 0, spread: 0 }
   const e = a.explode
   const y = pose.y
   const x = pose.x
@@ -386,23 +394,25 @@ export function computePose(flow: TestFlow, a: AnimValues, out?: Pose): Pose {
     y[k] = 0
     x[k] = 0
   }
+  pose.spread = e
+  // 分解位移按「相邻两层之间约 0.75 的空隙」排出，PCB 自身分层展开的厚度（pcbSurfaceLift）也算在内
   if (flow === 'FT') {
-    y.pogo = e * 0.45
-    y.loadboard = e * 0.9
-    y.socket = e * 1.45
-    const rel = a.lift * 0.6 + (1 - a.press) * COMP + e * 0.55
+    y.pogo = e * 0.8
+    y.loadboard = e * 2.2
+    y.socket = e * 3.75
+    const rel = a.lift * 0.6 + (1 - a.press) * COMP + e * 1.0
     y.dut = y.socket + rel
-    y.handler = y.dut + e * 0.55
+    y.handler = y.dut + e * 1.0
     x.dut = a.shuttle * 2.4
     x.handler = x.dut
     pose.pinComp = a.shuttle > 0.01 ? 0 : clamp(COMP - rel, 0, COMP)
     pose.needleDefl = 0
   } else {
     y.chuck = -a.drop * 0.5 + a.od * OD
-    y.wafer = y.chuck + e * 0.3
-    y.probecard = e * 0.8
-    y.pogo = e * 1.3
-    y.testhead = e * 1.8
+    y.wafer = y.chuck + e * 0.55
+    y.probecard = e * 1.8
+    y.pogo = e * 3.1
+    y.testhead = e * 3.9
     x.chuck = a.waferShift * 1.3
     x.wafer = x.chuck
     pose.pinComp = 0
@@ -421,17 +431,24 @@ export const STATIC_POSE: Record<TestFlow, Pose> = {
 export type PcbLayer = 'top' | 'inner' | 'bottom'
 export type PcbNode = { x: number; z: number; layer: PcbLayer; via?: boolean }
 
-/**
- * 8 层板叠层（从上到下）：L1 顶层信号 · L2 GND · L3 内层信号 · L4 PWR · L5 GND · L6 信号 · L7 GND · L8 底层信号。
- * 上下表面各一层阻焊绿油；厚度为教学放大值。
- */
-export const PCB_STACK = {
-  layers: ['SIG', 'GND', 'SIG', 'PWR', 'GND', 'SIG', 'GND', 'SIG'] as const,
-  cu: 0.004,
-  mask: 0.003,
+/** 铜箔与阻焊厚度（教学放大值） */
+export const PCB_STACK = { cu: 0.004, mask: 0.003 }
+
+export type CuKind = 'SIG' | 'GND' | 'PWR'
+export type BoardSpec = {
+  t: number
+  /** 各层铜从上到下的用途 */
+  layers: readonly CuKind[]
+  /** 示意走线所在的内层（0 起） */
+  inner: number
+  /** 分层展开时相邻两片（阻焊 / 铜 / 介质）之间额外拉开的距离 */
+  step: number
 }
-/** 示意走线所在的内层：L3 */
-export const INNER_LAYER = 2
+
+/** Load Board：8 层板，L1 顶层信号 · L2 GND · L3 内层信号 · L4 PWR · L5 GND · L6 信号 · L7 GND · L8 底层信号 */
+export const LB_SPEC: BoardSpec = { t: LB.t, layers: ['SIG', 'GND', 'SIG', 'PWR', 'GND', 'SIG', 'GND', 'SIG'], inner: 2, step: 0.08 }
+/** Probe Card PCB：示意为 6 层（真实探针卡常有几十层） */
+export const PC_SPEC: BoardSpec = { t: PC.t, layers: ['SIG', 'GND', 'SIG', 'PWR', 'GND', 'SIG'], inner: 2, step: 0.08 }
 
 export type StackInfo = {
   /** 每层铜箔中心相对板中心的 y */
@@ -440,11 +457,12 @@ export type StackInfo = {
   dielectric: Array<{ y: number; h: number }>
 }
 
-const stackCache = new Map<number, StackInfo>()
-export function pcbStack(t: number): StackInfo {
-  const hit = stackCache.get(t)
+const stackCache = new Map<BoardSpec, StackInfo>()
+export function pcbStack(spec: BoardSpec): StackInfo {
+  const hit = stackCache.get(spec)
   if (hit) return hit
-  const n = PCB_STACK.layers.length
+  const { t } = spec
+  const n = spec.layers.length
   const diel = (t - 2 * PCB_STACK.mask - n * PCB_STACK.cu) / (n - 1)
   const copper: number[] = []
   const dielectric: Array<{ y: number; h: number }> = []
@@ -458,15 +476,39 @@ export function pcbStack(t: number): StackInfo {
     }
   }
   const info = { copper, dielectric }
-  stackCache.set(t, info)
+  stackCache.set(spec, info)
   return info
 }
 
-export function pcbLayerY(t: number, layer: PcbLayer): number {
-  const s = pcbStack(t)
-  if (layer === 'top') return s.copper[0]!
-  if (layer === 'bottom') return s.copper[s.copper.length - 1]!
-  return s.copper[INNER_LAYER]!
+/**
+ * 分层展开时第 k 片相对原位置额外抬高的量。
+ * 片序号从上到下：0 = 顶面阻焊 / 丝印，2i+1 = 第 i 层铜，2i+2 = 其下的介质，2n = 底面阻焊。
+ * 抬高量对序号是线性的，所以贯穿全板的过孔只要按比例拉长就仍然穿过每一层。
+ */
+export function pcbSlotLift(spec: BoardSpec, slot: number, spread: number): number {
+  return spread * spec.step * (spec.layers.length - slot)
+}
+
+/** 顶面（及其上的器件）展开时抬高的量；底面是它的相反数 */
+export function pcbSurfaceLift(spec: BoardSpec, spread: number): number {
+  return spread * spec.step * spec.layers.length
+}
+
+/** 展开后从板中心到顶面阻焊的距离 */
+export function pcbHalf(spec: BoardSpec, spread: number): number {
+  return spec.t / 2 + pcbSurfaceLift(spec, spread)
+}
+
+export function pcbLayerIndex(spec: BoardSpec, layer: PcbLayer): number {
+  if (layer === 'top') return 0
+  if (layer === 'bottom') return spec.layers.length - 1
+  return spec.inner
+}
+
+/** 某层铜箔中心相对板中心的 y（含分层展开位移） */
+export function pcbLayerY(spec: BoardSpec, layer: PcbLayer, spread = 0): number {
+  const i = pcbLayerIndex(spec, layer)
+  return pcbStack(spec).copper[i]! + pcbSlotLift(spec, 2 * i + 1, spread)
 }
 
 /** FT：Load Board 底层（Pogo）→ 过孔 → 内层 → 过孔 → 顶层（Socket 焊盘） */
@@ -555,8 +597,13 @@ export type HopId =
 
 export type Hop = { id: HopId; pts: Vec3[] }
 
-function boardPt(n: PcbNode, cy: number, t: number, dx = 0): Vec3 {
-  return [n.x + dx, cy + pcbLayerY(t, n.layer), n.z]
+function boardPt(n: PcbNode, cy: number, spec: BoardSpec, spread: number): Vec3 {
+  return [n.x, cy + pcbLayerY(spec, n.layer, spread), n.z]
+}
+
+/** 探针卡 PCB 以下部分（空间转换器、探针）的整体位移：层位移 + 底面分层展开 */
+export function probeBelowY(pose: Pose): number {
+  return pose.y.probecard - pcbSurfaceLift(PC_SPEC, pose.spread)
 }
 
 export function buildHops(flow: TestFlow, pkg: Pkg, probe: ProbeType, ch: number, pose: Pose): Hop[] {
@@ -564,7 +611,7 @@ export function buildHops(flow: TestFlow, pkg: Pkg, probe: ProbeType, ch: number
   if (flow === 'FT') {
     const r = ftRoute(pkg, ch)
     const lbY = LB.y + pose.y.loadboard
-    const b = (i: number) => boardPt(r[i]!, lbY, LB.t)
+    const b = (i: number) => boardPt(r[i]!, lbY, LB_SPEC, pose.spread)
     const cx = edge[0]
     const cz = edge[2]
     const p = contactFor(pkg, ch)
@@ -586,14 +633,13 @@ export function buildHops(flow: TestFlow, pkg: Pkg, probe: ProbeType, ch: number
   }
   const r = cpRoute(ch)
   const pcY = PC.y + pose.y.probecard
-  const b = (i: number) => boardPt(r[i]!, pcY, PC.t)
+  const b = (i: number) => boardPt(r[i]!, pcY, PC_SPEC, pose.spread)
   const [rx, rz] = ringXZ(ch)
   const pad = padFor(ch)
-  const needle = needleShape(probe, pad, pose.y.probecard, pose.needleDefl)
+  const below = probeBelowY(pose)
+  const needle = needleShape(probe, pad, below, pose.needleDefl)
   const stBottom: Vec3 =
-    probe === 'vertical'
-      ? [pad.x, PC.stBottom + pose.y.probecard, pad.z]
-      : [needle.pts[0]![0] * 0.85, PC.stBottom + pose.y.probecard, needle.pts[0]![2] * 0.85]
+    probe === 'vertical' ? [pad.x, PC.stBottom + below, pad.z] : [needle.pts[0]![0] * 0.85, PC.stBottom + below, needle.pts[0]![2] * 0.85]
   const wy = pose.y.wafer
   const wx = pose.x.wafer
   return [
@@ -644,6 +690,15 @@ export const LAYER_BOX: Record<TestFlow, Partial<Record<LayerId, LayerBox>>> = {
   },
 }
 
+/** 层包围盒（PCB 分层展开时上下对称长高） */
+export function layerBox(flow: TestFlow, id: LayerId, spread: number): LayerBox | undefined {
+  const box = LAYER_BOX[flow][id]
+  if (!box) return undefined
+  const spec = id === 'loadboard' ? LB_SPEC : id === 'probecard' ? PC_SPEC : null
+  if (!spec || spread <= 0) return box
+  return { c: box.c, s: [box.s[0], box.s[1] + 2 * pcbSurfaceLift(spec, spread), box.s[2]] }
+}
+
 /**
  * 3D 标注的锚点：ax / az ∈ {-1, 0, 1} 表示层包围盒的左 / 中 / 右、后 / 中 / 前，side 为标签朝哪边展开。
  * 这组取值是按默认视角在 760–1300 px 宽的画布、中英文、组装与分解两种状态下逐一投影检查过的，互不重叠、不出界。
@@ -670,7 +725,8 @@ export const LABEL_ANCHOR: Record<TestFlow, Partial<Record<LayerId, LabelAnchor>
 /** 轨道相机：水平方向不限（可 360° 环绕）；俯仰从接近正上方到略低于水平，另外每帧按地面高度再收紧，镜头不钻到地面下 */
 export const CAMERA_LIMITS = { minPolar: 0.05, maxPolar: Math.PI * 0.55, floorClear: 0.25 }
 
-export const CAMERA_PRESET: Record<TestFlow, { position: Vec3; target: Vec3; explodeShift: number }> = {
-  FT: { position: [7.4, 3.4, 8.4], target: [0, -0.25, 0], explodeShift: 1.2 },
-  CP: { position: [7.4, 3.6, 8.4], target: [0, 0.15, 0], explodeShift: 0.9 },
+/** explodeShift：完全分解时镜头目标上移量（落在分解后叠层的中部）；explodeDolly：完全分解时镜头距离的倍数 */
+export const CAMERA_PRESET: Record<TestFlow, { position: Vec3; target: Vec3; explodeShift: number; explodeDolly: number }> = {
+  FT: { position: [7.4, 3.4, 8.4], target: [0, -0.25, 0], explodeShift: 2.8, explodeDolly: 1.42 },
+  CP: { position: [7.4, 3.6, 8.4], target: [0, 0.15, 0], explodeShift: 1.85, explodeDolly: 1.26 },
 }

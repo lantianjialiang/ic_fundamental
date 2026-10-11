@@ -33,8 +33,8 @@
 | 轨道 | 前缀 | 课数 | 内容 |
 |---|---|---|---|
 | 数字测试基础 | F | 16 | 从欧姆定律讲起，按量产顺序走完开短路、DC、功能、AC、表征、向量、写程序、排错、闩锁和 Scan |
-| 基础 / 数字 | D | 15 | 产业位置、3D 物理连接、ATE / PMU、规格、DC / 功能 / 时序与 AC、向量、Scan、程序与排错、Shmoo、虚拟 ALU、闩锁入口 |
-| 交互实验 | X | 1 | 自己设 Period / Drive / Strobe 和 Leakage 限流，立刻看 Pass / Fail |
+| 基础 / 数字 | D | 16 | 产业位置、3D 物理连接、ATE / PMU、规格、DC / 功能 / 时序与 AC、向量、Scan、程序与排错、Shmoo、虚拟 ALU、闩锁入口、虚拟 ATE 工作站 |
+| 交互实验 | X | 2 | 自己设 Period / Drive / Strobe 和 Leakage 限流；虚拟 ATE 工作站跑 IDDQ 与开短路、读 Datalog、诊断故障 |
 | 可靠性 / 车规 | Q | 1 | 目前只有 Latch-up 入口，完整 ESD / 老化后续补 |
 
 **数字测试基础（F01–F16）**
@@ -58,7 +58,7 @@
 | F15 | CMOS 闩锁测试 |
 | F16 | Scan 测试原理 |
 
-**基础 / 数字（D01–D15）**
+**基础 / 数字（D01–D16）**
 
 | 编号 | 课程 |
 |---|---|
@@ -77,6 +77,7 @@
 | D13 | 虚拟 4-bit ALU 的 Test Program |
 | D14 | Latch-up 入口 |
 | D15 | 交互实验（与 X01 同一课） |
+| D16 | 虚拟 ATE 操作系统：IDDQ 与开短路工作站（与 X02 同一课） |
 
 两条数字轨道互补：D 轨先立名词、看动画和 3D 画面，F 轨用一颗 256×4 SRAM 把量产程序走一遍。D 轨里和 F 轨重复的细节只点到为止，并链接到对应的 F 课。
 
@@ -155,6 +156,7 @@ ic_fundamental/
 ├── vite.config.ts
 ├── tsconfig.json
 ├── scripts/check-i18n.mjs  # 多语言检查
+├── scripts/check-vate.mjs  # D16 教学模型数值核对
 └── src/
     ├── main.tsx              # 入口：先套主题，再挂 Locale
     ├── App.tsx               # 首页 → 轨道 → 单课，每课按需加载
@@ -172,6 +174,7 @@ ic_fundamental/
     │   ├── catalog.ts        # 稳定课程 ID（不含编号）
     │   ├── titles.ts
     │   ├── module00–17/      # 基础 / 数字（module09、module13 已并入相邻课）
+    │   ├── vate/             # D16 虚拟 ATE 工作站（model/ 为纯函数模型）
     │   ├── fund/             # 数字测试基础
     │   └── timing/           # 共用时序示波器
 ```

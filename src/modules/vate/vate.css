@@ -1,0 +1,500 @@
+/* ---- 虚拟 ATE 工作站 ---- */
+.vws {
+  border: 1px solid var(--line);
+  border-radius: var(--r-l);
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.vws__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--fig-box-2);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.vws__bar b {
+  padding: 1px 8px;
+  border-radius: var(--r);
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+  color: var(--blue);
+  background: var(--blue-bg);
+}
+
+.vws__body {
+  display: grid;
+  grid-template-columns: 168px minmax(0, 1fr);
+  min-height: 420px;
+}
+
+.vws__tree {
+  padding: 12px 10px;
+  border-right: 1px solid var(--line-soft);
+  background: var(--panel-2);
+}
+
+.vws__tree-head {
+  margin: 0 0 8px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.vws__tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vws__tab {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vws__tab:hover {
+  background: var(--card-hover);
+}
+
+.vws__tab.is-active {
+  border-color: var(--gold-line);
+  background: var(--gold-bg);
+  color: var(--text);
+}
+
+.vws__code {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.vws__main {
+  min-width: 0;
+  padding: 14px;
+}
+
+/* ---- 单个实验台：条件 → 结果 → Datalog ---- */
+.vlab {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.vpane {
+  min-width: 0;
+  padding: 12px 14px 14px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-l);
+  background: var(--card);
+}
+
+.vws .vpane__title {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.vpane--result {
+  border-color: var(--blue-line);
+}
+
+.vgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 18px;
+  margin: 4px 0 8px;
+}
+
+.vfield {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  margin-bottom: 8px;
+}
+
+.vfield__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 10px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.vfield__head b {
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--gold);
+}
+
+.vws .vfield__hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.vfield .seg {
+  margin: 0;
+}
+
+.vslider {
+  width: 100%;
+}
+
+.vselect,
+.vnum {
+  max-width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.vnum {
+  width: 90px;
+  font-family: var(--mono);
+}
+
+.vth {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.vth label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.vws .vwarn {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--red-2);
+}
+
+.vrun {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 10px;
+}
+
+.vrun__go {
+  min-width: 96px;
+  font-weight: 600;
+}
+
+.vrun__hint {
+  flex: 1 1 240px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--dim);
+}
+
+.vquiz-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 4px 0 12px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.vquiz-head b {
+  font-family: var(--mono);
+  color: var(--gold);
+}
+
+.vws .vquiz-head .vfield__hint {
+  flex-basis: 100%;
+}
+
+/* ---- 芯片俯视图 ---- */
+.vchip {
+  margin: 0;
+}
+
+.vchip svg {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-l);
+}
+
+.vchip figcaption {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.vchip__pin {
+  cursor: pointer;
+}
+
+.vchip__pin:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.vpins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vpins__btn {
+  appearance: none;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--panel-2);
+  color: var(--text-2);
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.vpins__btn.is-active {
+  border-color: var(--gold-line);
+  background: var(--gold-bg);
+  color: var(--text);
+}
+
+/* ---- 结果 ---- */
+.vws .vempty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.vres__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.vres__no {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.vres__sum {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.vres__count {
+  white-space: nowrap;
+}
+
+.vws .vres__headline {
+  margin: 4px 0 8px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+}
+
+.vws .vres__model {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.vres__model b,
+.vres__why b {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.vres__why ul,
+.vres__warn {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-2);
+}
+
+.vres__why li + li,
+.vres__warn li + li {
+  margin-top: 4px;
+}
+
+.vres__warn {
+  margin: 10px 0 0;
+  padding: 8px 12px 8px 26px;
+  border-left: 3px solid var(--gold);
+  border-radius: var(--r);
+  background: var(--gold-bg);
+  color: var(--text);
+}
+
+/* 判定徽章：颜色 + 符号 + 文字 */
+.vbadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.vbadge--pass {
+  border-color: var(--green-line);
+  background: var(--green-bg);
+  color: var(--green-2);
+}
+
+.vbadge--fail {
+  border-color: var(--red-line);
+  background: var(--red-bg);
+  color: var(--red-2);
+}
+
+.vbadge--warn {
+  border-color: var(--gold-line);
+  background: var(--gold-bg);
+  color: var(--gold);
+}
+
+.vbadge--muted {
+  background: var(--panel-2);
+  color: var(--muted);
+}
+
+/* ---- Datalog ---- */
+.vlog__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.vscroll {
+  max-height: 340px;
+  overflow: auto;
+  border-radius: var(--r-l);
+}
+
+.vlog {
+  margin: 0;
+  min-width: 560px;
+}
+
+.vlog td,
+.vlog th {
+  padding: 6px 10px;
+}
+
+.vlog td.vlog__cond {
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+.vlog td.vlog__read {
+  min-width: 72px;
+  font-family: var(--mono);
+}
+
+.vlog td:last-child {
+  white-space: nowrap;
+}
+
+.vlog__cond span {
+  display: block;
+  white-space: nowrap;
+}
+
+.vlog__cond span + span {
+  color: var(--muted);
+}
+
+.vlog tbody tr:focus-visible td {
+  outline: 2px solid var(--blue);
+  outline-offset: -2px;
+}
+
+@media (max-width: 900px) {
+  .vws__body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vws__tree {
+    border-right: 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .vws__tabs {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .vws__tab {
+    flex: 1 1 160px;
+  }
+
+  .vws__main {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .vgrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vfield .pick--3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

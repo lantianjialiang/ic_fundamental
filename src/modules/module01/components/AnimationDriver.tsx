@@ -1,7 +1,7 @@
 import { useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
-import { activeChannel, useScene } from '../context/SceneContext'
-import { applyFade } from '../data/dim'
+import { useScene } from '../context/SceneContext'
+import { applyBoardFade } from '../data/fade'
 import { PHASES, PHASE_SECONDS, computePose, type ContactPhase } from '../data/layout'
 import { SECTION_OFF, SECTION_PLANE } from '../data/materials'
 
@@ -88,12 +88,10 @@ export function AnimationDriver({ onPhase }: AnimationDriverProps) {
     computePose(cfg.flow, s, s.pose)
     s.scrubMax = Math.max(s.scrubMax, s.pose.needleDefl)
 
-    const wantFade = s.explode > 0.3 || s.sectionTarget > 0 || cfg.selected !== null ? 1 : 0
+    // 板体半透明：剖开或选中通道时要看清板内走线；分解时阻焊面只稍微变淡，下面各铜层仍看得见
+    const wantFade = s.sectionTarget > 0 || cfg.selected !== null ? 1 : s.explode > 0.3 ? 0.55 : 0
     s.boardFade = cfg.reduced ? wantFade : approach(s.boardFade, wantFade, dt * 2.5)
-    // 只看路径：有高亮通道（选中或信号阶段）且开关打开时，其它部件淡到几乎透明
-    const wantDim = cfg.pathOnly && activeChannel(s, cfg) !== null ? 1 : 0
-    s.dim = cfg.reduced ? wantDim : approach(s.dim, wantDim, dt * 3.5)
-    applyFade(s.boardFade, s.dim)
+    applyBoardFade(s.boardFade)
 
     if (s.phase !== lastPhase.current) {
       lastPhase.current = s.phase

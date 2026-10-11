@@ -33,6 +33,8 @@ import {
   voxReading,
   type InMethod,
 } from './data/dc'
+import { EQ_ITEMS } from './data/dcEq'
+import { DcEqFig } from './DcEqFig'
 import { DriverFig } from './DriverFig'
 import { Callout, Cards, Explain, Knob, Readout, Seg, Steps, fmtOhm, fmtV, type Note } from './parts'
 
@@ -61,6 +63,14 @@ const S = {
   colV: loc('电压', 'Voltage'),
   colI: loc('电流', 'Current'),
   colR: loc('R = V / I', 'R = V / I'),
+  eqTitle: loc('每一项测试的等效电路', 'The equivalent circuit of each test'),
+  eqNote: loc(
+    '点一项，看测试时芯片在 PMU / DPS 眼里等效成什么。为什么开短路是二极管、VOL / VOH 是电阻，见「常见问题」。',
+    'Pick a test to see what the chip looks like to the PMU / DPS during it. For why opens/shorts sees diodes but VOL / VOH sees resistors, see the FAQ.',
+  ),
+  eqForce: loc('强加', 'Force'),
+  eqMeasure: loc('测量', 'Measure'),
+  eqLimit: loc('判定', 'Limit'),
   voxTitle: loc('VOH / VOL：串行静态测法', 'VOH / VOL: serial static method'),
   voxLab: loc('动手：让 VOH / VOL 通过或失败', 'Hands-on: make VOH / VOL pass or fail'),
   voxLabNote: loc('改驱动强度，或者故意让预处理放错状态，看读数和诊断怎么变。', 'Change the drive strength, or deliberately precondition the wrong state, and watch the reading and diagnosis change.'),
@@ -114,6 +124,8 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
   const [inMethod, setInMethod] = useState<InMethod>(IN_METHODS[0].id)
   const [inLeaky, setInLeaky] = useState(true)
   const [other, setOther] = useState(OTHER[0].id)
+  const [eqId, setEqId] = useState(EQ_ITEMS[0].id)
+  const eq = EQ_ITEMS.find((item) => item.id === eqId) ?? EQ_ITEMS[0]
   const [note, setNote] = useState<Note>({ kicker: S.kicker, title: WORDS[0].title, text: WORDS[0].text })
 
   const order = FLOWS[flow]
@@ -260,6 +272,26 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
+      <Section title={t(S.eqTitle)} note={t(S.eqNote)}>
+        <Cards
+          items={EQ_ITEMS}
+          activeId={eqId}
+          cols={4}
+          onPick={(item) => {
+            setEqId(item.id)
+            setNote({ kicker: S.kicker, title: item.title, text: item.text })
+          }}
+        />
+        <DcEqFig item={eq} />
+        <Readout
+          items={[
+            { label: S.eqForce, value: t(eq.force) },
+            { label: S.eqMeasure, value: t(eq.measure) },
+            { label: S.eqLimit, value: t(eq.limit) },
+          ]}
+        />
+        <Explain paras={[eq.text, ...(eq.explain ?? [])]} />
+      </Section>
       <Section title={t(S.voxTitle)}>
         <Steps items={VOX_STEPS} />
         <h3>{t(S.voxLab)}</h3>

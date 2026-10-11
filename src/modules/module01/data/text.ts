@@ -31,23 +31,28 @@ export const T = {
   ),
   scaleShort: loc('尺寸已放大 · 16 路通道示意', 'Enlarged scale · 16 channels shown'),
 
+  hideOthers: loc('隐藏其它部件', 'Hide others'),
+  hideOthersOff: loc('先在侧栏点选一层或一个通道', 'Pick a layer or a channel in the panel first'),
+  hideLayer: loc('隐藏 {name}', 'Hide {name}'),
+  showLayer: loc('显示 {name}', 'Show {name}'),
+
   layersTitle: loc('叠层结构', 'Stack'),
-  layersHint: loc('点某一层：镜头对准并框出它，再点一次取消。', 'Click a layer to focus the camera on it; click again to release.'),
+  layersHint: loc(
+    '点某一层：镜头对准并框出它，再点一次取消。勾选工具栏「隐藏其它部件」就只显示这一层；右侧眼睛按钮可以单独隐藏某一层。',
+    'Click a layer to focus the camera on it; click again to release. Tick “Hide others” in the toolbar to show only that layer; the eye button on the right hides a single layer.',
+  ),
   channelsTitle: loc('通道', 'Channels'),
   pathTitle: loc('信号路径', 'Signal path'),
   noChannel: loc('选一个通道，或在 3D 中点 Load Board / Probe Card 上的走线。', 'Pick a channel, or click a trace on the Load Board / Probe Card in 3D.'),
   clear: loc('清除选择', 'Clear selection'),
-  pathViewGroup: loc('路径显示方式', 'Path view'),
-  pathOnly: loc('只看路径', 'Path only'),
-  showAll: loc('显示全部', 'Show all'),
-  pathOnlyHint: loc(
-    '只看路径：其它部件变得几乎透明，只留下这一路真正经过的零件发光——通道板、那根 Pogo 针、板上的焊盘 / 走线 / 过孔，以及 FT 的 Socket 针和锡球、CP 的空间转换器、探针和 die pad。',
-    'Path only: everything else turns nearly transparent and only the parts this channel actually passes through glow — the channel card, its pogo pin, the pads / traces / vias on the board, plus the socket pin and solder ball (FT) or the space transformer, probe and die pad (CP).',
+  pathHint: loc(
+    '金色发光的是这一路真正经过的零件：通道板、那根 Pogo 针、板上的焊盘 / 走线 / 过孔，以及 FT 的 Socket 针和锡球、CP 的空间转换器、探针和 die pad。板体会变半透明，因为走线和过孔大多埋在板子内层，不透明就看不到；其它部件照常显示。想只看这一路经过的部件，勾选工具栏「隐藏其它部件」。',
+    'The glowing gold parts are what this channel actually passes through: the channel card, its pogo pin, the pads / traces / vias on the board, plus the socket pin and solder ball (FT) or the space transformer, probe and die pad (CP). The board turns see-through because most traces and vias are buried in inner layers; everything else stays as is. To see only the parts on this path, tick “Hide others” in the toolbar.',
   ),
   pcbTitle: loc('PCB 层', 'PCB layers'),
   pcbText: loc(
-    'Load Board 是 8 层板：板边能看到绿油、铜箔、FR4 介质一层层交替。表面绿色的是阻焊绿油 (solder mask)，焊盘处开窗露出沉金；白字是丝印 (silkscreen)，标出位号 C/R/K/J/TP 和 PIN 1。示意走线：底层 L8 → 过孔 → 内层 L3 → 过孔 → 顶层 L1。分解、剖开或选中通道时板子变半透明；剖开后切口能看到各层铜箔和贯穿全板的过孔。',
-    'The load board is an 8-layer PCB: its edge shows solder mask, copper and FR4 dielectric alternating. The green coat is solder mask, opened over the gold (ENIG) pads; the white print is silkscreen marking reference designators C/R/K/J/TP and PIN 1. Example route: bottom L8 → via → inner L3 → via → top L1. The board turns see-through when exploded, cut away or a channel is selected; the cutaway face shows every copper layer and vias running through the whole board.',
+    'Load Board 是 8 层板：板边能看到绿油、铜箔、FR4 介质一层层交替。表面绿色的是阻焊绿油 (solder mask)，焊盘处开窗露出沉金；白字是丝印 (silkscreen)，标出位号 C/R/K/J/TP 和 PIN 1。示意走线：底层 L8 → 过孔 → 内层 L3 → 过孔 → 顶层 L1。点「分解」时板子拆成一叠薄片：顶面阻焊 / 丝印、L1–L8 各层铜、夹在铜层之间的 FR4 介质；GND / PWR 层是整片铜皮，信号过孔穿过的地方挖出一圈隔离环，否则信号会和地 / 电源短路；竖直细柱是贯穿全板的过孔，把各层连起来。Probe Card 的 PCB 同样能拆开（这里示意为 6 层，真实探针卡常有几十层）。剖开后切口能看到各层铜箔和贯穿全板的过孔。',
+    'The load board is an 8-layer PCB: its edge shows solder mask, copper and FR4 dielectric alternating. The green coat is solder mask, opened over the gold (ENIG) pads; the white print is silkscreen marking reference designators C/R/K/J/TP and PIN 1. Example route: bottom L8 → via → inner L3 → via → top L1. “Explode” splits the board into a stack of sheets: top solder mask / silkscreen, copper layers L1–L8 and the FR4 dielectric between them. GND / PWR layers are solid copper pours with a clearance ring cut around each signal via — otherwise the signal would short to ground / power. The thin vertical posts are vias running through the whole board and tying the layers together. The probe-card PCB splits the same way (shown as 6 layers here; real probe cards often have dozens). The cutaway face shows every copper layer and the through-board vias.',
   ),
   phaseTitle: loc('接触动画', 'Contact sequence'),
   phaseIdle: loc('点工具栏「接触动画」观看压接 / 扎针全过程。', 'Press “Contact animation” in the toolbar to watch the docking / probing sequence.'),
@@ -65,11 +70,16 @@ export const T = {
   stiffener: loc('加强板', 'Stiffener'),
 } as const
 
-/** 路径显示方式：数组顺序即按钮顺序，初始值取第一个（只看路径） */
-export const PATH_VIEWS = [
-  { id: 'path', pathOnly: true, label: T.pathOnly },
-  { id: 'all', pathOnly: false, label: T.showAll },
-] as const
+/** PCB 分层展开时每一片的 3D 标注；{name} 替换成 L1、L2… */
+export const PCB_TEXT = {
+  maskTop: loc('阻焊 / 丝印（顶面）', 'Solder mask / silkscreen (top)'),
+  top: loc('{name} 顶层 · 信号', '{name} top · signal'),
+  bottom: loc('{name} 底层 · 信号', '{name} bottom · signal'),
+  inner: loc('{name} 内层信号', '{name} inner signal'),
+  gnd: loc('{name} GND 地平面', '{name} GND plane'),
+  pwr: loc('{name} PWR 电源平面', '{name} PWR plane'),
+  dielectric: loc('FR4 介质（芯板 / 半固化片）', 'FR4 dielectric (core / prepreg)'),
+} as const
 
 type LayerText = { name: LText; sub: LText; desc: LText }
 

@@ -281,12 +281,14 @@ export const L = {
   comb: loc('组合逻辑', 'Combinational logic'),
   combSub: loc('输入 Q1–Q4，输出 D1–D4', 'In: Q1–Q4 · Out: D1–D4'),
   hidden: loc('外部 Pin 碰不到', 'Not reachable from pins'),
+  legQ: loc('Q 旧值', 'Q old'),
+  legD: loc('D 新值', 'D new'),
   exp: loc('期望', 'Expected'),
   act: loc('读到', 'Read'),
   from: loc('来自', 'From'),
   figCap: loc(
-    '金色方块：移入的激励；绿色方块：捕获的结果；灰色方块：下一条 Pattern。金色线是这一拍起作用的路径。组合逻辑里每格是一个 D 的算式，Capture 时代入当前 Q 的值；FF 下方的「1→0」是 Capture 沿上 Q 的变化。',
-    'Gold squares: stimulus shifted in. Green: captured result. Grey: next pattern. Gold lines are the paths active on this clock. Each cell in the logic is the equation for one D; during capture it shows the current Q values plugged in. The “1→0” under each FF is how its Q changes on the capture edge.',
+    '金色方块：移入的激励；绿色方块：捕获的结果；灰色方块：下一条 Pattern。金色线是这一拍起作用的路径。Capture 两帧里，蓝色实线是 Q（FF 现在存的旧值，送进组合逻辑），橙色虚线是 D（逻辑算出的新值，等时钟沿存进 FF）。组合逻辑里每格是一个 D 的算式，Capture 时代入当前 Q 的值；FF 下方的「1→0」是 Capture 沿上 Q 的变化。',
+    'Gold squares: stimulus shifted in. Green: captured result. Grey: next pattern. Gold lines are the paths active on this clock. In the two capture frames, solid blue lines are Q (the old value each FF holds, fed into the logic) and dashed orange lines are D (the new value the logic computes, stored on the clock edge). Each cell in the logic is the equation for one D; during capture it shows the current Q values plugged in. The “1→0” under each FF is how its Q changes on the capture edge.',
   ),
 }
 

@@ -59,8 +59,8 @@ export function isPass(mode: Mode, volt: number): boolean {
 
 export const TAKEAWAY: LText[] = [
   loc(
-    '输出规格是“带负载的电压”：VOH @ IOH、VOL @ IOL。不带电流测，坏的驱动也能过。原因：输出级导通的那个 MOS 管相当于一个导通电阻 R_on。不带负载时没有电流流过 R_on，上面没有压降，输出就是 VDD 或 0 V；哪怕 R_on 变大了（驱动变弱、管子有缺陷、工艺偏差），读数也一模一样。只有拉出 / 灌入规定的 IOH / IOL 电流，压降 I × R_on 才显现：VOH = VDD − |IOH| × R_on，VOL = IOL × R_on。按本课的图（VDD = 3.0 V）：VOL @ 8 mA，正常下拉 40 Ω → 0.32 V Pass，偏弱 70 Ω → 0.56 V Fail；VOH @ 4 mA，正常上拉 100 Ω → 2.60 V Pass，偏弱 200 Ω → 2.20 V Fail。可空载（0 mA）时两颗芯片都是 0 V / 3.00 V，分不出来。',
-    'Output specs are voltages under load: VOH @ IOH and VOL @ IOL. Without the current, a weak driver still passes. Why: the MOS transistor that is on in the output stage acts like an on-resistance R_on. With no load, no current flows through R_on, so there is no drop across it and the output is simply VDD or 0 V — even if R_on has grown (weaker drive, a defective transistor, process variation), the reading is identical. Only when the specified IOH / IOL is pulled out or pushed in does the drop I × R_on appear: VOH = VDD − |IOH| × R_on, VOL = IOL × R_on. In this lesson’s figure (VDD = 3.0 V): VOL @ 8 mA, a normal 40 Ω pull-down gives 0.32 V (Pass) while a weak 70 Ω one gives 0.56 V (Fail); VOH @ 4 mA, a normal 100 Ω pull-up gives 2.60 V (Pass) while a weak 200 Ω one gives 2.20 V (Fail). Unloaded (0 mA), both parts read 0 V / 3.00 V and cannot be told apart.',
+    '输出规格是“带负载的电压”：VOH @ IOH、VOL @ IOL。不带电流测，R_on 上没有压降，坏的驱动也能过；详细推导见「常见问题」。',
+    'Output specs are voltages under load: VOH @ IOH and VOL @ IOL. Without the current there is no drop across R_on, so a weak driver still passes; the full derivation is in the FAQ.',
   ),
   loc(
     'IOH / IOL 对应客户板上这根脚真实要带的负载：后级芯片的输入（尤其 TTL 类输入要吃电流）、上拉 / 下拉电阻、传输线和端接电阻。测试时用 PMU 模拟这份负载，带不动的芯片装到板上就会电平不够、被后级认错。',

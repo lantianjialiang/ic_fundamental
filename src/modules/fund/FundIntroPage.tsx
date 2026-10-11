@@ -20,8 +20,6 @@ import {
   FACTORS,
   FORCE_RANGES,
   GLITCH_TEXT,
-  IOH_MA,
-  IOL_MA,
   KELVIN_LEAD,
   KELVIN_V,
   LIMIT_TEXT,
@@ -52,10 +50,11 @@ import {
   TEST_ITEMS,
   USES,
   VEC_KINDS,
+  HIZ_OFFSET,
   binOf,
+  bridge,
   compare,
   fmtMoney,
-  loadCurrent,
   makeLot,
   peSwitch,
   peTransit,
@@ -72,7 +71,7 @@ import {
   type UseId,
 } from './data/intro'
 import { ArchFig, BinFig, PinSymbol, SystemFig } from './IntroFig'
-import { PinElecFig } from './IntroPeFig'
+import { LoadCode, PinElecFig } from './IntroPeFig'
 import { KelvinFig, PmuFig, RangeFig, fmtMa } from './IntroPmuFig'
 import { Callout, Cards, Explain, Knob, Readout, Seg, Steps, fmtOhm, type Note } from './parts'
 import './intro.css'
@@ -228,9 +227,29 @@ const S = {
   l0: loc('逻辑 0', 'Logic 0'),
   l1: loc('逻辑 1', 'Logic 1'),
   lx: loc('中间（三态 / 坏）', 'Between (tri-state / bad)'),
-  iolFlow: loc('流 IOL：DUT 在吸电流', 'IOL flows: the DUT is sinking current'),
-  iohFlow: loc('流 IOH：DUT 在送电流', 'IOH flows: the DUT is sourcing current'),
-  iZero: loc('正好等于 VREF：切换点', 'Exactly at VREF: the switch point'),
+  iolFlow: loc(
+    '输出低于 VREF：D1、D3 导通，IOL 流进 DUT，DUT 在吸电流（这就是 VOL @ IOL 的测试条件）。',
+    'Output below VREF: D1 and D3 conduct, IOL flows into the DUT and the DUT is sinking current (the VOL @ IOL test condition).',
+  ),
+  iohFlow: loc(
+    '输出高于 VREF：D2、D4 导通，IOH 从 DUT 抽出，DUT 在送电流（这就是 VOH @ IOH 的测试条件）。',
+    'Output above VREF: D2 and D4 conduct, IOH is pulled out of the DUT and the DUT is sourcing current (the VOH @ IOH test condition).',
+  ),
+  iZero: loc(
+    '输出在 VREF ±0.1 V 以内：四只二极管都部分导通，IOL、IOH 两边分流，净电流在 +IOL 和 −IOH 之间。正好等于 VREF 时两边各一半，因为 IOL ≠ IOH，净电流并不是 0。',
+    'Output within VREF ±0.1 V: all four diodes partly conduct and IOL and IOH are split, so the net current is between +IOL and −IOH. Exactly at VREF each splits in half; since IOL ≠ IOH, the net current is not zero.',
+  ),
+  vPin: loc('引脚电压', 'Pin voltage'),
+  diodes: loc('各二极管电流', 'Diode currents'),
+  hizBtn: loc('DUT 输出高阻（三态）', 'DUT output high-Z (tri-state)'),
+  hizNote: loc(
+    'DUT 不驱动，引脚上只剩电流负载：桥把电压拉到净电流为 0 的点，比 VREF 高几十 mV。VREF 在 VOL 和 VOH 之间，比较器读到“中间”，三态测试就是靠这个判出高阻。',
+    'The DUT is not driving, so only the current load acts on the pin: the bridge pulls it to the point of zero net current, a few tens of mV above VREF. With VREF between VOL and VOH, the comparators read "between", which is how a tri-state test detects high impedance.',
+  ),
+  loadHint: loc(
+    '电流负载只在“输出（比较 + 负载）”状态下经 F2、K1 接到 DUT；切到那个状态，图里的二极管桥和下面的代码才会跟着走。',
+    'The current load reaches the DUT through F2 and K1 only in the "Output (compare + load)" state; switch to it to see the diode bridge and the code below follow along.',
+  ),
   rulesTitle: loc('动手：测试工程守则', 'Try it: test engineering rules'),
   rulesNote: loc('每个场景点一下：可以，还是违规？', 'For each scenario, click: OK, or a violation?'),
   colCase: loc('场景', 'Scenario'),
@@ -302,6 +321,7 @@ export function FundIntroPage({ moduleId, onModuleChange }: Props) {
   const [conflict, setConflict] = useState(false)
   const [vout, setVout] = useState(0.2)
   const [vref, setVref] = useState(1.5)
+  const [hiz, setHiz] = useState(false)
   // 9 守则
   const [ruleAns, setRuleAns] = useState<Record<string, RuleAns>>({})
 
@@ -373,8 +393,10 @@ export function FundIntroPage({ moduleId, onModuleChange }: Props) {
   /* ---- 管脚电子 ---- */
   const sw = switching ? peTransit(pePrev, peMode) : peSwitch(peMode)
   const peItem = PE_MODES.find((m) => m.id === peMode) ?? PE_MODES[0]
-  const read = compare(vout)
-  const iLoad = loadCurrent(vout, vref)
+  /* DUT 高阻时引脚电压不由 DUT 决定，而是被电流负载拉到净电流为 0 的点 */
+  const vPin = hiz ? vref + HIZ_OFFSET : vout
+  const read = compare(vPin)
+  const br = bridge(vPin, vref)
 
   /* ---- 守则 ---- */
   const answered = RULE_CASES.filter((c) => ruleAns[c.id]).length
@@ -951,24 +973,41 @@ export function FundIntroPage({ moduleId, onModuleChange }: Props) {
             </button>
           </div>
         ) : null}
-        <PinElecFig mode={peMode} sw={sw} switching={switching} fdata={fdata} vout={vout} vref={vref} conflict={conflict} />
+        <PinElecFig mode={peMode} sw={sw} switching={switching} fdata={fdata} vout={vPin} vref={vref} conflict={conflict} />
         <Explain paras={[peItem.text]} />
         {peMode === 'drive' && conflict ? <Callout tone="bad">{t(CONFLICT_TEXT)}</Callout> : null}
         <Explain paras={PE_PARTS} />
 
         <h4 className="intro-sub">{t(S.outSub)}</h4>
+        {peMode !== 'compare' ? <p className="intro__note">{t(S.loadHint)}</p> : null}
+        <div className="row-actions">
+          <button
+            type="button"
+            className={`kind__btn${hiz ? ' is-wrong' : ''}`}
+            aria-pressed={hiz}
+            onClick={() => {
+              setHiz((h) => !h)
+              if (!hiz) pickNote(S.hizBtn, S.hizNote)
+            }}
+          >
+            {t(S.hizBtn)}
+          </button>
+        </div>
         <div className="knob-row">
-          <Knob label={S.vDut} value={vout} unit="V" min={0} max={5} step={0.1} onChange={setVout} />
+          {hiz ? null : <Knob label={S.vDut} value={vout} unit="V" min={0} max={5} step={0.1} onChange={setVout} />}
           <Knob label={S.vref} value={vref} unit="V" min={0} max={3} step={0.1} onChange={setVref} />
         </div>
         <Readout
           items={[
+            { label: S.vPin, value: `${vPin.toFixed(2)} V` },
             { label: S.cmpRead, value: t(read === 'low' ? S.l0 : read === 'high' ? S.l1 : S.lx), state: read === 'mid' ? 'fail' : 'pass' },
-            { label: S.loadI, value: iLoad > 0 ? `+${IOL_MA} mA` : iLoad < 0 ? `−${IOH_MA} mA` : '0 mA' },
+            { label: S.loadI, value: Math.abs(br.iDut) < 0.005 ? '0.00 mA' : `${br.iDut > 0 ? '+' : '−'}${Math.abs(br.iDut).toFixed(2)} mA` },
+            { label: S.diodes, value: `D1 ${br.d1.toFixed(2)} · D2 ${br.d2.toFixed(2)} · D3 ${br.d3.toFixed(2)} · D4 ${br.d4.toFixed(2)} mA` },
           ]}
         />
-        <Callout tone={read === 'mid' ? 'bad' : 'ok'}>{t(CMP_TEXT[read])}</Callout>
-        <Callout>{t(iLoad > 0 ? S.iolFlow : iLoad < 0 ? S.iohFlow : S.iZero)}</Callout>
+        <Callout tone={read === 'mid' && !hiz ? 'bad' : 'ok'}>{t(hiz ? S.hizNote : CMP_TEXT[read])}</Callout>
+        <Callout>{t(br.branch === 'iol' ? S.iolFlow : br.branch === 'ioh' ? S.iohFlow : S.iZero)}</Callout>
+        <LoadCode vref={vref} branch={br.branch} active={peMode === 'compare'} />
         <Explain paras={LOAD_TEXT} />
         <Explain paras={[CONFLICT_TEXT, PPPMU_TEXT]} />
       </Section>

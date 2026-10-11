@@ -2,7 +2,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 import { Vector3 } from 'three'
 import { useScene, type SceneConfig, type SceneStore } from '../context/SceneContext'
-import { CAMERA_LIMITS, CAMERA_PRESET, FLOOR_Y, LAYER_BOX } from '../data/layout'
+import { CAMERA_LIMITS, CAMERA_PRESET, FLOOR_Y, layerBox } from '../data/layout'
 
 type CameraRigProps = {
   /** 每次变化都回到当前流程的默认视角 */
@@ -25,8 +25,13 @@ function anchorY(store: SceneStore, cfg: SceneConfig): number {
   return store.explode * CAMERA_PRESET[cfg.flow].explodeShift
 }
 
+/** 镜头距离倍数：分解后叠层变高，镜头随之拉远以框住全部 */
+function dollyScale(store: SceneStore, cfg: SceneConfig): number {
+  return 1 + store.explode * (CAMERA_PRESET[cfg.flow].explodeDolly - 1)
+}
+
 /**
- * 镜头：切 FT/CP、重置、聚焦某层时平滑过渡；分解时随叠层上移；
+ * 镜头：切 FT/CP、重置、聚焦某层时平滑过渡；分解时随叠层上移并拉远（聚焦某层时只跟随、不拉远）；
  * 用户一拖动就取消正在进行的过渡。
  */
 export function CameraRig({ resetKey }: CameraRigProps) {
@@ -35,6 +40,7 @@ export function CameraRig({ resetKey }: CameraRigProps) {
   const controls = useThree((s) => s.controls) as unknown as OrbitLike | null
   const goal = useRef<Goal | null>(null)
   const lastAnchor = useRef(0)
+  const lastScale = useRef(1)
   const initialized = useRef(false)
   const cfgRef = useRef(cfg)
   cfgRef.current = cfg
@@ -44,9 +50,11 @@ export function CameraRig({ resetKey }: CameraRigProps) {
     if (!controls || c.focus) return
     const preset = CAMERA_PRESET[c.flow]
     const shift = store.explode * preset.explodeShift
+    const scale = dollyScale(store, c)
     lastAnchor.current = shift
+    lastScale.current = scale
     const target = new Vector3(...preset.target).add(new Vector3(0, shift, 0))
-    const pos = new Vector3(...preset.position).add(new Vector3(0, shift, 0))
+    const pos = new Vector3(...preset.position).sub(new Vector3(...preset.target)).multiplyScalar(scale).add(target)
     if (!initialized.current) {
       initialized.current = true
       controls.target.copy(target)
@@ -60,12 +68,12 @@ export function CameraRig({ resetKey }: CameraRigProps) {
   useEffect(() => {
     const c = cfgRef.current
     if (!controls || !c.focus) return
-    const box = LAYER_BOX[c.flow][c.focus]
+    const box = layerBox(c.flow, c.focus, store.explodeTarget)
     if (!box) return
     lastAnchor.current = store.pose.y[c.focus]
     const center = new Vector3(box.c[0] + store.pose.x[c.focus], box.c[1] + store.pose.y[c.focus], box.c[2])
     const dir = camera.position.clone().sub(controls.target).normalize()
-    const dist = Math.max(2.6, Math.max(box.s[0], box.s[2]) * 1.7)
+    const dist = Math.max(2.6, Math.max(box.s[0], box.s[2]) * 1.7, box.s[1] * 2.4)
     goal.current = { pos: center.clone().addScaledVector(dir, dist), target: center }
   }, [controls, camera, cfg.focus, cfg.flow, store])
 
@@ -92,6 +100,14 @@ export function CameraRig({ resetKey }: CameraRigProps) {
         goal.current.target.y += delta
       }
     }
+    const scale = dollyScale(store, cfg)
+    const ratio = scale / lastScale.current
+    lastScale.current = scale
+    const dolly = !cfg.focus && Math.abs(ratio - 1) > 1e-6
+    if (dolly) {
+      camera.position.sub(controls.target).multiplyScalar(ratio).add(controls.target)
+      if (goal.current) goal.current.pos.sub(goal.current.target).multiplyScalar(ratio).add(goal.current.target)
+    }
     const g = goal.current
     if (g) {
       const k = cfg.reduced ? 1 : 1 - Math.exp(-dt * 4.5)
@@ -111,7 +127,7 @@ export function CameraRig({ resetKey }: CameraRigProps) {
     const cosMax = Math.min(1, Math.max(-1, (minY - controls.target.y) / dist))
     controls.maxPolarAngle = Math.max(CAMERA_LIMITS.minPolar, Math.min(CAMERA_LIMITS.maxPolar, Math.acos(cosMax)))
 
-    if (g || clamped || Math.abs(delta) > 1e-6) controls.update()
+    if (g || clamped || dolly || Math.abs(delta) > 1e-6) controls.update()
   })
 
   return null

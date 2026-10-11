@@ -13,7 +13,7 @@ import {
   type LineSegments,
   type Mesh,
 } from 'three'
-import { activeChannel, useScene } from '../context/SceneContext'
+import { activeChannel, isolatedLayers, useScene } from '../context/SceneContext'
 import { CHANNEL_COUNT, buildHops, hopPolyline, type Vec3 } from '../data/layout'
 import { GEO } from '../data/materials'
 import type { SceneTheme } from '../hooks/useSceneTheme'
@@ -90,7 +90,9 @@ export function SignalFlow({ theme }: SignalFlowProps) {
   useFrame((_, rawDt) => {
     const dt = Math.min(rawDt, 0.05)
     const pose = store.pose
-    const ch = activeChannel(store, cfg)
+    // 只剩一层时，跨层的管线会悬在空处；该层内的高亮由 PathHighlight 负责
+    const soloLayer = isolatedLayers(cfg)?.length === 1
+    const ch = soloLayer ? null : activeChannel(store, cfg)
 
     const tubeMesh = tube.current
     const pulseMesh = pulses.current
@@ -144,7 +146,7 @@ export function SignalFlow({ theme }: SignalFlowProps) {
 
     const lineMesh = lines.current
     if (lineMesh) {
-      const showAll = store.explode > 0.3 && ch === null
+      const showAll = store.explode > 0.3 && activeChannel(store, cfg) === null && !isolatedLayers(cfg) && cfg.hidden.length === 0
       lineMesh.visible = showAll
       if (showAll) {
         const arr = lineGeo.getAttribute('position') as BufferAttribute

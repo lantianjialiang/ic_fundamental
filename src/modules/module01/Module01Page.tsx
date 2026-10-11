@@ -6,7 +6,7 @@ import { type ModuleId } from '../catalog'
 import { LegendPanel } from './components/LegendPanel'
 import { createStore, resetContact, type SceneConfig } from './context/SceneContext'
 import { PHASES, computePose, type ContactPhase, type LayerId, type Pkg, type ProbeType, type TestFlow } from './data/layout'
-import { PATH_VIEWS, PHASE_TEXT, T } from './data/text'
+import { PHASE_TEXT, T } from './data/text'
 import { useReducedMotion } from './hooks/useReducedMotion'
 import { Scene } from './Scene'
 import './module01.css'
@@ -25,18 +25,15 @@ export function Module01Page({ moduleId, onModuleChange }: Module01PageProps) {
   const [probe, setProbe] = useState<ProbeType>('cantilever')
   const [showLabels, setShowLabels] = useState(false)
   const [selected, setSelected] = useState<number | null>(null)
-  const [pathOnly, setPathOnly] = useState<boolean>(PATH_VIEWS[0].pathOnly)
   const [focus, setFocus] = useState<LayerId | null>(null)
+  const [hideOthers, setHideOthers] = useState(false)
+  const [hidden, setHidden] = useState<LayerId[]>([])
   const [exploded, setExploded] = useState(false)
   const [section, setSection] = useState(false)
   const [phase, setPhase] = useState<ContactPhase>('idle')
   const [resetKey, setResetKey] = useState(0)
 
-  /** 每次选中一个通道都自动回到「只看路径」 */
-  const selectChannel = (ch: number | null) => {
-    setSelected(ch)
-    if (ch !== null) setPathOnly(PATH_VIEWS[0].pathOnly)
-  }
+  const toggleHidden = (id: LayerId) => setHidden((list) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]))
 
   const stopContact = () => {
     resetContact(store)
@@ -52,6 +49,7 @@ export function Module01Page({ moduleId, onModuleChange }: Module01PageProps) {
     setExploded(false)
     setSelected(null)
     setFocus(null)
+    setHidden([])
     setFlow(next)
   }
 
@@ -63,7 +61,6 @@ export function Module01Page({ moduleId, onModuleChange }: Module01PageProps) {
   }
 
   const startContact = () => {
-    setPathOnly(PATH_VIEWS[0].pathOnly)
     store.explodeTarget = 0
     setExploded(false)
     store.scrubMax = 0
@@ -111,10 +108,10 @@ export function Module01Page({ moduleId, onModuleChange }: Module01PageProps) {
   }
 
   const cfg = useMemo<SceneConfig>(
-    () => ({ flow, pkg, probe, selected, pathOnly, focus, showLabels, reduced, onSelect: selectChannel }),
-    // selectChannel 只调用稳定的 setState，不需要进依赖
-    [flow, pkg, probe, selected, pathOnly, focus, showLabels, reduced],
+    () => ({ flow, pkg, probe, selected, focus, exploded, hideOthers, hidden, showLabels, reduced, onSelect: setSelected }),
+    [flow, pkg, probe, selected, focus, exploded, hideOthers, hidden, showLabels, reduced],
   )
+  const canIsolate = focus !== null || selected !== null
 
   const phases = PHASES[flow]
   const phaseIndex = phases.indexOf(phase)
@@ -189,6 +186,15 @@ export function Module01Page({ moduleId, onModuleChange }: Module01PageProps) {
             <input type="checkbox" checked={showLabels} onChange={(event) => setShowLabels(event.target.checked)} />
             {t(T.labels)}
           </label>
+          <label className={`lab__check${canIsolate ? '' : ' is-disabled'}`} title={canIsolate ? undefined : t(T.hideOthersOff)}>
+            <input
+              type="checkbox"
+              checked={hideOthers}
+              disabled={!canIsolate}
+              onChange={(event) => setHideOthers(event.target.checked)}
+            />
+            {t(T.hideOthers)}
+          </label>
           <button type="button" className="lab__btn" onClick={resetView}>
             {t(T.resetView)}
           </button>
@@ -222,12 +228,12 @@ export function Module01Page({ moduleId, onModuleChange }: Module01PageProps) {
           pkg={pkg}
           probe={probe}
           selected={selected}
-          onSelect={selectChannel}
+          onSelect={setSelected}
           focus={focus}
           onFocus={(id) => setFocus((f) => (f === id ? null : id))}
+          hidden={hidden}
+          onToggleHidden={toggleHidden}
           phase={phase}
-          pathOnly={pathOnly}
-          onPathOnly={setPathOnly}
         />
       </div>
     </LabShell>

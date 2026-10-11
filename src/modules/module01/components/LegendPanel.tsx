@@ -14,7 +14,7 @@ import {
   type ProbeType,
   type TestFlow,
 } from '../data/layout'
-import { HOP_TEXT, LAYER_TEXT, PATH_VIEWS, PHASE_TEXT, T } from '../data/text'
+import { HOP_TEXT, LAYER_TEXT, PHASE_TEXT, T } from '../data/text'
 
 type LegendPanelProps = {
   flow: TestFlow
@@ -24,12 +24,28 @@ type LegendPanelProps = {
   onSelect: (channel: number | null) => void
   focus: LayerId | null
   onFocus: (id: LayerId) => void
+  hidden: LayerId[]
+  onToggleHidden: (id: LayerId) => void
   phase: ContactPhase
-  pathOnly: boolean
-  onPathOnly: (on: boolean) => void
 }
 
-export function LegendPanel({ flow, pkg, probe, selected, onSelect, focus, onFocus, phase, pathOnly, onPathOnly }: LegendPanelProps) {
+function EyeIcon({ off }: { off: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+      <path
+        d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      {off ? <path d="M4 20 20 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /> : null}
+    </svg>
+  )
+}
+
+export function LegendPanel({ flow, pkg, probe, selected, onSelect, focus, onFocus, hidden, onToggleHidden, phase }: LegendPanelProps) {
   const { t } = useLocale()
   const phases = PHASES[flow]
   const phaseIndex = phases.indexOf(phase)
@@ -85,16 +101,27 @@ export function LegendPanel({ flow, pkg, probe, selected, onSelect, focus, onFoc
           const text = LAYER_TEXT[flow][id]
           if (!text) return null
           const active = focus === id
+          const off = hidden.includes(id)
+          const name = t(text.name)
           return (
-            <li key={id}>
+            <li key={id} className={off ? 'is-hidden' : undefined}>
               <button
                 type="button"
                 className={`m01-layers__btn${active ? ' is-active' : ''}`}
                 aria-pressed={active}
                 onClick={() => onFocus(id)}
               >
-                <span className="m01-layers__name">{t(text.name)}</span>
+                <span className="m01-layers__name">{name}</span>
                 <span className="m01-layers__desc">{t(text.desc)}</span>
+              </button>
+              <button
+                type="button"
+                className={`m01-layers__eye${off ? ' is-off' : ''}`}
+                aria-label={t(off ? T.showLayer : T.hideLayer).replace('{name}', name)}
+                title={t(off ? T.showLayer : T.hideLayer).replace('{name}', name)}
+                onClick={() => onToggleHidden(id)}
+              >
+                <EyeIcon off={off} />
               </button>
             </li>
           )
@@ -128,27 +155,7 @@ export function LegendPanel({ flow, pkg, probe, selected, onSelect, focus, onFoc
       </div>
 
       <h2>{t(T.pathTitle)}</h2>
-      {selected !== null || phase === 'signal' ? (
-        <>
-          <div className="lab__modes m01-pathview" role="group" aria-label={t(T.pathViewGroup)}>
-            {PATH_VIEWS.map((v) => {
-              const active = pathOnly === v.pathOnly
-              return (
-                <button
-                  key={v.id}
-                  type="button"
-                  className={`lab__mode${active ? ' is-active' : ''}`}
-                  aria-pressed={active}
-                  onClick={() => onPathOnly(v.pathOnly)}
-                >
-                  {t(v.label)}
-                </button>
-              )
-            })}
-          </div>
-          {pathOnly ? <p className="legend__hint">{t(T.pathOnlyHint)}</p> : null}
-        </>
-      ) : null}
+      {selected !== null || phase === 'signal' ? <p className="legend__hint">{t(T.pathHint)}</p> : null}
       {selected !== null ? (
         <div className="legend__path">
           <p className="legend__path-title">{`CH${selected + 1} → ${endpoint(selected)}`}</p>

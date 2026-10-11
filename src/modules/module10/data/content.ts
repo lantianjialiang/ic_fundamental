@@ -66,8 +66,8 @@ export const SOURCES: Array<{ id: SourceId; title: LText; text: LText }> = [
     id: 'func',
     title: loc('Functional', 'Functional'),
     text: loc(
-      '主要来自设计验证：设计 / 验证工程师用 testbench 跑仿真，把仿真波形（VCD）转成测试向量（WGL、STIL 等格式）交给测试工程师。测试工程师把它转成测试机格式，配上时序（Drive / Strobe 时刻）和电平，再上机调试；只有少量向量由测试工程师针对规格补写，例如某个特定工作模式或边界条件。Functional 证明芯片「功能对」，但说不出覆盖了多少故障。',
-      'Mostly from design verification: design or verification engineers run testbench simulations, and the simulation waveforms (VCD) are converted into test vectors (WGL, STIL and similar formats) for the test engineer. The test engineer converts them to the tester format, adds timing (drive / strobe times) and levels, and debugs them on the tester. Only a few vectors are written by the test engineer for specific spec items, such as a particular operating mode or a boundary condition. Functional vectors prove the function is right but say nothing about fault coverage.',
+      '主要来自设计验证：设计 / 验证工程师用 testbench 跑仿真，把仿真波形导出成 VCD、WGL 或 STIL 文件交给测试工程师。这些都还不是机台能直接跑的东西：测试工程师用转换工具把它们转成目标 ATE 的 Pattern 格式，配上时序（Drive / Strobe 时刻）和电平，再上机调试；只有少量向量由测试工程师针对规格补写，例如某个特定工作模式或边界条件。Functional 证明芯片「功能对」，但说不出覆盖了多少故障。',
+      'Mostly from design verification: design or verification engineers run testbench simulations, and export the simulation waveforms as VCD, WGL or STIL files for the test engineer. None of these runs on the tester directly: the test engineer uses a conversion tool to turn them into the target ATE’s pattern format, adds timing (drive / strobe times) and levels, and debugs them on the tester. Only a few vectors are written by the test engineer for specific spec items, such as a particular operating mode or a boundary condition. Functional vectors prove the function is right but say nothing about fault coverage.',
     ),
   },
   {
@@ -82,8 +82,8 @@ export const SOURCES: Array<{ id: SourceId; title: LText; text: LText }> = [
     id: 'atpg',
     title: loc('ATPG / Scan', 'ATPG / Scan'),
     text: loc(
-      '由 DFT 工程师提供：他们在设计里插入 Scan 链（以及 Logic BIST、Memory BIST 等电路），再用 ATPG（Automatic Test Pattern Generation）工具读门级网表和故障模型，对每个故障自动搜一条能抓到它的向量，报出故障覆盖率，输出 STIL / WGL 等 Pattern 文件。测试工程师拿到后转成测试机格式、配时序和电平、上机调试。量产程序里常有一半左右的向量是 DFT 工程师给的。',
-      'Provided by the DFT engineer: they insert scan chains (and circuits such as logic BIST and memory BIST) into the design, then run an ATPG (Automatic Test Pattern Generation) tool on the gate-level netlist and a fault model. The tool searches for a vector that catches each fault, reports fault coverage, and writes pattern files such as STIL or WGL. The test engineer converts them to the tester format, adds timing and levels, and debugs them on the tester. In a production program, roughly half of the vectors often come from the DFT engineer.',
+      '由 DFT 工程师提供：他们在设计里插入 Scan 链（以及 Logic BIST、Memory BIST 等电路），再用 ATPG（Automatic Test Pattern Generation）工具读门级网表和故障模型，对每个故障自动搜一条能抓到它的向量，报出故障覆盖率，输出 STIL / WGL 等 Pattern 文件。测试工程师拿到后转成目标 ATE 的 Pattern 格式、配时序和电平、上机调试。量产程序里常有一半左右的向量是 DFT 工程师给的。',
+      'Provided by the DFT engineer: they insert scan chains (and circuits such as logic BIST and memory BIST) into the design, then run an ATPG (Automatic Test Pattern Generation) tool on the gate-level netlist and a fault model. The tool searches for a vector that catches each fault, reports fault coverage, and writes pattern files such as STIL or WGL. The test engineer converts them into the target ATE’s pattern format, adds timing and levels, and debugs them on the tester. In a production program, roughly half of the vectors often come from the DFT engineer.',
     ),
   },
 ]

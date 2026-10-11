@@ -97,7 +97,6 @@ export function FundQualifyPage({ moduleId, onModuleChange }: Props) {
   const [param, setParam] = useState(MARGIN_PARAMS[0].id)
   // 3. Shmoo
   const [shPick, setShPick] = useState<string | null>(null)
-  const [shVerdict, setShVerdict] = useState<Record<string, 'right' | 'wrong'>>({})
   // 4. 分 Bin
   const [made, setMade] = useState<Record<string, number>>({})
   const [range, setRange] = useState(TEMP_RANGES[0].id)
@@ -124,10 +123,10 @@ export function FundQualifyPage({ moduleId, onModuleChange }: Props) {
     setShPick(id)
     const v = SHMOO_VECS.find((x) => x.id === id)
     if (!v) return
-    setShVerdict((prev) => ({ ...prev, [id]: v.holes.length > 0 ? 'right' : 'wrong' }))
     setNote({ kicker: S.kicker, title: v.name, text: v.text })
   }
   const shItem = SHMOO_VECS.find((x) => x.id === shPick)
+  const shVerdict: Record<string, 'right' | 'wrong'> = shItem ? { [shItem.id]: shItem.holes.length > 0 ? 'right' : 'wrong' } : {}
 
   /* ---- 分 Bin ---- */
   const progSum: Record<number, number> = {}

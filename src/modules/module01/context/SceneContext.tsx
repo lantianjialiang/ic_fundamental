@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react'
 import {
+  CHANNEL_LAYERS,
   STATIC_ANIM,
   computePose,
   type AnimValues,
@@ -21,8 +22,6 @@ export type SceneStore = AnimValues & {
   section: number
   sectionTarget: number
   boardFade: number
-  /** 「只看路径」淡化进度 0..1：其它部件的不透明度从 1 降到 DIM_OPACITY */
-  dim: number
   phase: ContactPhase
   phaseT: number
   pulseT: number
@@ -38,7 +37,6 @@ export function createStore(flow: TestFlow): SceneStore {
     section: 0,
     sectionTarget: 0,
     boardFade: 0,
-    dim: 0,
     phase: 'idle',
     phaseT: 0,
     pulseT: 0,
@@ -64,15 +62,33 @@ export type SceneConfig = {
   pkg: Pkg
   probe: ProbeType
   selected: number | null
-  /** 有高亮路径时，是否把其它部件淡化成几乎透明 */
-  pathOnly: boolean
   focus: LayerId | null
+  /** 分解按钮的目标状态（PCB 分层标注只在分解时显示） */
+  exploded: boolean
+  /** 只显示选中的那一层 / 选中通道经过的部件 */
+  hideOthers: boolean
+  /** 侧栏眼睛按钮单独隐藏的层 */
+  hidden: LayerId[]
   showLabels: boolean
   reduced: boolean
   onSelect: (channel: number | null) => void
 }
 
 type SceneContextValue = { store: SceneStore; cfg: SceneConfig }
+
+/** 「隐藏其它部件」生效时要保留的层；没选层也没选通道时返回 null（不生效） */
+export function isolatedLayers(cfg: SceneConfig): LayerId[] | null {
+  if (!cfg.hideOthers) return null
+  if (cfg.focus) return [cfg.focus]
+  if (cfg.selected !== null) return CHANNEL_LAYERS[cfg.flow]
+  return null
+}
+
+export function layerVisible(cfg: SceneConfig, id: LayerId): boolean {
+  if (cfg.hidden.includes(id)) return false
+  const keep = isolatedLayers(cfg)
+  return !keep || keep.includes(id)
+}
 
 /** 当前要高亮的通道：选中的通道；没选时接触动画「信号」阶段默认走 CH1 */
 export function activeChannel(store: SceneStore, cfg: SceneConfig): number | null {

@@ -3,7 +3,6 @@ import { useMemo } from 'react'
 import { ExtrudeGeometry, MeshStandardMaterial, Shape } from 'three'
 import { useLocale } from '../../../i18n/LocaleContext'
 import { useScene } from '../context/SceneContext'
-import { registerDim } from '../data/dim'
 import { BGA, DUT_BASE_Y, QFP, allContacts, qfpLeads } from '../data/layout'
 import { GEO, MAT } from '../data/materials'
 import { dutMarkTexture } from '../data/textures'
@@ -35,8 +34,8 @@ function gullWingGeometry(): ExtrudeGeometry {
 }
 
 const markMaterials = {
-  BGA: registerDim(new MeshStandardMaterial({ map: dutMarkTexture('BGA'), roughness: 0.6, metalness: 0 })),
-  QFP: registerDim(new MeshStandardMaterial({ map: dutMarkTexture('QFP'), roughness: 0.6, metalness: 0 })),
+  BGA: new MeshStandardMaterial({ map: dutMarkTexture('BGA'), roughness: 0.6, metalness: 0 }),
+  QFP: new MeshStandardMaterial({ map: dutMarkTexture('QFP'), roughness: 0.6, metalness: 0 }),
 }
 
 /** DUT：BGA（基板 + 塑封 + 锡球阵列）或 QFP（塑封 + 四边鸥翼引脚），顶面带打标贴图 */

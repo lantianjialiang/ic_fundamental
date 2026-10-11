@@ -3,7 +3,6 @@ import { useMemo, useRef } from 'react'
 import { ExtrudeGeometry, MeshBasicMaterial, MeshStandardMaterial, Shape, type InstancedMesh } from 'three'
 import { useLocale } from '../../../i18n/LocaleContext'
 import { useScene } from '../context/SceneContext'
-import { registerDim } from '../data/dim'
 import { DIE, DIE_PADS, PAD_TOP, WAFER, dieCells, padIndexFor } from '../data/layout'
 import { GEO, MAT } from '../data/materials'
 import { frameGeometry } from '../data/shapes'
@@ -39,8 +38,8 @@ function waferGeometry(): ExtrudeGeometry {
   return g
 }
 
-const dieMat = registerDim(new MeshStandardMaterial({ map: dieTexture(), metalness: 0.35, roughness: 0.32 }))
-const outlineMat = registerDim(new MeshBasicMaterial({ color: '#ffcf4a', toneMapped: false }))
+const dieMat = new MeshStandardMaterial({ map: dieTexture(), metalness: 0.35, roughness: 0.32 })
+const outlineMat = new MeshBasicMaterial({ color: '#ffcf4a', toneMapped: false })
 
 /** 晶圆：数百颗 die（实例化）+ 被测 die 高亮 + pad + 扎针后的 scrub 痕 */
 export function Wafer() {

@@ -205,32 +205,31 @@ const ARTS: Record<TermId, (p: ArtProps) => ReactNode> = {
           ))}
         </g>
         <rect x="114" y="102" width="12" height="4" fill="var(--gold-bg-2)" stroke="var(--gold)" strokeWidth="1" />
-        {/* 测试头和弹簧针 */}
-        <rect x="64" y="4" width="112" height="14" rx="2" fill="var(--fig-box-2)" stroke="var(--line-3)" />
-        {[70, 76, 82, 158, 164, 170].map((x) => (
-          <line key={x} x1={x} y1="18" x2={x} y2="30" stroke="var(--gold)" strokeWidth="1.4" />
+        {/* 测试头：弹簧针压在探针卡外圈焊盘上 */}
+        <rect x="20" y="6" width="200" height="16" rx="2" fill="var(--fig-box-2)" stroke="var(--line-3)" />
+        {[30, 38, 46, 54, 186, 194, 202, 210].map((x) => (
+          <line key={x} x1={x} y1="22" x2={x} y2="40" stroke="var(--gold)" strokeWidth="1.4" />
         ))}
-        {/* 探针卡 PCB，中间开窗 */}
-        <rect x="24" y="30" width="74" height="12" rx="2" fill="var(--blue-bg)" stroke="var(--blue)" />
-        <rect x="142" y="30" width="74" height="12" rx="2" fill="var(--blue-bg)" stroke="var(--blue)" />
-        <rect x="86" y="42" width="14" height="5" rx="1" fill="var(--line-2)" />
-        <rect x="140" y="42" width="14" height="5" rx="1" fill="var(--line-2)" />
-        {/* 悬臂探针：针尖落在被测 die 的 pad 上 */}
+        {/* 探针卡：一整块圆形 PCB（侧视为一条），顶面中央是金属加强板，底面中央是固定探针的环氧环 */}
+        <rect x="18" y="40" width="204" height="10" rx="2" fill="var(--blue-bg)" stroke="var(--blue)" />
+        <rect x="88" y="34" width="64" height="6" rx="1" fill="var(--line-2)" stroke="var(--line-3)" strokeWidth="0.6" />
+        <path d="M92 50 H148 L140 60 H100 Z" fill="var(--fig-box)" stroke="var(--line-3)" strokeWidth="0.8" />
+        {/* 悬臂探针：从环氧环内沿斜伸向中心，针尖落在被测 die 的 pad 上 */}
         {[
-          'M90 46 L113 98 L116 104',
-          'M96 46 L115 98 L118 104',
-          'M144 46 L125 98 L122 104',
-          'M150 46 L127 98 L124 104',
+          'M102 58 L114 98 L115 103',
+          'M106 58 L116 98 L117 103',
+          'M138 58 L126 98 L125 103',
+          'M134 58 L124 98 L123 103',
         ].map((d) => (
-          <path key={d} d={d} fill="none" stroke="var(--gold)" strokeWidth="1.4" />
+          <path key={d} d={d} fill="none" stroke="var(--gold)" strokeWidth="1.3" />
         ))}
-        <Lbl small={small} x={120} y={15} color="var(--muted)" size={10}>
+        <Lbl small={small} x={120} y={18} color="var(--muted)" size={10}>
           {t(L.testHead)}
         </Lbl>
-        <Lbl small={small} x={214} y={56} anchor="end">
+        <Lbl small={small} x={220} y={64} anchor="end">
           {t(L.probeCard)}
         </Lbl>
-        <Lbl small={small} x={216} y={84} anchor="end">
+        <Lbl small={small} x={220} y={88} anchor="end">
           {t(L.wafer)}
         </Lbl>
         <Lbl small={small} x={14} y={146} anchor="start" color="var(--muted)" size={10}>

@@ -23,7 +23,22 @@ import {
   routeVias,
   socketPads,
 } from './loadboard'
-import { CARD_COUNT, LB, PCB_STACK, SOCKET, cardX, ftRoute, pcbStack, towerPinXZ, type Pkg, CHANNEL_COUNT } from './layout'
+import {
+  CARD_COUNT,
+  CHANNEL_COUNT,
+  LB,
+  LB_SPEC,
+  PC,
+  PC_SPEC,
+  PCB_STACK,
+  SOCKET,
+  cardX,
+  cpRoute,
+  ftRoute,
+  pcbStack,
+  towerPinXZ,
+  type Pkg,
+} from './layout'
 
 /** 用 Canvas 在本地生成丝印 / 打标 / die 图案贴图（离线，无需下载、不加载字体文件） */
 
@@ -93,13 +108,13 @@ const ORM: Pal = {
 type Painter = { g: CanvasRenderingContext2D; S: number; X: (x: number) => number; Y: (z: number) => number }
 
 /** 顶面：贴图上方 = 板子后边（−Z）；底面：贴图上方 = 板子前边（+Z）。两面从外面看文字都不是镜像 */
-function painter(g: CanvasRenderingContext2D, bottom: boolean): Painter {
-  const S = g.canvas.width / LB.w
+function painter(g: CanvasRenderingContext2D, bottom: boolean, w = LB.w, d = LB.d): Painter {
+  const S = g.canvas.width / w
   return {
     g,
     S,
-    X: (x) => (x + LB.w / 2) * S,
-    Y: bottom ? (z) => (LB.d / 2 - z) * S : (z) => (z + LB.d / 2) * S,
+    X: (x) => (x + w / 2) * S,
+    Y: bottom ? (z) => (d / 2 - z) * S : (z) => (z + d / 2) * S,
   }
 }
 
@@ -370,7 +385,7 @@ function drawLbTop(p: Painter, pal: Pal, pkg: Pkg, albedo: boolean) {
   // 叠层表（左后角），和板边看到的层一一对应
   frame(p, -2.0, -1.37, -1.3, -0.92, SILK_W, silk)
   text(p, 'STACK-UP 8L', -1.97, -1.3, 0.05, silk, 'left', true)
-  const names = PCB_STACK.layers.map((t, i) => `L${i + 1} ${t}`)
+  const names = LB_SPEC.layers.map((t, i) => `L${i + 1} ${t}`)
   text(p, names.slice(0, 4).join(' '), -1.97, -1.19, 0.031, silk, 'left')
   text(p, names.slice(4).join(' '), -1.97, -1.1, 0.031, silk, 'left')
   text(p, 'FR4 1.6mm ENIG', -1.97, -1.01, 0.034, silk, 'left')
@@ -468,7 +483,7 @@ export function lbEdgeTextures() {
   const draw = (pal: (typeof STACK_COLOR)['albedo']) => (g: CanvasRenderingContext2D, w: number, h: number) => {
     const sy = h / LB.t
     const Y = (y: number) => (LB.t / 2 - y) * sy
-    const st = pcbStack(LB.t)
+    const st = pcbStack(LB_SPEC)
     g.fillStyle = pal.diel
     g.fillRect(0, 0, w, h)
     g.fillStyle = pal.mask
@@ -493,7 +508,7 @@ export function lbSectionTexture(pkg: Pkg) {
     const sy = h / LB.t
     const X = (x: number) => (x + LB.w / 2) * sx
     const Y = (y: number) => (LB.t / 2 - y) * sy
-    const st = pcbStack(LB.t)
+    const st = pcbStack(LB_SPEC)
     const cu = PCB_STACK.cu
     g.fillStyle = '#b3a46b'
     g.fillRect(0, 0, w, h)
@@ -517,7 +532,7 @@ export function lbSectionTexture(pkg: Pkg) {
       .map((v) => v[0])
     const allVias = [...sigVias, ...gndVias, ...pwrVias]
 
-    PCB_STACK.layers.forEach((kind, i) => {
+    LB_SPEC.layers.forEach((kind, i) => {
       const top = Y(st.copper[i]! + cu / 2)
       const hh = cu * sy
       g.fillStyle = '#cf7c43'
@@ -663,6 +678,184 @@ export function pcSilkTexture() {
       g.beginPath()
       g.arc(c + Math.cos(a) * c * 0.62, c + Math.sin(a) * c * 0.62, 18, 0, Math.PI * 2)
       g.stroke()
+    }
+  })
+}
+
+/* ---------------- PCB 分层展开：各层铜图形（透明底，透明处在 3D 里挖空） ---------------- */
+
+const CU = '#d2884c'
+const DRILL = '#2a1a10'
+const CLEAR = 'rgba(0,0,0,0)'
+/** 只留铜：绿油、开窗外圈、丝印都画成透明，沉金焊盘和盖油走线都画成铜 */
+const CU_PAL: Pal = { mask: CLEAR, maskCu: CU, dimple: DRILL, relief: CLEAR, gold: CU, silk: CLEAR, hole: DRILL, fid: CU }
+
+type XZ = [number, number]
+const keyOf = ([x, z]: XZ) => `${x.toFixed(3)},${z.toFixed(3)}`
+
+/** 在铜皮上挖圆孔（隔离环 anti-pad / 分割缝） */
+function cutCircles(p: Painter, pts: XZ[], r: number) {
+  p.g.globalCompositeOperation = 'destination-out'
+  for (const [x, z] of pts) circ(p, x, z, r, '#000')
+  p.g.globalCompositeOperation = 'source-over'
+}
+
+/** 内层上的过孔：孔壁铜环 + 钻孔 */
+function barrels(p: Painter, pts: XZ[], r = 0.016) {
+  for (const [x, z] of pts) {
+    circ(p, x, z, r, CU)
+    circ(p, x, z, 0.008, DRILL)
+  }
+}
+
+/** Load Board 上各类过孔按网络分组：信号过孔在 GND / PWR 层要挖隔离环，地过孔直接连在 GND 铜皮上 */
+function lbVias(pkg: Pkg) {
+  const cap: XZ[] = LB_CAPS.map((c) => {
+    const [nx, nz] = capInward(c)
+    return [c.x + nx * 0.1, c.z + nz * 0.1]
+  })
+  const sig: XZ[] = [
+    ...routeVias(pkg),
+    ...(pkg === 'BGA' ? fanoutVias(pkg) : []),
+    ...LB_RES.map<XZ>((r) => [r.x - 0.1, r.z]),
+    ...LB_SMAS.map<XZ>((s) => [s.x, s.z - 0.17]),
+    ...LB_RELAYS.flatMap<XZ>((k) => {
+      const inward = k.x > 0 ? -1 : 1
+      return [
+        [k.x + inward * 0.2, k.z - 0.125],
+        [k.x + inward * 0.2, k.z + 0.125],
+      ]
+    }),
+  ]
+  const known = new Set([...cap, ...sig].map(keyOf))
+  const gnd: XZ[] = [...(pkg === 'QFP' ? fanoutVias(pkg) : []), ...decorVias().filter((v) => !known.has(keyOf(v)))]
+  const pins: XZ[] = LB_HEADERS.flatMap((h) => headerPins(h.x))
+  return { cap, sig, gnd, pins }
+}
+
+function drawLbPlane(p: Painter, pkg: Pkg, kind: 'GND' | 'PWR') {
+  const v = lbVias(pkg)
+  if (kind === 'GND') {
+    // 整层地铜皮，离板边内缩一点
+    box(p, 0, 0, LB.w - 0.1, LB.d - 0.1, CU)
+    cutCircles(p, [...v.sig, ...v.cap], 0.036)
+  } else {
+    // 分割电源层：中间 VDD_DUT 一块，左右继电器区 VCC_RLY 各一块，之间是隔离缝
+    box(p, 0, 0, 2.5, 2.5, CU)
+    for (const sx of [-1, 1]) box(p, sx * 1.68, -0.05, 0.56, 1.5, CU)
+    cutCircles(p, [...v.sig, ...v.gnd], 0.036)
+  }
+  cutCircles(p, v.pins, 0.042)
+  cutCircles(p, LB_HOLES, 0.11)
+  barrels(p, [...v.sig, ...v.cap, ...v.gnd])
+  for (const [x, z] of v.pins) circ(p, x, z, 0.012, DRILL)
+}
+
+function drawLbInner(p: Painter, pkg: Pkg, layer: number) {
+  const v = lbVias(pkg)
+  barrels(p, [...v.sig, ...v.cap, ...v.gnd])
+  for (const [x, z] of v.pins) {
+    circ(p, x, z, 0.027, CU)
+    circ(p, x, z, 0.012, DRILL)
+  }
+  for (const [x, z] of LB_HOLES) {
+    circ(p, x, z, 0.078, CU)
+    circ(p, x, z, 0.045, DRILL)
+  }
+  if (layer === LB_SPEC.inner) {
+    // L3：牛角座 → 继电器的控制线
+    for (const k of LB_RELAYS) {
+      const sx = k.x > 0 ? 1 : -1
+      const pins = headerPins(sx * 2.12).filter(([px]) => Math.abs(px) < 2.12)
+      for (const dz of [-0.125, 0.125]) {
+        const vx = k.x - sx * 0.2
+        const vz = k.z + dz
+        const pin = pins.reduce((best, cur) => (Math.abs(cur[1] - vz) < Math.abs(best[1] - vz) ? cur : best), pins[0]!)
+        line(p, [pin, [sx * 1.5, pin[1]], [vx, vz]], 0.022, CU)
+      }
+    }
+    return
+  }
+  // L6：SMA 射频线（板边 → Socket 附近换层）
+  for (const s of LB_SMAS) {
+    const end: XZ = [s.x * 0.6, 1.16]
+    line(p, [[s.x, s.z - 0.17], [s.x, 1.36], end], 0.03, CU)
+    circ(p, end[0], end[1], 0.02, CU)
+    circ(p, end[0], end[1], 0.008, DRILL)
+  }
+}
+
+/** Load Board 第 i 层铜（L1 = 0） */
+export function lbCopperTexture(pkg: Pkg, i: number) {
+  const w = 1024
+  const h = Math.round((w * LB.d) / LB.w)
+  return make(`lb-cu-${pkg}-${i}`, w, h, (g) => {
+    const p = painter(g, false)
+    const kind = LB_SPEC.layers[i]!
+    if (i === 0) drawLbTop(p, CU_PAL, pkg, false)
+    else if (i === LB_SPEC.layers.length - 1) drawLbBottom(p, CU_PAL, pkg, false)
+    else if (kind === 'SIG') drawLbInner(p, pkg, i)
+    else drawLbPlane(p, pkg, kind)
+  })
+}
+
+/** Probe Card 第 i 层铜：顶层 Pogo 焊盘圈、底层空间转换器焊盘阵列、中间 GND / PWR 铜皮 */
+export function pcCopperTexture(i: number) {
+  const D = PC.r * 2
+  return make(`pc-cu-${i}`, 1024, 1024, (g) => {
+    const p = painter(g, false, D, D)
+    const n = PC_SPEC.layers.length
+    const kind = PC_SPEC.layers[i]!
+    const sig: XZ[] = []
+    const seen = new Set<string>()
+    for (let ch = 0; ch < CHANNEL_COUNT; ch += 1) {
+      for (const node of cpRoute(ch)) {
+        const k = keyOf([node.x, node.z])
+        if (!node.via || seen.has(k)) continue
+        seen.add(k)
+        sig.push([node.x, node.z])
+      }
+    }
+    const holes = Array.from({ length: 4 }, (_, k) => {
+      const a = Math.PI / 4 + (k * Math.PI) / 2
+      return [Math.cos(a) * PC.r * 0.62, Math.sin(a) * PC.r * 0.62] as XZ
+    })
+    const capPads = (r: number, phase: number): XZ[] =>
+      Array.from({ length: 20 }, (_, k) => (k / 20) * Math.PI * 2 + phase).flatMap<XZ>((a) => [
+        [Math.cos(a) * r - Math.sin(a) * 0.035, Math.sin(a) * r + Math.cos(a) * 0.035],
+        [Math.cos(a) * r + Math.sin(a) * 0.035, Math.sin(a) * r - Math.cos(a) * 0.035],
+      ])
+
+    if (kind === 'GND' || kind === 'PWR') {
+      circ(p, 0, 0, PC.r - 0.05, CU)
+      if (kind === 'PWR') {
+        // 分割电源：中间一圆块供 DUT，外圈一环供板上器件，之间是隔离缝
+        p.g.globalCompositeOperation = 'destination-out'
+        ring(p, 0, 0, 1.05, 0.05, '#000')
+        p.g.globalCompositeOperation = 'source-over'
+      }
+      cutCircles(p, sig, 0.04)
+      cutCircles(p, holes, 0.08)
+      barrels(p, sig)
+      return
+    }
+    for (const [x, z] of holes) {
+      circ(p, x, z, 0.06, CU)
+      circ(p, x, z, 0.03, DRILL)
+    }
+    if (i === 0) {
+      for (const [x, z] of towerPinXZ('CP')) circ(p, x, z, 0.022, CU)
+      for (const [x, z] of capPads(1.48, 0.08)) circ(p, x, z, 0.02, CU)
+      barrels(p, sig, 0.024)
+    } else if (i === n - 1) {
+      // 空间转换器底下的焊盘阵列
+      for (let a = 0; a < 12; a += 1) {
+        for (let b = 0; b < 12; b += 1) circ(p, (a - 5.5) * 0.075, (b - 5.5) * 0.075, 0.013, CU)
+      }
+      for (const [x, z] of capPads(0.8, 0.08)) circ(p, x, z, 0.02, CU)
+      barrels(p, sig, 0.024)
+    } else {
+      barrels(p, sig)
     }
   })
 }

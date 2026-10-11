@@ -44,6 +44,39 @@
   color: var(--text-2);
 }
 
+.pe-code {
+  margin: 0;
+  padding: 12px 14px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--well);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.pe-code__line {
+  display: block;
+  padding: 0 6px;
+  border-left: 3px solid transparent;
+  white-space: pre;
+}
+
+.pe-code__line.is-on {
+  border-left-color: var(--gold);
+  background: var(--gold-bg);
+}
+
+.pe-code__line.is-off {
+  opacity: 0.45;
+}
+
+.pe-code__cm {
+  color: var(--muted);
+}
+
 .intro-case {
   margin: 6px 0 0;
   font-size: 13px;

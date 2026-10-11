@@ -2,7 +2,7 @@ import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import { PlaneGeometry, type Mesh } from 'three'
 import { useScene } from '../context/SceneContext'
-import { CHANNEL_COUNT, LB, ftRoute, towerPinXZ } from '../data/layout'
+import { CHANNEL_COUNT, LB, LB_SPEC, ftRoute, pcbSurfaceLift, towerPinXZ, type Vec3 } from '../data/layout'
 import {
   BGA_PAD_R,
   CAP_TERM,
@@ -25,25 +25,34 @@ import {
   headerPins,
   socketPads,
 } from '../data/loadboard'
-import { GEO, MAT, SECTION_PLANE, lbMaterials, relayTopMaterial } from '../data/materials'
+import { GEO, MAT, SECTION_PLANE, lbCopperMaterials, lbMaterials, relayTopMaterial } from '../data/materials'
 import { frameGeometry } from '../data/shapes'
 import { BoardCopper } from './BoardCopper'
 import { InstancedParts, type InstanceItem } from './Instanced'
 import { LayerGroup } from './LayerGroup'
+import { PcbSheets, PcbSlot, PcbVias, SPREAD_MIN } from './PcbStack'
 
 const UNIT_PLANE = new PlaneGeometry(1, 1)
 const HEADER_SHROUD = frameGeometry(HEADER.w, HEADER.d, HEADER.w - 0.03, HEADER.d - 0.03, HEADER.h)
+/** 分解后总标注挪到右后角、顶面器件上方，不和左右两列的分层标签挤在一起 */
+const EXPLODED_LABEL = {
+  position: [LB.w / 2 + 0.2, LB.t / 2 + pcbSurfaceLift(LB_SPEC, 1) + 0.45, -LB.d / 2] as Vec3,
+  side: 'right' as const,
+}
 
 /**
  * Load Board / DIB：8 层 PCB。
  * 板体一个盒子、6 个面分别贴图：四周是叠层截面（绿油 / 铜 / 介质交替），顶 / 底面是绿油 + 丝印 + 沉金焊盘；
  * 剖开到 z=0 时在切口贴一张截面图，能看到各层铜箔和贯穿的过孔。
  * 器件：0402 旁路电容、串联电阻、测试点、SMD 继电器、2×12 牛角座、SMA；内层走线和过孔由 BoardCopper 画。
+ * 分解时整块板换成 PcbSheets 的一叠薄片，顶面器件随顶面阻焊、底面焊盘随底面阻焊移动，过孔拉长贯穿各层。
  */
 export function LoadBoard() {
   const { store, cfg } = useScene()
+  const body = useRef<Mesh>(null)
   const cap = useRef<Mesh>(null)
   const mats = lbMaterials(cfg.pkg)
+  const copper = lbCopperMaterials(cfg.pkg)
   const bodyMats = useMemo(() => [mats.side, mats.side, mats.top, mats.bottom, mats.side, mats.side], [mats])
 
   const routes = useMemo(() => Array.from({ length: CHANNEL_COUNT }, (_, ch) => ftRoute(cfg.pkg, ch)), [cfg.pkg])
@@ -64,9 +73,9 @@ export function LoadBoard() {
     [],
   )
 
-  /** 扇出 / 散热过孔孔壁（盖油，不露出板面；剖开或板子半透明时才看得到） */
+  /** 扇出 / 散热过孔孔壁（盖油，不露出板面；剖开、分层展开或板子半透明时才看得到）；y 相对板中心 */
   const vias = useMemo<InstanceItem[]>(
-    () => fanoutVias(cfg.pkg).map(([x, z]) => ({ p: [x, LB.y, z], s: [0.012, LB.t - 0.002, 0.012] })),
+    () => fanoutVias(cfg.pkg).map(([x, z]) => ({ p: [x, 0, z], s: [0.012, LB.t - 0.002, 0.012] })),
     [cfg.pkg],
   )
 
@@ -106,34 +115,53 @@ export function LoadBoard() {
     return { caps, terms, resBodies, relays, relayTops, tps, shrouds, headerPinItems, sma, screws }
   }, [])
 
-  // 剖开到底（切面停在 z=0）后，在切口贴截面图；切面移动途中不显示
+  // 剖开到底（切面停在 z=0）后，在切口贴截面图；切面移动途中、分层展开时不显示
   useFrame(() => {
+    const whole = store.pose.spread <= SPREAD_MIN
+    if (body.current) body.current.visible = whole
     const m = cap.current
     if (!m) return
-    const show = store.section > 0.985
+    const show = whole && store.section > 0.985
     m.visible = show
     if (show) m.position.z = SECTION_PLANE.constant + 0.001
   })
 
-  return (
-    <LayerGroup id="loadboard">
-      <mesh geometry={GEO.box} material={bodyMats} position={[0, LB.y, 0]} scale={[LB.w, LB.t, LB.d]} castShadow receiveShadow />
-      <mesh ref={cap} geometry={UNIT_PLANE} material={mats.cap} position={[0, LB.y, 0]} scale={[LB.w, LB.t, 1]} visible={false} />
+  const bottomSlot = 2 * LB_SPEC.layers.length
 
-      <InstancedParts geometry={cfg.pkg === 'BGA' ? GEO.cyl : GEO.box} material={MAT.gold} items={topPads} />
-      <InstancedParts geometry={GEO.cyl} material={MAT.gold} items={bottomPads} />
-      <InstancedParts geometry={GEO.cyl} material={MAT.copperClip} items={vias} />
-      <InstancedParts geometry={GEO.box} material={MAT.mlcc} items={parts.caps} />
-      <InstancedParts geometry={GEO.box} material={MAT.solder} items={parts.terms} />
-      <InstancedParts geometry={GEO.box} material={MAT.mold} items={parts.resBodies} />
-      <InstancedParts geometry={GEO.sphere} material={MAT.solder} items={parts.tps} />
-      <InstancedParts geometry={GEO.box} material={MAT.relayBody} items={parts.relays} castShadow />
-      <InstancedParts geometry={UNIT_PLANE} material={relayTopMaterial()} items={parts.relayTops} />
-      <InstancedParts geometry={HEADER_SHROUD} material={MAT.plasticGray} items={parts.shrouds} castShadow />
-      <InstancedParts geometry={GEO.box} material={MAT.gold} items={parts.headerPinItems} />
-      <InstancedParts geometry={GEO.cyl6} material={MAT.gold} items={parts.sma} castShadow />
-      <InstancedParts geometry={GEO.cyl} material={MAT.steel} items={parts.screws} />
-      <BoardCopper routes={routes} boardY={LB.y} thickness={LB.t} selected={cfg.selected} onSelect={cfg.onSelect} tented />
+  return (
+    <LayerGroup id="loadboard" labelAt={cfg.exploded ? EXPLODED_LABEL : undefined}>
+      <mesh ref={body} geometry={GEO.box} material={bodyMats} position={[0, LB.y, 0]} scale={[LB.w, LB.t, LB.d]} castShadow receiveShadow />
+      <mesh ref={cap} geometry={UNIT_PLANE} material={mats.cap} position={[0, LB.y, 0]} scale={[LB.w, LB.t, 1]} visible={false} />
+      <PcbSheets
+        id="loadboard"
+        spec={LB_SPEC}
+        boardY={LB.y}
+        outline={{ w: LB.w, d: LB.d }}
+        copper={copper}
+        maskTop={[mats.top]}
+        maskBottom={mats.bottom}
+      />
+
+      <PcbSlot spec={LB_SPEC} slot={0}>
+        <InstancedParts geometry={cfg.pkg === 'BGA' ? GEO.cyl : GEO.box} material={MAT.gold} items={topPads} />
+        <InstancedParts geometry={GEO.box} material={MAT.mlcc} items={parts.caps} />
+        <InstancedParts geometry={GEO.box} material={MAT.solder} items={parts.terms} />
+        <InstancedParts geometry={GEO.box} material={MAT.mold} items={parts.resBodies} />
+        <InstancedParts geometry={GEO.sphere} material={MAT.solder} items={parts.tps} />
+        <InstancedParts geometry={GEO.box} material={MAT.relayBody} items={parts.relays} castShadow />
+        <InstancedParts geometry={UNIT_PLANE} material={relayTopMaterial()} items={parts.relayTops} />
+        <InstancedParts geometry={HEADER_SHROUD} material={MAT.plasticGray} items={parts.shrouds} castShadow />
+        <InstancedParts geometry={GEO.box} material={MAT.gold} items={parts.headerPinItems} />
+        <InstancedParts geometry={GEO.cyl6} material={MAT.gold} items={parts.sma} castShadow />
+        <InstancedParts geometry={GEO.cyl} material={MAT.steel} items={parts.screws} />
+      </PcbSlot>
+      <PcbSlot spec={LB_SPEC} slot={bottomSlot}>
+        <InstancedParts geometry={GEO.cyl} material={MAT.gold} items={bottomPads} />
+      </PcbSlot>
+      <PcbVias spec={LB_SPEC} boardY={LB.y}>
+        <InstancedParts geometry={GEO.cyl} material={MAT.copperClip} items={vias} />
+      </PcbVias>
+      <BoardCopper routes={routes} spec={LB_SPEC} boardY={LB.y} selected={cfg.selected} onSelect={cfg.onSelect} tented />
     </LayerGroup>
   )
 }
