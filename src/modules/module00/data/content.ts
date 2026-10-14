@@ -387,6 +387,10 @@ export const TAKEAWAY: LText[] = [
     '结果是 Bin 号：FT 时 Handler 按 Bin 分拣，CP 时记进晶圆 Bin 图；好品数 ÷ 测试数 = 良率。',
     'The result is a Bin number: in FT the handler sorts by it, in CP it goes into the wafer bin map. Good count ÷ tested count = yield.',
   ),
+  loc(
+    '产业角色、封装形态等底子见预备轨 {@pIndustry}、{@pPackage}；物理怎么接到 ATE 见下一课 {@connection}。',
+    'Industry roles and package shapes are in the Prep track {@pIndustry}, {@pPackage}; how the DUT hooks to the ATE is the next lesson {@connection}.',
+  ),
 ]
 
 export const QUIZ: QuizQuestion[] = [

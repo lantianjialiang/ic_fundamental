@@ -795,6 +795,10 @@ export const TAKEAWAY: LText[] = [
     '负载板要阻抗匹配、等长；探针台全封闭防光防污染；分选机至少 3 个 Bin。',
     'Load boards need impedance and length matching; probers are fully enclosed against light and contamination; a handler needs at least 3 bins.',
   ),
+  loc(
+    'Fab 工艺主线与封装形态预习见 {@pSilicon}、{@pPackage}；DUT 怎么接到 ATE 的 3D 细节见 {@connection}。',
+    'Preview the fab process spine and package shapes in {@pSilicon}, {@pPackage}; 3D DUT-to-ATE hookup is in {@connection}.',
+  ),
 ]
 
 export const QUIZ: QuizQuestion[] = [

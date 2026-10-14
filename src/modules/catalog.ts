@@ -3,6 +3,13 @@
  * 所以调整、插入课程时不用改编号。
  */
 export const MODULE_IDS = [
+  'pIndustry',
+  'pHistory',
+  'pSilicon',
+  'pPackage',
+  'pParts',
+  'pDigital',
+  'pMeasure',
   'intro',
   'connection',
   'ate',

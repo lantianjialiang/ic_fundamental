@@ -27,6 +27,13 @@ const GlossaryPage = page<GlossaryPageProps>(() => import('./glossary/GlossaryPa
 const FaqPage = page<FaqPageProps>(() => import('./faq/FaqPage'), 'FaqPage')
 
 const LESSONS: Record<Exclude<ModuleId, 'intro'>, ComponentType<LessonProps>> = {
+  pIndustry: page(() => import('./modules/prep/PrepIndustryPage'), 'PrepIndustryPage'),
+  pHistory: page(() => import('./modules/prep/PrepHistoryPage'), 'PrepHistoryPage'),
+  pSilicon: page(() => import('./modules/prep/PrepSiliconPage'), 'PrepSiliconPage'),
+  pPackage: page(() => import('./modules/prep/PrepPackagePage'), 'PrepPackagePage'),
+  pParts: page(() => import('./modules/prep/PrepPartsPage'), 'PrepPartsPage'),
+  pDigital: page(() => import('./modules/prep/PrepDigitalPage'), 'PrepDigitalPage'),
+  pMeasure: page(() => import('./modules/prep/PrepMeasurePage'), 'PrepMeasurePage'),
   connection: page(() => import('./modules/module01/Module01Page'), 'Module01Page'),
   ate: page(() => import('./modules/module03/Module03Page'), 'Module03Page'),
   pmu: page(() => import('./modules/module04/Module04Page'), 'Module04Page'),

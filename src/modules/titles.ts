@@ -3,6 +3,13 @@ import { ui } from '../i18n/ui'
 import { type ModuleId } from './catalog'
 
 export const LESSON_TITLE: Record<ModuleId, LText> = {
+  pIndustry: ui.pIndustry.title,
+  pHistory: ui.pHistory.title,
+  pSilicon: ui.pSilicon.title,
+  pPackage: ui.pPackage.title,
+  pParts: ui.pParts.title,
+  pDigital: ui.pDigital.title,
+  pMeasure: ui.pMeasure.title,
   intro: ui.m01.title,
   connection: ui.m02.title,
   ate: ui.m03.title,

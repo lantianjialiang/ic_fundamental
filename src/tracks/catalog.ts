@@ -2,6 +2,7 @@ import { loc, type LText } from '../i18n/locale'
 import { type ModuleId } from '../modules/catalog'
 
 export type TrackId =
+  | 'prep'
   | 'digital'
   | 'fund'
   | 'bench'
@@ -28,6 +29,46 @@ export const TRACKS: Array<{
   knowledge: Array<{ title: LText; text: LText }>
   page?: TrackPageKind
 }> = [
+  {
+    id: 'prep',
+    title: loc('预备', 'Prep'),
+    blurb: loc(
+      '产业与历史、硅到封装、元器件与数字认图、桌上怎么量——再进 D / F 测法主线。{@pIndustry}–{@pMeasure}。',
+      'Industry and history, silicon to package, components and digital diagrams, bench measurement—then the D / F test spine. {@pIndustry}–{@pMeasure}.',
+    ),
+    ready: true,
+    lessons: ['pIndustry', 'pHistory', 'pSilicon', 'pPackage', 'pParts', 'pDigital', 'pMeasure'],
+    knowledge: [
+      {
+        title: loc('产业角色', 'Industry roles'),
+        text: loc('Fabless / Foundry / IDM / OSAT。{@pIndustry}。测试位置见 {@intro}。', 'Fabless / Foundry / IDM / OSAT. {@pIndustry}. Where test sits: {@intro}.'),
+      },
+      {
+        title: loc('简史与测不完', 'History and why exhaustive fails'),
+        text: loc('{@pHistory}。向量与 Scan 见 {@vector}–{@scan}、{@fScan}。', '{@pHistory}. Vectors and Scan: {@vector}–{@scan}, {@fScan}.'),
+      },
+      {
+        title: loc('硅到 Die', 'Silicon to die'),
+        text: loc('工艺主线与 Yield。{@pSilicon}。设备现场见 {@fAte}。', 'Process spine and yield. {@pSilicon}. Floor equipment: {@fAte}.'),
+      },
+      {
+        title: loc('封装与 CP / FT', 'Package and CP / FT'),
+        text: loc('{@pPackage}。物理连接见 {@connection}；链路总览见 {@intro}。', '{@pPackage}. Physical hookup: {@connection}; chain overview: {@intro}.'),
+      },
+      {
+        title: loc('元器件认图', 'Component literacy'),
+        text: loc('{@pParts}。桌上测量见 {@pMeasure}。', '{@pParts}. Bench measurement: {@pMeasure}.'),
+      },
+      {
+        title: loc('数字认图', 'Digital diagrams'),
+        text: loc('门、触发器、电平窗口（浅）。{@pDigital}。加深见 {@fBasics}。', 'Gates, flip-flops, level windows (light). {@pDigital}. Deeper: {@fBasics}.'),
+      },
+      {
+        title: loc('定律与桌上测量', 'Laws and bench measurement'),
+        text: loc('{@pMeasure}。PMU Force / Measure 见 {@fIntro}；开短路见 {@fOpens}。', '{@pMeasure}. PMU force / measure: {@fIntro}; opens / shorts: {@fOpens}.'),
+      },
+    ],
+  },
   {
     id: 'digital',
     title: loc('基础 / 数字', 'Basics / Digital'),
@@ -57,7 +98,10 @@ export const TRACKS: Array<{
     knowledge: [
       {
         title: loc('产业位置', 'Where test sits'),
-        text: loc('{@intro}。CP / FT、ATE、DUT、Bin、Yield。', '{@intro}. CP / FT, ATE, DUT, Bin, Yield.'),
+        text: loc(
+          '{@intro}。CP / FT、ATE、DUT、Bin、Yield。产业角色预习 {@pIndustry}。',
+          '{@intro}. CP / FT, ATE, DUT, Bin, Yield. Industry roles preview: {@pIndustry}.',
+        ),
       },
       {
         title: loc('物理连接', 'Physical connection'),
@@ -745,6 +789,8 @@ export const TRACKS: Array<{
 
 /** 课程编号前缀：课程编号 = 前缀 + 它在所属轨道里的序号 */
 const PREFIX: Record<TrackId, string> = {
+  // 预备轨用 B（Before）：power 轨道已占用 P
+  prep: 'B',
   digital: 'D',
   fund: 'F',
   bench: 'X',

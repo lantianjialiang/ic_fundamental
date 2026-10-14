@@ -32,6 +32,7 @@ Lesson codes are generated from track prefix + sequence (e.g. `F01`, `D03`). Ins
 
 | Track | Prefix | Lessons | Focus |
 |---|---|---|---|
+| Prep | B | 7 | Industry roles, history, silicon→die, packaging & CP/FT, components, digital diagrams, bench measurement—then enter D / F |
 | Foundations / Digital | D | 16 | Industry context, 3D physical hookup, ATE / PMU, specs, DC / functional / timing & AC, vectors, Scan, programs & debug, Shmoo, virtual ALU, latch-up intro, virtual ATE workstation |
 | Digital test fundamentals | F | 16 | From Ohm’s law through production order: opens/shorts, DC, functional, AC, characterization, vectors, programming, debug, latch-up, and Scan |
 | Interactive labs | X | 2 | Set Period / Drive / Strobe and leakage limits yourself; virtual ATE workstation for IDDQ and opens/shorts, datalog, fault diagnosis |
@@ -254,6 +255,7 @@ Issues and pull requests are welcome. When changing UI or adding lessons:
 
 | 轨道 | 前缀 | 课数 | 内容 |
 |---|---|---|---|
+| 预备 | B | 7 | 产业角色、简史、硅到 Die、封装与 CP/FT、元器件、数字认图、桌上测量——再进 D / F |
 | 基础 / 数字 | D | 16 | 产业位置、3D 物理连接、ATE / PMU、规格、DC / 功能 / 时序与 AC、向量、Scan、程序与排错、Shmoo、虚拟 ALU、闩锁入口、虚拟 ATE 工作站 |
 | 数字测试基础 | F | 16 | 从欧姆定律讲起，按量产顺序走完开短路、DC、功能、AC、表征、向量、写程序、排错、闩锁和 Scan |
 | 交互实验 | X | 2 | 自己设 Period / Drive / Strobe 和 Leakage 限流；虚拟 ATE 工作站跑 IDDQ 与开短路、读 Datalog、诊断故障 |

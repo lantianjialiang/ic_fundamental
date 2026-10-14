@@ -700,4 +700,54 @@ export const ui = {
     title: loc('Scan 测试原理', 'Scan Test Principles'),
     goal: loc('时序电路为什么难测；Scan 怎么把触发器串成移位寄存器；Flush / Shift 测试和 Scan 专用测试机。', 'Why sequential circuits are hard to test; how scan chains flip-flops into a shift register; flush / shift tests and dedicated scan testers.'),
   },
+
+  pIndustry: {
+    title: loc('半导体产业', 'Semiconductor Industry'),
+    goal: loc(
+      '能画出设计 → 制造 → 封测 → 出货的产业链，并说出 Fabless、Foundry、IDM、OSAT 各自干什么。',
+      'Sketch design → fab → assembly/test → ship, and say what Fabless, Foundry, IDM and OSAT each do.',
+    ),
+  },
+  pHistory: {
+    title: loc('半导体简史', 'Semiconductor History'),
+    goal: loc(
+      '能按时间说出若干里程碑，并说明集成度上升后为什么穷举测会垮掉。',
+      'Name a few milestones in order, and explain why exhaustive test collapses as integration rises.',
+    ),
+  },
+  pSilicon: {
+    title: loc('从硅到芯片', 'From Silicon to Chip'),
+    goal: loc(
+      '能解释 Wafer、Die、Lot、Yield，并能按顺序说出从前端工艺到划片的主线。',
+      'Explain wafer, die, lot and yield, and list the front-end process spine through dicing.',
+    ),
+  },
+  pPackage: {
+    title: loc('封装与测试', 'IC Packaging and Testing'),
+    goal: loc(
+      '能认出常见封装外形，并说清 CP 与 FT 的差别：在哪测、测什么、为什么都要。',
+      'Recognize common packages and contrast CP vs FT: where, what, and why both exist.',
+    ),
+  },
+  pParts: {
+    title: loc('电子元器件', 'Electronic Components'),
+    goal: loc(
+      '能认 R/C/L、二极管、BJT/MOS、运放符号，并说出各自最基本的作用。',
+      'Recognize R/C/L, diode, BJT/MOS and op-amp symbols, and state each one’s basic job.',
+    ),
+  },
+  pDigital: {
+    title: loc('数字电路基础', 'Digital Circuit Basics'),
+    goal: loc(
+      '会读基本门的真值表，分清组合与时序，认识 D 触发器；知道逻辑 0/1 最终要落到电压窗口。',
+      'Read basic gate truth tables, tell combinational from sequential, know the D flip-flop, and that logic 0/1 is a voltage window.',
+    ),
+  },
+  pMeasure: {
+    title: loc('基本定律与测量', 'Basic Laws and Measuring'),
+    goal: loc(
+      '会用 V=IR、P=VI 做数量级估算；说清电压表并联、电流表串联；知道接错的后果。',
+      'Estimate with V=IR and P=VI; state voltmeter in parallel and ammeter in series; know what a wrong hookup does.',
+    ),
+  },
 }

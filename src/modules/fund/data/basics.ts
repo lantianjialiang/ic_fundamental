@@ -502,6 +502,10 @@ export const TAKEAWAY: LText[] = [
     'TTL 典型电平 VIL 0.8 / VIH 2.0 / VOL 0.4 / VOH 2.4，噪声容限 0.4 V；D 触发器在上升沿采样，是 1 位存储器。',
     'Typical TTL levels VIL 0.8 / VIH 2.0 / VOL 0.4 / VOH 2.4, noise margin 0.4 V; a D flip-flop samples on the rising edge and is a 1-bit memory.',
   ),
+  loc(
+    '更浅的认图预习见预备轨 {@pDigital}、{@pMeasure}、{@pParts}；本课把电学与逻辑讲深一层。',
+    'A lighter diagram-first preview is in the Prep track {@pDigital}, {@pMeasure}, {@pParts}; this lesson goes one layer deeper on electronics and logic.',
+  ),
 ]
 
 export const QUIZ: QuizQuestion[] = [
