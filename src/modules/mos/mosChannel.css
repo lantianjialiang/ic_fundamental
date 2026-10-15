@@ -1,0 +1,24 @@
+/* 沟道课：粒子和耗尽区的过渡动画；系统要求减少动态效果时直接跳到终点 */
+.mosChannel-p {
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.mosChannel-dep {
+  transition: height 0.5s ease, transform 0.5s ease;
+}
+
+.mosChannel-fade {
+  transition: opacity 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mosChannel-p,
+  .mosChannel-dep,
+  .mosChannel-fade {
+    transition: none;
+  }
+}
+
+.mosChannel-plot-wrap {
+  margin-top: 10px;
+}

@@ -1,0 +1,119 @@
+/* pcbFlow lesson: small additions on top of prep.css */
+
+.pcbFlow-hot {
+  cursor: pointer;
+  outline: none;
+}
+
+.pcbFlow-hot:hover > rect:first-child {
+  stroke: var(--text-2);
+  stroke-dasharray: 4 3;
+}
+
+.pcbFlow-hot:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.pcbFlow-detail {
+  display: grid;
+  grid-template-columns: 8em 1fr;
+  gap: 4px 12px;
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.pcbFlow-detail dt {
+  color: var(--muted);
+}
+
+.pcbFlow-detail dd {
+  margin: 0;
+  color: var(--text-2);
+}
+
+.pcbFlow-loop {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.pcbFlow-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.pcbFlow-found {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.pcbFlow-found b {
+  color: var(--gold);
+}
+
+.pcbFlow-group {
+  margin-top: 14px;
+}
+
+.pcbFlow-group h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+.pcbFlow-check {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 4px 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.pcbFlow-check + .pcbFlow-check {
+  margin-top: 6px;
+}
+
+.pcbFlow-check.is-on {
+  border-color: var(--green-line);
+  background: var(--green-bg);
+}
+
+.pcbFlow-check input {
+  margin-top: 2px;
+}
+
+.pcbFlow-check small {
+  grid-column: 2;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.pcbFlow-meter {
+  height: 8px;
+  margin: 6px 0 4px;
+  border-radius: 4px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.pcbFlow-meter > span {
+  display: block;
+  height: 100%;
+  background: var(--green);
+  transition: width 0.25s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pcbFlow-meter > span {
+    transition: none;
+  }
+}

@@ -1,0 +1,101 @@
+.pcbFab-timeline {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 0 0 6px;
+  list-style: none;
+  overflow-x: auto;
+}
+
+.pcbFab-timeline li {
+  flex: 1 0 74px;
+}
+
+.pcbFab-timeline button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  min-height: 52px;
+  padding: 6px 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+  color: var(--text-2);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.25;
+  text-align: center;
+  cursor: pointer;
+}
+
+.pcbFab-timeline button b {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.pcbFab-timeline button:hover {
+  background: var(--card-hover);
+}
+
+.pcbFab-timeline button.is-done {
+  border-color: var(--green-line);
+}
+
+.pcbFab-timeline button.is-active {
+  border-color: var(--gold);
+  background: var(--gold-bg);
+  color: var(--gold);
+}
+
+.pcbFab-timeline button:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.pcbFab-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.pcbFab-controls input[type='range'] {
+  flex: 1 1 200px;
+  min-width: 160px;
+}
+
+.pcbFab-controls__pos {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.pcbFab-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 6px 0 2px;
+  padding: 0;
+  color: var(--text-2);
+  font-size: 12px;
+  list-style: none;
+}
+
+.pcbFab-legend li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pcbFab-legend i {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+}

@@ -3,6 +3,8 @@ import { type ModuleId } from '../modules/catalog'
 
 export type TrackId =
   | 'prep'
+  | 'mos'
+  | 'pcb'
   | 'digital'
   | 'fund'
   | 'bench'
@@ -66,6 +68,116 @@ export const TRACKS: Array<{
       {
         title: loc('定律与桌上测量', 'Laws and bench measurement'),
         text: loc('{@pMeasure}。PMU Force / Measure 见 {@fIntro}；开短路见 {@fOpens}。', '{@pMeasure}. PMU force / measure: {@fIntro}; opens / shorts: {@fOpens}.'),
+      },
+    ],
+  },
+  {
+    id: 'mos',
+    title: loc('MOS 管与数字电路', 'MOSFETs and Digital Circuits'),
+    blurb: loc(
+      'MOS 管怎么导通、在哪个区工作，怎样搭出反相器和逻辑门，板上怎么用、怎么选型。{@mosPrimer}–{@mosSelect}。',
+      'How a MOSFET turns on, which region it works in, how it builds inverters and gates, how it is used on boards and how to choose one. {@mosPrimer}–{@mosSelect}.',
+    ),
+    ready: true,
+    lessons: [
+      'mosPrimer',
+      'mosIntro',
+      'mosChannel',
+      'mosRegion',
+      'mosSwitch',
+      'mosInverter',
+      'mosGates',
+      'mosDynamic',
+      'mosApps',
+      'mosReal',
+      'mosSelect',
+    ],
+    knowledge: [
+      {
+        title: loc('预备与认识', 'Primer and first look'),
+        text: loc(
+          'N / P 型、PN 结、RC（选修）{@mosPrimer}；四个端子、NMOS / PMOS、和 BJT 对比 {@mosIntro}。元件认图见 {@pParts}。',
+          'N / P type, PN junction, RC (optional) {@mosPrimer}; four terminals, NMOS / PMOS, comparison with BJT {@mosIntro}. Component literacy: {@pParts}.',
+        ),
+      },
+      {
+        title: loc('沟道与工作区', 'Channel and regions'),
+        text: loc(
+          '积累、耗尽、反型与 Vth {@mosChannel}；截止、线性、饱和与 I-V 曲线 {@mosRegion}。',
+          'Accumulation, depletion, inversion and Vth {@mosChannel}; cutoff, linear, saturation and I-V curves {@mosRegion}.',
+        ),
+      },
+      {
+        title: loc('开关与 CMOS', 'Switches and CMOS'),
+        text: loc(
+          '传好 0 / 传好 1、Rds(on)、高低边 {@mosSwitch}；反相器 VTC 与功耗 {@mosInverter}；NAND / NOR、传输门 {@mosGates}。门的真值表见 {@pDigital}。',
+          'Good 0 / good 1, Rds(on), high / low side {@mosSwitch}; inverter VTC and power {@mosInverter}; NAND / NOR, transmission gates {@mosGates}. Gate truth tables: {@pDigital}.',
+        ),
+      },
+      {
+        title: loc('动态与应用', 'Dynamics and applications'),
+        text: loc(
+          '寄生电容、米勒平台、Qg 和延时 {@mosDynamic}；GPIO 驱动、负载开关、电平转换、H 桥 {@mosApps}。',
+          'Parasitic capacitance, Miller plateau, Qg and delay {@mosDynamic}; GPIO drive, load switches, level shifting, H-bridges {@mosApps}.',
+        ),
+      },
+      {
+        title: loc('可靠性与选型', 'Reliability and selection'),
+        text: loc(
+          '体二极管、漏电、ESD、闩锁 {@mosReal}；数据手册与综合任务 {@mosSelect}。测法见 {@dc}、{@latch}、{@fDc}。',
+          'Body diode, leakage, ESD, latch-up {@mosReal}; datasheets and the capstone {@mosSelect}. How they are tested: {@dc}, {@latch}, {@fDc}.',
+        ),
+      },
+    ],
+  },
+  {
+    id: 'pcb',
+    title: loc('PCB 入门', 'PCB Basics'),
+    blurb: loc(
+      'PCB 怎么造出来、怎么从设计变成成品；看懂 PCB 文件和术语，并按清单完成一块双层小板。{@pcbIntro}–{@pcbDfm}。',
+      'How a PCB is made and how a design becomes a finished board; read PCB files and terms, then check a small two-layer board against a list. {@pcbIntro}–{@pcbDfm}.',
+    ),
+    ready: true,
+    lessons: [
+      'pcbIntro',
+      'pcbMaterial',
+      'pcbStack',
+      'pcbFab',
+      'pcbSupply',
+      'pcbFlow',
+      'pcbBasics',
+      'pcbLayout',
+      'pcbTools',
+      'pcbDfm',
+    ],
+    knowledge: [
+      {
+        title: loc('知道：板子是什么、怎么造', 'Know: what a board is and how it is made'),
+        text: loc(
+          '作用与分类 {@pcbIntro}；材料与表面处理 {@pcbMaterial}；叠层与过孔 {@pcbStack}；制造流程 {@pcbFab}。',
+          'Jobs and types {@pcbIntro}; materials and finishes {@pcbMaterial}; stack-up and vias {@pcbStack}; fabrication {@pcbFab}.',
+        ),
+      },
+      {
+        title: loc('知道：从设计到成品', 'Know: from design to product'),
+        text: loc(
+          '供应链、交付文件、SMT {@pcbSupply}。测试用的负载板和针卡见 {@connection}。',
+          'Supply chain, deliverables, SMT {@pcbSupply}. Load boards and probe cards used in test: {@connection}.',
+        ),
+      },
+      {
+        title: loc('会做：设计', 'Do: design'),
+        text: loc(
+          '设计流程 {@pcbFlow}；线宽、铺铜、阻抗 {@pcbBasics}；布局布线 {@pcbLayout}；Altium 实操 {@pcbTools}。',
+          'Design flow {@pcbFlow}; trace width, pours, impedance {@pcbBasics}; placement and routing {@pcbLayout}; Altium in practice {@pcbTools}.',
+        ),
+      },
+      {
+        title: loc('会做：自查', 'Do: self-check'),
+        text: loc(
+          'DFM / DFA / DFT、常见错误、综合项目 {@pcbDfm}。封装外形见 {@pPackage}。',
+          'DFM / DFA / DFT, common mistakes, the capstone {@pcbDfm}. Package outlines: {@pPackage}.',
+        ),
       },
     ],
   },
@@ -547,8 +659,8 @@ export const TRACKS: Array<{
       {
         title: loc('阈值与电荷', 'Threshold and charge'),
         text: loc(
-          'Vth、Qg、Ciss。开关快慢首先是电荷，不是数字 Period。',
-          'Vth, Qg, Ciss. Switching speed is about charge first, not a digital period.',
+          'Vth、Qg、Ciss。开关快慢首先是电荷，不是数字 Period。器件层面见 {@mosDynamic}、{@mosSelect}。',
+          'Vth, Qg, Ciss. Switching speed is about charge first, not a digital period. Device level: {@mosDynamic}, {@mosSelect}.',
         ),
       },
       {
@@ -791,6 +903,9 @@ export const TRACKS: Array<{
 const PREFIX: Record<TrackId, string> = {
   // 预备轨用 B（Before）：power 轨道已占用 P
   prep: 'B',
+  // MOS 轨用 T（Transistor）：M 已给 Memory；PCB 轨用 L（Layout）：P 已给 power、B 已给预备
+  mos: 'T',
+  pcb: 'L',
   digital: 'D',
   fund: 'F',
   bench: 'X',

@@ -1,0 +1,176 @@
+/* pcbTools lesson: small additions on top of prep.css */
+
+.pcbTools-split {
+  display: grid;
+  grid-template-columns: minmax(200px, 250px) 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .pcbTools-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pcbTools-tree {
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+  padding: 6px 0;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.pcbTools-grp {
+  padding: 4px 10px;
+  color: var(--muted);
+}
+
+.pcbTools-grp small {
+  margin-left: 6px;
+  font-family: inherit;
+  opacity: 0.8;
+}
+
+.pcbTools-file {
+  display: block;
+  width: 100%;
+  padding: 5px 10px;
+  border: 0;
+  border-left: 3px solid transparent;
+  background: transparent;
+  color: var(--text-2);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pcbTools-file:hover {
+  background: var(--card-hover);
+}
+
+.pcbTools-file.is-active {
+  border-left-color: var(--gold);
+  background: var(--gold-bg);
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.pcbTools-file:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
+
+.pcbTools-detail {
+  display: grid;
+  grid-template-columns: 8em 1fr;
+  gap: 4px 12px;
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.pcbTools-detail dt {
+  color: var(--muted);
+}
+
+.pcbTools-detail dd {
+  margin: 0;
+  color: var(--text-2);
+}
+
+.pcbTools-keys {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  background: var(--card);
+  font-family: var(--mono);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.pcbTools-checks {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
+
+.pcbTools-rowbtn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pcbTools-rowbtn:hover {
+  color: var(--gold);
+}
+
+.pcbTools-rowbtn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+tr.pcbTools-on td {
+  background: var(--gold-bg);
+}
+
+.pcbTools-quote {
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .pcbTools-quote {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pcbTools-field {
+  margin-bottom: 8px;
+}
+
+.pcbTools-field > span {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.pcbTools-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border: 1px solid var(--gold-line);
+  border-radius: 10px;
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pcbTools-num {
+  text-align: right;
+  font-family: var(--mono);
+  white-space: nowrap;
+}
+
+.pcbTools-up {
+  color: var(--red);
+}
+
+.pcbTools-down {
+  color: var(--green);
+}
+
+.pcbTools-formula {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-2);
+  word-break: break-word;
+}

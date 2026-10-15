@@ -197,7 +197,7 @@ export function PrepDigitalPage({ moduleId, onModuleChange }: Props) {
         <Callout tone="warn">
           <p>{t(LEVEL.text)}</p>
         </Callout>
-        <Related ids={['dc', 'fDc', 'func', 'fBasics']} onOpen={onModuleChange} />
+        <Related ids={['dc', 'fDc', 'func', 'fBasics', 'mosInverter', 'mosGates']} onOpen={onModuleChange} />
       </Section>
 
       <Section title={t(S.takeawayTitle)}>

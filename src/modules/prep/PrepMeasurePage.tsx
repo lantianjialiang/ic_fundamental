@@ -175,7 +175,7 @@ export function PrepMeasurePage({ moduleId, onModuleChange }: Props) {
         <Callout>
           <p>{t(SCOPE_TEXT)}</p>
         </Callout>
-        <Related ids={['timing', 'fAc']} onOpen={onModuleChange} />
+        <Related ids={['timing', 'fAc', 'mosDynamic']} onOpen={onModuleChange} />
       </Section>
 
       <Section title={t(S.benchTitle)}>

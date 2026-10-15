@@ -1,0 +1,25 @@
+.mosRegion-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+  align-items: start;
+}
+
+.mosRegion-grid .term-fig {
+  min-width: 0;
+}
+
+.mosRegion-cell {
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.mosRegion-cell .readout {
+  margin-top: 0;
+}
+
+@media (max-width: 960px) {
+  .mosRegion-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

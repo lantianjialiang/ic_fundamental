@@ -88,7 +88,7 @@ export function PrepPartsPage({ moduleId, onModuleChange }: Props) {
           </p>
           <RefP text={partItem.test} onOpen={onModuleChange} />
         </Callout>
-        <Related ids={['fOpens', 'pmu', 'dc', 'connection']} onOpen={onModuleChange} />
+        <Related ids={['fOpens', 'pmu', 'dc', 'connection', 'mosIntro']} onOpen={onModuleChange} />
       </Section>
 
       <Section title={t(S.demoTitle)} note={t(S.demoNote)}>
@@ -119,7 +119,7 @@ export function PrepPartsPage({ moduleId, onModuleChange }: Props) {
         <Callout tone="warn">
           <p>{t(demoItem.text)}</p>
         </Callout>
-        <Related ids={['fOpens', 'pmu', 'fDc', 'spec']} onOpen={onModuleChange} />
+        <Related ids={['fOpens', 'pmu', 'fDc', 'spec', 'mosRegion']} onOpen={onModuleChange} />
       </Section>
 
       <Section title={t(S.takeawayTitle)}>

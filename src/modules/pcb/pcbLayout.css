@@ -1,0 +1,16 @@
+/* pcbLayout lesson: small additions on top of prep.css */
+
+.pcbLayout-ctrl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 4px 12px;
+}
+
+.pcbLayout-ctrl .seg {
+  margin: 0 0 12px;
+}
+
+.pcbLayout-ctrl .lab__btn {
+  margin-bottom: 12px;
+}

@@ -1,0 +1,48 @@
+.mosApps-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 10px 0;
+}
+
+.mosApps-row > b {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mosApps-row--fault {
+  padding: 8px 10px;
+  border: 1px dashed var(--red-line);
+  border-radius: 8px;
+  background: var(--red-bg);
+}
+
+.mosApps-row--fault > b {
+  color: var(--red-2);
+}
+
+.mosApps-part {
+  margin: 0 0 8px;
+}
+
+.mosApps-part b {
+  margin-right: 0.6em;
+  color: var(--gold);
+}
+
+.mosApps-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--blue);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.mosApps-link:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}

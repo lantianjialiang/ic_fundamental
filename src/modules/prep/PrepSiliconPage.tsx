@@ -142,7 +142,7 @@ export function PrepSiliconPage({ moduleId, onModuleChange }: Props) {
             {t(layerItem.fault)}
           </p>
         </Callout>
-        <Related ids={['scan', 'fScan', 'fOpens', 'fDc']} onOpen={onModuleChange} />
+        <Related ids={['scan', 'fScan', 'fOpens', 'fDc', 'mosChannel']} onOpen={onModuleChange} />
       </Section>
 
       <Section title={t(S.cpTitle)}>

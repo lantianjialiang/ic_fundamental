@@ -1,0 +1,121 @@
+/* pcbDfm lesson: small additions on top of prep.css */
+
+.pcbDfm-hot {
+  cursor: pointer;
+  outline: none;
+}
+
+.pcbDfm-hot:hover > rect:first-child {
+  stroke: var(--text-2);
+  stroke-dasharray: 4 3;
+}
+
+.pcbDfm-hot:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.pcbDfm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.pcbDfm-found {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.pcbDfm-found b {
+  color: var(--gold);
+}
+
+.pcbDfm-group {
+  margin-top: 14px;
+}
+
+.pcbDfm-group h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+.pcbDfm-check {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 4px 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.pcbDfm-check + .pcbDfm-check {
+  margin-top: 6px;
+}
+
+.pcbDfm-check.is-on {
+  border-color: var(--green-line);
+  background: var(--green-bg);
+}
+
+.pcbDfm-check input {
+  margin-top: 2px;
+}
+
+.pcbDfm-check small {
+  grid-column: 2;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.pcbDfm-meter {
+  height: 8px;
+  margin: 6px 0 4px;
+  border-radius: 4px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.pcbDfm-meter > span {
+  display: block;
+  height: 100%;
+  background: var(--green);
+  transition: width 0.25s ease;
+}
+
+.pcbDfm-detail {
+  display: grid;
+  grid-template-columns: 6em 1fr;
+  gap: 4px 12px;
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.pcbDfm-detail dt {
+  color: var(--muted);
+}
+
+.pcbDfm-detail dd {
+  margin: 0;
+  color: var(--text-2);
+}
+
+.pcbDfm-missing {
+  margin: 6px 0 0;
+  padding-left: 20px;
+  font-size: 13px;
+}
+
+.pcbDfm-missing b {
+  color: var(--gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pcbDfm-meter > span {
+    transition: none;
+  }
+}

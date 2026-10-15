@@ -1,0 +1,48 @@
+.pcbMaterial-group {
+  margin: 8px 0 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.pcbMaterial-group > b {
+  margin-right: 8px;
+  color: var(--text-2);
+}
+
+.pcbMaterial-dots {
+  white-space: nowrap;
+  letter-spacing: 1px;
+  color: var(--gold);
+}
+
+.pcbMaterial-dots span {
+  color: var(--line);
+}
+
+.pcbMaterial-row {
+  cursor: pointer;
+}
+
+.pcbMaterial-row.is-active td {
+  background: var(--gold-bg);
+}
+
+.pcbMaterial-pick {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pcbMaterial-pick:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.pcbMaterial-table th.is-sorted {
+  color: var(--gold);
+}

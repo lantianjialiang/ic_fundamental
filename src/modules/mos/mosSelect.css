@@ -1,0 +1,116 @@
+/* 综合任务和 SOA 面板：类名都以 mosSelect- 开头 */
+
+.mosSelect-group {
+  margin-top: 16px;
+}
+
+.mosSelect-group > b {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.mosSelect-hint {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.mosSelect-table tr.is-active td {
+  background: var(--gold-bg);
+}
+
+.mosSelect-table td small {
+  margin-left: 6px;
+  color: var(--gold);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.mosSelect-table td,
+.mosSelect-table th {
+  white-space: nowrap;
+}
+
+.mosSelect-checks {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.mosSelect-check {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 4px 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+}
+
+.mosSelect-check.is-pass {
+  border-color: var(--green-line);
+  background: var(--green-bg);
+}
+
+.mosSelect-check.is-fail {
+  border-color: var(--red-line);
+  background: var(--red-bg);
+}
+
+.mosSelect-check.is-skip {
+  opacity: 0.65;
+}
+
+.mosSelect-check__head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-weight: 600;
+}
+
+.mosSelect-check__head span {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.mosSelect-check__badge {
+  font-size: 12px;
+}
+
+.is-pass .mosSelect-check__badge {
+  color: var(--green);
+}
+
+.is-fail .mosSelect-check__badge {
+  color: var(--red);
+}
+
+.mosSelect-check p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.mosSelect-report {
+  margin: 10px 0 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--well);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .mosSelect-check {
+    grid-template-columns: 1fr;
+  }
+}

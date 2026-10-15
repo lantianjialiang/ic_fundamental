@@ -1,0 +1,107 @@
+import { loc, type LText } from '../../../i18n/locale'
+
+export const S = {
+  kickerFlow: loc('供应链流程', 'Supply-chain flow'),
+  kickerFiles: loc('设计交付文件', 'Hand-over files'),
+  kickerChannel: loc('元器件渠道', 'Parts channels'),
+  kickerBuy: loc('采购概念', 'Purchasing'),
+  kickerCost: loc('打样与量产', 'Prototype vs volume'),
+  kickerPanel: loc('拼板', 'Panelization'),
+  kickerSmt: loc('SMT 产线', 'SMT line'),
+  kickerReflow: loc('回流焊曲线', 'Reflow profile'),
+  introTitle: loc('一块板子的路线', 'The route of one board'),
+  flowTitle: loc('从 EDA 到出货：供应链流程图', 'From EDA to shipping: the supply-chain chart'),
+  flowNote: loc(
+    '点任意一站，看它要什么输入、交什么输出、最容易在哪里耽误，以及设计怎样影响它。元器件采购是和裸板并行的一条支线，在 SMT 汇合。',
+    'Click any stage to see its inputs, outputs, common delays and how the design affects it. Parts sourcing runs in parallel with the bare board and joins at SMT.',
+  ),
+  flowCap: loc('示意：六站主线，加一条元器件采购支线。', 'Illustration: six-stage main line plus a parts-sourcing branch.'),
+  inputs: loc('输入：', 'Inputs: '),
+  outputs: loc('输出：', 'Outputs: '),
+  delays: loc('常见延误：', 'Common delays: '),
+  design: loc('设计怎样影响它：', 'How the design affects it: '),
+  filesTitle: loc('设计要交哪些文件', 'What the design hands over'),
+  filesNote: loc('点开每一份，看它装了什么、谁来用、最常出的错。', 'Open each one to see what it holds, who uses it and the most common mistake.'),
+  whatLabel: loc('内容：', 'Contents: '),
+  usedLabel: loc('谁来用：', 'Used by: '),
+  trapLabel: loc('常见坑：', 'Common trap: '),
+  channelTitle: loc('元器件从哪里来', 'Where the parts come from'),
+  channelNote: loc('点图里的方框，比较几种渠道。实线是正规渠道，虚线是有风险的绕路。', 'Click a box to compare channels. Solid arrows are normal channels; dashed arrows are risky detours.'),
+  buyTitle: loc('采购要懂的五个概念', 'Five purchasing concepts'),
+  buyNote: loc('这些概念要在选型时就用上，不要等到出图以后。', 'Use these when choosing parts, not after the layout is finished.'),
+  lifeTitle: loc('生命周期状态', 'Lifecycle states'),
+  lifeState: loc('状态', 'State'),
+  lifeMeaning: loc('含义', 'Meaning'),
+  lifeAction: loc('该怎么做', 'What to do'),
+  costTitle: loc('打样与量产：钱花在哪里', 'Prototype vs volume: where the money goes'),
+  costNote: loc(
+    '改动下面的选项，看单价怎么变。数字是教学用的相对值（示意参数），只看趋势，不是报价。',
+    'Change the options below and watch the unit price move. The numbers are illustrative relative values for teaching, showing trends rather than a quote.',
+  ),
+  layers: loc('层数', 'Layers'),
+  finish: loc('表面处理', 'Finish'),
+  feature: loc('最小线宽线距', 'Min trace/space'),
+  qty: loc('数量（块）', 'Quantity (boards)'),
+  util: loc('拼板利用率', 'Panel utilisation'),
+  unit: loc('单价指数', 'Unit price index'),
+  nreShare: loc('一次性费用占比', 'One-off cost share'),
+  legNre: loc('一次性费用 ÷ 数量', 'One-off ÷ quantity'),
+  legMat: loc('板材与面积', 'Material and area'),
+  legProc: loc('工序', 'Process'),
+  costCap: loc('示意模型：20 cm² 的板，单价 = 一次性费用 ÷ 数量 + 材料 ÷ 利用率 + 工序。', 'Illustrative model: a 20 cm² board; unit price = one-off ÷ quantity + material ÷ utilisation + process.'),
+  panelTitle: loc('拼板、工艺边与定位标记', 'Panels, rails and fiducials'),
+  panelNote: loc('点图里的部件，或右边的名字。', 'Click a part in the drawing or a name on the right.'),
+  panelCap: loc('示意：三块板拼成一张，上下是工艺边；左两块用 V-Cut，右边一块用邮票孔。', 'Illustration: three boards in one panel with rails top and bottom; the left two are split by V-cut, the right one by mouse bites.'),
+  smtTitle: loc('SMT 产线：一块板怎样走完整条线', 'The SMT line: one board, start to finish'),
+  smtNote: loc('从第 1 步开始，逐站播放，也可以点下面的站名。', 'Start at step 1 and play station by station, or click a station name below.'),
+  smtCap: loc('板子侧视图，厚度和锡量为方便看清而放大，示意。', 'Side view of the board; thickness and paste height are exaggerated for clarity.'),
+  flawLabel: loc('常见问题：', 'Typical problems: '),
+  reflowTitle: loc('回流焊温度曲线', 'The reflow temperature profile'),
+  reflowNote: loc('点图里的四个温区，拖动峰值温度，看焊接结果怎么变。', 'Click the four zones in the chart and drag the peak temperature to see how the result changes.'),
+  reflowCap: loc('示意参数：SAC305，升温 1 °C/s，峰值停留 15 s，降温 2 °C/s。', 'Illustrative parameters: SAC305, ramp 1 °C/s, 15 s at peak, cooling 2 °C/s.'),
+  peak: loc('峰值温度', 'Peak temperature'),
+  tal: loc('熔点以上时间', 'Time above liquidus'),
+  verdict: loc('判断', 'Verdict'),
+  takeawayTitle: loc('带走这几句', 'Key takeaways'),
+  quizTitle: loc('复习题', 'Review questions'),
+  quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
+  asideLater: loc(
+    '裸板怎么造见 {@pcbFab}；下一课讲设计流程 {@pcbFlow}；出图前的检查清单在 {@pcbDfm}。',
+    'How the bare board is made: {@pcbFab}; the next lesson covers the design flow, {@pcbFlow}; the pre-release checklist is in {@pcbDfm}.',
+  ),
+  next: loc('下一课：PCB 设计流程', 'Next: The PCB design flow'),
+}
+
+export const INTRO: LText[] = [
+  loc(
+    '一块板子从屏幕上的图变成能开机的产品，要经过六站：EDA 里画好，导出设计文件，PCB 厂做裸板，SMT 厂贴上元器件，测试，出货。裸板怎么造见 {@pcbFab}，画图的流程见 {@pcbFlow}。',
+    'A board goes from a drawing on screen to a product that boots through six stages: draw it in EDA, export design files, have the PCB fab make the bare board, have the SMT line place the parts, test, ship. How the bare board is made is in {@pcbFab}; the drawing flow is in {@pcbFlow}.',
+  ),
+  loc(
+    '每一站都靠上一站交来的东西开工：文件少一份、元器件缺一颗、板边没留工艺边，整条线就会停下来。所以这一课每个环节都问三件事：要什么输入，交什么输出，最容易在哪里耽误。',
+    'Every stage starts from what the previous one hands over: one missing file, one missing part or no rail on the board edge stops the whole line. So for every stage this lesson asks three things: what goes in, what comes out and where it most often stalls.',
+  ),
+]
+
+export const TAKEAWAY: LText[] = [
+  loc(
+    '设计文件缺哪份，对应那一站就开不了工：Gerber 告诉工厂板子长什么样，钻孔文件告诉它孔在哪，BOM 和坐标文件告诉贴片厂贴什么、贴在哪。',
+    'Whichever file is missing blocks the matching stage: Gerber tells the fab what the board looks like, the drill file where the holes go, and the BOM plus centroid file tell the assembler what to place and where.',
+  ),
+  loc(
+    '采购往往比画板更卡进度：交期和 MOQ 决定能不能按时买到，生命周期决定以后还能不能买，所以选型时就要查，并备好第二来源。',
+    'Sourcing often delays a project more than layout does: lead time and MOQ decide whether you can buy on time, lifecycle decides whether you can still buy later, so check them at part selection and line up a second source.',
+  ),
+  loc(
+    '工艺边、工艺孔和 Fiducial 是给机器用的：没有它们，贴片机夹不住板、认不准位置，所以必须在设计时留出来。',
+    'Rails, tooling holes and fiducials are for the machines: without them the placer cannot clamp the board or find its position, so they must be designed in.',
+  ),
+  loc(
+    '回流焊峰值必须高过焊料熔点、又不能烤坏元件：SAC305 约 217 °C 熔化，峰值取 240–250 °C，低了润湿不足，高了逼近元件耐温。',
+    'The reflow peak must exceed the solder melting point without cooking the parts: SAC305 melts near 217 °C, so peak at 240–250 °C; lower wets poorly, higher nears the parts temperature limit.',
+  ),
+  loc(
+    'AOI 只看得见表面，BGA 底下要靠 X 光；ICT 查「焊对了没有」，FCT 查「板子能不能用」，两者回答的是不同问题，所以都要做。',
+    'AOI sees only the surface, so BGAs need X-ray; ICT asks whether it was soldered correctly and FCT whether the board works. They answer different questions, so both are needed.',
+  ),
+]

@@ -1,0 +1,43 @@
+/* mosIntro：开关动画与对比表 */
+
+.mosIntro-flow {
+  stroke-dasharray: 6 8;
+  animation: mosIntro-dash 0.6s linear infinite;
+}
+
+@keyframes mosIntro-dash {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+
+.mosIntro-blade {
+  transition: transform 0.25s ease;
+}
+
+.mosIntro-row {
+  cursor: pointer;
+}
+
+.mosIntro-row:hover td {
+  background: var(--card-hover);
+}
+
+.mosIntro-row.is-active td {
+  background: var(--gold-bg-2);
+}
+
+.mosIntro-row:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mosIntro-flow {
+    animation: none;
+  }
+
+  .mosIntro-blade {
+    transition: none;
+  }
+}

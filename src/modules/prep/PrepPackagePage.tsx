@@ -117,7 +117,7 @@ export function PrepPackagePage({ moduleId, onModuleChange }: Props) {
           </p>
           <RefP text={partItem.text} onOpen={onModuleChange} />
         </Callout>
-        <Related ids={['fOpens', 'connection', 'fQualify']} onOpen={onModuleChange} />
+        <Related ids={['fOpens', 'connection', 'fQualify', 'pcbStack']} onOpen={onModuleChange} />
       </Section>
 
       <Section title={t(S.flowTitle)} note={t(S.flowNote)}>

@@ -1,8 +1,31 @@
 import { type LText } from '../i18n/locale'
 import { ui } from '../i18n/ui'
 import { type ModuleId } from './catalog'
+import { MOS_META } from './mos/meta'
+import { PCB_META } from './pcb/meta'
 
 export const LESSON_TITLE: Record<ModuleId, LText> = {
+  mosPrimer: MOS_META.mosPrimer.title,
+  mosIntro: MOS_META.mosIntro.title,
+  mosChannel: MOS_META.mosChannel.title,
+  mosRegion: MOS_META.mosRegion.title,
+  mosSwitch: MOS_META.mosSwitch.title,
+  mosInverter: MOS_META.mosInverter.title,
+  mosGates: MOS_META.mosGates.title,
+  mosDynamic: MOS_META.mosDynamic.title,
+  mosApps: MOS_META.mosApps.title,
+  mosReal: MOS_META.mosReal.title,
+  mosSelect: MOS_META.mosSelect.title,
+  pcbIntro: PCB_META.pcbIntro.title,
+  pcbMaterial: PCB_META.pcbMaterial.title,
+  pcbStack: PCB_META.pcbStack.title,
+  pcbFab: PCB_META.pcbFab.title,
+  pcbSupply: PCB_META.pcbSupply.title,
+  pcbFlow: PCB_META.pcbFlow.title,
+  pcbBasics: PCB_META.pcbBasics.title,
+  pcbLayout: PCB_META.pcbLayout.title,
+  pcbTools: PCB_META.pcbTools.title,
+  pcbDfm: PCB_META.pcbDfm.title,
   pIndustry: ui.pIndustry.title,
   pHistory: ui.pHistory.title,
   pSilicon: ui.pSilicon.title,
