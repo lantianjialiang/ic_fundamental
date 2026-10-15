@@ -877,8 +877,8 @@ export const TRACKS: Array<{
     id: 'glossary',
     title: loc('术语表', 'Glossary'),
     blurb: loc(
-      '把 D、F 两条轨道里讲到的名词收在一起：原文、中英文名、一句话解释和出处课程。可以搜索，可以按课程或按 A–Z 看。',
-      'Every term from the D and F tracks in one place: the original name, Chinese and English names, a one-line definition and the lessons it comes from. Search it, or browse by lesson or A–Z.',
+      '把 D、F、T（MOS 管）、L（PCB）几条轨道里讲到的名词收在一起：原文、中英文名、一句话解释和出处课程。可以搜索，可以按课程或按 A–Z 看。',
+      'Terms from the D, F, T (MOSFETs) and L (PCB) tracks in one place: the original name, Chinese and English names, a one-line definition and the lessons it comes from. Search it, or browse by lesson or A–Z.',
     ),
     ready: true,
     lessons: [],

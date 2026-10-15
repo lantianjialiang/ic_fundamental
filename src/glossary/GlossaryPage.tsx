@@ -44,9 +44,14 @@ const VIEWS = [
 
 type ViewId = (typeof VIEWS)[number]['id']
 
-/** 分组顺序：先 D 轨，再 F 轨 */
+/** 分组顺序：先 D 轨，再 F 轨，最后 T（MOS）和 L（PCB）轨 */
 const LESSON_ORDER: ModuleId[] = [
-  ...new Set([...(trackById('digital')?.lessons ?? []), ...(trackById('fund')?.lessons ?? [])]),
+  ...new Set([
+    ...(trackById('digital')?.lessons ?? []),
+    ...(trackById('fund')?.lessons ?? []),
+    ...(trackById('mos')?.lessons ?? []),
+    ...(trackById('pcb')?.lessons ?? []),
+  ]),
 ]
 
 const rank = (id: ModuleId) => {

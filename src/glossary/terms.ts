@@ -1,5 +1,7 @@
 import { loc, type LText } from '../i18n/locale'
 import { type ModuleId } from '../modules/catalog'
+import { MOS_TERMS } from './termsMos'
+import { PCB_TERMS } from './termsPcb'
 
 /**
  * 术语表数据：从 D、F 两条轨道各课的术语卡、参数表和正文里汇总。
@@ -18,7 +20,7 @@ export type GlossaryTerm = {
   lessons: ModuleId[]
 }
 
-export const TERMS: GlossaryTerm[] = [
+const BASE_TERMS: GlossaryTerm[] = [
   /* ---------------- D01 什么是半导体测试 ---------------- */
   {
     id: 'cp',
@@ -2011,3 +2013,25 @@ export const TERMS: GlossaryTerm[] = [
     lessons: ['fScan'],
   },
 ]
+
+/** 已有词条里，MOS / PCB 新课也用到的概念：只追加引用，主词条仍在原来的数字测试课程下。 */
+const EXTRA_LESSONS: Record<string, ModuleId[]> = {
+  cmos: ['mosInverter', 'mosGates'],
+  'latch-up': ['mosReal'],
+  esd: ['mosReal'],
+  scr: ['mosReal'],
+  'parasitic-bjt': ['mosReal'],
+  'noise-margin': ['mosInverter'],
+  'open-drain': ['mosApps'],
+  'pull-up-down': ['mosApps'],
+  'r-on': ['mosSwitch'],
+  datasheet: ['mosSelect'],
+  decoupling: ['pcbLayout'],
+  via: ['pcbStack'],
+}
+
+const LINKED_BASE_TERMS: GlossaryTerm[] = BASE_TERMS.map((term) =>
+  EXTRA_LESSONS[term.id] ? { ...term, lessons: [...term.lessons, ...EXTRA_LESSONS[term.id]] } : term,
+)
+
+export const TERMS: GlossaryTerm[] = [...LINKED_BASE_TERMS, ...MOS_TERMS, ...PCB_TERMS]

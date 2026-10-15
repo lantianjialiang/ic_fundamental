@@ -1,5 +1,7 @@
 import { loc, type LText } from '../i18n/locale'
 import { type ModuleId } from '../modules/catalog'
+import { MOS_FAQ_GROUP } from './faqMos'
+import { PCB_FAQ_GROUP } from './faqPcb'
 
 /**
  * 常见问题。
@@ -20,7 +22,7 @@ export type FaqGroup = {
   items: FaqItem[]
 }
 
-export const FAQ_GROUPS: FaqGroup[] = [
+const BASE_FAQ_GROUPS: FaqGroup[] = [
   {
     id: 'basics',
     title: loc('入门与测试流程', 'Getting started and the test flow'),
@@ -475,5 +477,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
     ],
   },
 ]
+
+export const FAQ_GROUPS: FaqGroup[] = [...BASE_FAQ_GROUPS, MOS_FAQ_GROUP, PCB_FAQ_GROUP]
 
 export const FAQ_ITEMS: FaqItem[] = FAQ_GROUPS.flatMap((group) => group.items)
