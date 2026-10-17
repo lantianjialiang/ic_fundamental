@@ -400,11 +400,11 @@ export const TRACKS: Array<{
     id: 'bench',
     title: loc('交互实验', 'Interactive lab'),
     blurb: loc(
-      '时序、Leakage、Pattern / Stuck；再到一台虚拟 ATE 工作站跑 IDDQ 和开短路。自己拧旋钮，立刻 Pass / Fail。现课 {@bench}–{@vate}。',
-      'Timing, leakage, pattern / stuck; then a virtual ATE workstation running IDDQ and opens / shorts. Turn the knobs and see pass / fail at once. Lessons {@bench}–{@vate}.',
+      '时序、Leakage、Pattern / Stuck；再到一台虚拟 ATE 工作站跑 IDDQ 和开短路；最后用一台产线模拟器跑整批 wafer、判故障。现课 {@bench}–{@sim}。',
+      'Timing, leakage, pattern / stuck; then a virtual ATE workstation running IDDQ and opens / shorts; finally a production simulator that runs whole wafers and diagnoses faults. Lessons {@bench}–{@sim}.',
     ),
     ready: true,
-    lessons: ['bench', 'vate'],
+    lessons: ['bench', 'vate', 'sim'],
     knowledge: [
       {
         title: loc('时序模拟器', 'Timing simulator'),
@@ -425,6 +425,13 @@ export const TRACKS: Array<{
         text: loc(
           '{@vate}。IDDQ：选 DUT、VDD、向量、等待时间、量程，看读数为什么 PASS / FAIL / 无效。开短路：注入开路、短路、接触电阻，跑完自己定位故障。',
           '{@vate}. IDDQ: pick the DUT, VDD, vector, settling time and range, and see why the reading passes, fails or is invalid. Opens / shorts: inject opens, shorts and contact resistance, then locate the fault yourself.',
+        ),
+      },
+      {
+        title: loc('产线模拟器', 'Production simulator'),
+        text: loc(
+          '{@sim}。一颗 3.3V 器件、七个测试项、六个 Bin：改限值、跑批量、看 Cpk 与 Wafer Map，再判断过杀、漏检和故障根因；还能自己出题。',
+          '{@sim}. One 3.3 V device, seven tests, six bins: edit limits, run lots, read Cpk and the wafer map, then judge overkill, underkill and the root cause—and write your own question.',
         ),
       },
       {

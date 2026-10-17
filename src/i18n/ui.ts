@@ -750,4 +750,11 @@ export const ui = {
       'Estimate with V=IR and P=VI; state voltmeter in parallel and ammeter in series; know what a wrong hookup does.',
     ),
   },
+  atesim: {
+    title: loc('ATE 产线模拟器', 'ATE production simulator'),
+    goal: loc(
+      '从程序限值、单颗读数到批量良率，再按 Bin、直方图与 Wafer Map 判断故障根因；也能自己出一道题。',
+      'From program limits and single-die readings to lot yield, then judge the root cause from bins, histograms and the wafer map—and write a question of your own.',
+    ),
+  },
 }

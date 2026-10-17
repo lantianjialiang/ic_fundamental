@@ -49,6 +49,7 @@ export const LESSON_TITLE: Record<ModuleId, LText> = {
   latch: ui.m16.title,
   bench: ui.m17.title,
   vate: ui.vate.title,
+  sim: ui.atesim.title,
   fBasics: ui.fBasics.title,
   fAte: ui.fAte.title,
   fIntro: ui.fIntro.title,

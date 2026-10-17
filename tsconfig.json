@@ -9,6 +9,10 @@
 
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
+    // ATE 模拟器的引擎层（rng/dut/instruments/tests/flow/lot/scenarios）是纯 JS、
+    // 不访问 DOM，按原样搬进来复用，只做语法级加载、不逐个补类型
+    "allowJs": true,
+    "checkJs": false,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
