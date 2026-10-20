@@ -1,0 +1,58 @@
+/* RF-04 阻抗匹配与 S 参数：Γ 平面与 |Γ| 曲线 */
+
+.rfs-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.rfs-bg {
+  fill: #0d1117;
+}
+
+.rfs-title {
+  fill: #e6edf3;
+  font: 600 12px Consolas, ui-monospace, monospace;
+}
+
+.rfs-tick {
+  fill: #8b949e;
+  font: 10px Consolas, ui-monospace, monospace;
+}
+
+.rfs-axis {
+  stroke: #484f58;
+  stroke-width: 1;
+}
+
+.rfs-outer {
+  fill: none;
+  stroke: #58a6ff;
+  stroke-width: 1.5;
+}
+
+.rfs-limit {
+  fill: none;
+  stroke: #e8c45a;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.rfs-curve {
+  fill: none;
+  stroke: #58a6ff;
+  stroke-width: 1.8;
+}
+
+.rfs-dot--pass {
+  fill: #3fb950;
+  stroke: #0d1117;
+  stroke-width: 1.5;
+}
+
+.rfs-dot--fail {
+  fill: #f85149;
+  stroke: #0d1117;
+  stroke-width: 1.5;
+}

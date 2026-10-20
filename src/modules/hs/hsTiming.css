@@ -1,0 +1,8 @@
+/* HS-03 时序图：SVG 按宽度等比缩放，圆角与眼图一致 */
+
+.hs-timing-fig {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}

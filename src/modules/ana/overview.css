@@ -1,0 +1,56 @@
+/* ANA-01 模拟芯片测试概述：规格书表格与说明文字（共享版式见 ana.css） */
+
+.ov-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 12px;
+}
+
+.ov-spec {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.ov-spec th,
+.ov-spec td {
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line-2);
+  white-space: nowrap;
+}
+
+.ov-spec th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.ov-spec td:nth-child(n + 4):nth-child(-n + 6) {
+  font-family: var(--mono);
+  text-align: right;
+}
+
+.ov-spec__check {
+  width: 40px;
+  text-align: center;
+}
+
+.ov-spec__sym {
+  font-family: var(--mono);
+}
+
+.ov-spec__cond {
+  color: var(--text-2);
+  white-space: normal;
+}
+
+.ov-spec tr.is-picked td {
+  background: var(--fig-box-2);
+}
+
+.ov-note {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--text-2);
+}

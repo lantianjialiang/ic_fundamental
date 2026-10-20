@@ -1,0 +1,50 @@
+/* HS-07 ATE 高速测试限制：两个眼图并排、频响图与图例 */
+
+.ate-eyes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.ate-eyes .term-fig {
+  min-width: 0;
+  margin: 0;
+}
+
+.ate-resp__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.ate-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.ate-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ate-legend__swatch {
+  display: inline-block;
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+@media (max-width: 960px) {
+  .ate-eyes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

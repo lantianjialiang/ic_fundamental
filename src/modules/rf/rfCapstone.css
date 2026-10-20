@@ -1,0 +1,259 @@
+/* RF-14 综合课：控件行、测试流程、Bin 分布、报告表 */
+
+.rf-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.rf-controls > label {
+  min-width: 0;
+}
+
+.rf-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.rf-grid .term-fig {
+  min-width: 0;
+}
+
+.rf-cell {
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.rf-cell .readout {
+  margin-top: 0;
+}
+
+.rf-cap-ber {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* BER 图的 SVG 样式（颜色走 CSS 变量） */
+.rf-fig-bg {
+  fill: var(--panel);
+}
+
+.rf-fig-axis {
+  stroke: var(--line-2);
+  stroke-width: 1;
+}
+
+.rf-fig-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.rf-fig-muted {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+.rf-cap-ref {
+  stroke: var(--green);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.rf-cap-spec {
+  stroke: var(--gold);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+}
+
+.rf-cap-test {
+  stroke: var(--red);
+  stroke-width: 1.2;
+}
+
+.rf-cap-curve {
+  stroke: var(--blue);
+  stroke-width: 2;
+  fill: none;
+}
+
+.rf-cap-dot {
+  fill: var(--red);
+}
+
+/* 测试流程：横向五步，按通过 / 失败 / 跳过着色 */
+.rf-flow {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rf-flow__step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+  font-size: 13px;
+}
+
+.rf-flow__step b {
+  font-weight: 600;
+}
+
+.rf-flow__step span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rf-flow__step.is-pass span {
+  color: var(--green);
+}
+
+.rf-flow__step.is-fail {
+  border-color: var(--red);
+  background: var(--red-bg);
+}
+
+.rf-flow__step.is-fail span {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.rf-flow__step.is-skip {
+  color: var(--dim);
+  border-style: dashed;
+}
+
+.rf-flow__step.is-skip span {
+  color: var(--dim);
+}
+
+.rf-flow-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Bin 分布：横条 */
+.rf-bins {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.rf-bin {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) 56px;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.rf-bin__track {
+  height: 14px;
+  border-radius: 7px;
+  background: var(--panel);
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.rf-bin__fill {
+  display: block;
+  height: 100%;
+}
+
+.rf-bin__fill.is-pass {
+  background: var(--green);
+}
+
+.rf-bin__fill.is-txFail {
+  background: var(--red);
+}
+
+.rf-bin__fill.is-rxFail {
+  background: var(--gold);
+}
+
+.rf-bin__count {
+  font-family: var(--mono);
+  text-align: right;
+  color: var(--text-2);
+}
+
+/* 停止项计数表 */
+.rf-table-wrap {
+  overflow-x: auto;
+  margin-top: 10px;
+}
+
+.rf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.rf-table th,
+.rf-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.rf-table th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.rf-table td.is-fail {
+  color: var(--red);
+  font-weight: 700;
+}
+
+/* 报告表：100 行，固定高度滚动，表头吸顶 */
+.rf-report {
+  max-height: 340px;
+  overflow: auto;
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+
+.rf-report .rf-table th {
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  z-index: 1;
+}
+
+.rf-report .rf-table th,
+.rf-report .rf-table td {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.rf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 0;
+}
+
+@media (max-width: 960px) {
+  .rf-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

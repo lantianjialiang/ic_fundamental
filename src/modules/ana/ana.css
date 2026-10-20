@@ -1,0 +1,84 @@
+/* 模拟 / 混合信号课的共用版式：控件行、两栏图文、字段标签 */
+
+.ana-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.ana-controls > .knob-row,
+.ana-controls > .ana-field {
+  min-width: 0;
+}
+
+.ana-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ana-field__label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.ana-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+  align-items: start;
+}
+
+.ana-grid .term-fig {
+  min-width: 0;
+}
+
+.ana-cell {
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.ana-cell .readout {
+  margin-top: 0;
+}
+
+/* 先预测再看结果：预测框与反馈句 */
+.ana-predict {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  max-width: 420px;
+}
+
+.ana-predict__input {
+  width: 160px;
+  padding: 6px 8px;
+  font: inherit;
+  font-family: var(--mono);
+  color: var(--text);
+  background: var(--fig-box);
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+}
+
+.ana-predict__note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.ana-predict__note.is-ok {
+  color: var(--green);
+}
+
+.ana-predict__note.is-bad {
+  color: var(--red);
+}
+
+@media (max-width: 960px) {
+  .ana-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

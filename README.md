@@ -16,8 +16,8 @@ The main line follows the textbook *The Fundamentals of Digital Semiconductor Te
 - **中文 / English**: Switch in the header; default is Chinese, with full English copy. Choice is stored in `localStorage` under `ic-lab-locale`.
 - **Shareable URLs**: Each lesson has its own hash URL; refresh keeps your place, and the browser Back button works.
 - **Dark / light**: Switch in the header; choice is stored in `ic-lab-theme`.
-- **Glossary** (`#/glossary`): Terms from tracks D and F, browsable by lesson or A–Z, searchable in both languages. Each term is defined once under the earliest lesson that introduces it, with all references listed; each term has its own URL, e.g. `#/glossary/strobe`.
-- **FAQ** (`#/faq`): Topic-grouped Q&A, searchable and collapsible; lesson codes in answers link straight to lessons. Each entry has its own URL, e.g. `#/faq/strobe-early`.
+- **Glossary** (`#/glossary`): Terms from tracks D, F, T (MOS), L (PCB), A (analog), H (high-speed), R (RF) and M (memory), browsable by lesson or A–Z, searchable in both languages. Each term is defined once under the earliest lesson that introduces it, with all references listed; each term has its own URL, e.g. `#/glossary/strobe`.
+- **FAQ** (`#/faq`): Topic-grouped Q&A for the digital, MOS, PCB, analog, high-speed, RF and memory tracks, searchable and collapsible; lesson codes in answers link straight to lessons. Each entry has its own URL, e.g. `#/faq/strobe-early`.
 - **Feedback**: “Report an issue” beside the footer copyright and at the bottom of the lesson sidebar—GitHub Issue or email, with lesson, URL, locale, theme, and browser info attached automatically.
 
 Technical terms (ATE, DUT, VIH, Scan, etc.) stay in their usual form in both languages.
@@ -37,6 +37,12 @@ Lesson codes are generated from track prefix + sequence (e.g. `F01`, `D03`). Ins
 | Digital test fundamentals | F | 16 | From Ohm’s law through production order: opens/shorts, DC, functional, AC, characterization, vectors, programming, debug, latch-up, and Scan |
 | Interactive labs | X | 2 | Set Period / Drive / Strobe and leakage limits yourself; virtual ATE workstation for IDDQ and opens/shorts, datalog, fault diagnosis |
 | Reliability / automotive | Q | 1 | Latch-up entry only for now; full ESD / aging content planned |
+| MOSFETs and digital circuits | T | 11 | How a MOSFET turns on, which region it works in, how inverters and gates are built, board use and selection |
+| PCB basics | L | 10 | How a board is made, the design-to-product flow, reading PCB files, design rules and a self-check |
+| Analog | A | 15 | Force / measure, DC and dynamic parameters, ADC / DAC, LDO, PLL, trim, statistics, and a capstone test program |
+| High-speed I/O | H | 8 | Signal basics, channel integrity, clock and data timing, jitter and noise, eye diagrams, high-speed interface test, ATE limits, and a capstone |
+| RF test | R | 14 | dB / dBm, test system and link, S-parameters and matching, gain, P1dB, IP3, noise figure, harmonics, phase noise, modulation, EVM / ACPR, calibration, and a capstone |
+| Memory test | M | 13 | Array structure, read/write, fault models, patterns, March tests, timing and Shmoo, DRAM, DDR training, BIST with repair and ECC, parallel test, coverage and yield, bin analysis, and a capstone |
 
 **Foundations / Digital (D01–D16)**
 
@@ -82,9 +88,79 @@ Lesson codes are generated from track prefix + sequence (e.g. `F01`, `D03`). Ins
 
 The two digital tracks complement each other: D establishes vocabulary with animation and 3D; F walks through a production-style program on a 256×4 SRAM. Where D overlaps F, D only summarizes and links to the matching F lesson.
 
+**Analog (A01–A15)**
+
+| Code | Lesson |
+|---|---|
+| A01 | Overview of Analog and Mixed-signal Test |
+| A02 | Voltage, Current and Measurement Basics |
+| A03 | ATE Analog Resources and Load Board |
+| A04 | PMU / SMU and FVMI / FIMV |
+| A05 | Continuous-time Signals and Frequency |
+| A06 | Sampling Theorem and ADC Sampling |
+| A07 | Waveform Capture and FFT |
+| A08 | Analog Pin Leakage and Quiescent Current Judgement |
+| A09 | LDO Test |
+| A10 | ADC / DAC Static Parameters |
+| A11 | ADC Dynamic Parameters |
+| A12 | PLL and Clock Test |
+| A13 | Trim and OTP |
+| A14 | Test Limits and Statistics |
+| A15 | Capstone: Mixed-signal Test Program |
+
+**High-speed I/O (H01–H08)**
+
+| Code | Lesson |
+|---|---|
+| H01 | High-speed Signal Basics |
+| H02 | Transmission and Signal Integrity |
+| H03 | Clock and Data Timing |
+| H04 | Jitter and Noise |
+| H05 | Eye Diagram Analysis |
+| H06 | High-speed Interface Test |
+| H07 | Limits of ATE for High-speed Test |
+| H08 | Capstone: High-speed Interface Test |
+
+**RF test (R01–R14)**
+
+| Code | Lesson |
+|---|---|
+| R01 | Overview of RF Test |
+| R02 | dB, dBm and dBc |
+| R03 | RF Test System and Signal Path |
+| R04 | Impedance Matching and S-parameters |
+| R05 | Gain and Insertion Loss |
+| R06 | Output Power and P1dB |
+| R07 | Linearity: IP3 and IMD |
+| R08 | Noise Figure |
+| R09 | Harmonics and Spurious |
+| R10 | Phase Noise |
+| R11 | Modulation Basics: I/Q and Constellations |
+| R12 | EVM and ACPR |
+| R13 | RF Calibration and Error |
+| R14 | Capstone: RF Transceiver Test |
+
+**Memory test (M01–M13)**
+
+| Code | Lesson |
+|---|---|
+| M01 | Memory Array Structure |
+| M02 | Memory Read and Write Flow |
+| M03 | Memory Fault Models |
+| M04 | Patterns and Data Backgrounds |
+| M05 | March Test |
+| M06 | Memory Timing Test |
+| M07 | DRAM Basics |
+| M08 | DDR / LPDDR Read-Write Training |
+| M09 | BIST, Redundancy Repair and ECC |
+| M10 | Parallel Memory Test |
+| M11 | Test Coverage and Yield |
+| M12 | Bin and Failure Analysis |
+| M13 | Capstone: Memory Test |
+
 ### Syllabus only (lessons not built yet)
 
-Analog ICs, memory, RF, high-speed interfaces, power devices, sensor / CIS, co-packaged silicon photonics. The home page shows what each track will cover.
+Power devices, sensor / CIS, co-packaged silicon photonics. The home page shows what each track will cover.
 
 ---
 
@@ -171,8 +247,8 @@ ic_fundamental/
     ├── site.ts               # Repo URL, feedback email
     ├── home/                 # Home, track pages, glossary/FAQ chrome
     ├── lab/                  # Lesson shell, nav, quiz list, feedback link
-    ├── glossary/             # Glossary: terms.ts + pages
-    ├── faq/                  # FAQ: faq.ts + pages
+    ├── glossary/             # Glossary: terms.ts merges per-track files (termsMos, termsPcb, termsAna, termsHs, termsRf, termsMem, …) + pages
+    ├── faq/                  # FAQ: faq.ts merges per-track groups (faqMos, faqPcb, faqAna, faqHs, faqRf, faqMem, …) + pages
     ├── i18n/                 # loc() / useT(), UI strings
     ├── tracks/catalog.ts     # Tracks, lesson order, lessonCode()
     ├── modules/
@@ -181,6 +257,12 @@ ic_fundamental/
     │   ├── module00–17/      # Foundations / digital (module09, module13 merged into neighbors)
     │   ├── vate/             # D16 virtual ATE workstation (model/ = pure functions)
     │   ├── fund/             # Digital test fundamentals
+    │   ├── mos/              # MOSFET track lessons
+    │   ├── pcb/              # PCB track lessons
+    │   ├── ana/              # Analog track: core/ (rng, stats, FFT math), knowledge/ (one file per lesson: terms, extraLessons, faqs), *Model / *Data / *Fig / Page per lesson
+    │   ├── hs/               # High-speed track: core/ (PRBS, jitter / Q-function math), knowledge/ (one file per lesson: terms, extraLessons, faqs), *Model / *Data / *Fig / Page per lesson
+    │   ├── rf/               # RF track: core/ (units, dB and Friis math), knowledge/ (one file per lesson: terms, extraLessons, faqs), *Model / *Data / *Fig / Page per lesson
+    │   ├── mem/              # Memory track: core/ (array, March engine), knowledge/ (one file per lesson: terms, extraLessons, faqs), *Model / *Data / *Fig / Page per lesson
     │   └── timing/           # Shared timing scope
 ```
 
@@ -192,6 +274,7 @@ All user-visible text goes through `loc()` / `useT()`—do not hard-code a singl
 
 - **Teaching illustrations only**—not an ATE vendor manual and not a substitute for real production test programs.
 - Some numbers are labeled illustrative (e.g. bench tester channel counts, cost exercise amounts); do not treat them as fab data.
+- Analog lessons (noise, LDO, ADC, PLL, and the capstone yield / Cpk) use simple models in `src/modules/ana/*Model.ts`; their limits and default verdicts are teaching values, not production limits.
 - F04 datasheet examples follow the textbook (storage temperature, input ratings, absolute-max entries). On the F-track 256×4 SRAM, VIH is 2.2 V (textbook ch. 4; ch. 7 examples use 2.0 V). The D-track uses a fictional 3.3 V device with VIH 2.0 V; the generic TTL level table also uses 2.0 V.
 - No user accounts, no server, no grade upload. Locale and theme live only in local `localStorage`.
 - 3D lessons: left-drag rotate, wheel zoom, right-drag pan.
@@ -209,8 +292,10 @@ Issues and pull requests are welcome. When changing UI or adding lessons:
 
 ### Adding glossary / FAQ entries
 
-- **Glossary:** Add to `TERMS` in `src/glossary/terms.ts`: `{ id, term, name: loc(...), def: loc(...), lessons: [...] }`. `id` is lowercase letters, digits, and hyphens only—it becomes part of the URL; do not change it after publish. If the term exists, append to `lessons` instead of duplicating; the canonical entry stays under the earliest lesson in sort order.
-- **FAQ:** Add to the group’s `items` in `src/faq/faq.ts`: `{ id, q: loc(...), a: loc(...), lessons: [...] }`. Use `{@lessonId}` in answers and keep wording aligned with lessons. Fold useful “my question isn’t listed” feedback back into this file.
+- **Glossary:** Each track has its own term file (`src/glossary/termsMos.ts`, `termsPcb.ts`, `termsAna.ts`, `termsHs.ts`, `termsRf.ts`, `termsMem.ts`, …), and `src/glossary/terms.ts` merges them into `TERMS`. Add a new term to the file of the track that owns it: `{ id, term, name: loc(...), def: loc(...), lessons: [...] }`. `id` is lowercase letters, digits, and hyphens only—it becomes part of the URL; do not change it after publish. If the term exists, append to `lessons` instead of duplicating; the canonical entry stays under the earliest lesson in sort order.
+- **Per-lesson knowledge (analog, high-speed, RF and memory):** Each analog lesson has `src/modules/ana/knowledge/<lessonId>.ts`, typed as `AnaKnowledge = { terms, extraLessons, faqs }` (see `knowledge/types.ts`). `knowledge/index.ts` lists them in lesson order; `src/glossary/termsAna.ts` and `src/faq/faqAna.ts` flatten them. The high-speed and RF lessons follow the same pattern in `src/modules/hs/knowledge/<lessonId>.ts` and `src/modules/rf/knowledge/<lessonId>.ts`, listed by their `index.ts` files and aggregated by `src/glossary/termsHs.ts` / `termsRf.ts` and `src/faq/faqHs.ts` / `faqRf.ts`. Memory lessons follow the same pattern in `src/modules/mem/knowledge/<lessonId>.ts`, listed by `src/modules/mem/knowledge/index.ts` and aggregated by `src/glossary/termsMem.ts` / `src/faq/faqMem.ts`. Put a lesson's terms, FAQs and cross-references in its knowledge file, and register any new file in the aggregator.
+- **`extraLessons`:** Maps an existing term ID to extra lesson IDs, e.g. `{ 'measure-range': ['anaMeasure'] }`. `withExtraLessons` in `src/glossary/terms.ts` applies every such map to all terms (base, MOS, PCB, analog, high-speed, RF, memory) and de-duplicates the lesson list, so a lesson can add a cross-reference without editing the file that owns the term. Use this instead of defining the same term twice.
+- **FAQ:** Each track has a group file (`src/faq/faqMos.ts`, `faqPcb.ts`, `faqAna.ts`, `faqHs.ts`, `faqRf.ts`, `faqMem.ts`), merged into `FAQ_GROUPS` in `src/faq/faq.ts`. Add `{ id, q: loc(...), a: loc(...), lessons: [...] }` to the right group's `items`; analog, high-speed, RF and memory FAQs live in the lesson's `knowledge/<lessonId>.ts`. Use `{@lessonId}` in answers and keep wording aligned with lessons. Fold useful “my question isn’t listed” feedback back into the same file.
 - **Feedback targets:** GitHub repo and email are in `src/site.ts`; update that file when the repo moves.
 
 ---
@@ -239,8 +324,8 @@ Issues and pull requests are welcome. When changing UI or adding lessons:
 - **中文 / English**：页头切换，默认中文，全部文案都有英文。选择存在 `localStorage` 的 `ic-lab-locale`。
 - **可分享的地址**：每课有自己的 hash 地址，刷新不丢位置，浏览器后退可用。
 - **深色 / 浅色**：页头切换，选择存在 `ic-lab-theme`。
-- **术语表**（`#/glossary`）：从 D、F 两条轨道汇总的术语，按课程或 A–Z 浏览，中英文搜索。同一个词只完整写一次，放在最早讲到它的那一课下面，并列出所有出处；每个词有自己的地址，如 `#/glossary/strobe`。
-- **常见问题**（`#/faq`）：按主题分组的问答，可搜索、可折叠，答案里的课程编号能直接点。每条有自己的地址，如 `#/faq/strobe-early`。
+- **术语表**（`#/glossary`）：从 D、F、T（MOS 管）、L（PCB）、A（模拟）、H（高速）、R（射频）、M（存储器）几条轨道汇总的术语，按课程或 A–Z 浏览，中英文搜索。同一个词只完整写一次，放在最早讲到它的那一课下面，并列出所有出处；每个词有自己的地址，如 `#/glossary/strobe`。
+- **常见问题**（`#/faq`）：按主题分组的问答（覆盖数字、MOS、PCB、模拟、高速、射频与存储器轨道），可搜索、可折叠，答案里的课程编号能直接点。每条有自己的地址，如 `#/faq/strobe-early`。
 - **问题反馈**：每页底部版权行旁、课程侧栏底部都有「反馈问题」，可选 GitHub Issue 或邮件，自动带上课程、地址、语言、主题和浏览器信息。
 
 技术专有名词（ATE、DUT、VIH、Scan 等）两语都保留原文。
@@ -260,6 +345,12 @@ Issues and pull requests are welcome. When changing UI or adding lessons:
 | 数字测试基础 | F | 16 | 从欧姆定律讲起，按量产顺序走完开短路、DC、功能、AC、表征、向量、写程序、排错、闩锁和 Scan |
 | 交互实验 | X | 2 | 自己设 Period / Drive / Strobe 和 Leakage 限流；虚拟 ATE 工作站跑 IDDQ 与开短路、读 Datalog、诊断故障 |
 | 可靠性 / 车规 | Q | 1 | 目前只有 Latch-up 入口，完整 ESD / 老化后续补 |
+| MOS 管与数字电路 | T | 11 | MOS 管怎么导通、工作在哪个区，怎样搭反相器和逻辑门，板上怎么用、怎么选型 |
+| PCB 入门 | L | 10 | PCB 怎么造出来、从设计到成品的流程，读懂 PCB 文件，设计规则与自查 |
+| 模拟芯片 | A | 15 | Force / Measure、DC 与动态参数、ADC / DAC、LDO、PLL、Trim、统计，以及综合测试程序 |
+| 高速接口 | H | 8 | 高速信号基础、传输与信号完整性、时序、抖动与噪声、眼图、接口测试、ATE 限制，以及综合课 |
+| 射频测试 | R | 14 | dB / dBm、测试系统与链路、S 参数与匹配、增益、P1dB、IP3、噪声系数、谐波、相位噪声、调制、EVM / ACPR、校准，以及综合课 |
+| 存储器测试 | M | 13 | 阵列结构、读写流程、故障模型、Pattern、March 测试、时序与 Shmoo、DRAM、DDR 训练、BIST 与修复 / ECC、并行测试、覆盖率与良率、Bin 分析，以及综合课 |
 
 **基础 / 数字（D01–D16）**
 
@@ -305,9 +396,79 @@ Issues and pull requests are welcome. When changing UI or adding lessons:
 
 两条数字轨道互补：D 轨先立名词、看动画和 3D 画面，F 轨用一颗 256×4 SRAM 把量产程序走一遍。D 轨里和 F 轨重复的细节只点到为止，并链接到对应的 F 课。
 
+**模拟（A01–A15）**
+
+| 编号 | 课程 |
+|---|---|
+| A01 | 模拟芯片测试概述 |
+| A02 | 电压、电流与测量基础 |
+| A03 | ATE 模拟资源与负载板 |
+| A04 | PMU / SMU 与 FVMI / FIMV |
+| A05 | 连续时间信号与频率 |
+| A06 | 采样定理与 ADC 采样 |
+| A07 | 波形采集与 FFT |
+| A08 | 模拟引脚漏电与静态电流判定 |
+| A09 | LDO 测试 |
+| A10 | ADC / DAC 静态参数 |
+| A11 | ADC 动态参数 |
+| A12 | PLL / 时钟测试 |
+| A13 | Trim 与 OTP |
+| A14 | 测试限值与统计 |
+| A15 | 综合：混合信号芯片测试程序 |
+
+**高速接口（H01–H08）**
+
+| 编号 | 课程 |
+|---|---|
+| H01 | 高速信号基础 |
+| H02 | 传输与信号完整性 |
+| H03 | 时钟与数据时序 |
+| H04 | 抖动与噪声 |
+| H05 | 眼图分析 |
+| H06 | 高速接口测试 |
+| H07 | ATE 高速测试的限制 |
+| H08 | 综合：高速接口测试 |
+
+**射频测试（R01–R14）**
+
+| 编号 | 课程 |
+|---|---|
+| R01 | RF 测试概述 |
+| R02 | dB、dBm 与 dBc |
+| R03 | RF 测试系统与链路 |
+| R04 | 阻抗匹配与 S 参数 |
+| R05 | 增益与插入损耗 |
+| R06 | 输出功率与 P1dB |
+| R07 | 线性度：IP3 与 IMD |
+| R08 | 噪声系数 |
+| R09 | 谐波与杂散 |
+| R10 | 相位噪声 |
+| R11 | 调制基础：I/Q 与星座图 |
+| R12 | EVM 与 ACPR |
+| R13 | RF 校准与误差 |
+| R14 | 综合：RF 收发器测试 |
+
+**存储器测试（M01–M13）**
+
+| 编号 | 课程 |
+|---|---|
+| M01 | 存储器阵列结构 |
+| M02 | 存储器读写流程 |
+| M03 | 存储器故障模型 |
+| M04 | Pattern 与数据背景 |
+| M05 | March 测试 |
+| M06 | 存储器时序测试 |
+| M07 | DRAM 基础 |
+| M08 | DDR / LPDDR 读写训练 |
+| M09 | BIST、冗余修复与 ECC |
+| M10 | 存储器并行测试 |
+| M11 | 测试覆盖率与良率 |
+| M12 | Bin 与失效分析 |
+| M13 | 综合：存储器测试 |
+
 ### 大纲已列，课还没做
 
-模拟芯片、Memory、RF、高速接口、功率器件、传感器 / CIS、硅光共封。首页能看到每条轨道要掌握什么。
+功率器件、传感器 / CIS、硅光共封。首页能看到每条轨道要掌握什么。
 
 ---
 
@@ -394,8 +555,8 @@ ic_fundamental/
     ├── site.ts               # 仓库地址、反馈邮箱
     ├── home/                 # 首页、轨道页、术语表 / FAQ 共用外框
     ├── lab/                  # 课程壳、导航、判题列表、反馈链接
-    ├── glossary/             # 术语表：terms.ts 数据 + 页面
-    ├── faq/                  # 常见问题：faq.ts 数据 + 页面
+    ├── glossary/             # 术语表：terms.ts 汇总 termsMos、termsPcb、termsAna、termsHs、termsRf、termsMem 等 + 页面
+    ├── faq/                  # 常见问题：faq.ts 汇总 faqMos、faqPcb、faqAna、faqHs、faqRf、faqMem 等 + 页面
     ├── i18n/                 # loc() / useT()，界面文案
     ├── tracks/catalog.ts     # 轨道、课序、lessonCode()
     ├── modules/
@@ -404,6 +565,12 @@ ic_fundamental/
     │   ├── module00–17/      # 基础 / 数字（module09、module13 已并入相邻课）
     │   ├── vate/             # D16 虚拟 ATE 工作站（model/ 为纯函数模型）
     │   ├── fund/             # 数字测试基础
+    │   ├── mos/              # MOS 管轨道课程
+    │   ├── pcb/              # PCB 轨道课程
+    │   ├── ana/              # 模拟轨道：core/（随机数、统计、FFT 数学）、knowledge/（每课一个文件：术语、extraLessons、FAQ），每课另有 *Model / *Data / *Fig / Page
+    │   ├── hs/               # 高速轨道：core/（PRBS、抖动 / Q 函数计算）、knowledge/（每课一个文件：术语、extraLessons、FAQ）、每课的 *Model / *Data / *Fig / Page
+    │   ├── rf/               # 射频轨道：core/（dB / dBm、Friis 计算）、knowledge/（每课一个文件：术语、extraLessons、FAQ）、每课的 *Model / *Data / *Fig / Page
+    │   ├── mem/              # 存储器轨道：core/（阵列、March 引擎）、knowledge/（每课一个文件：术语、extraLessons、FAQ）、每课的 *Model / *Data / *Fig / Page
     │   └── timing/           # 共用时序示波器
 ```
 
@@ -415,6 +582,7 @@ ic_fundamental/
 
 - 这是**教学示意**，不是某家 ATE 的操作手册，也不替代真实测试程序。
 - 部分数字标了「示意」（例如台式测试机通道数、成本练习金额），不要当产线数据用。
+- 模拟课里的噪声、LDO、ADC、PLL，以及综合课的良率与 Cpk，用的是 `src/modules/ana/*Model.ts` 里的简化模型；限值和默认判定是教学取值，不是产线限值。
 - F04 规格书示例按教材对齐（存储温度、输入额定值、绝对最大值条目）；F 轨 256×4 SRAM 的 VIH 按 2.2 V（教材第 4 章；第 7 章例题沿用 2.0 V），D 轨用一颗假想的 3.3 V 芯片，VIH 2.0 V，通用 TTL 电平表也是 2.0 V。
 - 没有用户系统、没有服务端、不会上传成绩。语言和主题只存在本机 `localStorage`。
 - 3D 课用鼠标：左键旋转、滚轮缩放、右键平移。
@@ -432,8 +600,10 @@ ic_fundamental/
 
 ### 添加术语 / FAQ
 
-- **术语**：在 `src/glossary/terms.ts` 的 `TERMS` 里加一条 `{ id, term, name: loc('中文名', 'English name'), def: loc('解释', 'Definition'), lessons: [...] }`。`id` 只用小写字母、数字、连字符，是地址的一部分，发布后别改。同一个词已经有了就只往 `lessons` 里加课程，不要另起一条；主词条会自动放到课序最靠前的那一课下面。
-- **FAQ**：在 `src/faq/faq.ts` 对应分组的 `items` 里加 `{ id, q: loc(...), a: loc(...), lessons: [...] }`。答案里用 `{@课程ID}` 引用课程，口径要和课文一致。「我的问题不在这里」收到的问题，整理后也补到这里。
+- **术语**：每条轨道有自己的术语文件（`src/glossary/termsMos.ts`、`termsPcb.ts`、`termsAna.ts`、`termsHs.ts`、`termsRf.ts`、`termsMem.ts` 等），`src/glossary/terms.ts` 把它们合并成 `TERMS`。新词加在所属轨道的文件里：`{ id, term, name: loc('中文名', 'English name'), def: loc('解释', 'Definition'), lessons: [...] }`。`id` 只用小写字母、数字、连字符，是地址的一部分，发布后别改。同一个词已经有了就只往 `lessons` 里加课程，不要另起一条；主词条会自动放到课序最靠前的那一课下面。
+- **模拟 / 高速 / 射频 / 存储器的课内知识**：每课一个文件 `src/modules/ana/knowledge/<课程ID>.ts`，类型是 `AnaKnowledge = { terms, extraLessons, faqs }`（见 `knowledge/types.ts`）。`knowledge/index.ts` 按课序列出它们；`src/glossary/termsAna.ts` 和 `src/faq/faqAna.ts` 把词条与 FAQ 摊平。高速课同样放在 `src/modules/hs/knowledge/<课程ID>.ts`，由 `src/modules/hs/knowledge/index.ts` 按课序列出，再由 `src/glossary/termsHs.ts`、`src/faq/faqHs.ts` 汇总。射频课放在 `src/modules/rf/knowledge/<课程ID>.ts`，由 `src/modules/rf/knowledge/index.ts` 列出，再由 `termsRf.ts`、`faqRf.ts` 汇总。存储器课放在 `src/modules/mem/knowledge/<课程ID>.ts`，由 `src/modules/mem/knowledge/index.ts` 列出，再由 `termsMem.ts`、`faqMem.ts` 汇总。课的术语、FAQ 和交叉引用写在它的 knowledge 文件里；新文件要加进对应的汇总文件。
+- **`extraLessons`**：把已有词条的 ID 映射到额外的课程 ID，例如 `{ 'measure-range': ['anaMeasure'] }`。`src/glossary/terms.ts` 里的 `withExtraLessons` 把所有这类映射应用到全部词条（基础、MOS、PCB、模拟、高速、射频、存储器），并对课程列表去重，所以不必改词条所在的文件就能加交叉引用。同一个词不要定义两次，用这个机制代替。
+- **FAQ**：每条轨道有自己的分组文件（`src/faq/faqMos.ts`、`faqPcb.ts`、`faqAna.ts`、`faqHs.ts`、`faqRf.ts`、`faqMem.ts`），在 `src/faq/faq.ts` 里合并成 `FAQ_GROUPS`。把 `{ id, q: loc(...), a: loc(...), lessons: [...] }` 加到对应分组的 `items`；模拟、高速、射频和存储器课的问答写在该课的 `knowledge/<课程ID>.ts` 里。答案里用 `{@课程ID}` 引用课程，口径要和课文一致。「我的问题不在这里」收到的问题，整理后也补到同一个文件里。
 - **反馈地址**：GitHub 仓库和邮箱在 `src/site.ts`，换仓库时只改这一处。
 
 ---

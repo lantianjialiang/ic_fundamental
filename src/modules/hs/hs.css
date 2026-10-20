@@ -1,0 +1,58 @@
+/* 高速信号课的共用版式：控件行、眼图与读数两栏 */
+
+.hs-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.hs-controls > .hs-field,
+.hs-controls > .knob-row {
+  min-width: 0;
+}
+
+.hs-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.hs-field__label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.hs-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.hs-grid .term-fig {
+  min-width: 0;
+}
+
+.hs-eye {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.hs-cell {
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.hs-cell .readout {
+  margin-top: 0;
+}
+
+@media (max-width: 960px) {
+  .hs-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

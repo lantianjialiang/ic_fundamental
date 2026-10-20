@@ -1,0 +1,13 @@
+/* RF-09 谐波与杂散：频谱图的版式（控件与两栏布局复用 hs.css） */
+
+.rf-harm-fig {
+  min-width: 0;
+  margin: 0;
+}
+
+.rf-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}

@@ -1,0 +1,19 @@
+/* RF-08 噪声系数：链路框图与贡献条形图的版式（控件与两栏布局复用 hs.css） */
+
+.rf-nf-figs {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rf-nf-fig {
+  min-width: 0;
+  margin: 0;
+}
+
+.rf-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}

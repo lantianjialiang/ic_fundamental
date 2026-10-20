@@ -1,0 +1,58 @@
+/* MEM-03 存储器故障模型：控件行、阵列与读数两栏 */
+
+.mft-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.mft-controls > label,
+.mft-controls > .mft-field {
+  min-width: 0;
+}
+
+.mft-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mft-field__label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.mft-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.mft-grid .term-fig {
+  min-width: 0;
+}
+
+.mft-cell {
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.mft-cell .readout {
+  margin-top: 0;
+}
+
+.mft-note {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+@media (max-width: 960px) {
+  .mft-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

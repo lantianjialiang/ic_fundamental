@@ -1,0 +1,52 @@
+/* RF-01 频率概述：频段图与滑块 */
+
+.rf-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.rf-svg__bg {
+  fill: #0d1117;
+}
+
+.rf-axis {
+  stroke: #8b949e;
+  stroke-width: 1;
+}
+
+.rf-band-label {
+  fill: #e6edf3;
+  font: 600 12px Consolas, ui-monospace, monospace;
+}
+
+.rf-tick {
+  fill: #8b949e;
+  font: 11px Consolas, ui-monospace, monospace;
+}
+
+.rf-marker {
+  stroke: #e8c45a;
+  stroke-width: 1.5;
+}
+
+.rf-marker-dot {
+  fill: #e8c45a;
+}
+
+.rf-marker-label {
+  fill: #e8c45a;
+  font: 600 12px Consolas, ui-monospace, monospace;
+}
+
+.rf-slider {
+  display: grid;
+  gap: 6px;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.rf-slider input {
+  width: 100%;
+}

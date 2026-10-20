@@ -1,0 +1,99 @@
+/* MEM-04 Pattern 与数据背景：控件行、两栏图文、覆盖表与条形图 */
+
+.mem-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.mem-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mem-field__label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.mem-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.mem-grid .term-fig {
+  min-width: 0;
+}
+
+.mem-cell {
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.mem-cell .readout {
+  margin-top: 0;
+}
+
+@media (max-width: 960px) {
+  .mem-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.mem-cov th.is-sel,
+.mem-cov td.is-sel {
+  background: var(--gold-bg);
+}
+
+.mem-cov td {
+  white-space: nowrap;
+}
+
+.mem-cov td.mem-cov__name {
+  white-space: normal;
+}
+
+.mem-cov .mem-hit {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.mem-cov .mem-miss {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.mem-fig {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+.mem-fig-text {
+  font-size: 12px;
+  fill: var(--text-2);
+}
+
+.mem-fig-muted {
+  font-size: 11px;
+  fill: var(--muted);
+}
+
+.mem-bar-cov {
+  fill: var(--blue);
+}
+
+.mem-bar-cost {
+  fill: var(--gold);
+}
+
+.mem-row-sel {
+  fill: var(--gold-bg);
+}

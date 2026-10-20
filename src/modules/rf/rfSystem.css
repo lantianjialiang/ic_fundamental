@@ -1,0 +1,58 @@
+/* RF-03 测试系统与链路：链路图与连接方案 */
+
+.rf-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.rf-svg__bg {
+  fill: #0d1117;
+}
+
+.rf-status {
+  font: 600 13px Consolas, ui-monospace, monospace;
+}
+
+.rf-status--ok {
+  fill: #3fb950;
+}
+
+.rf-status--bad {
+  fill: #f85149;
+}
+
+.rf-box {
+  stroke-width: 1.5;
+}
+
+.rf-box--inst {
+  fill: #1f3b57;
+  stroke: #58a6ff;
+}
+
+.rf-box--pass {
+  fill: #21262d;
+  stroke: #8b949e;
+}
+
+.rf-box--dut {
+  fill: #3d3316;
+  stroke: #e8c45a;
+}
+
+.rf-box-label {
+  fill: #e6edf3;
+  font: 600 11px Consolas, ui-monospace, monospace;
+}
+
+.rf-wire {
+  stroke: #8b949e;
+  stroke-width: 1.5;
+}
+
+.rf-level {
+  fill: #e6edf3;
+  font: 11px Consolas, ui-monospace, monospace;
+}

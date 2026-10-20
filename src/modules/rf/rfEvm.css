@@ -1,0 +1,22 @@
+/* RF-12（EVM / ACPR）专用：全宽频谱图与 AM/AM 曲线 */
+
+.rf-wide {
+  margin-top: 14px;
+  min-width: 0;
+}
+
+.rf-wide .term-fig {
+  min-width: 0;
+}
+
+.rf-spec__svg,
+.rf-rapp__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.rf-rapp__svg {
+  max-width: 320px;
+}

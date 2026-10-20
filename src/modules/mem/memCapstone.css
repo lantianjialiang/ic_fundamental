@@ -1,0 +1,66 @@
+/* MEM-13 综合：控件、单颗与批次的两栏布局、报告按钮 */
+
+.mcap-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.mcap-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mcap-field__label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.mcap-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.mcap-cell {
+  min-width: 0;
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.mcap-cell .term-fig {
+  margin: 0;
+}
+
+.mcap-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.mcap-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.mcap-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+@media (max-width: 960px) {
+  .mcap-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

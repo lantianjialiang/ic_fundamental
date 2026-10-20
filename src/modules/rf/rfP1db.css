@@ -1,0 +1,39 @@
+/* RF-06 输出功率与 P1dB：控件行与图、读数两栏 */
+
+.rfp1-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.rfp1-controls > label {
+  min-width: 0;
+}
+
+.rfp1-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.rfp1-grid .term-fig {
+  min-width: 0;
+}
+
+.rfp1-cell {
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.rfp1-cell .readout {
+  margin-top: 0;
+}
+
+@media (max-width: 960px) {
+  .rfp1-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

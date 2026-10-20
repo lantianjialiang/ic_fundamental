@@ -1,5 +1,9 @@
 import { loc, type LText } from '../i18n/locale'
 import { type ModuleId } from '../modules/catalog'
+import { ANA_FAQ_GROUP } from './faqAna'
+import { HS_FAQ_GROUP } from './faqHs'
+import { MEM_FAQ_GROUP } from './faqMem'
+import { RF_FAQ_GROUP } from './faqRf'
 import { MOS_FAQ_GROUP } from './faqMos'
 import { PCB_FAQ_GROUP } from './faqPcb'
 
@@ -478,6 +482,6 @@ const BASE_FAQ_GROUPS: FaqGroup[] = [
   },
 ]
 
-export const FAQ_GROUPS: FaqGroup[] = [...BASE_FAQ_GROUPS, MOS_FAQ_GROUP, PCB_FAQ_GROUP]
+export const FAQ_GROUPS: FaqGroup[] = [...BASE_FAQ_GROUPS, MOS_FAQ_GROUP, PCB_FAQ_GROUP, ANA_FAQ_GROUP, HS_FAQ_GROUP, RF_FAQ_GROUP, MEM_FAQ_GROUP]
 
 export const FAQ_ITEMS: FaqItem[] = FAQ_GROUPS.flatMap((group) => group.items)

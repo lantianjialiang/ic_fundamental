@@ -1,0 +1,59 @@
+/* 射频调制课（RF-11）与 EVM 课（RF-12）的共用版式：控件行、图与读数两栏 */
+
+.rf-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.rf-controls > .rf-field,
+.rf-controls > label {
+  min-width: 0;
+}
+
+.rf-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rf-field__label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rf-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.rf-grid .term-fig {
+  min-width: 0;
+}
+
+.rf-const__svg {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  border-radius: 10px;
+}
+
+.rf-cell {
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.rf-cell .readout {
+  margin-top: 0;
+}
+
+@media (max-width: 960px) {
+  .rf-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

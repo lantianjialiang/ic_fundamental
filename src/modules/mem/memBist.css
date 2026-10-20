@@ -1,0 +1,64 @@
+/* MEM-09（BIST、冗余修复与 ECC）的版式：控件行、阵列图与读数两栏 */
+
+.mbist-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.mbist-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mbist-field__label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.mbist-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.mbist-grid .term-fig {
+  min-width: 0;
+}
+
+.mbist-cell {
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.mbist-cell .readout {
+  margin-top: 0;
+}
+
+.mbist-steps {
+  margin-top: 12px;
+}
+
+.mbist-steps__title {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.mbist-steps ol {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+@media (max-width: 960px) {
+  .mbist-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

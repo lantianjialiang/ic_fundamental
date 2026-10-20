@@ -1,0 +1,64 @@
+/* RF-02 dB / dBm / dBc：功率输入框、级联功率图 */
+
+.rf-input {
+  width: 100%;
+  min-width: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--border, #3d4756);
+  border-radius: 8px;
+  background: var(--panel, #0d1117);
+  color: inherit;
+  font: 14px Consolas, ui-monospace, monospace;
+}
+
+.rf-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.rf-svg__bg {
+  fill: #0d1117;
+}
+
+.rf-grid {
+  stroke: #3d4756;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.rf-grid--zero {
+  stroke: #6e7681;
+}
+
+.rf-tick {
+  fill: #8b949e;
+  font: 11px Consolas, ui-monospace, monospace;
+}
+
+.rf-value {
+  fill: #e6edf3;
+  font: 600 11px Consolas, ui-monospace, monospace;
+}
+
+.rf-trace {
+  fill: none;
+  stroke: #58a6ff;
+  stroke-width: 2;
+}
+
+.rf-node {
+  fill: #58a6ff;
+}
+
+.rf-limit {
+  stroke: #f85149;
+  stroke-width: 1.2;
+  stroke-dasharray: 6 4;
+}
+
+.rf-limit-label {
+  fill: #f85149;
+  font: 11px Consolas, ui-monospace, monospace;
+}

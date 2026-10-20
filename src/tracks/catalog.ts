@@ -397,67 +397,36 @@ export const TRACKS: Array<{
     ],
   },
   {
-    id: 'bench',
-    title: loc('交互实验', 'Interactive lab'),
-    blurb: loc(
-      '时序、Leakage、Pattern / Stuck；再到一台虚拟 ATE 工作站跑 IDDQ 和开短路；最后用一台产线模拟器跑整批 wafer、判故障。现课 {@bench}–{@sim}。',
-      'Timing, leakage, pattern / stuck; then a virtual ATE workstation running IDDQ and opens / shorts; finally a production simulator that runs whole wafers and diagnoses faults. Lessons {@bench}–{@sim}.',
-    ),
-    ready: true,
-    lessons: ['bench', 'vate', 'sim'],
-    knowledge: [
-      {
-        title: loc('时序模拟器', 'Timing simulator'),
-        text: loc(
-          '设 Period / Drive / DUT Delay / Strobe。波形跟着变，Strobe 太早就是 Compare 在稳定前。',
-          'Set period / drive / DUT delay / strobe. The waveform follows; a strobe that is too early compares before the output settles.',
-        ),
-      },
-      {
-        title: loc('Leakage', 'Leakage'),
-        text: loc(
-          'Force 电压 → Measure 电流 → 和 Limit 比。拧紧限流，好芯片也会 Fail。',
-          'Force voltage → measure current → compare with the limit. Tighten the limit and even a good device fails.',
-        ),
-      },
-      {
-        title: loc('虚拟 ATE 工作站', 'Virtual ATE workstation'),
-        text: loc(
-          '{@vate}。IDDQ：选 DUT、VDD、向量、等待时间、量程，看读数为什么 PASS / FAIL / 无效。开短路：注入开路、短路、接触电阻，跑完自己定位故障。',
-          '{@vate}. IDDQ: pick the DUT, VDD, vector, settling time and range, and see why the reading passes, fails or is invalid. Opens / shorts: inject opens, shorts and contact resistance, then locate the fault yourself.',
-        ),
-      },
-      {
-        title: loc('产线模拟器', 'Production simulator'),
-        text: loc(
-          '{@sim}。一颗 3.3V 器件、七个测试项、六个 Bin：改限值、跑批量、看 Cpk 与 Wafer Map，再判断过杀、漏检和故障根因；还能自己出题。',
-          '{@sim}. One 3.3 V device, seven tests, six bins: edit limits, run lots, read Cpk and the wafer map, then judge overkill, underkill and the root cause—and write your own question.',
-        ),
-      },
-      {
-        title: loc('和讲义的关系', 'How this relates to the lessons'),
-        text: loc(
-          '词在 {@pmu} / {@timing} / {@dc}。这里不讲新名词，只让你亲手把 Pass 拧成 Fail，再自己说出原因。',
-          'The terms are in {@pmu} / {@timing} / {@dc}. No new names here: you turn a pass into a fail yourself, then say why.',
-        ),
-      },
-    ],
-  },
-  {
     id: 'analog',
     title: loc('模拟芯片', 'Analog'),
     blurb: loc(
       '运放、基准、LDO / 电源、ADC / DAC。问连续量准不准，不是大海量 Pattern。',
       'Op amps, references, LDOs / power, ADC / DAC. The question is how accurate a continuous value is, not millions of patterns.',
     ),
-    ready: false,
-    lessons: [],
+    ready: true,
+    lessons: [
+      'anaOverview',
+      'anaMeasure',
+      'anaResources',
+      'anaSmu',
+      'anaSignal',
+      'anaSampling',
+      'anaFft',
+      'anaLeak',
+      'anaLdo',
+      'anaStatic',
+      'anaDynamic',
+      'anaPll',
+      'anaTrim',
+      'anaStats',
+      'anaCapstone',
+    ],
     knowledge: [
       {
         title: loc('模拟在问什么', 'What analog test asks'),
         text: loc(
-          '精度、分辨率、重复性、噪声底。Force V / Measure I。Kelvin 只立名字。',
-          'Accuracy, resolution, repeatability, noise floor. Force V / measure I. Kelvin is named only.',
+          '精度、分辨率、重复性、噪声底。Force V / Measure I；四线 Kelvin 见 {@anaMeasure}。',
+          'Accuracy, resolution, repeatability, noise floor. Force V / measure I; four-wire Kelvin: {@anaMeasure}.',
         ),
       },
       {
@@ -505,8 +474,22 @@ export const TRACKS: Array<{
       'SRAM、DRAM、Flash、EEPROM。阵列太大不能穷举，核心是算法和修复。',
       'SRAM, DRAM, Flash, EEPROM. Arrays are too large to test exhaustively; the core is algorithms and repair.',
     ),
-    ready: false,
-    lessons: [],
+    ready: true,
+    lessons: [
+      'memStructure',
+      'memRw',
+      'memFault',
+      'memPattern',
+      'memMarch',
+      'memTiming',
+      'memDram',
+      'memDdr',
+      'memBist',
+      'memParallel',
+      'memCoverage',
+      'memBin',
+      'memCapstone',
+    ],
     knowledge: [
       {
         title: loc('端口', 'Ports'),
@@ -559,8 +542,23 @@ export const TRACKS: Array<{
       'PA、LNA、Transceiver。有载波和 50 Ω 功率，不是高速眼图。',
       'PA, LNA, transceiver. Carriers and 50 Ω power, not high-speed eye diagrams.',
     ),
-    ready: false,
-    lessons: [],
+    ready: true,
+    lessons: [
+      'rfOverview',
+      'rfDb',
+      'rfSystem',
+      'rfSparam',
+      'rfGain',
+      'rfP1db',
+      'rfIp3',
+      'rfNf',
+      'rfHarm',
+      'rfPhaseNoise',
+      'rfModulation',
+      'rfEvm',
+      'rfCal',
+      'rfCapstone',
+    ],
     knowledge: [
       {
         title: loc('数字 Channel 不够', 'A digital channel is not enough'),
@@ -607,8 +605,17 @@ export const TRACKS: Array<{
       'SerDes、PCIe / USB / Ethernet 物理层。基带串行，不是天线口。',
       'SerDes, PCIe / USB / Ethernet PHY. Baseband serial links, not antenna ports.',
     ),
-    ready: false,
-    lessons: [],
+    ready: true,
+    lessons: [
+      'hsBasics',
+      'hsChannel',
+      'hsTiming',
+      'hsJitter',
+      'hsEye',
+      'hsInterface',
+      'hsAteLimit',
+      'hsCapstone',
+    ],
     knowledge: [
       {
         title: loc('眼图', 'Eye diagram'),
@@ -881,11 +888,58 @@ export const TRACKS: Array<{
     ],
   },
   {
+    id: 'bench',
+    title: loc('交互实验', 'Interactive lab'),
+    blurb: loc(
+      '时序、Leakage、Pattern / Stuck；再到一台虚拟 ATE 工作站跑 IDDQ 和开短路；最后用一台产线模拟器跑整批 wafer、判故障。现课 {@bench}–{@sim}。',
+      'Timing, leakage, pattern / stuck; then a virtual ATE workstation running IDDQ and opens / shorts; finally a production simulator that runs whole wafers and diagnoses faults. Lessons {@bench}–{@sim}.',
+    ),
+    ready: true,
+    lessons: ['bench', 'vate', 'sim'],
+    knowledge: [
+      {
+        title: loc('时序模拟器', 'Timing simulator'),
+        text: loc(
+          '设 Period / Drive / DUT Delay / Strobe。波形跟着变，Strobe 太早就是 Compare 在稳定前。',
+          'Set period / drive / DUT delay / strobe. The waveform follows; a strobe that is too early compares before the output settles.',
+        ),
+      },
+      {
+        title: loc('Leakage', 'Leakage'),
+        text: loc(
+          'Force 电压 → Measure 电流 → 和 Limit 比。拧紧限流，好芯片也会 Fail。',
+          'Force voltage → measure current → compare with the limit. Tighten the limit and even a good device fails.',
+        ),
+      },
+      {
+        title: loc('虚拟 ATE 工作站', 'Virtual ATE workstation'),
+        text: loc(
+          '{@vate}。IDDQ：选 DUT、VDD、向量、等待时间、量程，看读数为什么 PASS / FAIL / 无效。开短路：注入开路、短路、接触电阻，跑完自己定位故障。',
+          '{@vate}. IDDQ: pick the DUT, VDD, vector, settling time and range, and see why the reading passes, fails or is invalid. Opens / shorts: inject opens, shorts and contact resistance, then locate the fault yourself.',
+        ),
+      },
+      {
+        title: loc('产线模拟器', 'Production simulator'),
+        text: loc(
+          '{@sim}。一颗 3.3V 器件、七个测试项、六个 Bin：改限值、跑批量、看 Cpk 与 Wafer Map，再判断过杀、漏检和故障根因；还能自己出题。',
+          '{@sim}. One 3.3 V device, seven tests, six bins: edit limits, run lots, read Cpk and the wafer map, then judge overkill, underkill and the root cause—and write your own question.',
+        ),
+      },
+      {
+        title: loc('和讲义的关系', 'How this relates to the lessons'),
+        text: loc(
+          '词在 {@pmu} / {@timing} / {@dc}。这里不讲新名词，只让你亲手把 Pass 拧成 Fail，再自己说出原因。',
+          'The terms are in {@pmu} / {@timing} / {@dc}. No new names here: you turn a pass into a fail yourself, then say why.',
+        ),
+      },
+    ],
+  },
+  {
     id: 'glossary',
     title: loc('术语表', 'Glossary'),
     blurb: loc(
-      '把 D、F、T（MOS 管）、L（PCB）几条轨道里讲到的名词收在一起：原文、中英文名、一句话解释和出处课程。可以搜索，可以按课程或按 A–Z 看。',
-      'Terms from the D, F, T (MOSFETs) and L (PCB) tracks in one place: the original name, Chinese and English names, a one-line definition and the lessons it comes from. Search it, or browse by lesson or A–Z.',
+      '把 D、F、T（MOS 管）、L（PCB）、A（模拟）、H（高速）、R（射频）、M（存储器）几条轨道里讲到的名词收在一起：原文、中英文名、一句话解释和出处课程。可以搜索，可以按课程或按 A–Z 看。',
+      'Terms from the D, F, T (MOSFETs), L (PCB), A (analog), H (high-speed), R (RF) and M (memory) tracks in one place: the original name, Chinese and English names, a one-line definition and the lessons it comes from. Search it, or browse by lesson or A–Z.',
     ),
     ready: true,
     lessons: [],

@@ -1,0 +1,16 @@
+/* ANA-03 ATE 模拟资源与负载板：资源下拉与操作按钮（共享版式见 ana.css） */
+
+.res-select {
+  min-width: 170px;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--fig-box);
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+}
+
+.res-actions {
+  margin-top: 12px;
+}

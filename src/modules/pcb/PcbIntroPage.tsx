@@ -13,11 +13,10 @@ import { PCB_META } from './meta'
 import { RoleFig } from './IntroFigs'
 import { LevelFig } from './IntroFigs2'
 import { TypeFig } from './IntroFigs3'
-import { IntroGlossary } from './IntroGlossary'
 import '../prep/prep.css'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
-type Focus = 'role' | 'level' | 'type' | 'gloss'
+type Focus = 'role' | 'level' | 'type'
 
 function Line({ label, text, onOpen }: { label: LText; text: LText; onOpen: (id: ModuleId) => void }) {
   const { t } = useLocale()
@@ -44,7 +43,6 @@ export function PcbIntroPage({ moduleId, onModuleChange }: Props) {
     role: { kicker: S.kickerRole, title: role.title, text: role.text },
     level: { kicker: S.kickerLevel, title: level.title, text: level.text },
     type: { kicker: S.kickerType, title: type.title, text: type.text },
-    gloss: { kicker: S.kickerTerm, title: S.glossTitle, text: S.glossNote },
   }
   const shown = notes[focus]
 
@@ -117,13 +115,6 @@ export function PcbIntroPage({ moduleId, onModuleChange }: Props) {
           <Line label={S.typeWhy} text={type.why} onOpen={onModuleChange} />
         </Callout>
         <Related ids={['pcbMaterial', 'pcbStack', 'connection']} onOpen={onModuleChange} />
-      </Section>
-
-      <Section title={t(S.glossTitle)} note={t(S.glossNote)}>
-        <div onPointerDown={() => setFocus('gloss')} onKeyDown={() => setFocus('gloss')}>
-          <IntroGlossary onOpen={onModuleChange} />
-        </div>
-        <Related ids={['pcbMaterial', 'pcbStack', 'pcbFab', 'pcbSupply', 'pcbDfm']} onOpen={onModuleChange} />
       </Section>
 
       <Section title={t(S.takeawayTitle)}>

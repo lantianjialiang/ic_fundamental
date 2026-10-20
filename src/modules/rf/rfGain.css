@@ -1,0 +1,51 @@
+/* RF-05 增益与插入损耗：控件行与图、读数两栏 */
+
+.rfg-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.rfg-controls > .rfg-field,
+.rfg-controls > label {
+  min-width: 0;
+}
+
+.rfg-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rfg-field__label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rfg-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.rfg-grid .term-fig {
+  min-width: 0;
+}
+
+.rfg-cell {
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.rfg-cell .readout {
+  margin-top: 0;
+}
+
+@media (max-width: 960px) {
+  .rfg-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

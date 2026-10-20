@@ -1,0 +1,155 @@
+/* RF-13 校准课：控件行、链路示意、误差曲线 */
+
+.rf-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.rf-controls > .rf-field,
+.rf-controls > label {
+  min-width: 0;
+}
+
+.rf-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rf-field__label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rf-cal-path-wrap,
+.rf-cal-err-wrap {
+  margin: 0;
+  min-width: 0;
+}
+
+.rf-cal-path {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.rf-cal-path-wrap figcaption {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.rf-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+  margin-top: 12px;
+}
+
+.rf-cell {
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.rf-cell .readout {
+  margin-top: 0;
+}
+
+.rf-cal-err {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* SVG 共用样式：颜色走 CSS 变量，明暗两套主题都能看清 */
+.rf-fig-bg {
+  fill: var(--panel);
+}
+
+.rf-fig-box {
+  fill: var(--card);
+  stroke: var(--line-2);
+  stroke-width: 1.2;
+}
+
+.rf-fig-box.is-on {
+  stroke: var(--gold);
+  stroke-width: 2.5;
+}
+
+.rf-fig-wire {
+  stroke: var(--blue);
+  stroke-width: 2;
+}
+
+.rf-fig-text {
+  fill: var(--text-2);
+  font-size: 12px;
+}
+
+.rf-fig-muted {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+.rf-fig-muted.is-on {
+  fill: var(--gold);
+  font-weight: 700;
+}
+
+.rf-fig-axis {
+  stroke: var(--line-2);
+  stroke-width: 1;
+}
+
+.rf-fig-grid {
+  stroke: var(--line-2);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.rf-cal-plane {
+  stroke: var(--line-2);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 3;
+}
+
+.rf-cal-plane.is-on {
+  stroke: var(--gold);
+  stroke-width: 3;
+  stroke-dasharray: none;
+}
+
+.rf-cal-spec {
+  fill: var(--gold-bg);
+}
+
+.rf-cal-spec-line {
+  stroke: var(--gold);
+  stroke-width: 1;
+  stroke-dasharray: 5 3;
+}
+
+.rf-cal-line--before {
+  stroke: var(--red);
+  stroke-width: 2;
+  fill: none;
+}
+
+.rf-cal-line--after {
+  stroke: var(--blue);
+  stroke-width: 2;
+  fill: none;
+}
+
+@media (max-width: 960px) {
+  .rf-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,0 +1,93 @@
+/* 综合课：测试程序编辑器（顺序 + guardband）与批次控件 */
+
+.cap-order {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
+}
+
+.cap-order__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+}
+
+.cap-order__row--head {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.cap-order__no {
+  width: 18px;
+  text-align: center;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.cap-order__name {
+  flex: 1 1 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.cap-order__limit {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.cap-order__moves {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.cap-order__moves .lab__btn {
+  min-width: 30px;
+  padding: 2px 8px;
+}
+
+.cap-order__guard {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.cap-order__row--head .cap-order__name,
+.cap-order__row--head .cap-order__guard {
+  color: var(--muted);
+}
+
+.cap-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.cap-head__name {
+  color: var(--text-2);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.cap-export__note {
+  margin: 8px 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+}

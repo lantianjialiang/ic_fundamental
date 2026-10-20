@@ -1,0 +1,163 @@
+/* MEM-06 存储器时序：控件、时序条与读数、二分轨迹、Shmoo 图 */
+
+.mtim-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.mtim-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mtim-field__label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.mtim-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.mtim-grid .term-fig {
+  min-width: 0;
+}
+
+.mtim-cell-side {
+  min-width: 0;
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.mtim-cell-side .readout {
+  margin-top: 0;
+}
+
+.mtim-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.mtim-note {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.mtim-trace {
+  margin: 10px 0 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 4px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+.mtim-trace li.is-pass {
+  color: var(--pass, #34d399);
+}
+
+.mtim-trace li.is-fail {
+  color: var(--fail, #f87171);
+}
+
+.mtim-wave .mtim-valid {
+  fill: rgba(52, 211, 153, 0.22);
+}
+
+.mtim-wave .mtim-bad {
+  fill: rgba(148, 163, 184, 0.12);
+}
+
+.mtim-wave .mtim-axis,
+.mtim-wave .mtim-edge {
+  stroke: var(--muted, #94a3b8);
+  stroke-width: 1;
+}
+
+.mtim-wave .mtim-next {
+  stroke: var(--muted, #94a3b8);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.mtim-wave .mtim-strobe {
+  stroke-width: 2;
+}
+
+.mtim-wave .mtim-strobe.is-pass {
+  stroke: var(--pass, #34d399);
+}
+
+.mtim-wave .mtim-strobe.is-fail {
+  stroke: var(--fail, #f87171);
+}
+
+.mtim-wave .mtim-strobe-label {
+  font-size: 12px;
+}
+
+.mtim-wave .mtim-strobe-label.is-pass {
+  fill: var(--pass, #34d399);
+}
+
+.mtim-wave .mtim-strobe-label.is-fail {
+  fill: var(--fail, #f87171);
+}
+
+.mtim-shmoo .mtim-cell.is-pass {
+  fill: rgba(52, 211, 153, 0.55);
+}
+
+.mtim-shmoo .mtim-cell.is-fail {
+  fill: rgba(148, 163, 184, 0.22);
+}
+
+.mtim-shmoo .mtim-cur {
+  fill: none;
+  stroke: var(--accent, #60a5fa);
+  stroke-width: 2;
+}
+
+.mtim-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.mtim-chip {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-left: 8px;
+}
+
+.mtim-chip.is-pass {
+  background: rgba(52, 211, 153, 0.55);
+}
+
+.mtim-chip.is-fail {
+  background: rgba(148, 163, 184, 0.22);
+}
+
+@media (max-width: 960px) {
+  .mtim-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

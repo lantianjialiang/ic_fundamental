@@ -1,0 +1,32 @@
+/* RF-10 相位噪声：曲线图与频偏滑块的版式（控件与两栏布局复用 hs.css） */
+
+.rf-pn-fig {
+  min-width: 0;
+  margin: 0;
+}
+
+.rf-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  cursor: crosshair;
+}
+
+.rf-pn-slider {
+  margin: 4px 0 12px;
+}
+
+.rf-pn-slider label {
+  display: grid;
+  gap: 6px;
+}
+
+.rf-pn-slider span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rf-pn-slider input[type='range'] {
+  width: 100%;
+}

@@ -1,0 +1,149 @@
+/* MEM-05 March 测试：控件行、阵列与读数两栏、元素列表、逐步日志与覆盖表 */
+
+.mmar-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.mmar-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mmar-field__label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.mmar-select {
+  min-width: 200px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border, #334);
+  background: var(--panel, transparent);
+  color: var(--text);
+  font: inherit;
+}
+
+.mmar-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.mmar-progress {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.mmar-note {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.mmar-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.mmar-grid .term-fig {
+  min-width: 0;
+}
+
+.mmar-cell {
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.mmar-cell .readout {
+  margin-top: 0;
+}
+
+.mmar-elements__title {
+  margin: 12px 0 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.mmar-elements {
+  margin: 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 4px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+.mmar-elem {
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--text);
+}
+
+.mmar-elem.is-cur {
+  background: rgba(96, 165, 250, 0.18);
+  outline: 1px solid rgba(96, 165, 250, 0.6);
+}
+
+.mmar-table-block__title {
+  margin: 16px 0 4px;
+  font-weight: 600;
+}
+
+.mmar-log {
+  max-height: 260px;
+  overflow: auto;
+  margin-top: 8px;
+  border: 1px solid var(--border, #334);
+  border-radius: 8px;
+}
+
+.mmar-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.mmar-table th,
+.mmar-table td {
+  padding: 5px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border, #334);
+  white-space: nowrap;
+}
+
+.mmar-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--panel, #111827);
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.mmar-row.is-pending {
+  opacity: 0.4;
+}
+
+.mmar-cov td.is-hit {
+  color: var(--pass, #34d399);
+}
+
+.mmar-cov td.is-miss {
+  color: var(--fail, #f87171);
+}
+
+@media (max-width: 960px) {
+  .mmar-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,5 +1,9 @@
 import { loc, type LText } from '../i18n/locale'
 import { type ModuleId } from '../modules/catalog'
+import { ANA_EXTRA_LESSONS, ANA_TERMS } from './termsAna'
+import { HS_EXTRA_LESSONS, HS_TERMS } from './termsHs'
+import { MEM_EXTRA_LESSONS, MEM_TERMS } from './termsMem'
+import { RF_EXTRA_LESSONS, RF_TERMS } from './termsRf'
 import { MOS_TERMS } from './termsMos'
 import { PCB_TERMS } from './termsPcb'
 
@@ -2030,8 +2034,27 @@ const EXTRA_LESSONS: Record<string, ModuleId[]> = {
   via: ['pcbStack'],
 }
 
-const LINKED_BASE_TERMS: GlossaryTerm[] = BASE_TERMS.map((term) =>
-  EXTRA_LESSONS[term.id] ? { ...term, lessons: [...term.lessons, ...EXTRA_LESSONS[term.id]] } : term,
-)
+/** 所有“已有词条的课程补充”来源：数字基础、模拟、高速各自的表；同一个词条可以被多处补充 */
+const EXTRA_SOURCES: Array<Record<string, ModuleId[]>> = [
+  EXTRA_LESSONS,
+  ...ANA_EXTRA_LESSONS,
+  ...HS_EXTRA_LESSONS,
+  ...RF_EXTRA_LESSONS,
+  ...MEM_EXTRA_LESSONS,
+]
 
-export const TERMS: GlossaryTerm[] = [...LINKED_BASE_TERMS, ...MOS_TERMS, ...PCB_TERMS]
+/** 对任意一个轨道的词条都生效，所以 ANA / HS 课可以引用 MOS、PCB 里的词条 */
+function withExtraLessons(term: GlossaryTerm): GlossaryTerm {
+  const more = EXTRA_SOURCES.flatMap((source) => {
+    const hit: ModuleId[] | undefined = source[term.id]
+    return hit ?? []
+  })
+  if (more.length === 0) {
+    return term
+  }
+  return { ...term, lessons: [...new Set([...term.lessons, ...more])] }
+}
+
+export const TERMS: GlossaryTerm[] = [...BASE_TERMS, ...MOS_TERMS, ...PCB_TERMS, ...ANA_TERMS, ...HS_TERMS, ...RF_TERMS, ...MEM_TERMS].map(
+  withExtraLessons,
+)
