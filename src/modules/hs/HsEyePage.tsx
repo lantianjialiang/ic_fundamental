@@ -9,7 +9,8 @@ import { Callout, Knob, Readout, Seg } from '../fund/parts'
 import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import { EyeFig } from './EyeFig'
-import { INTRO, MISCONCEPTIONS, QUIZ, RATE_OPTIONS, S, TAKEAWAY, taskItems, verdictOf } from './eyeData'
+import { PrereqSection } from './HsPrereq'
+import { INTRO, MISCONCEPTIONS, PREREQ, QUIZ, RATE_OPTIONS, S, TAKEAWAY, taskItems, verdictOf } from './eyeData'
 import { DEFAULT_EYE, analyseEye, type EyeState } from './eyeModel'
 import { HS_META } from './meta'
 import './hs.css'
@@ -87,6 +88,8 @@ export function HsEyePage({ moduleId, onModuleChange }: Props) {
       <Section title={t(S.quizTitle)} note={t(S.quizNote)}>
         <QuizList questions={QUIZ} yes={t(ui.fund.yes)} no={t(ui.fund.no)} />
       </Section>
+
+      <PrereqSection title={S.prereqTitle} note={S.prereqNote} items={PREREQ} />
     </LessonFrame>
   )
 }

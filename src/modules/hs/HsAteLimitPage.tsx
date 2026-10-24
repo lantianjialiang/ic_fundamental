@@ -9,11 +9,13 @@ import { Callout, Knob, Readout, Seg } from '../fund/parts'
 import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import { EyeCanvas, ResponseFig } from './AteLimitFig'
+import { PrereqSection } from './HsPrereq'
 import {
   DEEMBED_OPTIONS,
   INTRO,
   LOOP_PARAS,
   MISCONCEPTIONS,
+  PREREQ,
   QUIZ,
   S,
   TAKEAWAY,
@@ -150,6 +152,8 @@ export function HsAteLimitPage({ moduleId, onModuleChange }: Props) {
       <Section title={t(S.quizTitle)} note={t(S.quizNote)}>
         <QuizList questions={QUIZ} yes={t(ui.fund.yes)} no={t(ui.fund.no)} />
       </Section>
+
+      <PrereqSection title={S.prereqTitle} note={S.prereqNote} items={PREREQ} />
     </LessonFrame>
   )
 }

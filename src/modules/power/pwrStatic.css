@@ -1,0 +1,59 @@
+/* PWR-02 静态参数测试：力与测量表、误差曲线的版式（控件与两栏布局复用 hs.css） */
+
+.pwr-table {
+  width: 100%;
+  margin: 8px 0 12px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.pwr-table th,
+.pwr-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line-2);
+  text-align: left;
+  vertical-align: top;
+}
+
+.pwr-table th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.pwr-figs {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pwr-fig {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pwr-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.pwr-fig figcaption {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.pwr-fig__summary {
+  font-family: var(--mono);
+  color: var(--text);
+}
+
+.pwr-formula {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}

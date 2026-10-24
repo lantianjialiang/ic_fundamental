@@ -74,6 +74,11 @@ export const S = {
   takeawayTitle: loc('带走这几句', 'Key takeaways'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
+  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqNote: loc(
+    '正文里的眼宽、眼高、总误码率与最佳相位都从这一节列出的几条推出。读完正文再回来看。',
+    'The eye width, eye height, total BER and best phase in the body are derived from the items below. Read the body first, then come back here.',
+  ),
   asideLater: loc(
     '真实的高速测试还要做 PRBS 同步、环回配置、CDR 的锁定与均衡器设置，并在多个温度与电压下重复。这里的样片与规格都是示意的，见 {@hsInterface}。',
     'Real high-speed test also covers PRBS sync, loopback setup, CDR lock and equaliser settings, repeated over temperature and voltage. The samples and limits here are illustrative; see {@hsInterface}.',
@@ -153,6 +158,30 @@ export const MISCONCEPTIONS = [
   loc(
     '采样点一定放在眼的几何中心。每颗样片的偏移（skew）不同，最佳相位就不同；要用时序扫描去找浴盆的最低点。',
     'The sampling point is always at the geometric centre of the eye. Each sample has its own skew, so the best phase differs; use a timing sweep to find the bottom of the bathtub.',
+  ),
+]
+
+/** 课末补充：眼宽与 TJ、眼高与电压噪声、误码率相加、最佳相位在 skew + 0.5 UI、直接计数与外推 */
+export const PREREQ: LText[] = [
+  loc(
+    '眼宽与 TJ：UI 减去 TJ(BER) 得到眼开口（ps），再除以 UI 得到眼宽（UI）。TJ = DJ_pp + 2·Q⁻¹(BER)·RJ_rms（见 HS-04）。例：DJ = 18 ps、RJ = 2.5 ps、BER 1e-12 时，TJ = 18 + 2 × 7.03 × 2.5 ≈ 53 ps；10 Gb/s 下眼宽 = (100 − 53) ÷ 100 ≈ 0.47 UI。',
+    'Eye width and TJ: subtract TJ(BER) from the UI to get the eye opening in ps, then divide by the UI to get the eye width in UI. TJ = DJ_pp + 2·Q⁻¹(BER)·RJ_rms (see HS-04). Example: with DJ = 18 ps, RJ = 2.5 ps and BER 1e-12, TJ = 18 + 2 × 7.03 × 2.5 ≈ 53 ps; at 10 Gb/s the eye width is (100 − 53) ÷ 100 ≈ 0.47 UI.',
+  ),
+  loc(
+    '眼高与电压噪声：噪声 σ 同时压低两侧的电平。最坏的“1”电平 = E/2 − Q⁻¹·σ，最坏的“0”电平 = −E/2 + Q⁻¹·σ，两者之差为 EH = E − 2·Q⁻¹(BER)·σ，其中 E 是无噪声的中心眼高。例：E = 200 mV、σ = 12 mV、BER 1e-12 时，EH = 200 − 2 × 7.03 × 12 ≈ 31 mV，低于 120 mV 的规格。',
+    'Eye height and voltage noise: the noise squeezes both levels. The worst “1” level is E/2 − Q⁻¹·σ and the worst “0” level is −E/2 + Q⁻¹·σ, so their difference is EH = E − 2·Q⁻¹(BER)·σ, where E is the centre eye height without noise. Example: with E = 200 mV, σ = 12 mV and BER 1e-12, EH = 200 − 2 × 7.03 × 12 ≈ 31 mV, below the 120 mV spec.',
+  ),
+  loc(
+    '误码率相加：时序误差与电压误差是两个独立的原因，任何一个发生都会出错。两者都很小时，总 BER ≈ 时序 BER + 电压 BER。代码 berAt() 就是这样相加的，电压项为 Q(E ÷ 2σ)，它与眼高公式用的是同一个 Q⁻¹ 关系。',
+    'Adding BER parts: timing errors and voltage errors are two independent causes, and either one makes a bit wrong. When both are small, the total BER ≈ timing BER + voltage BER. The code berAt() adds them this way, with the voltage term Q(E ÷ 2σ), which uses the same Q⁻¹ relation as the eye-height formula.',
+  ),
+  loc(
+    '最佳采样相位为什么在 skew + 0.5 UI：令 d = φ − skew，时序 BER 是两条边沿尾部之和，交换 d 与 UI − d 时结果不变，所以它关于 d = UI ÷ 2 对称。对称点上两侧边沿都离采样沿最远，这里 BER 最小。因此要做扫描：skew 不为零时，中心不在 0.5 UI。',
+    'Why the best phase is at skew + 0.5 UI: let d = φ − skew. The timing BER is the sum of two edge tails, and swapping d with UI − d leaves it unchanged, so it is symmetric about d = UI ÷ 2. At the symmetric point both edges are farthest from the sampling edge, so BER is smallest there. This is why a sweep is needed: with a non-zero skew the centre is not at 0.5 UI.',
+  ),
+  loc(
+    '直接计数与外推：要用计数证明 BER 低于 1e-12（95% 置信），需要约 3 × 10¹² 位（3 ÷ N 公式见 HS-06），10 Gb/s 下约 300 s。本页的 1e-12 眼宽与眼高是用 TJ 与噪声模型外推的，报告里要写明这一点。',
+    'Counting versus extrapolation: showing BER below 1e-12 at 95% confidence by counting needs about 3 × 10¹² bits (the 3 ÷ N rule in HS-06), about 300 s at 10 Gb/s per lane. The 1e-12 eye width and height on this page are extrapolated with the TJ and noise models, and the report should say so.',
   ),
 ]
 

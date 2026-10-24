@@ -5,7 +5,7 @@ import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
 import { type ModuleId } from '../catalog'
 import { Callout, Cards, type Note } from '../fund/parts'
-import { CHAIN, CHIP_TYPES, QUIZ, SYS, SYS_ORDER, TAKEAWAY, TERMS, WHAT, type ChainId, type SysId, type TermId } from './data/content'
+import { CHAIN, CHIP_TYPES, QUIZ, STDF_PARAS, STDF_RECORDS, STDF_TITLE, SYS, SYS_ORDER, TAKEAWAY, TERMS, WHAT, type ChainId, type SysId, type TermId } from './data/content'
 import { GlossaryArt } from './GlossaryArt'
 import { ChainFig, SysFig } from './IntroFigs'
 import './module00.css'
@@ -109,6 +109,20 @@ export function Module00Page({ moduleId, onModuleChange, onOpenConnection }: Mod
             setNote({ kicker: ui.m01.kickerDiagram, title: SYS[id].title, text: SYS[id].text })
           }}
         />
+      </Section>
+
+      <Section title={t(STDF_TITLE)}>
+        {STDF_PARAS.map((para) => (
+          <p key={para.zh}>{t(para)}</p>
+        ))}
+        <Callout>
+          {STDF_RECORDS.map((rec) => (
+            <p key={rec.id}>
+              <b>{rec.id}</b>
+              {` · ${t(rec.when)} · ${t(rec.has)}`}
+            </p>
+          ))}
+        </Callout>
       </Section>
 
       <Section title={t(ui.m01.takeawayTitle)}>

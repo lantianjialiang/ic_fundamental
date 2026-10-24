@@ -7,8 +7,8 @@ import { type Bias, type Defect, type DefectKind, type OsVerdict, type PinId } f
 export const S = {
   introTitle: loc('这一课怎么用', 'How to use this lesson'),
   introBody: loc(
-    '下面是一台简化的 ATE 工作站。左边选测试项，中间配条件，按 Run 执行；每跑一次，Datalog 里多一行。点 Datalog 的任意一行，结果区和右侧栏会解释它为什么 PASS、FAIL 或无效。多改几次条件再跑，比较前后两行。',
-    'Below is a simplified ATE workstation. Pick a test on the left, set the conditions in the middle and press Run; every run adds a line to the datalog. Click any datalog line and the result panel and the side bar explain why it passed, failed or was invalid. Change the conditions, run again, and compare the lines.',
+    '先在第一个标签「基础台」里拧 Period、Drive、Strobe 与漏电限流，看 Strobe 落在哪里会 PASS 或 FAIL（原 D15 实验台并入本课）。然后是一台简化的 ATE 工作站：左边选测试项，中间配条件，按 Run 执行；每跑一次，Datalog 里多一行。点 Datalog 的任意一行，结果区和右侧栏会解释它为什么 PASS、FAIL 或无效。多改几次条件再跑，比较前后两行。',
+    'Start with the first tab, the basic bench: turn period, drive, strobe and the leakage limit and see where the strobe makes a PASS or FAIL (the former D15 bench is merged into this lesson). Then comes a simplified ATE workstation: pick a test on the left, set the conditions in the middle and press Run; every run adds a line to the datalog. Click any datalog line and the result panel and the side bar explain why it passed, failed or was invalid. Change the conditions, run again, and compare the lines.',
   ),
   disclaimer: loc(
     '数值仅为教学示例，不代表任何具体芯片的真实规格。教学 DUT：VT8，8 脚，VDD = 1.8 V，绝对最大额定值 2.0 V。',

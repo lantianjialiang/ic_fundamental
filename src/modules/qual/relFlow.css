@@ -1,0 +1,145 @@
+/* REL-08 量产测试流程：节点编辑器、参数控件、温度图与 Pareto 图、批次报告 */
+
+.rf-lab {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.rf-flow {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rf-flow__title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.rf-flow__list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rf-flow__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+}
+
+.rf-flow__item.is-off {
+  opacity: 0.55;
+}
+
+.rf-flow__btns {
+  display: inline-flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.rf-flow__btns button {
+  min-width: 32px;
+}
+
+.rf-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rf-controls {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rf-slider {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rf-slider input {
+  width: 100%;
+}
+
+.rf-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rf-field__label,
+.rf-group {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.rf-group {
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.rf-flow-figs {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rf-flow-fig {
+  margin: 0;
+  min-width: 0;
+}
+
+.rf-flow-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.rf-report {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.rf-report p {
+  margin: 0;
+}
+
+.rf-report__title {
+  font-weight: 600;
+}
+
+.rf-export {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.rf-export p {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .rf-lab {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

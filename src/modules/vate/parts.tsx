@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
 import { loc, type LText } from '../../i18n/locale'
 
-export type Note = { kicker: LText; title: LText | string; text: LText | string }
+export type Note = { kicker: LText | string; title: LText | string; text: LText | string }
 
 export type Tone = 'pass' | 'fail' | 'warn' | 'muted'
 

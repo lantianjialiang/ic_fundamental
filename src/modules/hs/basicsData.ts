@@ -14,8 +14,13 @@ export const S = {
   introTitle: loc('数据速率、UI 与上升时间', 'Data rate, UI and rise time'),
   coreTitle: loc('拨一拨：速率与上升时间', 'Try it: data rate and rise time'),
   coreNote: loc(
-    '一位占的时间是 UI = 1000 / 速率。上升时间 tr 由通道带宽决定（BW ≈ 0.35 / tr）。下图是一段 0/1 码型经过一阶 RC 通道后的波形，虚线是理想方波。',
-    'One bit lasts UI = 1000 / rate. Rise time tr is set by the channel bandwidth (BW ≈ 0.35 / tr). The chart shows a 0/1 pattern after a first-order RC channel; the dashed line is the ideal square wave.',
+    '一位占的时间是 UI = 1000 / 速率（ps，推导见本页最后的补充一节）。上升时间 tr 由通道带宽决定（BW ≈ 350 / tr，tr 用 ps、BW 用 GHz）。下图是一段 0/1 码型经过一阶 RC 通道后的波形，虚线是理想方波。',
+    'One bit lasts UI = 1000 / rate in ps (derived in the supplement at the end of this page). Rise time tr is set by the channel bandwidth (BW ≈ 350 / tr, with tr in ps and BW in GHz). The chart shows a 0/1 pattern after a first-order RC channel; the dashed line is the ideal square wave.',
+  ),
+  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqNote: loc(
+    '正文里的 1000、0.35、9、0.7 都从这一节列出的几条推出。读完正文再回来看。',
+    'The 1000, 0.35, 9 and 0.7 in the body are derived from the items below. Read the body first, then come back here.',
   ),
   rateLabel: loc('数据速率', 'Data rate'),
   trLabel: loc('上升时间 tr（10%–90%）', 'Rise time tr (10%–90%)'),
@@ -68,8 +73,36 @@ export const INTRO = [
     'High-speed serial links send data one bit after another. At Gb/s rates one unit interval (UI) lasts only hundreds to tens of picoseconds. The RC low-pass from {@anaSignal} applies here too: an edge takes time to finish, and the UI does not wait for it.',
   ),
   loc(
-    '这一课只做三件事：从速率算出 UI；从带宽算出上升时间（BW ≈ 0.35 / tr）；用 tr / UI 判断一位结束时波形是否已经到达稳态。',
-    'This lesson does three things: compute the UI from the rate; compute the rise time from the bandwidth (BW ≈ 0.35 / tr); and use tr / UI to judge whether the waveform has reached steady state at the end of each bit.',
+    '这一课只做三件事：从速率算出 UI；从带宽算出上升时间（BW ≈ 350 / tr，tr 用 ps）；用 tr / UI 判断一位结束时波形是否已经到达稳态。',
+    'This lesson does three things: compute the UI from the rate; compute the rise time from the bandwidth (BW ≈ 350 / tr, with tr in ps); and use tr / UI to judge whether the waveform has reached steady state at the end of each bit.',
+  ),
+]
+
+/** 先讲清楚的几个推导：每个数字（1000、0.35、9、0.7）都能从单位或一阶 RC 的阶跃响应得出 */
+export const PREREQ: LText[] = [
+  loc(
+    '单位（1000 从哪来）：1 Gb/s = 10⁹ bit/s，一位占 1 ÷ (10⁹ × R) 秒。1 秒 = 10¹² ps，所以 UI = 10¹² ÷ (10⁹ × R) ps = 1000 ÷ R ps。10 Gb/s 时 UI = 1000 ÷ 10 = 100 ps。',
+    'Units (where the 1000 comes from): 1 Gb/s = 10⁹ bit/s, so one bit lasts 1 ÷ (10⁹ × R) s. One second is 10¹² ps, so UI = 10¹² ÷ (10⁹ × R) ps = 1000 ÷ R ps. At 10 Gb/s, UI = 1000 ÷ 10 = 100 ps.',
+  ),
+  loc(
+    '时间常数 τ：一阶 RC 的 τ = R·C。对阶跃输入，输出 v(t) = 1 − e^(−t/τ)，其中 e ≈ 2.718 是自然对数的底；走过 τ 时，输出已完成约 63%。',
+    'Time constant τ: for a first-order RC, τ = R·C. For a step input the output is v(t) = 1 − e^(−t/τ), where e ≈ 2.718 is the base of natural logarithms; after one τ the output has covered about 63%.',
+  ),
+  loc(
+    '上升时间 tr（10%–90%）：t10 = −τ·ln 0.9 ≈ 0.105 τ，t90 = −τ·ln 0.1 ≈ 2.303 τ，所以 tr = t90 − t10 = τ·ln 9 ≈ 2.2 τ，即 τ = tr ÷ ln 9。',
+    'Rise time tr (10%–90%): t10 = −τ·ln 0.9 ≈ 0.105 τ and t90 = −τ·ln 0.1 ≈ 2.303 τ, so tr = t90 − t10 = τ·ln 9 ≈ 2.2 τ, i.e. τ = tr ÷ ln 9.',
+  ),
+  loc(
+    '带宽 BW：一阶 RC 的 −3 dB 频率（幅度降到 1/√2 ≈ 70.7% 的点）是 f = 1 ÷ (2π·τ)。于是 BW × tr = ln 9 ÷ (2π) ≈ 0.35，即 BW ≈ 0.35 ÷ tr（tr 用秒、BW 用赫兹）；tr 用 ps、BW 用 GHz 时，因为 1 ns = 1000 ps，化成 BW ≈ 350 ÷ tr。',
+    'Bandwidth BW: the −3 dB frequency of a first-order RC (where the amplitude drops to 1/√2 ≈ 70.7%) is f = 1 ÷ (2π·τ). Then BW × tr = ln 9 ÷ (2π) ≈ 0.35, i.e. BW ≈ 0.35 ÷ tr (tr in seconds, BW in hertz). With tr in ps and BW in GHz, 1 ns = 1000 ps turns this into BW ≈ 350 ÷ tr.',
+  ),
+  loc(
+    '完成度 1 − 9^(−UI/tr)：一位结束时，走完的比例是 1 − e^(−UI/τ)。代入 τ = tr ÷ ln 9，得 e^(−UI/τ) = e^(−(UI/tr)·ln 9) = 9^(−UI/tr)。tr/UI = 0.5 时是 9^(−2) = 1/81 ≈ 1.2%，即约 99% 到位。',
+    'Completion 1 − 9^(−UI/tr): at the end of a bit the share covered is 1 − e^(−UI/τ). Substituting τ = tr ÷ ln 9 gives e^(−UI/τ) = e^(−(UI/tr)·ln 9) = 9^(−UI/tr). At tr/UI = 0.5 that is 9^(−2) = 1/81 ≈ 1.2%, so about 99% has settled.',
+  ),
+  loc(
+    '0.7 从哪来：判据 tr ≤ 0.5·UI = 500 ÷ R ps。代入 BW ≈ 350 ÷ tr，得 BW ≥ 350·R ÷ 500 = 0.7·R GHz。',
+    'Where 0.7 comes from: the criterion tr ≤ 0.5·UI = 500 ÷ R ps. Substituting BW ≈ 350 ÷ tr gives BW ≥ 350·R ÷ 500 = 0.7·R GHz.',
   ),
 ]
 
@@ -83,14 +116,14 @@ export const MISCONCEPTIONS: LText[] = [
     'Enough bandwidth once means any rate works. The bandwidth needed grows with rate: with tr ≤ 0.5 UI, BW ≥ 0.7 × rate, so doubling the rate doubles the bandwidth requirement.',
   ),
   loc(
-    '上升时间和带宽是两件独立的事。BW ≈ 0.35 / tr 把两者绑在一起：知道一个，就能算出另一个。',
-    'Rise time and bandwidth are separate things. BW ≈ 0.35 / tr ties them together: knowing one gives you the other.',
+    '上升时间和带宽是两件独立的事。BW ≈ 350 / tr（tr 用 ps）把两者绑在一起：知道一个，就能算出另一个。',
+    'Rise time and bandwidth are separate things. BW ≈ 350 / tr (tr in ps) ties them together: knowing one gives you the other.',
   ),
 ]
 
 export const TAKEAWAY: LText = loc(
-  'UI = 1000 / 速率（ps）；BW ≈ 0.35 / tr（tr 为 ps 时 BW 为 GHz）；判据 tr / UI ≤ 0.5，一位结束时约 99% 到位，即波形到达稳态；由此得到 BW ≥ 0.7 × 速率。',
-  'UI = 1000 / rate (ps); BW ≈ 0.35 / tr (BW in GHz when tr is in ps); criterion tr / UI ≤ 0.5, so about 99% has settled at the end of each bit and the waveform is steady; hence BW ≥ 0.7 × rate.',
+  'UI = 1000 / 速率（ps）；BW ≈ 350 / tr（tr 用 ps、BW 用 GHz，等价于 tr 用 ns 时的 0.35 / tr）；判据 tr / UI ≤ 0.5，一位结束时约 99% 到位，即波形到达稳态；由此得到 BW ≥ 0.7 × 速率。',
+  'UI = 1000 / rate (ps); BW ≈ 350 / tr (tr in ps, BW in GHz; the same as 0.35 / tr with tr in ns); criterion tr / UI ≤ 0.5, so about 99% has settled at the end of each bit and the waveform is steady; hence BW ≥ 0.7 × rate.',
 )
 
 /** 右侧说明栏：根据波形结果给结论和原因 */
@@ -153,7 +186,7 @@ export const QUIZ: QuizQuestion[] = [
   },
   {
     id: 'q2',
-    prompt: loc('上升时间 tr = 70 ps，用 BW ≈ 0.35 / tr 估算，带宽约是多少？', 'Rise time tr = 70 ps. Using BW ≈ 0.35 / tr, about what bandwidth is needed?'),
+    prompt: loc('上升时间 tr = 70 ps，用 BW ≈ 350 / tr（tr 用 ps）估算，带宽约是多少？', 'Rise time tr = 70 ps. Using BW ≈ 350 / tr (tr in ps), about what bandwidth is needed?'),
     options: [
       { id: 'a', text: loc('2.5 GHz', '2.5 GHz') },
       { id: 'b', text: loc('5 GHz', '5 GHz') },

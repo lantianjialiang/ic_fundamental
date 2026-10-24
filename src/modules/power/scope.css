@@ -1,0 +1,42 @@
+/* 示波器视图（ScopeView）：多通道折线 + 可选积分阴影 */
+
+.scope {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.scope__svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  background: var(--well);
+}
+
+.scope__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.scope__key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.scope__key i {
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.scope__summary {
+  font-size: 13px;
+  color: var(--muted);
+}

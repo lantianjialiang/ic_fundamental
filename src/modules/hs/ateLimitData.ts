@@ -63,6 +63,11 @@ export const S = {
   takeawayTitle: loc('带走这几句', 'Key takeaways'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
+  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqNote: loc(
+    '正文里的夹具带宽、级联上升时间与去嵌入都从这一节列出的几条推出。读完正文再回来看。',
+    'The fixture bandwidth, cascaded rise time and de-embedding in the body are derived from the items below. Read the body first, then come back here.',
+  ),
   asideLater: loc(
     '真实的 ATE 还要考虑时钟抖动、串扰、电源噪声和接触电阻；这里只练带宽、夹具损耗与去嵌入三件事。SerDes 的 BER 与时序扫描见下一课。',
     'Real ATE work also covers clock jitter, crosstalk, supply noise and contact resistance; here we only practise bandwidth, fixture loss and de-embedding. BER and timing sweeps come in the next lesson.',
@@ -111,6 +116,30 @@ export const MISCONCEPTIONS = [
   loc(
     '夹具去嵌入之后，ATE 的带宽就不再影响结果。去嵌入只去掉已经建模的那一段；ATE 通道若没有被校准，它的带宽限制仍然留在测得眼里。',
     'Once the fixture is de-embedded, ATE bandwidth no longer affects the result. De-embedding removes only the part that has been modelled; if the ATE channel is not calibrated, its bandwidth limit stays in the measured eye.',
+  ),
+]
+
+/** 课末补充：由损耗反算带宽、级联上升时间的平方和开方、去嵌入的逆运算、模型误差的方向、上升时间占 UI 的比例 */
+export const PREREQ: LText[] = [
+  loc(
+    '由损耗反算带宽：一阶低通在频率 f 的损耗 L = 10·log10(1 + (f/BW)²)（见 HS-02）。反过来 (f/BW)² = 10^(L/10) − 1，所以 BW = f ÷ √(10^(L/10) − 1)。例：f = 5 GHz、L = 3 dB 时 BW = 5 ÷ √(2 − 1) ≈ 5 GHz。',
+    'Bandwidth from a loss: for a first-order low-pass, the loss at frequency f is L = 10·log10(1 + (f/BW)²) (see HS-02). Solving gives (f/BW)² = 10^(L/10) − 1, so BW = f ÷ √(10^(L/10) − 1). Example: at f = 5 GHz with L = 3 dB, BW = 5 ÷ √(2 − 1) ≈ 5 GHz.',
+  ),
+  loc(
+    '级联的上升时间：每一段都是一阶低通，串接后总上升时间不是简单相加，而是按平方和开方合成：t_sys ≈ √(t₁² + t₂² + …)。例：8 GHz 与 6 GHz 两段，350 ÷ BW 分别是 43.75 ps 与 58.3 ps；直接相加得 102 ps，平方和开方约 73 ps。这是近似：假定各段独立、边沿形状相近；段数多或某一段特别慢时误差会变大。',
+    'Rise time of cascaded stages: each stage is a first-order low-pass, and chained stages combine not by a plain sum but by root-sum-square: t_sys ≈ √(t₁² + t₂² + …). Example: 8 GHz and 6 GHz stages give 350 ÷ BW = 43.75 ps and 58.3 ps; the sum is 102 ps, but the root-sum-square is about 73 ps. This is an approximation: it assumes independent stages with similar edge shapes, and the error grows with many stages or one very slow stage.',
+  ),
+  loc(
+    '去嵌入的逆运算：测得路径是一阶低通的级联。对一阶低通，y[n] = y[n−1] + a·(x[n] − y[n−1])，所以逆运算是 x[n] = y[n−1] + (y[n] − y[n−1]) ÷ a，其中 a 由带宽决定。页面的去嵌入就按这个递推计算，用的是模型带宽。',
+    'Inverse operation of de-embedding: the measured path is a cascade of first-order low-passes. For one stage, y[n] = y[n−1] + a·(x[n] − y[n−1]), so the inverse is x[n] = y[n−1] + (y[n] − y[n−1]) ÷ a, where a depends on the bandwidth. The page de-embeds with exactly this recursion, using the model bandwidth.',
+  ),
+  loc(
+    '模型误差为什么会欠补偿或过补偿：逆运算把每个跳变放大 1 ÷ a 倍。模型带宽偏大（modelErr > 0）时 a 偏大，放大倍数偏小，残留的夹具影响还在眼里，是欠补偿；模型带宽偏小时放大过头，相当于给高频加了峰化，眼可能比真实眼还好。两种情况下稳态（直流）都是准确的，差别只在跳变处。',
+    'Why model error under- or over-compensates: the inverse boosts each transition by 1 ÷ a. If the model bandwidth is too high (modelErr > 0), a is too large, the boost is too small and some fixture effect remains: under-compensation. If the model bandwidth is too low, the boost is too large, which adds high-frequency peaking and can make the eye look better than the real one. Both cases keep the steady (DC) level correct; only the transitions differ.',
+  ),
+  loc(
+    '上升时间占 UI 的比例：tr ÷ UI = tr × 速率 ÷ 1000（tr 用 ps，速率用 Gb/s）。路径上升时间固定时，速率翻倍，边沿占 UI 的比例也翻倍。例：8 GHz 的 ATE 通道上升时间 43.75 ps，4 Gb/s 时占 17.5%，10 Gb/s 时占 44%。',
+    'Share of the UI taken by the edge: tr ÷ UI = tr × rate ÷ 1000 (tr in ps, rate in Gb/s). With a fixed path rise time, doubling the rate doubles the share of the UI the edge takes. Example: an 8 GHz ATE channel has a rise time of 43.75 ps, which is 17.5% of the UI at 4 Gb/s and 44% at 10 Gb/s.',
   ),
 ]
 

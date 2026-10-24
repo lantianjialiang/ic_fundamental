@@ -40,6 +40,11 @@ export const S = {
   misTitle: loc('常见误区', 'Common misconceptions'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
+  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqNote: loc(
+    '正文里的 Q⁻¹、双狄拉克 TJ 与开口公式都从这一节列出的几条推出。读完正文再回来看。',
+    'The Q⁻¹, dual-Dirac TJ and opening formulas in the body are derived from the items below. Read the body first, then come back here.',
+  ),
   asideLater: loc(
     '直方图只抽了有限个样本，最低只能看到约 1/4000 的尾部概率，1e-12 要靠 Q 函数外推。真实的抖动分解还有码型相关的 DDJ、周期抖动和噪声耦合，这里只练 DJ、RJ 与 TJ 三件事。',
     'A histogram of finite samples only shows tail probabilities down to about 1/4000, so 1e-12 must be extrapolated with the Q function. Real jitter decomposition also includes pattern-dependent DDJ, periodic jitter and noise coupling; here we only practise DJ, RJ and TJ.',
@@ -95,6 +100,30 @@ export const MISCONCEPTIONS: LText[] = [
   loc(
     '直方图画得够多，就能直接读出 1e-12 的眼宽。4000 个样本的直方图，每个 bin 的概率最低只到约 1/4000；1e-12 要靠模型外推，这正是双狄拉克模型的用途。',
     'With enough samples the histogram shows the 1e-12 eye width directly. A 4000-sample histogram only reaches a probability of about 1/4000 per bin; 1e-12 has to be extrapolated with the model, which is what the dual-Dirac model is for.',
+  ),
+]
+
+/** 课末补充：Q 与 Q⁻¹ 的记号、高斯尾为什么乘 Q⁻¹、双狄拉克模型推导、DJ 为什么不乘 Q、直方图的极限 */
+export const PREREQ: LText[] = [
+  loc(
+    'Q 函数的记号：Q(x) 是标准正态分布的尾部概率，P(X > x)，Q(x) = ½·erfc(x ÷ √2)。页面和代码里写的 Q(BER) 实际指它的反函数 Q⁻¹(BER)：使尾部概率恰好等于 BER 的 σ 倍数。Q⁻¹(1e-9) ≈ 6，Q⁻¹(1e-12) ≈ 7.03，Q⁻¹(1e-15) ≈ 8。',
+    'Notation for Q: Q(x) is the tail probability of a standard normal, P(X > x) = ½·erfc(x ÷ √2). The page and code write Q(BER) for its inverse Q⁻¹(BER): the number of σ at which the tail probability equals BER. Q⁻¹(1e-9) ≈ 6, Q⁻¹(1e-12) ≈ 7.03, Q⁻¹(1e-15) ≈ 8.',
+  ),
+  loc(
+    '高斯项为什么乘 Q⁻¹：RJ 没有硬边界，要让误码率达到 BER，边沿必须偏离均值 Q⁻¹(BER)·σ，而左右两侧各有一个边沿，所以 RJ 贡献的峰峰值是 2·Q⁻¹(BER)·σ。例：σ = 2 ps、BER 1e-12 时是 2 × 7.03 × 2 ≈ 28 ps，远大于 6σ = 12 ps。',
+    'Why the Gaussian term is multiplied by Q⁻¹(BER): RJ has no hard edge, so to reach a BER the edge must sit Q⁻¹(BER)·σ away from its mean, and each side contributes one edge. So RJ adds 2·Q⁻¹(BER)·σ peak-to-peak. Example: σ = 2 ps at BER 1e-12 gives 2 × 7.03 × 2 ≈ 28 ps, far more than 6σ = 12 ps.',
+  ),
+  loc(
+    '双狄拉克模型的推导：把 DJ 近似成两个 δ 峰，一半的沿在 −DJ/2，一半在 +DJ/2；每个峰再被高斯 RJ 展宽。某一侧的边沿越过采样点的概率就是高斯尾。于是 BER 下的眼开口 = UI − 两侧各自的（DJ/2 + Q⁻¹·σ）之和 = UI − DJ − 2·Q⁻¹(BER)·σ = UI − TJ(BER)。',
+    'Derivation of the dual-Dirac model: approximate DJ by two delta peaks, half the edges at −DJ/2 and half at +DJ/2; each peak is then widened by the Gaussian RJ. The chance that one side’s edge crosses the sample is a Gaussian tail. The eye opening at a given BER is UI minus the two sides, each at DJ/2 + Q⁻¹(BER)·σ: UI − DJ − 2·Q⁻¹(BER)·σ = UI − TJ(BER).',
+  ),
+  loc(
+    '为什么 DJ 不乘 Q：DJ 有界，峰位置固定在 ±DJ/2，无论测多少位都不会超出，所以它按峰峰值整块扣。只有 RJ 的尾部会随 BER 降低而变远。',
+    'Why DJ is not multiplied by Q: DJ is bounded, its peaks sit at ±DJ/2, and no number of bits goes beyond them, so it is subtracted whole as a peak-to-peak value. Only the RJ tail moves further out as BER falls.',
+  ),
+  loc(
+    '直方图的极限：4000 个样本，每个 bin 的概率最低只能看到约 1/4000，所以 1e-12 只能靠模型外推。页面的固定随机种子只保证每次结果相同，不改变统计结论。',
+    'Limit of the histogram: with 4000 samples the smallest probability a bin can show is about 1/4000, so 1e-12 can only be reached by extrapolation with the model. The fixed random seed on the page only makes every run identical; it does not change the statistics.',
   ),
 ]
 

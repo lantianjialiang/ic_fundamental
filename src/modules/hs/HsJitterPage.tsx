@@ -9,10 +9,12 @@ import { Callout, Knob, Readout, Seg } from '../fund/parts'
 import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import { JitterBathFig, JitterHistFig } from './HsJitterFig'
+import { PrereqSection } from './HsPrereq'
 import {
   BER_OPTIONS,
   INTRO,
   MISCONCEPTIONS,
+  PREREQ,
   QUIZ,
   RATE_OPTIONS,
   S,
@@ -104,6 +106,8 @@ export function HsJitterPage({ moduleId, onModuleChange }: Props) {
       <Section title={t(S.quizTitle)} note={t(S.quizNote)}>
         <QuizList questions={QUIZ} yes={t(ui.fund.yes)} no={t(ui.fund.no)} />
       </Section>
+
+      <PrereqSection title={S.prereqTitle} note={S.prereqNote} items={PREREQ} />
     </LessonFrame>
   )
 }

@@ -6,6 +6,8 @@ import { MEM_FAQ_GROUP } from './faqMem'
 import { RF_FAQ_GROUP } from './faqRf'
 import { MOS_FAQ_GROUP } from './faqMos'
 import { PCB_FAQ_GROUP } from './faqPcb'
+import { PWR_FAQ_GROUP } from './faqPower'
+import { QUAL_FAQ_GROUP } from './faqQual'
 
 /**
  * 常见问题。
@@ -57,6 +59,24 @@ const BASE_FAQ_GROUPS: FaqGroup[] = [
           'If a pin is not connected, no later result can be trusted: a failure could be the chip or the contact. So first confirm every pin is connected, then power up and test IDD, function, DC and AC. The flow in {@program} is opens/shorts → power-up / IDD → functional → DC → AC; the first failure stops the flow and sorts the part into that test’s bin.',
         ),
         lessons: ['program', 'fOpens'],
+      },
+      {
+        id: 'stdf-what',
+        q: loc('ATE 测完的结果存在哪里？STDF 是什么？', 'Where do ATE results go? What is STDF?'),
+        a: loc(
+          'ATE 把每一步结果写进 STDF（Standard Test Data Format）文件，它是二进制记录流：PTR / FTR 记录每项的测量值与判定，PRR 记录每颗器件的 HARD_BIN、SOFT_BIN，良率统计和失效分析都读它。它是行业通用格式，不同厂家的 ATE 和分析软件都能读写。见 {@intro}。',
+          'The ATE writes each step result into an STDF (Standard Test Data Format) file, a binary record stream: PTR / FTR record each item’s measured value and verdict, and PRR records each part’s HARD_BIN and SOFT_BIN. Yield statistics and failure analysis read this file. It is an industry-standard format that ATEs and analysis tools from different vendors can read and write. See {@intro}.',
+        ),
+        lessons: ['intro', 'genStdf'],
+      },
+      {
+        id: 'multisite-why',
+        q: loc('为什么不把 Site 数直接开到最大？', 'Why not just run the maximum number of sites?'),
+        a: loc(
+          'Site 越多，UPH 通常越高，但 Index、电源等共享资源的串行部分会压低并行效率；通道数也有上限，每小时测试成本还会随 Site 增加。UPH 最高不等于单颗成本最低，要看 COT。见 {@genMultisite}。',
+          'More sites usually raise UPH, but the serial part of shared resources such as index and power lowers parallel efficiency; channels cap the count, and the hourly test cost rises with each site. The highest UPH is not the lowest cost per part, so compare COT. See {@genMultisite}.',
+        ),
+        lessons: ['genMultisite'],
       },
       {
         id: 'fail-stop',
@@ -464,8 +484,8 @@ const BASE_FAQ_GROUPS: FaqGroup[] = [
         id: 'lesson-codes',
         q: loc('课程编号 D04、F06 是什么意思？', 'What do lesson codes like D04 and F06 mean?'),
         a: loc(
-          '字母是轨道，数字是这一课在轨道里的顺序：D 是“基础 / 数字”轨道（D01–D15），F 是“数字测试基础”轨道（F01–F16）。文中出现的编号都可以点，直接跳到那一课。',
-          'The letter is the track and the number is the lesson’s place in it: D is the Basics / Digital track (D01–D15) and F is the Digital Test Fundamentals track (F01–F16). Every code in the text is clickable and jumps to that lesson.',
+          '字母是轨道，数字是这一课在轨道里的顺序：D 是“基础 / 数字”轨道（D01–D17），F 是“数字测试基础”轨道（F01–F16）。文中出现的编号都可以点，直接跳到那一课。',
+          'The letter is the track and the number is the lesson’s place in it: D is the Basics / Digital track (D01–D17) and F is the Digital Test Fundamentals track (F01–F16). Every code in the text is clickable and jumps to that lesson.',
         ),
         lessons: ['intro', 'fBasics'],
       },
@@ -482,6 +502,6 @@ const BASE_FAQ_GROUPS: FaqGroup[] = [
   },
 ]
 
-export const FAQ_GROUPS: FaqGroup[] = [...BASE_FAQ_GROUPS, MOS_FAQ_GROUP, PCB_FAQ_GROUP, ANA_FAQ_GROUP, HS_FAQ_GROUP, RF_FAQ_GROUP, MEM_FAQ_GROUP]
+export const FAQ_GROUPS: FaqGroup[] = [...BASE_FAQ_GROUPS, MOS_FAQ_GROUP, PCB_FAQ_GROUP, ANA_FAQ_GROUP, HS_FAQ_GROUP, RF_FAQ_GROUP, MEM_FAQ_GROUP, QUAL_FAQ_GROUP, PWR_FAQ_GROUP]
 
 export const FAQ_ITEMS: FaqItem[] = FAQ_GROUPS.flatMap((group) => group.items)

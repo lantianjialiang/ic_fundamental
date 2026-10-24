@@ -39,6 +39,11 @@ export const S = {
   misTitle: loc('常见误区', 'Common misconceptions'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
+  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqNote: loc(
+    '正文里的 Γ、回波损耗、损耗 dB、f_N 与预加重比例都从这一节列出的几条推出。读完正文再回来看。',
+    'The Γ, return loss, loss in dB, f_N and pre-emphasis ratio in the body are derived from the items below. Read the body first, then come back here.',
+  ),
   asideLater: loc(
     '这里没有画串扰，只讲概念；真实的 CTLE、FFE、DFE 也只讲作用，不做参数设计。眼图的 mask 判定见 HS-05。',
     'Crosstalk is not modelled here, only described. Real CTLE, FFE and DFE are explained by their purpose, not designed. Mask judgement on the eye is in HS-05.',
@@ -97,6 +102,34 @@ export const MISCONCEPTIONS: LText[] = [
   loc(
     '预加重越多越好。过强会压低连续同样的位，眼张开度反而变小；它只该补偿损耗那部分，不该超过需要。',
     'More pre-emphasis is always better. Too much pulls down runs of identical bits and shrinks the eye; it should only compensate the loss that is actually there.',
+  ),
+]
+
+/** 课末补充：反射、dB、一阶低通损耗、奈奎斯特频率、预加重比例、回声求和，都从这几条推出 */
+export const PREREQ: LText[] = [
+  loc(
+    '特性阻抗与反射：Z0 = 50 Ω 是传输线本身的特性阻抗，由线的几何形状和介质决定，不是电阻。终端 ZL 不等于 Z0 时，反射系数 Γ = (ZL − Z0) ÷ (ZL + Z0)。ZL = 150 Ω 时 Γ = 100 ÷ 200 = 0.5，回波损耗 RL = −20·log10|Γ| ≈ 6 dB；ZL = Z0 时 Γ = 0，没有回波。',
+    'Characteristic impedance and reflection: Z0 = 50 Ω is the characteristic impedance of the line itself, set by its geometry and dielectric, not a resistance. When the termination ZL differs from Z0, the reflection coefficient is Γ = (ZL − Z0) ÷ (ZL + Z0). With ZL = 150 Ω, Γ = 100 ÷ 200 = 0.5 and return loss RL = −20·log10|Γ| ≈ 6 dB; with ZL = Z0, Γ = 0 and there is no echo.',
+  ),
+  loc(
+    'dB：功率比用 10·log10，幅度（电压）比用 20·log10。0 dB 表示不变；−3 dB 表示幅度降到 1/√2 ≈ 0.71（功率减半）；−6 dB 表示幅度减半。本站把损耗写成正的 dB 数，表示衰减了多少；回波损耗 RL 也是正数，越大说明反射越小。',
+    'dB: a power ratio uses 10·log10 and an amplitude (voltage) ratio uses 20·log10. 0 dB means no change; −3 dB means the amplitude falls to 1/√2 ≈ 0.71 (half the power); −6 dB means the amplitude halves. This site writes loss as a positive dB number counting how much is lost; return loss RL is also positive, and the larger it is, the smaller the reflection.',
+  ),
+  loc(
+    '一阶低通的损耗：信道按 H(f) = 1 ÷ (1 + j·f/BW) 建模，幅度 |H| = 1 ÷ √(1 + (f/BW)²)，损耗 L = −20·log10|H| = 10·log10(1 + (f/BW)²)。f = BW 时 L = 10·log10 2 ≈ 3 dB，所以 BW 就是 −3 dB 频率。例：10 Gb/s 时 f_N = 5 GHz，BW = 5 GHz 则损耗约 3 dB（见小测 q4）。',
+    'Loss of a first-order low-pass: the channel is modelled as H(f) = 1 ÷ (1 + j·f/BW), with magnitude |H| = 1 ÷ √(1 + (f/BW)²), so the loss is L = −20·log10|H| = 10·log10(1 + (f/BW)²). At f = BW, L = 10·log10 2 ≈ 3 dB, so BW is the −3 dB frequency. Example: at 10 Gb/s, f_N = 5 GHz; with BW = 5 GHz the loss is about 3 dB (quiz q4).',
+  ),
+  loc(
+    '奈奎斯特频率：NRZ 数据里最快的交替“0101…”每 2 个 UI 重复一次，基频 f = 1 ÷ (2 UI) = 速率 ÷ 2。所以 10 Gb/s 对应 f_N = 5 GHz；信道在 f_N 处的损耗，是高速数据受到的主要衰减。',
+    'Nyquist frequency: in NRZ data the fastest alternating pattern “0101…” repeats every 2 UI, so its fundamental is f = 1 ÷ (2 UI) = rate ÷ 2. That makes f_N = 5 GHz at 10 Gb/s, and the channel loss at f_N is the main attenuation high-speed data sees.',
+  ),
+  loc(
+    '预加重的满幅比例：发送端的 FIR 是 e[n] = (x[n] − k·x[n−1]) ÷ (1 + k)，x 取 ±1。跳变处 x[n] = 1、x[n−1] = −1，得 e = (1 + k) ÷ (1 + k) = 1（满幅）；连续同样的位 x[n] = x[n−1] = 1，得 e = (1 − k) ÷ (1 + k)。k = 0.3 时这个比例约 0.54，所以预加重后连续位明显低于满幅。',
+    'Pre-emphasis full-swing ratio: the transmitter FIR is e[n] = (x[n] − k·x[n−1]) ÷ (1 + k) with x = ±1. At a transition, x[n] = 1 and x[n−1] = −1 give e = (1 + k) ÷ (1 + k) = 1 (full swing). In a run of identical bits, x[n] = x[n−1] = 1 gives e = (1 − k) ÷ (1 + k). With k = 0.3 this ratio is about 0.54, so runs sit well below full swing after pre-emphasis.',
+  ),
+  loc(
+    '回声与稳态电平：信号在终端与驱动端之间每往返一次，就多一次回声。第 k 次回声的系数是 (1 + Γ_L)(Γ_L·Γ_S)^k，延迟 (2k + 1)·TD。把所有回声用等比数列求和，得到远端稳态电平 (1 + Γ_L) ÷ (1 − Γ_L·Γ_S)，这就是页面上“远端稳态电平”的来源。Z_S = 25 Ω 与 TD = 100 ps 都是示意值。',
+    'Echoes and the steady level: each round trip between the termination and the driver adds an echo. The k-th echo has coefficient (1 + Γ_L)(Γ_L·Γ_S)^k and delay (2k + 1)·TD. Summing the geometric series gives the far-end steady level (1 + Γ_L) ÷ (1 − Γ_L·Γ_S), which is the “far-end steady level” on the page. Z_S = 25 Ω and TD = 100 ps are teaching values.',
   ),
 ]
 

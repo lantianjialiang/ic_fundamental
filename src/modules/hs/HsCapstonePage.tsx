@@ -9,10 +9,12 @@ import { type ModuleId } from '../catalog'
 import { Callout, Seg, Steps } from '../fund/parts'
 import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
+import { PrereqSection } from './HsPrereq'
 import { BathtubFig, EyeBoxFig } from './SerdesFig'
 import {
   INTRO,
   MISCONCEPTIONS,
+  PREREQ,
   QUIZ,
   S,
   SAMPLE_OPTIONS,
@@ -195,6 +197,8 @@ export function HsCapstonePage({ moduleId, onModuleChange }: Props) {
       <Section title={t(S.quizTitle)} note={t(S.quizNote)}>
         <QuizList questions={QUIZ} yes={t(ui.fund.yes)} no={t(ui.fund.no)} />
       </Section>
+
+      <PrereqSection title={S.prereqTitle} note={S.prereqNote} items={PREREQ} />
     </LessonFrame>
   )
 }

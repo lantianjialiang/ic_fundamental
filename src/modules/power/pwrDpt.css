@@ -1,0 +1,38 @@
+/* PWR-05 双脉冲测试：电路图、波形区与积分区间选择的版式（示波器本体复用 scope.css，控件复用 hs.css） */
+
+.pwr-dpt-figs {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pwr-dpt-fig {
+  margin: 0;
+  min-width: 0;
+}
+
+.pwr-dpt-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.pwr-dpt-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pwr-dpt-note {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pwr-dpt-seg {
+  margin-top: 12px;
+}

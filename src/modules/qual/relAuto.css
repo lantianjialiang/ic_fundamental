@@ -1,0 +1,81 @@
+.rel-fig {
+  min-width: 0;
+  margin: 0;
+}
+
+.rel-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.rel-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.rel-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rel-legend i {
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.rel-auto-note {
+  margin: 8px 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.rel-auto-table {
+  width: 100%;
+  margin-top: 12px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.rel-auto-table caption {
+  text-align: left;
+  margin-bottom: 6px;
+  color: var(--muted);
+}
+
+.rel-auto-table th,
+.rel-auto-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line, #d0d7de);
+  text-align: left;
+}
+
+.rel-auto-table tr.is-current td {
+  font-weight: 600;
+}
+
+.rel-auto-rows {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.rel-auto-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.rel-auto-row select {
+  min-width: 0;
+  width: 100%;
+}

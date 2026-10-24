@@ -9,7 +9,8 @@ import { Callout, Knob, Readout, Seg } from '../fund/parts'
 import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import { BasicsFig } from './BasicsFig'
-import { INTRO, MISCONCEPTIONS, QUIZ, RATE_OPTIONS, S, TAKEAWAY, taskItems, verdictOf } from './basicsData'
+import { PrereqSection } from './HsPrereq'
+import { INTRO, MISCONCEPTIONS, PREREQ, QUIZ, RATE_OPTIONS, S, TAKEAWAY, taskItems, verdictOf } from './basicsData'
 import { type BasicsState, DEFAULT_BASICS, analyseBasics } from './basicsModel'
 import { HS_META } from './meta'
 import './hs.css'
@@ -85,6 +86,8 @@ export function HsBasicsPage({ moduleId, onModuleChange }: Props) {
       <Section title={t(S.quizTitle)} note={t(S.quizNote)}>
         <QuizList questions={QUIZ} yes={t(ui.fund.yes)} no={t(ui.fund.no)} />
       </Section>
+
+      <PrereqSection title={S.prereqTitle} note={S.prereqNote} items={PREREQ} />
     </LessonFrame>
   )
 }

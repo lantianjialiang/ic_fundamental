@@ -1,11 +1,11 @@
 /**
  * 高速信号基础（HS-01）的教学模型。
  * 速率 rate（Gb/s）决定 UI = 1000 / rate（ps）。
- * 通道按一阶 RC 低通处理：上升时间（10%–90%）tr 与 −3 dB 带宽满足 BW ≈ 0.35 / tr（tr 单位 ps 时 BW 单位 GHz 为 350 / tr）。
+ * 通道按一阶 RC 低通处理：上升时间（10%–90%）tr 与 −3 dB 带宽满足 BW × tr = ln 9 ÷ 2π ≈ 0.35（tr 单位 ps 时 BW 单位 GHz 为 BW ≈ 350 / tr）。
  * 一阶 RC 的 10%–90% 上升时间 = τ·ln 9，所以 τ = tr / ln 9。
  * 一个 UI 结束时，边沿已走到 1 − exp(−UI/τ) = 1 − 9^(−UI/tr) 的比例（完成度）。
  * 判据：tr / UI ≤ 0.5，此时残留误差 9^(−2) ≈ 1.2%，即一位结束时已走到约 99%，波形可视为到达稳态。
- * 反推：判据要求 tr ≤ 0.5·UI，代入 BW ≈ 0.35 / tr，得 BW ≥ 0.7 × 速率（GHz）。
+ * 反推：判据要求 tr ≤ 0.5·UI，代入 BW ≈ 350 / tr（tr 用 ps），得 BW ≥ 350·rate / 500 = 0.7 × 速率（GHz）。
  */
 
 export type BasicsState = {
@@ -34,7 +34,7 @@ const LN9 = Math.log(9)
 export type BasicsAnalysis = {
   /** 单位间隔 UI，ps */
   ui: number
-  /** 带宽 BW ≈ 0.35 / tr，GHz */
+  /** 带宽 BW ≈ 350 / tr（tr 用 ps），GHz */
   bw: number
   /** tr / UI */
   ratio: number

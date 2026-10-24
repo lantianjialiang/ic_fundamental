@@ -74,6 +74,11 @@ export const S = {
   takeawayTitle: loc('带走这几句', 'Key takeaways'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
+  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqNote: loc(
+    '正文里的 PRBS 码型、0 错误上限 3 ÷ N 与浴盆外推都从这一节列出的几条推出。读完正文再回来看。',
+    'The PRBS pattern, the 3 ÷ N bound for zero errors and bathtub extrapolation in the body are derived from the items below. Read the body first, then come back here.',
+  ),
   asideLater: loc(
     '真实测试还要去嵌入夹具与板级走线的损耗、统计远多于 4 万位的数据，并用更完整的模型外推；码型也要覆盖长连与最坏情况。这里只练浴盆曲线、码型阶数和 Loopback 三件事。',
     'A real test also de-embeds the fixture and board-trace loss, counts far more than 40000 bits, extrapolates with a fuller model, and makes sure the pattern covers long runs and worst cases. Here we only practise the bathtub curve, pattern order and Loopback.',
@@ -161,6 +166,30 @@ export const MISCONCEPTIONS: LText[] = [
   loc(
     'PRBS7 测得干净，就说明码型覆盖够了。PRBS7 的最长连续相同位只有 7 位，连续 8 位以上才出现的缺陷它永远看不到。码型要覆盖的是最坏情况，不只是“位数多”。',
     'PRBS7 came out clean, so the pattern coverage must be enough. The longest run of identical bits in PRBS7 is only 7, so a defect that appears only after 8 or more identical bits will never be seen. The pattern must cover the worst case, not just have many bits.',
+  ),
+]
+
+/** 课末补充：PRBS 与 LFSR、接收端怎样判错、最长连续相同位、0 错误上限 3 ÷ N、浴盆外推 */
+export const PREREQ: LText[] = [
+  loc(
+    'PRBS 与 LFSR：PRBS 由线性反馈移位寄存器（LFSR）产生。PRBS7 的多项式 x⁷ + x⁶ + 1 表示：新位 = 第 7 位与第 6 位异或（⊕），寄存器整体右移一位。选对多项式时周期为 2ⁿ − 1，PRBS7 为 127 位，这叫最长序列。',
+    'PRBS and the LFSR: a PRBS is produced by a linear feedback shift register (LFSR). The polynomial x⁷ + x⁶ + 1 for PRBS7 means the new bit is the XOR (⊕) of the 7th and 6th register bits, and the register shifts by one. With a suitable polynomial the period is 2ⁿ − 1, which is 127 bits for PRBS7; this is a maximal-length sequence.',
+  ),
+  loc(
+    '接收端为什么能判错：同步后，接收端用同一个多项式推算下一位应该是什么，再与采样到的位比较，不一样就是错误。同步通常需要连续收到 n 位（PRBS7 为 7 位）。',
+    'Why the receiver can count errors: once synchronised, the receiver runs the same polynomial to predict the next bit and compares it with the bit it samples; a mismatch is an error. Synchronisation usually takes n received bits (7 for PRBS7).',
+  ),
+  loc(
+    '最长连续相同位：阶数为 n 的最长序列，最长连续 1 为 n 位，最长连续 0 为 n − 1 位。PRBS7 是 7 个 1、6 个 0，与代码注释一致。所以要覆盖“连续 8 位相同才出现”的缺陷，至少要用 PRBS15（最长连续 1 为 15 位）。',
+    'Longest run: a maximal-length PRBS of order n has a longest run of n ones and n − 1 zeros. For PRBS7 that is 7 ones and 6 zeros, as in the code comment. A defect that appears only after 8 identical bits therefore needs at least PRBS15, whose longest run of ones is 15 bits.',
+  ),
+  loc(
+    '0 错误的 95% 上限为什么是 3 ÷ N：设每位出错的概率为 p，N 位全对的概率为 (1 − p)^N。取 (1 − p)^N = 0.05，即“真实 p 更大，却仍然 0 错误”的概率只有 5%。两边取对数：N·ln(1 − p) = ln 0.05，p ≈ ln 20 ÷ N ≈ 3.0 ÷ N。',
+    'Why the 95% upper bound for zero errors is 3 ÷ N: let p be the error probability per bit; N error-free bits happen with probability (1 − p)^N. Set (1 − p)^N = 0.05, so that a larger true p would show zero errors only 5% of the time. Taking logs, N·ln(1 − p) = ln 0.05, so p ≈ ln 20 ÷ N ≈ 3.0 ÷ N.',
+  ),
+  loc(
+    '浴盆曲线与外推：在每个采样相位上测一次 BER，连起来是浴盆：中间（0.5 UI）低，靠近边沿因为边沿偏近而高。可测的中段直接测，尾部用 HS-04 的双狄拉克模型外推到 1e-12。这里的外推只用 DJ 与 RJ，不含长连偏移，所以结果偏乐观。',
+    'Bathtub and extrapolation: BER is measured at each sampling phase; plotted, it is a bathtub, low in the middle (0.5 UI) and high near the edges. The measurable middle is measured directly, and the tails are extrapolated to 1e-12 with the dual-Dirac model from HS-04. The extrapolation here uses only DJ and RJ and not the long-run shift, so its result is optimistic.',
   ),
 ]
 

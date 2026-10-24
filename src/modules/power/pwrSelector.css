@@ -1,0 +1,80 @@
+/* PWR-01 器件选型：损耗条形图、Rds(on) 折线图与参数分类表的版式（控件与两栏布局复用 hs.css） */
+
+.pwr-figs {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pwr-fig {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pwr-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.pwr-fig figcaption {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.pwr-fig__summary {
+  font-family: var(--mono);
+  color: var(--text);
+}
+
+.pwr-formula {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.pwr-class-table {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pwr-class-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+}
+
+.pwr-class-row.is-wrong {
+  border-color: var(--red, #e5534b);
+}
+
+.pwr-class-row.is-right {
+  border-color: var(--green, #3fb950);
+}
+
+.pwr-class-row select {
+  min-width: 120px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line-2);
+  background: var(--well);
+  color: var(--text);
+  font: inherit;
+}
+
+.pwr-calc {
+  display: grid;
+  gap: 8px;
+}

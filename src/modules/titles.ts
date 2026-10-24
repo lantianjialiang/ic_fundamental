@@ -7,6 +7,9 @@ import { ANA_META } from './ana/meta'
 import { HS_META } from './hs/meta'
 import { RF_META } from './rf/meta'
 import { MEM_META } from './mem/meta'
+import { GEN_META } from './gen/meta'
+import { REL_META } from './qual/meta'
+import { PWR_META } from './power/meta'
 
 export const LESSON_TITLE: Record<ModuleId, LText> = {
   mosPrimer: MOS_META.mosPrimer.title,
@@ -53,6 +56,8 @@ export const LESSON_TITLE: Record<ModuleId, LText> = {
   latch: ui.m16.title,
   bench: ui.m17.title,
   vate: ui.vate.title,
+  genStdf: GEN_META.genStdf.title,
+  genMultisite: GEN_META.genMultisite.title,
   sim: ui.atesim.title,
   anaOverview: ANA_META.anaOverview.title,
   anaMeasure: ANA_META.anaMeasure.title,
@@ -104,6 +109,22 @@ export const LESSON_TITLE: Record<ModuleId, LText> = {
   memCoverage: MEM_META.memCoverage.title,
   memBin: MEM_META.memBin.title,
   memCapstone: MEM_META.memCapstone.title,
+  relBathtub: REL_META.relBathtub.title,
+  relAccel: REL_META.relAccel.title,
+  relStress: REL_META.relStress.title,
+  relWeibull: REL_META.relWeibull.title,
+  relBurnIn: REL_META.relBurnIn.title,
+  relAuto: REL_META.relAuto.title,
+  relPat: REL_META.relPat.title,
+  relFlow: REL_META.relFlow.title,
+  pwrSelector: PWR_META.pwrSelector.title,
+  pwrStatic: PWR_META.pwrStatic.title,
+  pwrKelvin: PWR_META.pwrKelvin.title,
+  pwrGate: PWR_META.pwrGate.title,
+  pwrDpt: PWR_META.pwrDpt.title,
+  pwrUis: PWR_META.pwrUis.title,
+  pwrWbg: PWR_META.pwrWbg.title,
+  pwrProgram: PWR_META.pwrProgram.title,
   fBasics: ui.fBasics.title,
   fAte: ui.fAte.title,
   fIntro: ui.fIntro.title,

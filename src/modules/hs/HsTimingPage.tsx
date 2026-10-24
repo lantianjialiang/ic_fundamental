@@ -8,8 +8,9 @@ import { type ModuleId } from '../catalog'
 import { Callout, Knob, Readout, Seg } from '../fund/parts'
 import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
+import { PrereqSection } from './HsPrereq'
 import { TimingFig } from './HsTimingFig'
-import { INTRO, MISCONCEPTIONS, QUIZ, RATE_OPTIONS, S, TAKEAWAY, taskItems, verdictOf } from './hsTimingData'
+import { INTRO, MISCONCEPTIONS, PREREQ, QUIZ, RATE_OPTIONS, S, TAKEAWAY, taskItems, verdictOf } from './hsTimingData'
 import { DEFAULT_TIMING, analyseTiming, type TimingState } from './hsTimingModel'
 import { HS_META } from './meta'
 import './hs.css'
@@ -91,6 +92,8 @@ export function HsTimingPage({ moduleId, onModuleChange }: Props) {
       <Section title={t(S.quizTitle)} note={t(S.quizNote)}>
         <QuizList questions={QUIZ} yes={t(ui.fund.yes)} no={t(ui.fund.no)} />
       </Section>
+
+      <PrereqSection title={S.prereqTitle} note={S.prereqNote} items={PREREQ} />
     </LessonFrame>
   )
 }

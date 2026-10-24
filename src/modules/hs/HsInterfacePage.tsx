@@ -8,11 +8,13 @@ import { type ModuleId } from '../catalog'
 import { Callout, Knob, Readout, Seg } from '../fund/parts'
 import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
+import { PrereqSection } from './HsPrereq'
 import { BathtubFig, PathFig } from './InterfaceFig'
 import {
   INTRO,
   MISCONCEPTIONS,
   ORDER_OPTIONS,
+  PREREQ,
   PATH_OPTIONS,
   QUIZ,
   RATE_OPTIONS,
@@ -113,6 +115,8 @@ export function HsInterfacePage({ moduleId, onModuleChange }: Props) {
       <Section title={t(S.quizTitle)} note={t(S.quizNote)}>
         <QuizList questions={QUIZ} yes={t(ui.fund.yes)} no={t(ui.fund.no)} />
       </Section>
+
+      <PrereqSection title={S.prereqTitle} note={S.prereqNote} items={PREREQ} />
     </LessonFrame>
   )
 }

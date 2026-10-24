@@ -376,6 +376,68 @@ export const SYS: Record<SysId, { title: LText; text: LText }> = {
 /** 系统框图里方块的显示顺序（从左上到右下），默认选中第一个 */
 export const SYS_ORDER: SysId[] = ['program', 'controller', 'ate', 'pe', 'pmu', 'dps', 'head', 'loadboard', 'socket', 'dut', 'result']
 
+/** 测试结果怎么保存：STDF 记录流（标题、段落、记录列表） */
+export const STDF_TITLE: LText = loc('测试结果存到哪：STDF', 'Where the results go: STDF')
+
+export const STDF_PARAS: LText[] = [
+  loc(
+    'ATE 测完不是只给一个 Pass / Fail，而是把每一步结果写进 STDF（Standard Test Data Format）文件。它是二进制的“记录流”：每条记录有 REC_LEN（2 字节长度）、REC_TYP（1 字节类型）、REC_SUB（1 字节子类型）组成的头，后面跟数据域。良率统计、失效分析、追溯都读这个文件，而不是读屏幕。',
+    'ATE does not just output one Pass / Fail. It writes each step result into an STDF (Standard Test Data Format) file. STDF is a binary record stream: each record starts with a header of REC_LEN (2 bytes), REC_TYP (1 byte) and REC_SUB (1 byte), followed by data fields. Yield statistics, failure analysis and traceability read this file, not the screen.',
+  ),
+  loc(
+    '一批的记录顺序：FAR（文件头，声明 CPU 字节序）→ MIR（批次信息）→ 每颗器件一段：PIR（开始）→ 若干 PTR（参数）/ FTR（功能）→ PRR（结果）→ 批次末尾：HBR / SBR / PCR（计数）→ MRR（结束）。CP 每片晶圆还多 WIR / WRR，标出晶圆的开始与结束。',
+    'Record order for one lot: FAR (file header, declares CPU byte order) → MIR (lot info) → for each part: PIR (start) → several PTR (parametric) / FTR (functional) → PRR (result) → at the end of the lot: HBR / SBR / PCR (counts) → MRR (end). CP also writes WIR / WRR per wafer to mark its start and end.',
+  ),
+  loc(
+    'Soft Bin 与 Hard Bin 要分清：Soft Bin 是测试程序里定义的分类，可以很细；Hard Bin 是映射到硬件分拣的结果，Handler 或 Prober 按它放进料盘。例如 Soft Bin 31、32 都是 DC 失败，映射后可以同放进 Hard Bin 3 这个料盘。',
+    'Keep Soft Bin and Hard Bin apart: the Soft Bin is the category defined in the test program and can be very fine; the Hard Bin is the result mapped to hardware sorting, which the handler or prober uses to choose the tray. For example, Soft Bin 31 and 32 may both be DC fails, and both can map to Hard Bin 3, one tray.',
+  ),
+]
+
+/** 常见 STDF 记录：名字、什么时候写、里面有什么；按一批里出现的先后排列 */
+export const STDF_RECORDS: Array<{ id: string; when: LText; has: LText }> = [
+  {
+    id: 'FAR',
+    when: loc('文件开头，一次', 'File start, once'),
+    has: loc('CPU_TYPE、STDF_VER，告诉读取程序字节序', 'CPU_TYPE and STDF_VER, so the reader knows the byte order'),
+  },
+  {
+    id: 'MIR',
+    when: loc('批次开始，一次', 'Lot start, once'),
+    has: loc('LOT_ID、PART_TYP、测试程序名、操作员等批次信息', 'LOT_ID, PART_TYP, test program name, operator and other lot info'),
+  },
+  {
+    id: 'PIR',
+    when: loc('每颗器件开始测试', 'Each part starts test'),
+    has: loc('HEAD_NUM、SITE_NUM，标出这颗器件在哪个测试位', 'HEAD_NUM and SITE_NUM, which test position the part is in'),
+  },
+  {
+    id: 'PTR',
+    when: loc('每颗器件、每个参数测一次', 'Each part, each parametric test'),
+    has: loc('测量值 RESULT、LO_LIMIT / HI_LIMIT、单位，对应 VOH、IDD 这类项目', 'The measured RESULT, LO_LIMIT / HI_LIMIT and units, e.g. for VOH or IDD'),
+  },
+  {
+    id: 'FTR',
+    when: loc('每颗器件、每个功能 Pattern 一次', 'Each part, each functional pattern'),
+    has: loc('Pattern 名、失败的向量号与管脚，用于定位功能失败', 'Pattern name, failing vector number and pin, used to locate the functional failure'),
+  },
+  {
+    id: 'PRR',
+    when: loc('每颗器件测完，一次', 'Each part after all tests, once'),
+    has: loc('HARD_BIN、SOFT_BIN、PART_ID、X / Y 坐标，是这颗器件的最终结论', 'HARD_BIN, SOFT_BIN, PART_ID and X / Y coordinates: the final verdict for this part'),
+  },
+  {
+    id: 'HBR / SBR',
+    when: loc('批次末尾', 'Lot end'),
+    has: loc('每个 Hard Bin、Soft Bin 各有多少颗', 'How many parts landed in each Hard Bin and Soft Bin'),
+  },
+  {
+    id: 'PCR / MRR',
+    when: loc('批次末尾', 'Lot end'),
+    has: loc('PCR：各测试位的总数与通过数；MRR：批次结束时间', 'PCR: totals and pass counts per test site; MRR: lot end time'),
+  },
+]
+
 export const TAKEAWAY: LText[] = [
   loc(
     '测试 = 自动加信号、测响应、判 Pass / Fail；本职是判断，不修理（存储芯片的冗余修复是专门加的一步）。',
@@ -386,6 +448,10 @@ export const TAKEAWAY: LText[] = [
   loc(
     '结果是 Bin 号：FT 时 Handler 按 Bin 分拣，CP 时记进晶圆 Bin 图；好品数 ÷ 测试数 = 良率。',
     'The result is a Bin number: in FT the handler sorts by it, in CP it goes into the wafer bin map. Good count ÷ tested count = yield.',
+  ),
+  loc(
+    '结果以 STDF 记录流保存：PRR 的 HARD_BIN 决定料盘，PTR / FTR 留下每一项的细节，良率和失效分析都读它。',
+    'Results are kept as an STDF record stream: PRR’s HARD_BIN decides the tray, PTR / FTR keep the detail of each item, and yield and failure analysis read it.',
   ),
   loc(
     '产业角色、封装形态等底子见预备轨 {@pIndustry}、{@pPackage}；物理怎么接到 ATE 见下一课 {@connection}。',
@@ -451,5 +517,19 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'a',
     explain: loc('良率 = 好品数 ÷ 测试数 = 180 ÷ 200 = 90%。', 'Yield = good ÷ tested = 180 ÷ 200 = 90%.'),
+  },
+  {
+    id: 'q6',
+    prompt: loc('Handler 按 STDF 里的哪个字段选料盘？', 'Which STDF field does the handler use to choose the output tray?'),
+    options: [
+      { id: 'a', text: loc('PTR 的 RESULT', 'PTR RESULT') },
+      { id: 'b', text: loc('PRR 的 HARD_BIN', 'PRR HARD_BIN') },
+      { id: 'c', text: loc('MIR 的 LOT_ID', 'MIR LOT_ID') },
+    ],
+    answer: 'b',
+    explain: loc(
+      'PRR 是每颗器件的最终结果，HARD_BIN 对应料盘。PTR 只是单个参数的测量值，MIR 只描述整批，都不直接决定料盘。',
+      'PRR is the final result of each part, and HARD_BIN maps to the tray. PTR is just one measured value, and MIR only describes the lot; neither decides the tray directly.',
+    ),
   },
 ]

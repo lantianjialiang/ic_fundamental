@@ -1,0 +1,309 @@
+/* 通用（GEN）课：STDF 与 Multi-site 共用的版式 */
+
+.gen-view {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.gen-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: center;
+}
+
+.gen-row__label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.gen-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+  min-width: 0;
+}
+
+.gen-controls > label,
+.gen-controls > .gen-row__label {
+  min-width: 0;
+}
+
+.gen-controls .lab__btn:disabled,
+.gen-export .lab__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gen-ok {
+  color: var(--green);
+}
+
+.gen-bad {
+  color: var(--red);
+}
+
+.gen-source {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.gen-formula {
+  margin: 2px 0;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+/* ---------- 字节浏览器 ---------- */
+
+.gen-bytes-wrap {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.gen-bytes__detect {
+  margin: 0;
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.gen-bytes__detect b {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.gen-bytes {
+  display: grid;
+  gap: 2px;
+  padding: 8px;
+  background: var(--fig-box);
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.gen-bytes__row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: max-content;
+}
+
+.gen-bytes__off {
+  width: 52px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.gen-bytes__byte {
+  width: 26px;
+  height: 22px;
+  padding: 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.gen-bytes__byte:hover {
+  border-color: var(--line-2);
+}
+
+.gen-bytes__byte.is-rec {
+  background: color-mix(in srgb, var(--gold) 14%, transparent);
+}
+
+.gen-bytes__byte.is-sel {
+  background: var(--gold);
+  color: var(--bg, #111);
+  border-color: var(--gold);
+  font-weight: 600;
+}
+
+.gen-bytes__byte:focus-visible,
+.gen-fields__pick:focus-visible,
+.gen-seq__item button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.gen-fields {
+  max-height: 320px;
+  overflow: auto;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+}
+
+.gen-fields table,
+.gen-sites {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.gen-fields th,
+.gen-fields td,
+.gen-sites th,
+.gen-sites td {
+  padding: 4px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--line-2);
+  vertical-align: top;
+}
+
+.gen-fields thead th,
+.gen-sites thead th {
+  position: sticky;
+  top: 0;
+  background: var(--fig-box);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.gen-fields__rec th {
+  background: color-mix(in srgb, var(--line-2) 40%, transparent);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.gen-fields tr.is-sel td {
+  background: color-mix(in srgb, var(--gold) 26%, transparent);
+}
+
+.gen-fields tr.is-rec td {
+  background: color-mix(in srgb, var(--gold) 10%, transparent);
+}
+
+.gen-fields__pick {
+  padding: 0;
+  font-family: var(--mono);
+  color: var(--text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+/* ---------- 组装实验 ---------- */
+
+.gen-seq {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.gen-seq__list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gen-seq__item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  padding: 6px 10px;
+  background: var(--fig-box);
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+}
+
+.gen-seq__no {
+  width: 22px;
+  font-family: var(--mono);
+  color: var(--muted);
+}
+
+.gen-seq__name {
+  flex: 1 1 260px;
+  min-width: 0;
+  font-size: 13px;
+}
+
+.gen-seq__bin {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.gen-seq__bin select {
+  font: inherit;
+  color: var(--text);
+  background: var(--well);
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.gen-seq__move {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.gen-seq__issues {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--red);
+  display: grid;
+  gap: 4px;
+}
+
+.gen-export {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: center;
+}
+
+/* ---------- 本地解析 ---------- */
+
+.gen-file {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.gen-file input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.gen-file:focus-within {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.gen-stats {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.gen-stats .term-fig {
+  min-width: 0;
+  margin: 0;
+}
+
+@media (max-width: 960px) {
+  .gen-seq__move {
+    margin-left: 0;
+  }
+}

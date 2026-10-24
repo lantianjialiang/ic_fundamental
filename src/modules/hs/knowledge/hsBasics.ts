@@ -16,11 +16,11 @@ export const HS_BASICS_KNOWLEDGE: AnaKnowledge = {
     },
     {
       id: 'bw-rise-rule',
-      term: 'BW ≈ 0.35 / tr',
+      term: 'BW ≈ 350 / tr',
       name: loc('带宽与上升时间的经验公式', 'Bandwidth–rise-time rule of thumb'),
       def: loc(
-        '一阶 RC 通道的 −3 dB 带宽与 10%–90% 上升时间之间的近似关系：BW ≈ 0.35 / tr（tr 为 ps 时 BW 为 GHz）。知道其中一个，就能估算另一个。见 {@hsBasics}。',
-        'The approximate link between the −3 dB bandwidth of a first-order channel and its 10%–90% rise time: BW ≈ 0.35 / tr (BW in GHz when tr is in ps). Knowing one gives an estimate of the other. See {@hsBasics}.',
+        '一阶 RC 通道的 −3 dB 带宽与 10%–90% 上升时间之间的近似关系：BW × tr = ln 9 ÷ 2π ≈ 0.35（单位为秒与赫兹）；tr 用 ps、BW 用 GHz 时即 BW ≈ 350 / tr。知道其中一个，就能估算另一个。见 {@hsBasics}。',
+        'The approximate link between the −3 dB bandwidth of a first-order channel and its 10%–90% rise time: BW × tr = ln 9 ÷ 2π ≈ 0.35 (in seconds and hertz); with tr in ps and BW in GHz this is BW ≈ 350 / tr. Knowing one gives an estimate of the other. See {@hsBasics}.',
       ),
       lessons: ['hsBasics'],
     },
@@ -66,6 +66,24 @@ export const HS_BASICS_KNOWLEDGE: AnaKnowledge = {
       a: loc(
         'UI = 1 ÷ 速率。速率以 Gb/s 为单位时，UI（ps）= 1000 ÷ 速率：10 Gb/s 时 UI = 100 ps，16 Gb/s 时 UI = 62.5 ps。它只与速率有关，与带宽无关。见 {@hsBasics}。',
         'UI = 1 ÷ rate. With the rate in Gb/s, UI (ps) = 1000 ÷ rate: 100 ps at 10 Gb/s and 62.5 ps at 16 Gb/s. It depends only on the rate, not on the bandwidth. See {@hsBasics}.',
+      ),
+      lessons: ['hsBasics'],
+    },
+    {
+      id: 'hs-basics-where-1000',
+      q: loc('UI = 1000 ÷ 速率，这个 1000 是从哪来的？', 'UI = 1000 ÷ rate: where does the 1000 come from?'),
+      a: loc(
+        '速率 R 以 Gb/s 计，即每秒 R × 10⁹ 位，一位占 1 ÷ (R × 10⁹) 秒。1 秒 = 10¹² ps，所以 UI = 10¹² ÷ (R × 10⁹) ps = 1000 ÷ R ps。1000 只是 10¹² 与 10⁹ 的单位换算。见 {@hsBasics}。',
+        'The rate R is in Gb/s, meaning R × 10⁹ bits per second, so one bit lasts 1 ÷ (R × 10⁹) s. One second is 10¹² ps, so UI = 10¹² ÷ (R × 10⁹) ps = 1000 ÷ R ps. The 1000 is simply the unit conversion between 10¹² and 10⁹. See {@hsBasics}.',
+      ),
+      lessons: ['hsBasics'],
+    },
+    {
+      id: 'hs-basics-bw-units',
+      q: loc('BW ≈ 0.35 / tr 和 BW ≈ 350 / tr 有什么区别？', 'What is the difference between BW ≈ 0.35 / tr and BW ≈ 350 / tr?'),
+      a: loc(
+        '是同一个公式，只是单位不同。0.35 来自 ln 9 ÷ 2π，tr 与 BW 都用国际单位（tr 用秒、BW 用赫兹）时用 0.35。工程上常用 tr 用 ps、BW 用 GHz：1 ns = 1000 ps，换算后系数变成 350。例：tr = 70 ps 时 BW ≈ 350 ÷ 70 = 5 GHz。见 {@hsBasics}。',
+        'They are the same formula with different units. 0.35 comes from ln 9 ÷ 2π and applies when tr is in seconds and BW in hertz. In engineering practice tr is in ps and BW in GHz: since 1 ns = 1000 ps, the constant becomes 350. Example: at tr = 70 ps, BW ≈ 350 ÷ 70 = 5 GHz. See {@hsBasics}.',
       ),
       lessons: ['hsBasics'],
     },

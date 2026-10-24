@@ -3,6 +3,8 @@ import { type ModuleId } from '../modules/catalog'
 import { ANA_EXTRA_LESSONS, ANA_TERMS } from './termsAna'
 import { HS_EXTRA_LESSONS, HS_TERMS } from './termsHs'
 import { MEM_EXTRA_LESSONS, MEM_TERMS } from './termsMem'
+import { PWR_EXTRA_LESSONS, PWR_TERMS } from './termsPower'
+import { QUAL_EXTRA_LESSONS, QUAL_TERMS } from './termsQual'
 import { RF_EXTRA_LESSONS, RF_TERMS } from './termsRf'
 import { MOS_TERMS } from './termsMos'
 import { PCB_TERMS } from './termsPcb'
@@ -184,7 +186,7 @@ const BASE_TERMS: GlossaryTerm[] = [
       '测完后给每颗 DUT 的分类号，例如 Bin 1 = 好品。量产里第一个 Fail 的测试项决定它进哪个 Bin，所以 Bin 号也告诉你它挂在哪一项。',
       'The category number each DUT gets after test, e.g. bin 1 = good. In production the first failing item decides the bin, so the bin number also tells you where it failed.',
     ),
-    lessons: ['intro', 'program', 'fIntro', 'fDc', 'fProgram'],
+    lessons: ['intro', 'program', 'fIntro', 'fDc', 'fProgram', 'genStdf'],
   },
   {
     id: 'yield',
@@ -265,6 +267,87 @@ const BASE_TERMS: GlossaryTerm[] = [
       'A memory test algorithm: write 0 to each address, then read 0 and write 1, and so on. The ATE’s algorithmic generator computes each cycle on the fly instead of storing every vector.',
     ),
     lessons: ['intro', 'vector'],
+  },
+
+  {
+    id: 'stdf',
+    term: 'STDF',
+    name: loc('标准测试数据格式', 'Standard Test Data Format'),
+    def: loc(
+      'ATE 测试结果的标准二进制文件格式。由 FAR、MIR、PIR、PTR、PRR 等记录组成：每颗器件的最终结果在 PRR 里，HARD_BIN 决定料盘。良率和失效分析都读它。',
+      'The standard binary file format for ATE test results. It is made of records such as FAR, MIR, PIR, PTR and PRR: each part’s final result sits in PRR, where HARD_BIN decides the tray. Yield and failure analysis read it.',
+    ),
+    lessons: ['intro', 'genStdf'],
+  },
+  {
+    id: 'hard-bin',
+    term: 'Hard Bin',
+    name: loc('硬分档（HARD_BIN）', 'Hard bin (HARD_BIN)'),
+    def: loc(
+      'ATE 对一颗 DUT 的最终分类，决定它进哪个料盘，记录在 STDF 的 PRR 里。通常第一个失效项决定它的 Hard Bin；Bin 1 一般是好品。',
+      'The final category the ATE gives a DUT, which decides its tray; it is recorded as HARD_BIN in the PRR of an STDF file. Usually the first failing item sets the hard bin; bin 1 is normally good.',
+    ),
+    lessons: ['genStdf'],
+  },
+  {
+    id: 'soft-bin',
+    term: 'Soft Bin',
+    name: loc('软分档（SOFT_BIN）', 'Soft bin (SOFT_BIN)'),
+    def: loc(
+      '比 Hard Bin 更细的程序分类，同一个料盘里可以区分失效类型，供失效分析用；它不决定料盘，料盘只看 Hard Bin。',
+      'A finer category from the test program than the hard bin. It separates failure types within one tray for failure analysis; it does not decide the tray, which depends only on the hard bin.',
+    ),
+    lessons: ['genStdf'],
+  },
+  {
+    id: 'site',
+    term: 'Site',
+    name: loc('测试位（Site）', 'Site'),
+    def: loc(
+      'Multi-site 测试中同时接触、同时测的一颗 DUT 所在的位置编号。STDF 的 PIR 记录里用 SITE_NUM 标出它，按 SITE_NUM 分组就能看出某个位置是否异常。',
+      'The position number of one DUT that is contacted and tested alongside others in a multi-site test. The PIR record of STDF carries it as SITE_NUM; grouping by SITE_NUM shows whether one position is abnormal.',
+    ),
+    lessons: ['genStdf', 'genMultisite'],
+  },
+  {
+    id: 'touchdown',
+    term: 'Touchdown',
+    name: loc('一次接触（Touchdown）', 'Touchdown'),
+    def: loc(
+      '探针或 Socket 与一组 DUT 接触、测完再分开的一个周期。一次 Touchdown 同时测 N 颗（N = Site 数），总时间 = Index 时间 + 并行测试时间 + N × 串行时间。',
+      'One cycle in which the probes or socket contact a group of DUTs, test them, and separate. One touchdown tests N parts at once (N = number of sites); total time = index time + parallel test time + N × serial time.',
+    ),
+    lessons: ['genMultisite'],
+  },
+  {
+    id: 'uph',
+    term: 'UPH',
+    name: loc('每小时产出（Units Per Hour）', 'Units per hour'),
+    def: loc(
+      '每小时测完的 DUT 数。UPH = 3600 × N ÷ (T_td × (1 + 重测率))。Site 增加会提高它，但共享资源的串行部分会压低并行效率。',
+      'Parts tested per hour. UPH = 3600 × N ÷ (T_td × (1 + retest rate)). More sites raise it, but the serial part of shared resources lowers parallel efficiency.',
+    ),
+    lessons: ['genMultisite'],
+  },
+  {
+    id: 'cot',
+    term: 'COT',
+    name: loc('单颗测试成本（Cost of Test）', 'Cost of test'),
+    def: loc(
+      '测一颗 DUT 的成本 = 每小时测试成本 ÷ UPH，常以美分计。每小时成本随 Site 数增加，所以 UPH 最高的方案不一定 COT 最低，要看两者的比值。',
+      'Cost of testing one DUT = hourly test cost ÷ UPH, often in cents. The hourly cost rises with each site, so the highest UPH is not always the lowest COT; compare the ratio.',
+    ),
+    lessons: ['genMultisite'],
+  },
+  {
+    id: 'multisite',
+    term: 'Multi-site',
+    name: loc('多 Site 并行测试', 'Multi-site test'),
+    def: loc(
+      '一台 ATE 的通道组同时测 N 颗 DUT。Index、电源、时钟和通道数限制了能并行的 Site 数，实际效率 η 通常小于 100%，见 {@genMultisite}。',
+      'One tester channel set tests N DUTs at once. Index time, power, clocks and channel count limit how many sites can run in parallel, so the real efficiency η is usually below 100%. See {@genMultisite}.',
+    ),
+    lessons: ['genMultisite'],
   },
 
   /* ---------------- D02 DUT 如何接到 ATE ---------------- */
@@ -1283,7 +1366,7 @@ const BASE_TERMS: GlossaryTerm[] = [
     lessons: ['latch', 'fBasics', 'fLatch'],
   },
 
-  /* ---------------- D16 虚拟 ATE 操作系统 ---------------- */
+  /* ---------------- D17 虚拟 ATE 操作系统（已合并 D15 实验台） ---------------- */
   {
     id: 'contact-resistance',
     term: 'Contact Resistance',
@@ -1569,10 +1652,10 @@ const BASE_TERMS: GlossaryTerm[] = [
     term: 'Datalog',
     name: loc('测试数据记录', 'Datalog'),
     def: loc(
-      '每个测试项的实测值和判定记录。看开短路要把相邻脚放在一起看；样品的 Datalog 还要带序列号、程序版本、测试机和日期。',
-      'The record of measured values and verdicts per test. For opens / shorts read adjacent pins together; sample datalogs also carry the serial number, program revision, tester and date.',
+      '每个测试项的实测值和判定记录。看开短路要把相邻脚放在一起看；样品的 Datalog 还要带序列号、程序版本、测试机和日期。这些结果的标准文件格式是 STDF，见 {@intro}。',
+      'The record of measured values and verdicts per test. For opens / shorts read adjacent pins together; sample datalogs also carry the serial number, program revision, tester and date. The standard file format for these results is STDF, see {@intro}.',
     ),
-    lessons: ['vate', 'fOpens', 'fChar', 'fDebug', 'fQualify'],
+    lessons: ['intro', 'vate', 'fOpens', 'fChar', 'fDebug', 'fQualify', 'genStdf'],
   },
 
   /* ---------------- F06 DC 参数 ---------------- */
@@ -2041,6 +2124,8 @@ const EXTRA_SOURCES: Array<Record<string, ModuleId[]>> = [
   ...HS_EXTRA_LESSONS,
   ...RF_EXTRA_LESSONS,
   ...MEM_EXTRA_LESSONS,
+  ...QUAL_EXTRA_LESSONS,
+  ...PWR_EXTRA_LESSONS,
 ]
 
 /** 对任意一个轨道的词条都生效，所以 ANA / HS 课可以引用 MOS、PCB 里的词条 */
@@ -2055,6 +2140,6 @@ function withExtraLessons(term: GlossaryTerm): GlossaryTerm {
   return { ...term, lessons: [...new Set([...term.lessons, ...more])] }
 }
 
-export const TERMS: GlossaryTerm[] = [...BASE_TERMS, ...MOS_TERMS, ...PCB_TERMS, ...ANA_TERMS, ...HS_TERMS, ...RF_TERMS, ...MEM_TERMS].map(
+export const TERMS: GlossaryTerm[] = [...BASE_TERMS, ...MOS_TERMS, ...PCB_TERMS, ...ANA_TERMS, ...HS_TERMS, ...RF_TERMS, ...MEM_TERMS, ...QUAL_TERMS, ...PWR_TERMS].map(
   withExtraLessons,
 )

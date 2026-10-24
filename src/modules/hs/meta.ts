@@ -18,7 +18,7 @@ export type HsLessonId = (typeof HS_LESSONS)[number]
 export const HS_META: Record<HsLessonId, LessonMeta> = {
   hsBasics: {
     title: loc('高速信号基础', 'High-speed Signal Basics'),
-    goal: loc('认识数据速率、UI 和上升时间；用 BW ≈ 0.35 / tr 估算带宽需求。', 'Know data rate, UI and rise time; estimate the bandwidth needed with BW ≈ 0.35 / tr.'),
+    goal: loc('认识数据速率、UI 和上升时间；用 BW ≈ 350 / tr（tr 用 ps）估算带宽需求。', 'Know data rate, UI and rise time; estimate the bandwidth needed with BW ≈ 350 / tr (tr in ps).'),
   },
   hsChannel: {
     title: loc('传输与信号完整性', 'Transmission and Signal Integrity'),

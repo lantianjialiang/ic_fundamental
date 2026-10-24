@@ -1,0 +1,55 @@
+/* PWR-07 宽禁带器件：材料条形图、Vth 滞回曲线、预置时序与 GaN 延时曲线的版式 */
+
+.pwrw-tabs {
+  margin-bottom: 12px;
+}
+
+.pwrw-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.pwrw-grid .term-fig {
+  min-width: 0;
+}
+
+.pwrw-fig {
+  margin: 0;
+  min-width: 0;
+}
+
+.pwrw-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.pwrw-stack {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pwrw-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 4px 0 0;
+}
+
+.pwrw-cell {
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.pwrw-cell .readout {
+  margin-top: 0;
+}
+
+@media (max-width: 960px) {
+  .pwrw-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

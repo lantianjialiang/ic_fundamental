@@ -185,8 +185,8 @@ export const TRACKS: Array<{
     id: 'digital',
     title: loc('基础 / 数字', 'Basics / Digital'),
     blurb: loc(
-      '先认名词、看动画：测什么、接到哪，再到 DC、功能、时序、Scan 和程序。现课 {@intro}–{@latch}，实验 {@bench}–{@vate}。',
-      'Names and animations first: what is tested and how it connects, then DC, functional, timing, Scan and the program. Lessons {@intro}–{@latch}, labs {@bench}–{@vate}.',
+      '先认名词、看动画：测什么、接到哪，再到 DC、功能、时序、Scan 和程序。现课 {@intro}–{@genMultisite}，综合实验 {@vate}（内含时序 / 漏电 / 图案台）。',
+      'Names and animations first: what is tested and how it connects, then DC, functional, timing, Scan and the program. Lessons {@intro}–{@genMultisite}; capstone lab {@vate} (includes the timing / leakage / pattern bench).',
     ),
     ready: true,
     lessons: [
@@ -204,7 +204,8 @@ export const TRACKS: Array<{
       'shmoo',
       'alu',
       'latch',
-      'bench',
+      'genStdf',
+      'genMultisite',
       'vate',
     ],
     knowledge: [
@@ -241,8 +242,8 @@ export const TRACKS: Array<{
       {
         title: loc('功能与时间', 'Function and time'),
         text: loc(
-          '真值表、Pattern、Strobe、Setup / Hold、tPD、fMAX。{@func}–{@timing}。拧旋钮见 {@bench}。',
-          'Truth table, pattern, strobe, setup / hold, tPD, fMAX. {@func}–{@timing}. Turn the knobs in {@bench}.',
+          '真值表、Pattern、Strobe、Setup / Hold、tPD、fMAX。{@func}–{@timing}。拧旋钮见 {@vate}。',
+          'Truth table, pattern, strobe, setup / hold, tPD, fMAX. {@func}–{@timing}. Turn the knobs in {@vate}.',
         ),
       },
       {
@@ -266,8 +267,8 @@ export const TRACKS: Array<{
       {
         title: loc('交互实验', 'Interactive lab'),
         text: loc(
-          '{@bench}。自己设 Period / Drive / Delay / Strobe，以及 Leakage 限流。{@vate} 是一台虚拟 ATE 工作站：IDDQ 与开短路，Run、看 Datalog、诊断故障。',
-          '{@bench}. Set period / drive / delay / strobe yourself, plus the leakage current limit. {@vate} is a virtual ATE workstation: IDDQ and opens / shorts, run, read the datalog, diagnose the fault.',
+          '{@vate}。先在基础台自己设 Period / Drive / Delay / Strobe 与漏电限流；再到虚拟 ATE 工作站跑 IDDQ 与开短路，Run、看 Datalog、诊断故障。',
+          '{@vate}. First set period / drive / delay / strobe and the leakage limit on the basic bench; then run IDDQ and opens / shorts on the virtual ATE workstation, read the datalog and diagnose the fault.',
         ),
       },
     ],
@@ -650,11 +651,20 @@ export const TRACKS: Array<{
     id: 'power',
     title: loc('功率器件', 'Power devices'),
     blurb: loc(
-      'MOSFET、IGBT、SiC、GaN。高压大电流、发热和安全工作区，不是运放精度课。',
-      'MOSFET, IGBT, SiC, GaN. High voltage, high current, heat and safe operating area, not op-amp precision.',
+      'MOSFET、IGBT、SiC、GaN。高压大电流、发热和安全工作区，不是运放精度课。现课 {@pwrSelector}–{@pwrProgram}。',
+      'MOSFET, IGBT, SiC, GaN. High voltage, high current, heat and safe operating area, not op-amp precision. Lessons {@pwrSelector}–{@pwrProgram}.',
     ),
-    ready: false,
-    lessons: [],
+    ready: true,
+    lessons: [
+      'pwrSelector',
+      'pwrStatic',
+      'pwrKelvin',
+      'pwrGate',
+      'pwrDpt',
+      'pwrUis',
+      'pwrWbg',
+      'pwrProgram',
+    ],
     knowledge: [
       {
         title: loc('器件图像', 'The device picture'),
@@ -772,11 +782,21 @@ export const TRACKS: Array<{
     id: 'qual',
     title: loc('可靠性 / 车规', 'Reliability / Automotive'),
     blurb: loc(
-      '横切轨道：老化、ESD、Latch-up、AEC-Q100。不是又一种芯片，是所有 CMOS 的加试。',
-      'A cross-cutting track: burn-in, ESD, latch-up, AEC-Q100. Not another chip type, but extra tests for every CMOS device.',
+      '横切轨道：老化、ESD、Latch-up、AEC-Q100。不是又一种芯片，是所有 CMOS 的加试。REL 系列 {@relBathtub}–{@relFlow}：从浴盆曲线、加速模型讲到车规量产流程。',
+      'A cross-cutting track: burn-in, ESD, latch-up, AEC-Q100. Not another chip type, but extra tests for every CMOS device. REL series {@relBathtub}–{@relFlow}: from the bathtub curve and acceleration models to the automotive production flow.',
     ),
     ready: true,
-    lessons: ['latch'],
+    lessons: [
+      'latch',
+      'relBathtub',
+      'relAccel',
+      'relStress',
+      'relWeibull',
+      'relBurnIn',
+      'relAuto',
+      'relPat',
+      'relFlow',
+    ],
     knowledge: [
       {
         title: loc('失效浴缸', 'The bathtub curve'),

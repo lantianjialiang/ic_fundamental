@@ -1,0 +1,49 @@
+/* REL-03 可靠性试验方法与样本量：图的版式、标准标注与试验一览表（控件与两栏布局复用 hs.css） */
+
+.rel-stress-figs {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rel-fig {
+  min-width: 0;
+  margin: 0;
+}
+
+.rel-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.rel-std-note {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rel-table-wrap {
+  overflow-x: auto;
+  margin-top: 14px;
+}
+
+.rel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.rel-table th,
+.rel-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line, #2a313c);
+}
+
+.rel-table th {
+  color: var(--muted);
+  font-weight: 600;
+}

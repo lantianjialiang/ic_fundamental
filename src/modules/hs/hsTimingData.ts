@@ -35,6 +35,11 @@ export const S = {
   misTitle: loc('常见误区', 'Common misconceptions'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
+  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqNote: loc(
+    '正文里的 Setup / Hold 边界、有效窗口与裕量都从这一节列出的几条推出。读完正文再回来看。',
+    'The setup and hold boundaries, valid window and margin in the body are derived from the items below. Read the body first, then come back here.',
+  ),
   asideLater: loc(
     '真实接收端的建立、保持时间随温度、电压和数据翻转方向变化，时钟还有自己的抖动；这里只练窗口、边界和裕量三件事。',
     'Real receiver setup and hold times vary with temperature, voltage and edge direction, and the clock has its own jitter; here we only practise the window, the boundaries and the margin.',
@@ -150,6 +155,30 @@ export function taskItems(state: TimingState, a: TimingAnalysis): TaskItem[] {
     { id: 'closed', text: S.task5, done: a.violation === 'closed' },
   ]
 }
+
+/** 课末补充：数据沿位置、Setup / Hold 边界、rms 与峰峰值、裕量最大化，都从这几条推出 */
+export const PREREQ: LText[] = [
+  loc(
+    '数据沿的位置：第 k 个数据沿理想在 k·UI，实际在 k·UI + e_k，e_k 是抖动（均值 0，rms 为 σ）。采样沿要同时满足两条：在本位的前沿之后至少 tSU（Setup）；在下一个数据沿之前至少 tH（Hold）。',
+    'Where the data edges fall: the k-th data edge ideally sits at k·UI and actually at k·UI + e_k, where e_k is jitter (mean 0, rms σ). The sampling edge must satisfy two rules: it must come at least tSU after the leading edge of its bit (setup), and at least tH before the next data edge (hold).',
+  ),
+  loc(
+    '窗口的推导：对所有沿取最坏情况，最晚的前沿 max(e) 与最早的下一个沿 min(e)。Setup 边界 S = tSU + max(e)，Hold 边界 H = UI − tH + min(e)，有效窗口 W = H − S = UI − tSU − tH − [max(e) − min(e)]。方括号里就是抖动峰峰值。',
+    'Derivation of the window: take the worst case over all edges, the latest leading edge max(e) and the earliest next edge min(e). Setup boundary S = tSU + max(e), hold boundary H = UI − tH + min(e), valid window W = H − S = UI − tSU − tH − [max(e) − min(e)]. The bracket is the peak-to-peak jitter.',
+  ),
+  loc(
+    'rms 与峰峰值：rms（σ，标准差）描述典型的分散程度；峰峰值是最大值与最小值之差，描述最坏情况。高斯分布的 ±σ 覆盖约 68%，±3σ 约 99.7%，但尾部无界，所以有限样本算出的峰峰值只是估计。窗口要对每一个沿都成立，因此扣的是峰峰值。',
+    'rms and peak-to-peak: rms (σ, the standard deviation) describes the typical spread, and peak-to-peak is the difference between the largest and smallest value, describing the worst case. For a Gaussian, ±σ covers about 68% and ±3σ about 99.7%, but the tails are unbounded, so a peak-to-peak taken from a finite sample only estimates the true extreme. The window must hold for every edge, so peak-to-peak is subtracted.',
+  ),
+  loc(
+    '裕量为什么在中央最大：采样沿到两个边界的距离之和恒为 W，因为 (φ − S) + (H − φ) = W。两个数之和为定值时，它们较小的那个在两者相等时最大，所以采样沿放在窗口中央，最小裕量为 W ÷ 2，是最大的。',
+    'Why the margin is largest at the centre: the distances from the sampling edge to the two boundaries always add up to W, since (φ − S) + (H − φ) = W. For two numbers with a fixed sum, the smaller one is largest when they are equal, so placing the sample at the centre gives the largest minimum margin, W ÷ 2.',
+  ),
+  loc(
+    '模型的局限：页面对 128 个抽样沿取 max 与 min，只是对真实极值的估计；抽样越多，极值越远，窗口越窄。真正的极值要用 HS-04 的统计模型外推。',
+    'Limits of the model: the page takes the max and min over 128 sampled edges, which only estimates the true extremes; more samples push the extremes further out and the window narrower. The true extremes are extrapolated with the statistical model in HS-04.',
+  ),
+]
 
 /** 小测题干中的数字由公式算出，与页面的换算保持一致 */
 const UI_10G = 1000 / 10

@@ -1,0 +1,26 @@
+/* REL-01 浴盆曲线：三张图竖排在左栏，读数在右栏（控件与两栏布局复用 hs.css） */
+
+.rel-bath-stack {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rel-bath-fig {
+  min-width: 0;
+  margin: 0;
+}
+
+.rel-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.rel-legend {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}

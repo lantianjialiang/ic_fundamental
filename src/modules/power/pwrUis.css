@@ -1,0 +1,38 @@
+/* PWR-06 UIS 与 SOA：电路图、雪崩波形与 SOA 双对数图的版式（示波器本体复用 scope.css，控件复用 hs.css） */
+
+.pwr-uis-figs {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pwr-uis-fig {
+  margin: 0;
+  min-width: 0;
+}
+
+.pwr-uis-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.pwr-uis-soa {
+  max-width: 560px;
+}
+
+.pwr-uis-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pwr-uis-note {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}

@@ -1,0 +1,26 @@
+/* REL-02 失效机理与加速模型：两张图竖排在左栏，读数在右栏（控件与两栏布局复用 hs.css） */
+
+.rel-acc-figs {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rel-acc-fig {
+  min-width: 0;
+  margin: 0;
+}
+
+.rel-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.rel-legend {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}

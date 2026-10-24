@@ -1,0 +1,50 @@
+/* PWR-04 栅极电荷：两栏布局（示意图 + 示波器与读数），版式与 pwrKelvin.css 一致 */
+
+.pwr-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.pwr-grid > * {
+  min-width: 0;
+}
+
+.pwr-fig {
+  margin: 0;
+  min-width: 0;
+}
+
+.pwr-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.pwr-note {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* 测试 Qgd 的输入框：标签在上，判定文字在下 */
+.pwr-guess {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.pwr-guess input {
+  width: 9rem;
+  padding: 4px 8px;
+  font: inherit;
+}
+
+@media (max-width: 960px) {
+  .pwr-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

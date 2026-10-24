@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
-import { type LText } from '../../i18n/locale'
+import { loc, type LText } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
 import { type ModuleId } from '../catalog'
 import { Callout } from '../fund/parts'
+import { BenchLab } from '../module17/BenchLab'
+import { QUIZ as BENCH_QUIZ } from '../module17/data/content'
 import { QUIZ, S, TAKEAWAY } from './data/content'
 import { IddqLab } from './IddqLab'
 import { OsLab } from './OsLab'
@@ -17,14 +19,23 @@ type VatePageProps = {
   onModuleChange: (id: ModuleId) => void
 }
 
-type Tab = 'iddq' | 'os'
+type Tab = 'bench' | 'iddq' | 'os'
+
+/** 合并后测验：先是原 D15 实验台的题，再是 VATE 的题 */
+const ALL_QUIZ = [...BENCH_QUIZ, ...QUIZ]
 
 const TABS: Array<{ id: Tab; label: LText; code: string }> = [
+  { id: 'bench', label: loc('基础台：时序 / 漏电 / 图案', 'Basic bench: timing / leakage / pattern'), code: 'T000' },
   { id: 'iddq', label: S.tabIddq, code: 'T100' },
   { id: 'os', label: S.tabOs, code: 'T200' },
 ]
 
 const START_NOTE: Record<Tab, Note> = {
+  bench: {
+    kicker: loc('基础台', 'Basic bench'),
+    title: loc('时序', 'Timing'),
+    text: loc('拧 Period、Drive、Strobe，看 Strobe 落在哪里。', 'Turn period, drive and strobe, and see where the strobe lands.'),
+  },
   iddq: { kicker: S.kickerIddq, title: S.asideIntroTitle, text: S.asideIntroText },
   os: { kicker: S.kickerOs, title: S.asideOsTitle, text: S.asideOsText },
 }
@@ -89,6 +100,9 @@ export function VatePage({ moduleId, onModuleChange }: VatePageProps) {
             </nav>
             <div className="vws__main">
               {/* 两个实验台都保持挂载，切换测试项不丢 Datalog */}
+              <div role="tabpanel" id="vate-panel-bench" aria-labelledby="vate-tab-bench" hidden={tab !== 'bench'}>
+                <BenchLab onNote={setNote('bench')} />
+              </div>
               <div role="tabpanel" id="vate-panel-iddq" aria-labelledby="vate-tab-iddq" hidden={tab !== 'iddq'}>
                 <IddqLab onNote={setNote('iddq')} />
               </div>
@@ -110,7 +124,7 @@ export function VatePage({ moduleId, onModuleChange }: VatePageProps) {
 
       <Section title={t(S.quizTitle)} note={t(S.quizNote)}>
         <div onClick={() => setQuizFocus(true)}>
-          <QuizList questions={QUIZ} yes={t(S.yes)} no={t(S.no)} />
+          <QuizList questions={ALL_QUIZ} yes={t(S.yes)} no={t(S.no)} />
         </div>
       </Section>
     </LessonFrame>

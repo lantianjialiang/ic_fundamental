@@ -47,7 +47,7 @@ export function Module16Page({ moduleId, onModuleChange }: Module16PageProps) {
       asideTitle={t(aside.title)}
       asideText={t(aside.text)}
       asideLater={t(ui.m16.asideLater)}
-      nextId="bench"
+      nextId="genStdf"
       nextLabel={t(ui.m16.next)}
     >
       <Section title={t(ui.m16.introTitle)}>

@@ -1,0 +1,123 @@
+/* PWR-08 综合测试程序：流程表、图与读数的版式 */
+
+.pwrp-flow-wrap {
+  overflow-x: auto;
+  margin-bottom: 8px;
+}
+
+.pwrp-flow {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.pwrp-flow th,
+.pwrp-flow td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line-2);
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.pwrp-flow th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.pwrp-flow tr.is-off td {
+  opacity: 0.45;
+}
+
+.pwrp-flow td.pwrp-cond {
+  white-space: normal;
+  min-width: 140px;
+}
+
+.pwrp-move {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.pwrp-move button {
+  min-width: 28px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--line-2);
+  background: var(--fig-box);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.pwrp-move button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.pwrp-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 4px 0 0;
+}
+
+.pwrp-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 0 16px;
+  align-items: start;
+}
+
+.pwrp-stack {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pwrp-fig {
+  margin: 0;
+  min-width: 0;
+}
+
+.pwrp-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.pwrp-cell {
+  min-width: 0;
+  margin-top: 14px;
+}
+
+.pwrp-cell .readout {
+  margin-top: 0;
+}
+
+.pwrp-export {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.pwrp-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line-2);
+  background: var(--fig-box);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.pwrp-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+@media (max-width: 960px) {
+  .pwrp-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

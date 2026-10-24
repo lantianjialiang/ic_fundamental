@@ -33,10 +33,11 @@ Lesson codes are generated from track prefix + sequence (e.g. `F01`, `D03`). Ins
 | Track | Prefix | Lessons | Focus |
 |---|---|---|---|
 | Prep | B | 7 | Industry roles, history, silicon→die, packaging & CP/FT, components, digital diagrams, bench measurement—then enter D / F |
-| Foundations / Digital | D | 16 | Industry context, 3D physical hookup, ATE / PMU, specs, DC / functional / timing & AC, vectors, Scan, programs & debug, Shmoo, virtual ALU, latch-up intro, virtual ATE workstation |
+| Foundations / Digital | D | 17 | Industry context, 3D physical hookup, ATE / PMU, specs, DC / functional / timing & AC, vectors, Scan, programs & debug, Shmoo, virtual ALU, latch-up intro, STDF / Datalog, multi-site cost, virtual ATE workstation (timing / leakage / pattern bench included) |
 | Digital test fundamentals | F | 16 | From Ohm’s law through production order: opens/shorts, DC, functional, AC, characterization, vectors, programming, debug, latch-up, and Scan |
 | Interactive labs | X | 2 | Set Period / Drive / Strobe and leakage limits yourself; virtual ATE workstation for IDDQ and opens/shorts, datalog, fault diagnosis |
-| Reliability / automotive | Q | 1 | Latch-up entry only for now; full ESD / aging content planned |
+| Reliability / automotive | Q | 9 | Latch-up entry, bathtub curve, acceleration models, stress and sample size, Weibull and FIT, burn-in, AEC-Q100 framework, wafer PAT, and a production flow capstone |
+| Power devices | P | 8 | Device selection, static parameters, Kelvin, gate charge, double-pulse switching, UIS / SOA / thermal, wide-bandgap test, and a test program capstone |
 | MOSFETs and digital circuits | T | 11 | How a MOSFET turns on, which region it works in, how inverters and gates are built, board use and selection |
 | PCB basics | L | 10 | How a board is made, the design-to-product flow, reading PCB files, design rules and a self-check |
 | Analog | A | 15 | Force / measure, DC and dynamic parameters, ADC / DAC, LDO, PLL, trim, statistics, and a capstone test program |
@@ -44,11 +45,11 @@ Lesson codes are generated from track prefix + sequence (e.g. `F01`, `D03`). Ins
 | RF test | R | 14 | dB / dBm, test system and link, S-parameters and matching, gain, P1dB, IP3, noise figure, harmonics, phase noise, modulation, EVM / ACPR, calibration, and a capstone |
 | Memory test | M | 13 | Array structure, read/write, fault models, patterns, March tests, timing and Shmoo, DRAM, DDR training, BIST with repair and ECC, parallel test, coverage and yield, bin analysis, and a capstone |
 
-**Foundations / Digital (D01–D16)**
+**Foundations / Digital (D01–D17)**
 
 | Code | Lesson |
 |---|---|
-| D01 | What is semiconductor test? |
+| D01 | What is semiconductor test? (incl. STDF result records) |
 | D02 | How does the DUT connect to the ATE? (3D: FT test head / load board / socket; CP prober / probe card) |
 | D03 | What’s inside an ATE? |
 | D04 | Why test is more than 0 and 1 |
@@ -62,8 +63,9 @@ Lesson codes are generated from track prefix + sequence (e.g. `F01`, `D03`). Ins
 | D12 | Yield, characterization, Shmoo |
 | D13 | Test program for a virtual 4-bit ALU |
 | D14 | Latch-up introduction |
-| D15 | Interactive lab (same lesson as X01) |
-| D16 | Virtual ATE OS: IDDQ and opens/shorts workstation (same lesson as X02) |
+| D15 | STDF and Datalog: byte-level viewer, record assembler with validator, in-browser parsing of your own `.stdf` (never uploaded), Pass/Fail, bin chart, parameter distribution and Cpk |
+| D16 | Multi-site and test cost: site count vs. UPH, parallel efficiency and COT; find an injected site offset by grouping on `SITE_NUM` |
+| D17 | Virtual ATE OS: timing / leakage / pattern bench (formerly D15, merged in), then the IDDQ and opens/shorts workstation (same lesson as X02) |
 
 **Digital test fundamentals (F01–F16)**
 
@@ -160,7 +162,7 @@ The two digital tracks complement each other: D establishes vocabulary with anim
 
 ### Syllabus only (lessons not built yet)
 
-Power devices, sensor / CIS, co-packaged silicon photonics. The home page shows what each track will cover.
+Sensor / CIS and co-packaged silicon photonics. The home page shows what each track will cover.
 
 ---
 
@@ -236,7 +238,10 @@ ic_fundamental/
 ├── vite.config.ts
 ├── tsconfig.json
 ├── scripts/check-i18n.mjs  # i18n lint
-├── scripts/check-vate.mjs  # D16 teaching model numeric checks
+├── scripts/check-vate.mjs  # D17 teaching model numeric checks
+├── scripts/check-gen.mjs   # D15–D16 STDF / multi-site model numeric checks
+├── scripts/check-qual.mjs  # REL-01–08 reliability numeric checks (scripts/checks/qual-*.mjs)
+├── scripts/check-power.mjs # PWR-01–08 power device numeric checks (scripts/checks/power-*.mjs)
 ├── scripts/export-brand-icons.mjs
 └── src/
     ├── main.tsx              # Entry: theme, then locale
@@ -255,7 +260,10 @@ ic_fundamental/
     │   ├── catalog.ts        # Stable lesson IDs (no numeric codes)
     │   ├── titles.ts
     │   ├── module00–17/      # Foundations / digital (module09, module13 merged into neighbors)
-    │   ├── vate/             # D16 virtual ATE workstation (model/ = pure functions)
+    │   ├── vate/             # D17 virtual ATE workstation (model/ = pure functions; hosts the timing / leakage / pattern bench from module17/BenchLab.tsx)
+    │   ├── gen/              # D15–D16 STDF / Datalog and multi-site (model/ = pure functions)
+    │   ├── qual/             # Reliability REL-01–08: core/ (reliability, wafer, pat models), knowledge/ (one file per lesson), *Model / *Data / *Fig / Page per lesson
+    │   ├── power/            # Power devices PWR-01–08: core/ (power, thermal models), knowledge/ (one file per lesson), *Model / *Data / *Fig / Page per lesson
     │   ├── fund/             # Digital test fundamentals
     │   ├── mos/              # MOSFET track lessons
     │   ├── pcb/              # PCB track lessons
@@ -341,10 +349,11 @@ Issues and pull requests are welcome. When changing UI or adding lessons:
 | 轨道 | 前缀 | 课数 | 内容 |
 |---|---|---|---|
 | 预备 | B | 7 | 产业角色、简史、硅到 Die、封装与 CP/FT、元器件、数字认图、桌上测量——再进 D / F |
-| 基础 / 数字 | D | 16 | 产业位置、3D 物理连接、ATE / PMU、规格、DC / 功能 / 时序与 AC、向量、Scan、程序与排错、Shmoo、虚拟 ALU、闩锁入口、虚拟 ATE 工作站 |
+| 基础 / 数字 | D | 17 | 产业位置、3D 物理连接、ATE / PMU、规格、DC / 功能 / 时序与 AC、向量、Scan、程序与排错、Shmoo、虚拟 ALU、闩锁入口、STDF / Datalog、多 Site 成本、虚拟 ATE 工作站（含时序 / 漏电 / 图案台） |
 | 数字测试基础 | F | 16 | 从欧姆定律讲起，按量产顺序走完开短路、DC、功能、AC、表征、向量、写程序、排错、闩锁和 Scan |
 | 交互实验 | X | 2 | 自己设 Period / Drive / Strobe 和 Leakage 限流；虚拟 ATE 工作站跑 IDDQ 与开短路、读 Datalog、诊断故障 |
-| 可靠性 / 车规 | Q | 1 | 目前只有 Latch-up 入口，完整 ESD / 老化后续补 |
+| 可靠性 / 车规 | Q | 9 | Latch-up 入口、浴盆曲线、加速模型、试验与样本量、Weibull 与 FIT、Burn-in、AEC-Q100 框架、晶圆 PAT，以及量产流程综合课 |
+| 功率器件 | P | 8 | 器件选型、静态参数、开尔文连接、栅极电荷、双脉冲开关、UIS / SOA / 热阻、宽禁带测试，以及测试程序综合课 |
 | MOS 管与数字电路 | T | 11 | MOS 管怎么导通、工作在哪个区，怎样搭反相器和逻辑门，板上怎么用、怎么选型 |
 | PCB 入门 | L | 10 | PCB 怎么造出来、从设计到成品的流程，读懂 PCB 文件，设计规则与自查 |
 | 模拟芯片 | A | 15 | Force / Measure、DC 与动态参数、ADC / DAC、LDO、PLL、Trim、统计，以及综合测试程序 |
@@ -352,11 +361,11 @@ Issues and pull requests are welcome. When changing UI or adding lessons:
 | 射频测试 | R | 14 | dB / dBm、测试系统与链路、S 参数与匹配、增益、P1dB、IP3、噪声系数、谐波、相位噪声、调制、EVM / ACPR、校准，以及综合课 |
 | 存储器测试 | M | 13 | 阵列结构、读写流程、故障模型、Pattern、March 测试、时序与 Shmoo、DRAM、DDR 训练、BIST 与修复 / ECC、并行测试、覆盖率与良率、Bin 分析，以及综合课 |
 
-**基础 / 数字（D01–D16）**
+**基础 / 数字（D01–D17）**
 
 | 编号 | 课程 |
 |---|---|
-| D01 | 什么是半导体测试？ |
+| D01 | 什么是半导体测试？（含 STDF 结果记录） |
 | D02 | DUT 如何接到 ATE？（3D：FT 测试头 / Load Board / Socket，CP 探针台 / 针卡） |
 | D03 | ATE 里面有什么？ |
 | D04 | 为什么测试不只是 0 和 1 |
@@ -370,8 +379,9 @@ Issues and pull requests are welcome. When changing UI or adding lessons:
 | D12 | Yield、Characterization、Shmoo |
 | D13 | 虚拟 4-bit ALU 的 Test Program |
 | D14 | Latch-up 入口 |
-| D15 | 交互实验（与 X01 同一课） |
-| D16 | 虚拟 ATE 操作系统：IDDQ 与开短路工作站（与 X02 同一课） |
+| D15 | STDF 与 Datalog：字节级浏览器、记录组装与校验、浏览器内解析自己的 `.stdf`（不上传），Pass/Fail、Bin 柱图、参数分布与 Cpk |
+| D16 | Multi-site 与测试成本：Site 数与 UPH、并行效率、COT；按 `SITE_NUM` 分组找出注入的 Site 偏移 |
+| D17 | 虚拟 ATE 操作系统：时序 / 漏电 / 图案台（原 D15 并入），再到 IDDQ 与开短路工作站（与 X02 同一课） |
 
 **数字测试基础（F01–F16）**
 
@@ -468,7 +478,7 @@ Issues and pull requests are welcome. When changing UI or adding lessons:
 
 ### 大纲已列，课还没做
 
-功率器件、传感器 / CIS、硅光共封。首页能看到每条轨道要掌握什么。
+传感器 / CIS、硅光共封。首页能看到每条轨道要掌握什么。
 
 ---
 
@@ -544,7 +554,10 @@ ic_fundamental/
 ├── vite.config.ts
 ├── tsconfig.json
 ├── scripts/check-i18n.mjs  # 多语言检查
-├── scripts/check-vate.mjs  # D16 教学模型数值核对
+├── scripts/check-vate.mjs  # D17 教学模型数值核对
+├── scripts/check-gen.mjs   # D15–D16 STDF / Multi-site 模型数值核对
+├── scripts/check-qual.mjs  # REL-01–08 可靠性数值核对（scripts/checks/qual-*.mjs）
+├── scripts/check-power.mjs # PWR-01–08 功率器件数值核对（scripts/checks/power-*.mjs）
 ├── scripts/export-brand-icons.mjs
 └── src/
     ├── main.tsx              # 入口：先套主题，再挂 Locale
@@ -563,7 +576,10 @@ ic_fundamental/
     │   ├── catalog.ts        # 稳定课程 ID（不含编号）
     │   ├── titles.ts
     │   ├── module00–17/      # 基础 / 数字（module09、module13 已并入相邻课）
-    │   ├── vate/             # D16 虚拟 ATE 工作站（model/ 为纯函数模型）
+    │   ├── vate/             # D17 虚拟 ATE 工作站（model/ 为纯函数模型；内含 module17/BenchLab.tsx 的时序 / 漏电 / 图案台）
+    │   ├── gen/              # D15–D16 STDF 与 Datalog、Multi-site（model/ 为纯函数模型）
+    │   ├── qual/             # 可靠性 REL-01–08：core/（可靠性、晶圆、PAT 模型）、knowledge/（每课一个文件），每课另有 *Model / *Data / *Fig / Page
+    │   ├── power/            # 功率器件 PWR-01–08：core/（功率、热阻模型）、knowledge/（每课一个文件），每课另有 *Model / *Data / *Fig / Page
     │   ├── fund/             # 数字测试基础
     │   ├── mos/              # MOS 管轨道课程
     │   ├── pcb/              # PCB 轨道课程

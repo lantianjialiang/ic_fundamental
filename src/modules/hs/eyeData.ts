@@ -31,6 +31,11 @@ export const S = {
   misTitle: loc('常见误区', 'Common misconceptions'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
+  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqNote: loc(
+    '正文里的眼图画法、眼高与眼宽、mask 形状和 350 ÷ BW 都从这一节列出的几条推出。读完正文再回来看。',
+    'The eye construction, eye height and width, mask shape and 350 ÷ BW in the body are derived from the items below. Read the body first, then come back here.',
+  ),
   asideLater: loc(
     '真实的眼图还要看均衡（CTLE / FFE / DFE）、串扰、电源噪声，以及用统计方法外推到 BER 10⁻¹²；这里只练 UI、上升时间和 mask 三件事。',
     'Real eye analysis also covers equalisation (CTLE / FFE / DFE), crosstalk, supply noise, and extrapolating to BER 10⁻¹² statistically; here we only practise UI, rise time and the mask.',
@@ -78,6 +83,30 @@ export const MISCONCEPTIONS: LText[] = [
   loc(
     '带宽够了，就不用管抖动。带宽决定边沿的形状（ISI），抖动决定边沿的时刻，两者都要进 mask 的判定。',
     'Once bandwidth is enough, jitter can be ignored. Bandwidth shapes the edges (ISI) and jitter moves their timing; both must be judged against the mask.',
+  ),
+]
+
+/** 课末补充：眼图怎么画、眼高与眼宽的定义、mask 的形状、350 ÷ BW 的来源、PRBS7 为什么能暴露码间干扰 */
+export const PREREQ: LText[] = [
+  loc(
+    '眼图怎么画：接收端按时钟对齐数据，把连续的波形每 2 UI 切一段（0–2 UI）叠在一起，每个采样相位上的所有电平合起来就是一片“眼”。本页每个 UI 取 32 个采样点，叠加三个 PRBS7 周期，前 127 位用来让滤波器建立。',
+    'How an eye is drawn: with the receiver clocked to the data, successive waveform segments are cut every 2 UI (0–2 UI) and overlaid. At each sampling phase, all the levels together form the eye. This page uses 32 samples per UI and overlays three PRBS7 periods, skipping the first 127 bits to let the filter settle.',
+  ),
+  loc(
+    '眼高与眼宽的定义：在中心（0.5 UI）采样相位上，眼高 = min（“1”的采样值）− max（“0”的采样值），单位 mV。眼宽 = 每个采样相位上眼开口为正的相位数 ÷ 每 UI 采样点数，单位 UI。眼高看幅度余量，眼宽看时序余量。',
+    'Definitions: at the centre (0.5 UI) sampling phase, eye height = min(samples of “1”) − max(samples of “0”), in mV. Eye width = the number of sampling phases where the opening is positive, divided by the samples per UI, in UI. Height is the amplitude margin; width is the timing margin.',
+  ),
+  loc(
+    '350 ÷ BW 的来源：一阶 RC 的 τ = 1 ÷ (2π·BW)，10%–90% 上升时间 = τ·ln 9 = ln 9 ÷ (2π·BW) ≈ 0.35 ÷ BW（BW 用赫兹、时间用秒）；BW 用 GHz、上升时间用 ps 时就是 350 ÷ BW。完整推导见 HS-01 的补充。',
+    'Where rise time ≈ 350 ÷ BW comes from: for a first-order RC, τ = 1 ÷ (2π·BW), and the 10%–90% rise time is τ·ln 9 = ln 9 ÷ (2π·BW) ≈ 0.35 ÷ BW (BW in hertz, time in seconds); with BW in GHz and rise time in ps this is 350 ÷ BW. The full derivation is in the HS-01 supplement.',
+  ),
+  loc(
+    'mask 的形状：以眼中心为中心的六边形禁区。中心半高 200 mV；离中心水平距离 0.15 UI 以内是平顶（|v| ≤ 200 mV），0.15–0.35 UI 之间线性收窄到 0，超过 0.35 UI 的地方没有禁区。采样点落进去就判 FAIL。这些尺寸是本站的教学取值，不是任何标准的数字。',
+    'Shape of the mask: a hexagon centred on the eye. Its half-height is 200 mV; within 0.15 UI horizontally of the centre the top and bottom are flat (|v| ≤ 200 mV), then they taper linearly to zero at 0.35 UI, and nothing lies beyond that. Any sample inside it fails. These sizes are teaching values on this site, not numbers from a standard.',
+  ),
+  loc(
+    'PRBS7 为什么能暴露码间干扰：PRBS7 是 127 位的伪随机码型（周期 2⁷ − 1，见 HS-06）。一个周期里，每一种 7 位组合恰好出现一次（全 0 除外），所以叠加后能看到各种相邻位组合造成的拖尾。它不是真随机，每个周期都一样。',
+    'Why PRBS7 exposes inter-symbol interference: PRBS7 is a 127-bit pseudo-random pattern (period 2⁷ − 1, see HS-06). In one period every 7-bit combination appears exactly once except all zeros, so stacking it shows the tails left by every neighbouring-bit combination. It is not truly random; it repeats the same way each period.',
   ),
 ]
 

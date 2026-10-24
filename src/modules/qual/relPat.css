@@ -1,0 +1,104 @@
+/* REL-07 零缺陷测试策略：PAT 图、直方图、图例与手算练习的版式（控件与两栏布局复用 hs.css） */
+
+.rel-pat-figs {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rel-pat-fig {
+  min-width: 0;
+  margin: 0;
+}
+
+.rel-pat-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.rel-pat-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rel-pat-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.rel-pat-legend__item i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.rel-pat-hand {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--fig-box);
+}
+
+.rel-pat-hand h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.rel-pat-hand p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.rel-pat-hand__data {
+  font-family: var(--mono);
+  color: var(--text);
+}
+
+.rel-pat-hand__row {
+  display: grid;
+  grid-template-columns: 96px 120px 1fr;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.rel-pat-hand__row input {
+  width: 100%;
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  background: var(--fig-box);
+  color: var(--text);
+}
+
+.rel-pat-hand__ok {
+  color: var(--ok, #3fb950);
+}
+
+.rel-pat-hand__bad {
+  color: var(--bad, #f85149);
+}
+
+.rel-pat-hand__none {
+  color: var(--muted);
+}
+
+@media (max-width: 560px) {
+  .rel-pat-hand__row {
+    grid-template-columns: 1fr;
+  }
+}
