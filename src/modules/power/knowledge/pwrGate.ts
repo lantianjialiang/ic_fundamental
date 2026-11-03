@@ -78,5 +78,14 @@ export const PWR_GATE_KNOWLEDGE: AnaKnowledge = {
       ),
       lessons: ['pwrGate'],
     },
+    {
+      id: 'pwr-gate-ciss-not-smaller',
+      q: loc('Ciss 是不是越小越好？', 'Is a smaller Ciss always better?'),
+      a: loc(
+        'Ciss 小，驱动电荷少、开关可以更快，但往往伴随着更小的芯片或更弱的短路耐受，而且 Ciss 随 Vds 变，不能拿低压读数去比高压工况。要按工作电压读对应的 Ciss，并和 Qg、Rg 一起看。见 {@pwrGate}。',
+        'A smaller Ciss means less drive charge and faster switching, but it often comes with a smaller die or weaker short-circuit withstand. Ciss also changes with Vds, so a low-voltage reading is not the high-voltage value. Read Ciss at the operating voltage and look at it together with Qg and Rg. See {@pwrGate}.',
+      ),
+      lessons: ['pwrGate'],
+    },
   ],
 }

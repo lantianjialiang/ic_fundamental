@@ -10,6 +10,8 @@ import { MEM_META } from './mem/meta'
 import { GEN_META } from './gen/meta'
 import { REL_META } from './qual/meta'
 import { PWR_META } from './power/meta'
+import { SNS_META } from './sns/meta'
+import { PIC_META } from './pic/meta'
 
 export const LESSON_TITLE: Record<ModuleId, LText> = {
   mosPrimer: MOS_META.mosPrimer.title,
@@ -125,6 +127,24 @@ export const LESSON_TITLE: Record<ModuleId, LText> = {
   pwrUis: PWR_META.pwrUis.title,
   pwrWbg: PWR_META.pwrWbg.title,
   pwrProgram: PWR_META.pwrProgram.title,
+  snsOverview: SNS_META.snsOverview.title,
+  snsPhoton: SNS_META.snsPhoton.title,
+  snsPixel: SNS_META.snsPixel.title,
+  snsPtc: SNS_META.snsPtc.title,
+  snsDark: SNS_META.snsDark.title,
+  snsFlat: SNS_META.snsFlat.title,
+  snsOptical: SNS_META.snsOptical.title,
+  snsAccel: SNS_META.snsAccel.title,
+  snsProgram: SNS_META.snsProgram.title,
+  picOverview: PIC_META.picOverview.title,
+  picUnits: PIC_META.picUnits.title,
+  picDevice: PIC_META.picDevice.title,
+  picMod: PIC_META.picMod.title,
+  picSweep: PIC_META.picSweep.title,
+  picAlign: PIC_META.picAlign.title,
+  picCutback: PIC_META.picCutback.title,
+  picLink: PIC_META.picLink.title,
+  picFlow: PIC_META.picFlow.title,
   fBasics: ui.fBasics.title,
   fAte: ui.fAte.title,
   fIntro: ui.fIntro.title,

@@ -14,18 +14,9 @@ export const PWR_PROGRAM_KNOWLEDGE: AnaKnowledge = {
       ),
       lessons: ['pwrProgram'],
     },
-    {
-      id: 'dynamic-pat',
-      term: 'Dynamic PAT limit',
-      name: loc('动态 PAT 限值', 'Dynamic PAT limit'),
-      def: loc(
-        '零件平均测试（PAT）用本批 DUT 的统计量定限值，而不是固定的规格。教学做法是 median ± k·σ_rob，σ_rob = 1.4826 × MAD，k 常取 3–8（示例值，以各公司规程为准）。它能抓住在规格之内、但明显偏离群体的边缘缺陷。见 {@pwrProgram}。',
-        'Part average testing (PAT) sets limits from the lot’s own statistics rather than only the fixed spec. The teaching method is median ± k·σ_rob, with σ_rob = 1.4826 × MAD and k usually 3–8 (an example value; follow each company’s procedure). It catches marginal defects that sit inside the spec but far from the population. See {@pwrProgram}.',
-      ),
-      lessons: ['pwrProgram'],
-    },
   ],
   extraLessons: {
+    'part-average-testing': ['pwrProgram'],
     kelvin: ['pwrProgram'],
     'pulse-width': ['pwrProgram'],
     'test-program': ['pwrProgram'],
@@ -79,6 +70,15 @@ export const PWR_PROGRAM_KNOWLEDGE: AnaKnowledge = {
         'At least two things: first, read it back with the parser and check that bin counts match the simulation or the line records; second, check that the record order (FAR, MIR, PIR, PTR, PRR, PCR, HBR, MRR and so on) is valid. Successful encoding does not prove the format is right. See {@genStdf} and {@pwrProgram}.',
       ),
       lessons: ['pwrProgram'],
+    },
+    {
+      id: 'pwr-program-pulse-not-longer',
+      q: loc('脉宽是不是越长，Rds(on) 测得越准？', 'Does a longer pulse make Rds(on) more accurate?'),
+      a: loc(
+        '不是。脉宽太长，自热让结温升高，Rds(on) 跟着漂，读数偏大。太短则采样还没稳定。量产要把脉宽停在自热还小、读数已经稳的那一段，不是越长越好。见 {@pwrStatic}、{@pwrProgram}。',
+        'No. A long pulse lets self-heating raise the junction temperature, so Rds(on) drifts high. A pulse that is too short has not settled. Production parks the width where heating is still small and the reading is already stable — not as long as possible. See {@pwrStatic} and {@pwrProgram}.',
+      ),
+      lessons: ['pwrProgram', 'pwrStatic'],
     },
   ],
 }

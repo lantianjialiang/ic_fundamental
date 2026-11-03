@@ -9,7 +9,7 @@ export const REL_ACCEL_KNOWLEDGE: AnaKnowledge = {
       term: 'Acceleration factor (AF)',
       name: loc('加速因子（AF）', 'Acceleration factor (AF)'),
       def: loc(
-        '试验条件下的寿命与使用条件下寿命之比。等效使用小时 = 试验小时 × AF。温度用 Arrhenius 计算，温度循环用 Coffin-Manson，电压用 exp[γ(Vs − Vu)]。多个应力的 AF 相乘。见 {@relAccel}。',
+        '使用寿命与试验寿命之比：AF = 使用寿命 / 试验寿命。等效使用小时 = 试验小时 × AF。温度用 Arrhenius 计算，温度循环用 Coffin-Manson，电压用 exp[γ(Vs − Vu)]。多个应力的 AF 相乘。见 {@relAccel}。',
         'The ratio of life under use conditions to life under stress conditions. Equivalent use hours = test hours × AF. Temperature uses Arrhenius, temperature cycling uses Coffin-Manson, and voltage uses exp[γ(Vs − Vu)]. AFs of several stresses multiply. See {@relAccel}.',
       ),
       lessons: ['relAccel'],
@@ -51,6 +51,26 @@ export const REL_ACCEL_KNOWLEDGE: AnaKnowledge = {
       def: loc(
         '温度循环疲劳寿命模型：N ∝ ΔT⁻ⁿ，加速因子 AF = (ΔTs / ΔTu)ⁿ。循环幅度 ΔT 越大，疲劳越快；它描述的是循环幅度，不是最高温度。见 {@relAccel}。',
         'A thermal-cycling fatigue model: N ∝ ΔT⁻ⁿ, with acceleration factor AF = (ΔTs / ΔTu)ⁿ. A larger swing ΔT fatigues faster; it describes the cycle swing, not the peak temperature. See {@relAccel}.',
+      ),
+      lessons: ['relAccel'],
+    },
+    {
+      id: 'hci',
+      term: 'HCI',
+      name: loc('热载流子注入（HCI）', 'Hot-carrier injection (HCI)'),
+      def: loc(
+        '沟道里被电场加速的载流子注入栅氧，使阈值和电流随时间漂移。它随电压和温度加速，属于晶圆制造可靠性（AEC-Q100 的 D 组）。见 {@relAccel}。',
+        'Carriers accelerated by the channel field inject into the gate oxide, so threshold and current drift with time. It is accelerated by voltage and temperature, and belongs to wafer-process reliability (AEC-Q100 group D). See {@relAccel}.',
+      ),
+      lessons: ['relAccel'],
+    },
+    {
+      id: 'nbti',
+      term: 'NBTI',
+      name: loc('负偏压温度不稳定性（NBTI）', 'Negative-bias temperature instability (NBTI)'),
+      def: loc(
+        'PMOS 在负栅压和高温下，界面陷阱增加，Vth 漂移。它随温度和偏压加速，也属于晶圆制造可靠性。见 {@relAccel}。',
+        'Under negative gate bias and high temperature, a PMOS grows interface traps and its Vth drifts. It is accelerated by temperature and bias, and also belongs to wafer-process reliability. See {@relAccel}.',
       ),
       lessons: ['relAccel'],
     },

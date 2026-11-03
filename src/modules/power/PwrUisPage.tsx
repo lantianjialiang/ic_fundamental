@@ -26,8 +26,8 @@ export function PwrUisPage({ moduleId, onModuleChange }: Props) {
   const [vds, setVds] = useState(50)
   const [iop, setIop] = useState(10)
   const [tcase, setTcase] = useState(25)
-  const [pw, setPw] = useState(100)
-  const [tMs, setTMs] = useState(1)
+  const [pw, setPw] = useState(50)
+  const [tMs, setTMs] = useState(0.5)
 
   const pulseSec = (PULSE_SEG.find((item) => item.id === pulse) ?? PULSE_SEG[0]).sec
   const uisRes = useMemo(() => simulateUis(uis), [uis])
@@ -100,8 +100,8 @@ export function PwrUisPage({ moduleId, onModuleChange }: Props) {
             setVds(50)
             setIop(10)
             setTcase(25)
-            setPw(100)
-            setTMs(1)
+            setPw(50)
+            setTMs(0.5)
           }}
         />
       }

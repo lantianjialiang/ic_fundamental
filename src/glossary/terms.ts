@@ -4,6 +4,8 @@ import { ANA_EXTRA_LESSONS, ANA_TERMS } from './termsAna'
 import { HS_EXTRA_LESSONS, HS_TERMS } from './termsHs'
 import { MEM_EXTRA_LESSONS, MEM_TERMS } from './termsMem'
 import { PWR_EXTRA_LESSONS, PWR_TERMS } from './termsPower'
+import { SNS_EXTRA_LESSONS, SNS_TERMS } from './termsSns'
+import { PIC_EXTRA_LESSONS, PIC_TERMS } from './termsPic'
 import { QUAL_EXTRA_LESSONS, QUAL_TERMS } from './termsQual'
 import { RF_EXTRA_LESSONS, RF_TERMS } from './termsRf'
 import { MOS_TERMS } from './termsMos'
@@ -2126,6 +2128,8 @@ const EXTRA_SOURCES: Array<Record<string, ModuleId[]>> = [
   ...MEM_EXTRA_LESSONS,
   ...QUAL_EXTRA_LESSONS,
   ...PWR_EXTRA_LESSONS,
+  ...SNS_EXTRA_LESSONS,
+  ...PIC_EXTRA_LESSONS,
 ]
 
 /** 对任意一个轨道的词条都生效，所以 ANA / HS 课可以引用 MOS、PCB 里的词条 */
@@ -2140,6 +2144,6 @@ function withExtraLessons(term: GlossaryTerm): GlossaryTerm {
   return { ...term, lessons: [...new Set([...term.lessons, ...more])] }
 }
 
-export const TERMS: GlossaryTerm[] = [...BASE_TERMS, ...MOS_TERMS, ...PCB_TERMS, ...ANA_TERMS, ...HS_TERMS, ...RF_TERMS, ...MEM_TERMS, ...QUAL_TERMS, ...PWR_TERMS].map(
+export const TERMS: GlossaryTerm[] = [...BASE_TERMS, ...MOS_TERMS, ...PCB_TERMS, ...ANA_TERMS, ...HS_TERMS, ...RF_TERMS, ...MEM_TERMS, ...QUAL_TERMS, ...PWR_TERMS, ...SNS_TERMS, ...PIC_TERMS].map(
   withExtraLessons,
 )

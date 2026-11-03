@@ -20,15 +20,22 @@ export default async function run({ load, check }) {
   check('调整后的流程（PAT 开、UIS 85 %）导出后 Bin 计数仍一致', tuned.binsMatch && tuned.issues === 0)
 
   console.log('PWR-08 Kelvin 检查与 Site 3')
-  const sites = runA.summary.sites
-  const site3 = sites[2].kelvinFails
-  const others = sites.filter((s) => s.site !== 3).map((s) => s.kelvinFails)
+  const allOn = {
+    ...m.DEFAULT_PROGRAM,
+    steps: m.STEP_ORDER.map((id) => ({ id, enabled: true })),
+  }
+  const kelvinFirst = m.runProgram(allOn, popA).summary
+  const site3 = kelvinFirst.sites[2].kelvinFails
+  const others = kelvinFirst.sites.filter((s) => s.site !== 3).map((s) => s.kelvinFails)
   check(
     'Kelvin 检查把 Site 3 的接触问题挑出的次数多于其他 Site',
     others.every((n) => site3 > n),
     `site3=${site3} others=${others.join(',')}`,
   )
-  const rdsFirst = { ...m.DEFAULT_PROGRAM, steps: [m.DEFAULT_PROGRAM.steps[5], ...m.DEFAULT_PROGRAM.steps.filter((_, i) => i !== 5)] }
+  const rdsFirst = {
+    ...m.DEFAULT_PROGRAM,
+    steps: ['rds', ...m.STEP_ORDER.filter((id) => id !== 'rds')].map((id) => ({ id, enabled: true })),
+  }
   const rdsFirstSummary = m.runProgram(rdsFirst, popA).summary
   check(
     'Rds(on) 排在 Kelvin 之前时，Site 3 的 Rds(on) 均值高于其他 Site',

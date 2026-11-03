@@ -5,16 +5,6 @@ import type { AnaKnowledge } from '../../ana/knowledge/types'
 export const PWR_WBG_KNOWLEDGE: AnaKnowledge = {
   terms: [
     {
-      id: 'wide-bandgap',
-      term: 'Wide bandgap',
-      name: loc('宽禁带半导体（SiC、GaN）', 'Wide-bandgap semiconductor (SiC, GaN)'),
-      def: loc(
-        '禁带宽度明显大于 Si（约 1.12 eV）的半导体，SiC（4H）约 3.3 eV，GaN 约 3.4 eV。禁带越宽，临界击穿场强越高，同耐压的漂移区可以更薄，导通电阻更低；教学上常用 R ∝ BV^2.5 / Ec^3 粗略比较。见 {@pwrWbg}。',
-        'A semiconductor whose bandgap is much wider than Si (about 1.12 eV): about 3.3 eV for 4H-SiC and about 3.4 eV for GaN. A wider bandgap gives a higher critical breakdown field, so the drift region can be thinner at the same voltage and on-resistance is lower; teaching often compares them roughly with R ∝ BV^2.5 / Ec^3. See {@pwrWbg}.',
-      ),
-      lessons: ['pwrWbg'],
-    },
-    {
       id: 'vth-hysteresis',
       term: 'Vth hysteresis',
       name: loc('阈值电压滞回', 'Threshold-voltage hysteresis'),
@@ -34,9 +24,19 @@ export const PWR_WBG_KNOWLEDGE: AnaKnowledge = {
       ),
       lessons: ['pwrWbg'],
     },
+    {
+      id: 'sic-preconditioning',
+      term: 'SiC gate preconditioning',
+      name: loc('SiC 栅极预置序列', 'SiC gate preconditioning'),
+      def: loc(
+        '测 SiC MOSFET 的 Vth 之前，先加一段固定的栅压和时间，让界面陷阱落到同一状态，正扫与反扫才可比。它和数字课里“测参数前先跑向量”的预处理不是同一件事。见 {@pwrWbg}。',
+        'Before measuring SiC MOSFET Vth, apply a fixed gate voltage for a fixed time so the interface traps reach one state and the forward and reverse sweeps can be compared. It is not the digital-test preconditioning that runs vectors before a parametric test. See {@pwrWbg}.',
+      ),
+      lessons: ['pwrWbg'],
+    },
   ],
   extraLessons: {
-    preconditioning: ['pwrWbg'],
+    'wbg-material': ['pwrWbg'],
   },
   faqs: [
     {

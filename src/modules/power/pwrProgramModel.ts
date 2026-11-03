@@ -289,9 +289,10 @@ export type ProgramState = {
   patK: number
 }
 
-/** 初始值：流程取规范表顺序并全部启用；脉宽、PAT 取 [0]；UIS 抽样 20 % */
+/** 初始值：Kelvin 在 Rds 之后且关掉，UIS 关掉，T1/T2/T3 都不会一进来就算完成 */
+const DEFAULT_STEP_IDS: StepId[] = ['igss', 'vth', 'idss', 'bvdss', 'rds', 'kelvin', 'vsd', 'uis']
 export const DEFAULT_PROGRAM: ProgramState = {
-  steps: STEP_ORDER.map((id) => ({ id, enabled: true })),
+  steps: DEFAULT_STEP_IDS.map((id) => ({ id, enabled: id !== 'kelvin' && id !== 'uis' })),
   pulseUs: PULSE_ORDER[0],
   uisPct: 20,
   pat: PAT_ORDER[0],

@@ -1,0 +1,13 @@
+{
+  "id": "VDUT-CIS1",
+  "note": "teaching illustration — not a real sensor",
+  "pixels": [128, 128],
+  "kEperDn": 8,
+  "readNoiseE": 3,
+  "fwcE": 20000,
+  "darkE25PerS": 20,
+  "darkDoubleC": 7,
+  "prnu": 0.01,
+  "shadingPct": 0.04,
+  "adcBits": 12
+}

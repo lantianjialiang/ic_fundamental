@@ -98,6 +98,10 @@ export const INTRO = [
     'BI 前后各做一次读点测试（在 ATE 上完成），可以看出剔除了多少件。成本是另一条线：BI 时间、炉子与老化板的产能、报废与现场失效的代价，共同决定最省的 BI 时间。下面的实验把这几项放在一起算。',
     'Read points before and after burn-in (done on the ATE) show how many parts were removed. Cost is the other side: BI time, oven and board capacity, scrap and field failure costs together decide the cheapest BI time. The lab below puts them together.',
   ),
+  loc(
+    '老化有几种形式：静态老化只加偏置、电路不翻转；动态老化让节点翻转，覆盖更宽；监控老化抽小样本跟踪工艺；晶圆级老化（WLBI）在切开前做，省封装成本。本课实验用动态老化的等效小时和成本，不展开每一种夹具。见 {@relBurnIn}。',
+    'Burn-in has several forms: static burn-in applies bias with the circuit idle; dynamic burn-in keeps nodes switching and covers more of the die; monitor burn-in samples a small lot to watch the process; wafer-level burn-in (WLBI) is done before dice are cut, saving package cost. This lesson’s lab uses the equivalent hours and cost of dynamic burn-in and does not open every fixture. See {@relBurnIn}.',
+  ),
 ]
 
 export const MISCONCEPTIONS = [

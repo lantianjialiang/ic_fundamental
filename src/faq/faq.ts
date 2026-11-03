@@ -8,6 +8,8 @@ import { MOS_FAQ_GROUP } from './faqMos'
 import { PCB_FAQ_GROUP } from './faqPcb'
 import { PWR_FAQ_GROUP } from './faqPower'
 import { QUAL_FAQ_GROUP } from './faqQual'
+import { SNS_FAQ_GROUP } from './faqSns'
+import { PIC_FAQ_GROUP } from './faqPic'
 
 /**
  * 常见问题。
@@ -502,6 +504,6 @@ const BASE_FAQ_GROUPS: FaqGroup[] = [
   },
 ]
 
-export const FAQ_GROUPS: FaqGroup[] = [...BASE_FAQ_GROUPS, MOS_FAQ_GROUP, PCB_FAQ_GROUP, ANA_FAQ_GROUP, HS_FAQ_GROUP, RF_FAQ_GROUP, MEM_FAQ_GROUP, QUAL_FAQ_GROUP, PWR_FAQ_GROUP]
+export const FAQ_GROUPS: FaqGroup[] = [...BASE_FAQ_GROUPS, MOS_FAQ_GROUP, PCB_FAQ_GROUP, ANA_FAQ_GROUP, HS_FAQ_GROUP, RF_FAQ_GROUP, MEM_FAQ_GROUP, QUAL_FAQ_GROUP, PWR_FAQ_GROUP, SNS_FAQ_GROUP, PIC_FAQ_GROUP]
 
 export const FAQ_ITEMS: FaqItem[] = FAQ_GROUPS.flatMap((group) => group.items)

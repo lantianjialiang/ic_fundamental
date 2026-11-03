@@ -64,9 +64,18 @@ export const REL_BATHTUB_KNOWLEDGE: AnaKnowledge = {
       ),
       lessons: ['relBathtub'],
     },
+    {
+      id: 'reliability-bathtub',
+      term: 'Reliability bathtub curve',
+      name: loc('可靠性浴盆曲线', 'Reliability bathtub curve'),
+      def: loc(
+        '失效率随时间的曲线：早期失效下降、偶然失效近似恒定、磨损失效再上升，形状像浴盆。横轴是工作时间，纵轴是 λ(t)。它和高速度量里 BER 对采样相位的浴盆不是同一个图。见 {@relBathtub}。',
+        'Failure rate versus time: infant mortality falling, a roughly constant random segment, then wear-out rising, like a bathtub. The x-axis is operating time and the y-axis is λ(t). It is not the high-speed BER-versus-sampling-phase bathtub. See {@relBathtub}.',
+      ),
+      lessons: ['relBathtub'],
+    },
   ],
   extraLessons: {
-    'bathtub-curve': ['relBathtub'],
     'burn-in': ['relBathtub'],
   },
   faqs: [
@@ -94,6 +103,15 @@ export const REL_BATHTUB_KNOWLEDGE: AnaKnowledge = {
       a: loc(
         '良率只统计出厂时通过测试的比例。潜在缺陷可以通过测试，在使用的前几百小时里才暴露，这就是早期失效。出厂测试抓的是可测的缺陷；要降低这部分风险，要靠 Burn-in 或统计筛选。见 {@relBathtub}。',
         'Yield only counts the parts that pass test at shipment. Latent defects can pass test and show up only during the first few hundred hours of use, which is infant mortality. Production test catches testable defects; burn-in or statistical screening is needed to cut this risk. See {@relBathtub}.',
+      ),
+      lessons: ['relBathtub'],
+    },
+    {
+      id: 'rel-bathtub-fit-not-higher',
+      q: loc('FIT 是不是越大越好？', 'Is a larger FIT better?'),
+      a: loc(
+        '不是。FIT 是每 10⁹ 器件小时的失效数，数字越大失效率越高。100 FIT 比 10 FIT 差一个数量级。说“指标好”要看更小的 FIT，或同一 FIT 下更长的等效器件小时。见 {@relBathtub}。',
+        'No. FIT is failures per 10⁹ device-hours, so a larger number is a higher failure rate. 100 FIT is an order of magnitude worse than 10 FIT. A “better” figure is a smaller FIT, or more equivalent device-hours at the same FIT. See {@relBathtub}.',
       ),
       lessons: ['relBathtub'],
     },

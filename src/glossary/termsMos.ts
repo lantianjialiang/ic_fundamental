@@ -237,10 +237,10 @@ export const MOS_TERMS: GlossaryTerm[] = [
     id: 'soa',
     term: 'SOA',
     name: loc('安全工作区', 'Safe operating area'),
-    def: loc(
-      '数据手册上画出的 Id–Vds 允许范围，超出就可能烧毁。脉冲越长，允许的功率越小，因为热量来不及散开。',
-      'The Id–Vds region in the datasheet where the device is safe. The longer the pulse, the less power is allowed, because heat has no time to spread.',
-    ),
+      def: loc(
+        '数据手册上画出的 Id–Vds 允许范围，超出就可能烧毁。脉冲越长，Zth 越接近稳态 Rth，允许的功率越小；短脉冲热量还来不及传开，Zth 更小，允许功率更大。',
+        'The Id–Vds region in the datasheet where the device is safe. The longer the pulse, the closer Zth is to the steady-state Rth, so less power is allowed. In a short pulse the heat has not yet spread, Zth is smaller, and more power is allowed.',
+      ),
     lessons: ['mosSelect'],
   },
   {

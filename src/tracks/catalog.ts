@@ -669,50 +669,50 @@ export const TRACKS: Array<{
       {
         title: loc('器件图像', 'The device picture'),
         text: loc(
-          '先分清二极管、MOSFET、IGBT、SiC、GaN 各挡什么：电压、电流、开关速度、材料带隙。',
-          'First tell diodes, MOSFETs, IGBTs, SiC and GaN apart: voltage, current, switching speed, bandgap.',
+          '先分清二极管、MOSFET、IGBT、SiC、GaN 各挡什么。入口 {@pwrSelector}。',
+          'First tell diodes, MOSFETs, IGBTs, SiC and GaN apart. Start at {@pwrSelector}.',
         ),
       },
       {
-        title: loc('阻断与导通', 'Blocking and conduction'),
+        title: loc('阻断、导通与静态测', 'Blocking, conduction and static test'),
         text: loc(
-          '击穿 BV、漏电；导通电阻 RDS(on) / VCE(sat)。同一颗管子两张脸。',
-          'Breakdown BV, leakage; on-resistance RDS(on) / VCE(sat). Two faces of the same transistor.',
+          'BV、Idss / Igss、Vth、Rds(on) 见 {@pwrStatic}。毫欧级要用四线，见 {@pwrKelvin}。',
+          'BV, Idss / Igss, Vth and Rds(on) in {@pwrStatic}. Milliohms need four-wire sensing; see {@pwrKelvin}.',
         ),
       },
       {
         title: loc('阈值与电荷', 'Threshold and charge'),
         text: loc(
-          'Vth、Qg、Ciss。开关快慢首先是电荷，不是数字 Period。器件层面见 {@mosDynamic}、{@mosSelect}。',
-          'Vth, Qg, Ciss. Switching speed is about charge first, not a digital period. Device level: {@mosDynamic}, {@mosSelect}.',
+          'Vth、Qg、米勒平台。开关快慢首先是电荷。见 {@pwrGate}；器件层面见 {@mosDynamic}。',
+          'Vth, Qg, Miller plateau. Switching speed is about charge first. See {@pwrGate}; device level: {@mosDynamic}.',
         ),
       },
       {
         title: loc('开关能量', 'Switching energy'),
         text: loc(
-          'Eon / Eoff、反向恢复。损耗 = 导通 + 开关，测脉冲才能看见。',
-          'Eon / Eoff, reverse recovery. Loss = conduction + switching; you only see it with pulse tests.',
+          'Eon / Eoff、反向恢复、di/dt 过冲。损耗 = 导通 + 开关。见 {@pwrDpt}。',
+          'Eon / Eoff, reverse recovery, di/dt overshoot. Loss = conduction + switching. See {@pwrDpt}.',
         ),
       },
       {
         title: loc('安全工作区', 'Safe operating area'),
         text: loc(
-          'SOA、短路承受、雪崩。超了是炸管，不是 Compare Fail。',
-          'SOA, short-circuit withstand, avalanche. Exceed it and the device blows up; it is not a compare fail.',
+          'SOA、雪崩能量 E_AS = ½LI²·BV/(BV−Vdd)。超了是炸管。见 {@pwrUis}。',
+          'SOA, avalanche energy E_AS = ½LI²·BV/(BV−Vdd). Exceed it and the device blows up. See {@pwrUis}.',
         ),
       },
       {
-        title: loc('热', 'Heat'),
+        title: loc('热与宽禁带', 'Heat and wide bandgap'),
         text: loc(
-          '结温、Rth、脉冲宽了电阻会漂。功率测试必须谈热，不能只谈室温直流。',
-          'Junction temperature, Rth; wide pulses make resistance drift. Power test must deal with heat, not just room-temperature DC.',
+          '结温、Zth、脉宽越长电阻越漂。SiC 预置、GaN 动态 Rds 见 {@pwrWbg}。',
+          'Junction temperature, Zth; a longer pulse makes resistance drift. SiC preconditioning and GaN dynamic Rds in {@pwrWbg}.',
         ),
       },
       {
-        title: loc('测法约束', 'Test method constraints'),
+        title: loc('量产程序', 'Production program'),
         text: loc(
-          'Kelvin、限流、脉冲宽度、高压安全。四线在这里不是点名，是保命和保精度。',
-          'Kelvin, current limits, pulse width, high-voltage safety. Four-wire here is about safety and accuracy, not a footnote.',
+          'Kelvin 要在 Rds 前，限流、脉宽、高压互锁。综合见 {@pwrProgram}。',
+          'Kelvin before Rds, current limits, pulse width, high-voltage interlock. Capstone: {@pwrProgram}.',
         ),
       },
     ],
@@ -721,59 +721,69 @@ export const TRACKS: Array<{
     id: 'sensor',
     title: loc('传感器 / CIS', 'Sensors / CIS'),
     blurb: loc(
-      'MEMS 与 CMOS 图像传感器。先给光、力、气压，再看电学结果。',
-      'MEMS and CMOS image sensors. Apply light, force or pressure first, then read the electrical result.',
+      '以 CMOS 图像传感器为主线，MEMS 加速度计作对照。先给光或加速度，再看电学结果。现课 {@snsOverview}–{@snsProgram}。',
+      'CMOS image sensors as the main line, with a MEMS accelerometer as contrast. Apply light or acceleration first, then read the electrical result. Lessons {@snsOverview}–{@snsProgram}.',
     ),
-    ready: false,
-    lessons: [],
+    ready: true,
+    lessons: [
+      'snsOverview',
+      'snsPhoton',
+      'snsPixel',
+      'snsPtc',
+      'snsDark',
+      'snsFlat',
+      'snsOptical',
+      'snsAccel',
+      'snsProgram',
+    ],
     knowledge: [
       {
-        title: loc('换能', 'Transduction'),
+        title: loc('换能与信号链', 'Transduction and the chain'),
         text: loc(
-          '物理量 → 电学量。没有激励源，测的只是放大器，不是传感器。',
-          'Physical quantity → electrical quantity. Without a stimulus you are testing the amplifier, not the sensor.',
+          '本轨以 CIS 为主：敏感元件 → 模拟前端 → ADC → 校准。没有光或力，测的只是放大器。入口 {@snsOverview}。',
+          'This track is built around CIS: sensing element → analog front end → ADC → calibration. Without light or force you are testing the amplifier. Start at {@snsOverview}.',
         ),
       },
       {
-        title: loc('MEMS 力学', 'MEMS mechanics'),
+        title: loc('光子与像素', 'Photons and pixels'),
         text: loc(
-          '质量块–弹簧、电容/压阻读出、残余应力、阻尼。先立模型，再谈灵敏度。',
-          'Proof mass and spring, capacitive / piezoresistive readout, residual stress, damping. Model first, then sensitivity.',
+          'QE、散粒与读噪见 {@snsPhoton}；4T、FD、CG、CDS、卷帘见 {@snsPixel}。',
+          'QE, shot noise and read noise in {@snsPhoton}; 4T, FD, CG, CDS and rolling shutter in {@snsPixel}.',
         ),
       },
       {
-        title: loc('CIS 像素', 'CIS pixels'),
+        title: loc('PTC 与满阱', 'PTC and full well'),
         text: loc(
-          '光电二极管、满阱、转换增益、量子效率。一个像素就是一只小光电流计。',
-          'Photodiode, full well, conversion gain, quantum efficiency. Each pixel is a tiny photocurrent meter.',
+          '差帧估 K、读噪和满阱。增益开大，电子数满阱变小。见 {@snsPtc}。',
+          'A frame difference estimates K, read noise and full well. Higher gain shrinks the electron full well. See {@snsPtc}.',
         ),
       },
       {
-        title: loc('阵列不均匀', 'Array non-uniformity'),
+        title: loc('暗场与亮场', 'Dark and bright fields'),
         text: loc(
-          'PRNU、DSNU、暗电流、坏点。CIS 的 Yield 常常是图，不是一颗 Bin。',
-          'PRNU, DSNU, dark current, defective pixels. CIS yield is often an image, not a single bin.',
+          '暗电流、DSNU、热像素见 {@snsDark}；PRNU、平场、死点和簇见 {@snsFlat}。Yield 常常是图，不是一颗 Bin。',
+          'Dark current, DSNU and hot pixels in {@snsDark}; PRNU, flat field, dead pixels and clusters in {@snsFlat}. Yield is often an image, not a single bin.',
         ),
       },
       {
-        title: loc('光学激励', 'Optical stimulus'),
+        title: loc('颜色与光学系统', 'Color and the optical system'),
         text: loc(
-          '光源、积分球、照度、波长。光路没校准，电学再准也是错的。',
-          'Light source, integrating sphere, illuminance, wavelength. If the optics are not calibrated, accurate electronics are still wrong.',
+          '拜耳、积分球、光谱响应。颜色不是只测 RGB 三点。见 {@snsOptical}。',
+          'Bayer, integrating sphere, spectral response. Color is not three RGB points. See {@snsOptical}.',
         ),
       },
       {
-        title: loc('力学 / 声学激励', 'Mechanical / acoustic stimulus'),
+        title: loc('MEMS 对照', 'MEMS contrast'),
         text: loc(
-          '振动台、气压、声压。夹具和校准和电学座同等重要。',
-          'Shakers, pressure, sound pressure. Fixtures and calibration matter as much as the electrical socket.',
+          '加速度计只作非光学对照：灵敏度、噪声密度、翻转法、自检代替不了 1 g。见 {@snsAccel}。',
+          'The accelerometer is only a non-optical contrast: sensitivity, noise density, flip calibration; self-test does not replace 1 g. See {@snsAccel}.',
         ),
       },
       {
-        title: loc('和模拟的分界', 'Boundary with analog'),
+        title: loc('量产程序', 'Production program'),
         text: loc(
-          '读出电路的 Offset / 噪声走模拟课；本轨管激励、像素和阵列缺陷。',
-          'Readout offset / noise belongs to the analog track; this track covers stimulus, pixels and array defects.',
+          '五项必测、缺陷图写 OTP、按个数和簇分 A/B/C，导出 STDF。见 {@snsProgram}。',
+          'Five required steps, a defect map into OTP, grades A/B/C from count and clusters, then STDF. See {@snsProgram}.',
         ),
       },
     ],
@@ -787,7 +797,6 @@ export const TRACKS: Array<{
     ),
     ready: true,
     lessons: [
-      'latch',
       'relBathtub',
       'relAccel',
       'relStress',
@@ -801,47 +810,50 @@ export const TRACKS: Array<{
       {
         title: loc('失效浴缸', 'The bathtub curve'),
         text: loc(
-          '早期失效、偶然失效、磨损失效。量产测试抓早期；可靠性抓尾巴。',
-          'Infant mortality, random failures, wear-out. Production test catches the early ones; reliability catches the tail.',
+          '早期、随机、磨损三段。出厂测试抓可测缺陷，Burn-in 抓早期，寿命试验抓磨损。从 {@relBathtub} 起，不是闩锁。',
+          'Infant, random and wear-out. Production test catches testable defects, burn-in catches early life, life test catches wear-out. Start at {@relBathtub}, not latch-up.',
         ),
       },
       {
         title: loc('电过应力', 'Electrical overstress'),
         text: loc(
-          'ESD（HBM / CDM）、EOS、Latch-up。{@latch} 是入口：寄生晶闸管，通常要掉电。',
-          'ESD (HBM / CDM), EOS, latch-up. {@latch} is the entry: a parasitic thyristor that usually needs a power-down.',
+          'ESD（HBM / CDM）、EOS、闩锁。{@latch} 是数字课里的相关入口，不在本轨课序里。',
+          'ESD (HBM / CDM), EOS, latch-up. {@latch} is a related digital lesson, not in this track’s sequence.',
         ),
       },
       {
-        title: loc('加速老化', 'Accelerated aging'),
+        title: loc('加速与试验', 'Acceleration and tests'),
         text: loc(
-          '温度、电压、湿度加快机理。HTOL、HAST、温循、THB 各加速哪一种。',
-          'Temperature, voltage and humidity speed up mechanisms. Which one HTOL, HAST, temperature cycling and THB each accelerate.',
+          'Arrhenius、电压、Coffin-Manson 见 {@relAccel}；HTOL、HTSL、TC、HAST、ELFR 与零失效上限见 {@relStress}。',
+          'Arrhenius, voltage and Coffin-Manson in {@relAccel}; HTOL, HTSL, TC, HAST, ELFR and the zero-failure bound in {@relStress}.',
         ),
       },
       {
         title: loc('车规框架', 'Automotive framework'),
         text: loc(
-          'AEC-Q100 是抽样鉴定，不是每颗都跑完整 qual。Grade 说的是温度范围。',
-          'AEC-Q100 is sample-based qualification, not a full qual on every part. The grade states the temperature range.',
+          'AEC-Q100 是抽样鉴定，Grade 说温度范围。ASIL 归 ISO 26262。见 {@relAuto}。',
+          'AEC-Q100 is sample-based qualification; the grade states the temperature range. ASIL belongs to ISO 26262. See {@relAuto}.',
         ),
       },
       {
         title: loc('Burn-in vs 量产', 'Burn-in vs production'),
         text: loc(
-          '老化筛弱品；量产测试钉规格点。两者目的不同，不要混成一道程序。',
-          'Burn-in screens weak parts; production test checks spec points. Different goals; do not merge them into one program.',
+          '静态 / 动态 / 监控 / 晶圆级老化筛弱品；量产测试钉规格点。见 {@relBurnIn}。',
+          'Static, dynamic, monitor and wafer-level burn-in screen weak parts; production test checks spec points. See {@relBurnIn}.',
         ),
       },
       {
         title: loc('指标怎么说', 'How the metrics are stated'),
-        text: loc('FIT、寿命、降额。先会读数量级，不推公式证明。', 'FIT, lifetime, derating. Read the orders of magnitude; no proofs.'),
+        text: loc(
+          'FIT、MTTF、Weibull。会代公式，并知道 Ea、CL 的不确定。见 {@relWeibull}。',
+          'FIT, MTTF, Weibull. Plug in the formulas and know the uncertainty in Ea and CL. See {@relWeibull}.',
+        ),
       },
       {
-        title: loc('和功能 Fail 分开', 'Separate from functional fails'),
+        title: loc('零缺陷筛选', 'Zero-defect screening'),
         text: loc(
-          '向量错按拍红；可靠性是电流、封装裂纹、参数漂移。先分类再选台子。',
-          'A vector fail turns a cycle red; reliability is current, package cracks, parameter drift. Classify first, then pick the equipment.',
+          'PAT、SBL、邻近规则抓规格内的坏 die。综合流程见 {@relPat}、{@relFlow}。',
+          'PAT, SBL and the neighbourhood rule catch in-spec bad die. The combined flow is {@relPat} and {@relFlow}.',
         ),
       },
     ],
@@ -850,59 +862,69 @@ export const TRACKS: Array<{
     id: 'cpo',
     title: loc('硅光共封', 'Silicon photonics / CPO'),
     blurb: loc(
-      '硅光芯片与光电共封装（CPO）。电学路径加上光路：耦合、波长、激光和探测器。',
-      'Silicon photonic chips and co-packaged optics (CPO). The electrical path plus the optical path: coupling, wavelength, lasers and detectors.',
+      '硅光芯片与光电共封装（CPO）。电学路径加上光路：耦合、波长、激光和探测器。现课 {@picOverview}–{@picFlow}。',
+      'Silicon photonic chips and co-packaged optics (CPO). The electrical path plus the optical path: coupling, wavelength, lasers and detectors. Lessons {@picOverview}–{@picFlow}.',
     ),
-    ready: false,
-    lessons: [],
+    ready: true,
+    lessons: [
+      'picOverview',
+      'picUnits',
+      'picDevice',
+      'picMod',
+      'picSweep',
+      'picAlign',
+      'picCutback',
+      'picLink',
+      'picFlow',
+    ],
     knowledge: [
       {
-        title: loc('光在芯片里', 'Light on the chip'),
+        title: loc('硅光与 CPO', 'Silicon photonics and CPO'),
         text: loc(
-          '波导、模式、折射率、耦合。光不是“很快的电”，走的是介质里的模式。',
-          'Waveguides, modes, refractive index, coupling. Light is not "very fast electricity"; it travels as modes in a dielectric.',
+          'PIC 走光，EIC 走电，CPO 把光引擎和 ASIC 封在一起。入口 {@picOverview}。',
+          'The PIC carries light, the EIC carries electricity, and CPO packages the optical engine with the ASIC. Start at {@picOverview}.',
         ),
       },
       {
-        title: loc('关键光电块', 'Key photonic blocks'),
+        title: loc('单位与波导', 'Units and waveguides'),
         text: loc(
-          '调制器、探测器、激光器（常是 III–V 贴装）、光栅/边缘耦合。各有各的失效。',
-          'Modulators, detectors, lasers (often bonded III–V), grating / edge couplers. Each fails in its own way.',
+          'dBm 相加、neff 定相位、ng 定 FSR。见 {@picUnits}。',
+          'dBm adds, neff sets phase, ng sets FSR. See {@picUnits}.',
         ),
       },
       {
-        title: loc('光规格', 'Optical specs'),
+        title: loc('无源器件', 'Passive devices'),
         text: loc(
-          '插入损耗、消光比、波长、响应度、暗电流、激光阈值。Pass 常是 dBm，不是 0/1。',
-          'Insertion loss, extinction ratio, wavelength, responsivity, dark current, laser threshold. Pass is often in dBm, not 0/1.',
+          'MZI、微环、FSR = λ²/(ng·L)，谐振 Q = λ/FWHM。见 {@picDevice}。',
+          'MZI, rings, FSR = λ²/(ng·L), resonator Q = λ/FWHM. See {@picDevice}.',
         ),
       },
       {
-        title: loc('共封在测什么', 'What CPO testing measures'),
+        title: loc('调制与探测', 'Modulation and detection'),
         text: loc(
-          'CPO = 电芯片 + 光引擎在同一封装。要分清测 PIC、测 EIC，还是测封装后的光口。',
-          'CPO = electrical chip + optical engine in one package. Be clear whether you test the PIC, the EIC, or the packaged optical port.',
+          'MZM、ER、OMA、PD 响应度。见 {@picMod}。扫描谱见 {@picSweep}。',
+          'MZM, ER, OMA, PD responsivity. See {@picMod}. Swept spectra in {@picSweep}.',
         ),
       },
       {
-        title: loc('对准与封装', 'Alignment and packaging'),
+        title: loc('对准与 cut-back', 'Alignment and cut-back'),
         text: loc(
-          '光纤阵列、耦合效率、贴装公差。微米级错位就是几 dB，像 Socket 接触不良。',
-          'Fiber arrays, coupling efficiency, placement tolerance. A micron of misalignment costs several dB, like a bad socket contact.',
+          '光栅/边缘耦合、主动对准见 {@picAlign}；斜率是波导损耗、截距是两端耦合，见 {@picCutback}。',
+          'Grating / edge couplers and active alignment in {@picAlign}; slope is waveguide loss and intercept is the two couplers in {@picCutback}.',
         ),
       },
       {
-        title: loc('热与波长', 'Heat and wavelength'),
+        title: loc('光链路', 'The optical link'),
         text: loc(
-          '结温一漂，波长和功率就漂。硅光测试默认要控温。',
-          'When junction temperature drifts, wavelength and power drift. Silicon photonics test needs temperature control by default.',
+          '灵敏度看 OMA，判决 Q 不是谐振 Q。见 {@picLink}。',
+          'Sensitivity is specified on OMA; decision Q is not resonator Q. See {@picLink}.',
         ),
       },
       {
-        title: loc('和高速 / RF 的分界', 'Boundary with high-speed / RF'),
+        title: loc('CPO 流程', 'CPO flow'),
         text: loc(
-          '电口 SerDes 回高速轨道；载波射频回 RF。本轨管光路、耦合和光电转换。',
-          'Electrical SerDes goes to the high-speed track; carrier RF goes to RF. This track covers the optical path, coupling and O/E conversion.',
+          '测试前移、KGD、良率连乘、光学并行。不是每步都扫完整光谱。见 {@picFlow}。',
+          'Shift-left, KGD, yield product, optical parallelism. Not a full spectrum at every step. See {@picFlow}.',
         ),
       },
     ],
@@ -958,8 +980,8 @@ export const TRACKS: Array<{
     id: 'glossary',
     title: loc('术语表', 'Glossary'),
     blurb: loc(
-      '把 D、F、T（MOS 管）、L（PCB）、A（模拟）、H（高速）、R（射频）、M（存储器）几条轨道里讲到的名词收在一起：原文、中英文名、一句话解释和出处课程。可以搜索，可以按课程或按 A–Z 看。',
-      'Terms from the D, F, T (MOSFETs), L (PCB), A (analog), H (high-speed), R (RF) and M (memory) tracks in one place: the original name, Chinese and English names, a one-line definition and the lessons it comes from. Search it, or browse by lesson or A–Z.',
+      '把 D、F、T（MOS）、L（PCB）、A（模拟）、H（高速）、R（射频）、M（存储器）、P（功率）、S（传感器）、Q（可靠性）、C（硅光）几条轨道里讲到的名词收在一起：原文、中英文名、一句话解释和出处课程。可以搜索，可以按课程或按 A–Z 看。',
+      'Terms from the D, F, T (MOS), L (PCB), A (analog), H (high-speed), R (RF), M (memory), P (power), S (sensor), Q (reliability) and C (silicon photonics) tracks in one place: the original name, Chinese and English names, a one-line definition and the lessons it comes from. Search it, or browse by lesson or A–Z.',
     ),
     ready: true,
     lessons: [],

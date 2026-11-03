@@ -37,6 +37,7 @@ import {
   controlsOf,
   initialStatic,
   measureOf,
+  withPulse,
   type StaticParam,
   type StaticState,
 } from './pwrStaticModel'
@@ -197,7 +198,7 @@ export function PwrStaticPage({ moduleId, onModuleChange }: Props) {
               min={PULSE_US.min}
               max={PULSE_US.max}
               step={PULSE_US.step}
-              onChange={(pulseUs) => update({ pulseUs })}
+              onChange={(pulseUs) => update(withPulse(state, pulseUs))}
             />
           ) : null}
           {isRds ? (

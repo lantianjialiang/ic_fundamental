@@ -25,6 +25,16 @@ export const PWR_STATIC_KNOWLEDGE: AnaKnowledge = {
       lessons: ['pwrStatic'],
     },
     {
+      id: 'igss',
+      term: 'Igss',
+      name: loc('栅极漏电（Igss）', 'Gate leakage (Igss)'),
+      def: loc(
+        '漏源短接（Vds = 0）时，栅极加规定电压下流过的电流。测法是强制 Vgs、测电流。它和 Idss 不是同一个漏电：Idss 看漏极，Igss 看栅氧。见 {@pwrStatic}。',
+        'The current into the gate at a specified Vgs with drain and source shorted (Vds = 0). Measured by forcing Vgs and measuring current. It is not the same leakage as Idss: Idss looks at the drain, Igss at the gate oxide. See {@pwrStatic}.',
+      ),
+      lessons: ['pwrStatic'],
+    },
+    {
       id: 'compliance',
       term: 'Compliance',
       name: loc('compliance（限值）', 'Compliance (limit)'),
@@ -74,6 +84,15 @@ export const PWR_STATIC_KNOWLEDGE: AnaKnowledge = {
       a: loc(
         '漏电随温度升高而增大（教学示意：每升高 10 °C 翻倍）。25 °C 时 10 nA 的良品，125 °C 时约 10 µA，超过了 100 nA 的限值。所以限值必须和测试温度一起写，见 {@pwrStatic}。',
         'Leakage rises with temperature (teaching illustration: it doubles every 10 °C). A 10 nA good die at 25 °C is about 10 µA at 125 °C, which is far above a 100 nA limit. The limit must be stated together with the test temperature. See {@pwrStatic}.',
+      ),
+      lessons: ['pwrStatic'],
+    },
+    {
+      id: 'pwr-static-pulse-not-longer',
+      q: loc('测 Rds(on) 时，脉宽是不是越长越准？', 'Is a longer pulse more accurate when measuring Rds(on)?'),
+      a: loc(
+        '不是。脉宽越长，ΔTj = P·Zth(t) 越大，Rds(on) 跟着漂，读数离 25 °C 真值越远。本课 50 A 下约 1.7 ms 以内误差才低于 1%，10 ms 大约 4%。要的是短到自热可接受、长到仪器来得及采样的窗口，不是最长脉宽。见 {@pwrStatic}。',
+        'No. A longer pulse grows ΔTj = P·Zth(t), so Rds(on) drifts and the reading moves farther from the 25 °C value. In this lesson the error at 50 A stays below 1% only up to about 1.7 ms, and a 10 ms pulse is about 4%. The window should be short enough that self-heating is acceptable and long enough for the instrument to sample, not the longest pulse. See {@pwrStatic}.',
       ),
       lessons: ['pwrStatic'],
     },

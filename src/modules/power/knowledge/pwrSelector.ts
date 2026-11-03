@@ -29,10 +29,10 @@ export const PWR_SELECTOR_KNOWLEDGE: AnaKnowledge = {
       term: 'Wide bandgap',
       name: loc('宽禁带半导体（SiC、GaN）', 'Wide-bandgap semiconductor (SiC, GaN)'),
       def: loc(
-        '禁带宽度远大于硅的材料。临界击穿场强高，同一耐压下漂移区可以更薄，Rds(on) 更低，还能耐高温、高频工作。SiC 多用于高压大功率，GaN 在 650 V 左右的高频场合常见。见 {@pwrSelector}。',
-        'Materials with a much wider bandgap than silicon. The critical breakdown field is higher, so for the same rating the drift region can be thinner and Rds(on) lower; they also tolerate high temperature and high frequency. SiC is common in high-voltage, high-power parts, and GaN around 650 V in high-frequency designs. See {@pwrSelector}.',
+        '禁带宽度远大于硅的材料：Si 约 1.12 eV，4H-SiC 约 3.3 eV，GaN 约 3.4 eV。临界击穿场强高，同一耐压下漂移区可以更薄，Rds(on) 更低；教学上常用 R ∝ BV^2.5 / Ec^3 粗略比较。SiC 多用于高压大功率，GaN 在 650 V 左右的高频场合常见。见 {@pwrSelector}、{@pwrWbg}。',
+        'Materials with a much wider bandgap than silicon: about 1.12 eV for Si, 3.3 eV for 4H-SiC and 3.4 eV for GaN. The critical breakdown field is higher, so for the same rating the drift region can be thinner and Rds(on) lower; teaching compares them roughly with R ∝ BV^2.5 / Ec^3. SiC is common in high-voltage, high-power parts, and GaN around 650 V in high-frequency designs. See {@pwrSelector} and {@pwrWbg}.',
       ),
-      lessons: ['pwrSelector'],
+      lessons: ['pwrSelector', 'pwrWbg'],
     },
     {
       id: 'conduction-loss',

@@ -74,6 +74,10 @@ export type StaticState = {
   compliance: number
   /** 脉宽（µs），只用于 Rds(on) */
   pulseUs: number
+  /** 是否看过 ≤150 µs 的短脉冲（T2 要求先比较短/长再落到 1.7 ms 附近） */
+  seenPulseShort: boolean
+  /** 是否看过 ≥8 ms 的长脉冲 */
+  seenPulseLong: boolean
   /** 占空比（%），只用于 Rds(on) */
   dutyPct: number
   /** 环境温度（°C） */
@@ -81,6 +85,15 @@ export type StaticState = {
   sample: SampleId
   /** 限值（nA），只用于 Idss / Igss */
   limitNa: number
+}
+
+/** 改脉宽时记下是否看过短脉冲和长脉冲，供 T2 判定 */
+export function withPulse(s: StaticState, pulseUs: number): Pick<StaticState, 'pulseUs' | 'seenPulseShort' | 'seenPulseLong'> {
+  return {
+    pulseUs,
+    seenPulseShort: s.seenPulseShort || pulseUs <= 150,
+    seenPulseLong: s.seenPulseLong || pulseUs >= 8000,
+  }
 }
 
 export function controlsOf(param: StaticParam): { force: number; compliance: number } {
@@ -93,6 +106,8 @@ export function initialStatic(): StaticState {
     param,
     ...controlsOf(param),
     pulseUs: PULSE_US.def,
+    seenPulseShort: PULSE_US.def <= 150,
+    seenPulseLong: PULSE_US.def >= 8000,
     dutyPct: DUTY_PCT.def,
     ta: TA_C.def,
     sample: SAMPLE_ORDER[0],

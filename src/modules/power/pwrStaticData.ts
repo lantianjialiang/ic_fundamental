@@ -179,8 +179,8 @@ export const S = {
     'Measure BVdss: force 100–500 µA (example 250 µA) and set the voltage compliance within ±1 V of BV (99–101 V).',
   ),
   task2: loc(
-    'I = 50 A 时比较 10 ms 与 100 µs 的脉宽，找出误差 <1% 的最大脉宽（约 1.7 ms）。',
-    'At I = 50 A, compare a 10 ms and a 100 µs pulse, then find the longest pulse with error below 1% (about 1.7 ms).',
+    'I = 50 A 时先看 10 ms 和 100 µs 的误差差多少，再把脉宽收到约 1.7 ms（误差刚低于 1% 的最长窗口）。',
+    'At I = 50 A, first compare the error at 10 ms and at 100 µs, then bring the pulse to about 1.7 ms (the longest window where the error just stays below 1%).',
   ),
   task3: loc(
     '在不同 Id 下读 Vth：把 Id 从默认的 250 µA 改到至少 2.5 mA，说明 Vth 没有唯一值。',
@@ -384,7 +384,14 @@ export function taskItems(s: StaticState): TaskItem[] {
     {
       id: 'pulse-width',
       text: S.task2,
-      done: s.param === 'rdson' && s.force === 50 && (m.errPct ?? 100) < 1 && s.pulseUs >= 1500,
+      done:
+        s.param === 'rdson' &&
+        s.force === 50 &&
+        s.seenPulseShort &&
+        s.seenPulseLong &&
+        s.pulseUs >= 1500 &&
+        s.pulseUs <= 1800 &&
+        (m.errPct ?? 100) < 1,
     },
     {
       id: 'vth-current',

@@ -18,7 +18,7 @@ export const PULSE_SEG: Array<{ id: PulseKey; label: LText; sec: number }> = [
 export const S = {
   kickerNow: loc('这一次雪崩与热', 'This avalanche and heat'),
   introTitle: loc('雪崩、SOA 与热阻：器件能承受多少能量与功率', 'Avalanche, SOA and thermal resistance: how much energy and power the device can take'),
-  uisTitle: loc('UIS：电感能量在器件里耗散', 'UIS: the inductor energy is dissipated in the device'),
+  uisTitle: loc('UIS：E_AS = ½LI²·BV/(BV−Vdd)，母线仍在供电', 'UIS: E_AS = ½LI²·BV/(BV−Vdd); the bus still supplies energy'),
   uisNote: loc(
     '测试条件为教学示例，示例，以现行标准为准。电感电流从 Ipk 线性降到 0，Vds 钳位在 BV；能量 E_AS = ½·L·Ipk²·BV/(BV−Vdd)，雪崩时间 t_av = L·Ipk/(BV−Vdd)。',
     'Test conditions are teaching examples; example, follow the current standard. The inductor current falls linearly from Ipk to 0 while Vds is clamped at BV; the energy is E_AS = ½·L·Ipk²·BV/(BV−Vdd) and the avalanche time is t_av = L·Ipk/(BV−Vdd).',

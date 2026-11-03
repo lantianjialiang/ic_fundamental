@@ -34,6 +34,26 @@ export const REL_PAT_KNOWLEDGE: AnaKnowledge = {
       ),
       lessons: ['relPat'],
     },
+    {
+      id: 'sbl',
+      term: 'SBL',
+      name: loc('统计 Bin 限值（SBL）', 'Statistical bin limit (SBL)'),
+      def: loc(
+        '看某一 Bin 的颗数是否突然高出历史分布。规格测试仍判 PASS 的批次，如果某个失败 Bin 异常变多，整批要扣住。它抓的是批次漂移，不是单颗参数离群。见 {@relPat}。',
+        'A check on whether the count in one bin suddenly sits above the historical distribution. A lot that still passes spec can be held if one fail bin grows abnormally. It catches lot drift, not a single-die parameter outlier. See {@relPat}.',
+      ),
+      lessons: ['relPat'],
+    },
+    {
+      id: 'sba',
+      term: 'SBA',
+      name: loc('统计 Bin 分析（SBA）', 'Statistical bin analysis (SBA)'),
+      def: loc(
+        '用历史 Bin 分布给当前批次设警戒，常和 SBL、统计良率限值（SYL）一起用。静态 PAT 用事先写好的限值，动态 PAT 用本批分布现场计算；本课实验只练动态 PAT 与邻近规则。见 {@relPat}。',
+        'Using the historical bin distribution to watch the current lot, often together with SBL and a statistical yield limit (SYL). Static PAT uses limits written in advance; dynamic PAT computes them from the current lot. This lesson’s lab only practises dynamic PAT and the neighbourhood rule. See {@relPat}.',
+      ),
+      lessons: ['relPat'],
+    },
   ],
   extraLessons: {
     wafer: ['relPat'],
@@ -66,6 +86,15 @@ export const REL_PAT_KNOWLEDGE: AnaKnowledge = {
       a: loc(
         '看偏移来自哪里。整 Lot 窗口假定同批晶圆分布一致，样本多、限值稳，但片与片之间有偏移时，偏高或偏低的晶圆会被系统性误剔。单晶圆窗口以本片为中心，能消掉片间偏移，但样本只有一片，限值噪声大。每 Site 窗口能抓测试座之间的差异。实际产线常几种同时用，见 {@relPat}。',
         'It depends on where the offset comes from. A whole-lot window assumes the wafers share one distribution: it is stable, but when wafers differ, the high or low ones are systematically over-killed. A single-wafer window centres on the wafer and removes wafer-to-wafer offset, but one wafer gives a noisy limit. A per-site window catches differences between test sites. Production lines often combine several; see {@relPat}.',
+      ),
+      lessons: ['relPat'],
+    },
+    {
+      id: 'rel-pat-in-spec',
+      q: loc('规格内是不是就是好品？', 'Does sitting inside spec mean the part is good?'),
+      a: loc(
+        '不是。潜在缺陷的参数仍在规格限内，规格测试一定放过它们。PAT 看的是相对同批分布的离群，SBL/SYL 看的是整批 Bin 或良率有没有漂出历史带。规格 PASS 只说明没碰到硬失效。见 {@relPat}。',
+        'No. A latent defect’s parameter is still inside the spec limit, so spec testing always lets it through. PAT looks at outliers relative to the lot; SBL/SYL watch whether a lot’s bins or yield drift off the historical band. A spec PASS only means no hard fail was hit. See {@relPat}.',
       ),
       lessons: ['relPat'],
     },

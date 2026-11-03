@@ -1,0 +1,9 @@
+{
+  "id": "VDUT-PIC1",
+  "note": "teaching illustration — not a foundry process",
+  "tx": { "ringRadiusUm": 10, "heater": true, "mzmVpiV": 4 },
+  "rx": { "kind": "Ge PD", "responsivityAW": 0.8, "darkCurrentNa": [1, 50], "tiaSigmaA": 1e-5 },
+  "coupling": { "gcLossDb": 3, "edgeCouplerOptional": true },
+  "cutbackCm": [0.1, 0.5, 1.0, 2.0],
+  "waveguide": { "neff": 2.4, "ng": 4.2, "lossDbPerCm": 2.5, "dneffDt": 0.00018, "lambdaNm": 1550 }
+}

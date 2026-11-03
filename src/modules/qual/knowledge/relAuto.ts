@@ -39,8 +39,8 @@ export const REL_AUTO_KNOWLEDGE: AnaKnowledge = {
       term: 'Three-temperature Test',
       name: loc('三温测试', 'Three-temperature test'),
       def: loc(
-        '在低温、室温、高温三个温度点各测一次，覆盖器件的温度范围两端。低温暴露冷启动与基准漂移，高温暴露漏电与精度漂移；温度点不覆盖等级的两端，对应的失效会漏掉。见 {@relAuto}。',
-        'Testing at cold, room and hot temperatures to cover both ends of the device’s temperature range. Cold exposes cold-start and reference drift; hot exposes leakage and accuracy drift. Test points that miss an end of the grade let the matching failures through. See {@relAuto}.',
+        '同一颗器件在低温、室温、高温各测一次，覆盖温度范围两端。低温暴露冷启动与基准漂移，高温暴露漏电与精度漂移；常温看不到只在两端超限的偏移，所以三温不能用常温代替。见 {@relAuto}、{@relFlow}。',
+        'The same device is tested at cold, room and hot temperatures to cover both ends of the range. Cold exposes cold-start and reference drift; hot exposes leakage and accuracy drift. A room test cannot see a shift that only exceeds its limit at one end, so room testing cannot replace the three temperatures. See {@relAuto} and {@relFlow}.',
       ),
       lessons: ['relAuto'],
     },
@@ -54,10 +54,18 @@ export const REL_AUTO_KNOWLEDGE: AnaKnowledge = {
       ),
       lessons: ['relAuto'],
     },
+    {
+      id: 'asil',
+      term: 'ASIL',
+      name: loc('汽车安全完整性等级（ASIL）', 'Automotive Safety Integrity Level (ASIL)'),
+      def: loc(
+        'ISO 26262 里按风险定出的功能安全等级，从 QM 到 ASIL A–D。它要求系统与软件层面的分析，单靠 AEC-Q100 的元器件认证不能满足。见 {@relAuto}。',
+        'The functional-safety levels in ISO 26262, from QM through ASIL A–D, set by risk. They require system and software analysis; component qualification under AEC-Q100 alone does not satisfy them. See {@relAuto}.',
+      ),
+      lessons: ['relAuto'],
+    },
   ],
-  extraLessons: {
-    'temperature-grade': ['relAuto'],
-  },
+  extraLessons: {},
   faqs: [
     {
       id: 'rel-auto-standards',

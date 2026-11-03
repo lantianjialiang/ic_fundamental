@@ -9,8 +9,8 @@ export const PWR_UIS_KNOWLEDGE: AnaKnowledge = {
       term: 'UIS',
       name: loc('非钳位感性开关（UIS）', 'Unclamped inductive switching (UIS)'),
       def: loc(
-        '器件关断时没有钳位电路，负载电感把电流推进雪崩区，电感里的能量 ½·L·Ipk² 在器件内耗散。UIS 测的是器件能承受的这份雪崩能量，见 {@pwrUis}。',
-        'When the device turns off with no clamp, the load inductor drives the current into avalanche and its energy ½·L·Ipk² is dissipated in the device. UIS measures how much of this avalanche energy the device can take; see {@pwrUis}.',
+        '器件关断时没有钳位电路，负载电感把电流推进雪崩区。雪崩期间母线仍在供电，器件耗散的是 E_AS = ½·L·Ipk²·BV/(BV−Vdd)，不是电感储能 ½·L·Ipk²。UIS 测的是器件能承受的这份雪崩能量，见 {@pwrUis}。',
+        'When the device turns off with no clamp, the load inductor drives the current into avalanche. The bus still supplies energy during avalanche, so the device dissipates E_AS = ½·L·Ipk²·BV/(BV−Vdd), not the stored inductor energy ½·L·Ipk². UIS measures how much of this avalanche energy the device can take; see {@pwrUis}.',
       ),
       lessons: ['pwrUis'],
     },
@@ -74,6 +74,15 @@ export const PWR_UIS_KNOWLEDGE: AnaKnowledge = {
       a: loc(
         '长脉冲时热量扩散到整个散热路径，Zth 趋近稳态 Rth，温升约为 P·Rth。若仍用短脉冲的小 Zth，会低估温升，SOA 与结温判断都会偏乐观。计算时先看脉宽，再选对应的 Zth。见 {@pwrUis}。',
         'For a long pulse the heat spreads through the whole thermal path, so Zth approaches the steady-state Rth and the rise is about P·Rth. Using the small short-pulse Zth would underestimate the rise and make the SOA and junction-temperature checks too optimistic. Look at the pulse width first, then pick the matching Zth. See {@pwrUis}.',
+      ),
+      lessons: ['pwrUis'],
+    },
+    {
+      id: 'pwr-uis-not-half-li2',
+      q: loc('雪崩能量能不能写成 ½LI²？', 'Can avalanche energy be written as ½LI²?'),
+      a: loc(
+        '不能。½LI² 只是电感里存的能量。雪崩期间母线还在供电，器件耗散的是 E_AS = ½·L·Ipk²·BV/(BV−Vdd)。Vdd 越接近 BV，分母越小，同一 Ipk 下器件吃到的能量越大。见 {@pwrUis}。',
+        'No. ½LI² is only the energy stored in the inductor. The bus still supplies energy during avalanche, so the device dissipates E_AS = ½·L·Ipk²·BV/(BV−Vdd). The closer Vdd is to BV, the smaller the denominator and the more energy the same Ipk dumps into the device. See {@pwrUis}.',
       ),
       lessons: ['pwrUis'],
     },

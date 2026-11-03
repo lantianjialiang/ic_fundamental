@@ -1,0 +1,8 @@
+{
+  "id": "VDUT-ACC1",
+  "note": "teaching illustration — not a real accelerometer",
+  "sVg": 0.3,
+  "offsetV": 1.65,
+  "ndGPerRtHz": 0.00015,
+  "bwHz": 50
+}

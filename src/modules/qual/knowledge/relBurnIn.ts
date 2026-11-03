@@ -5,6 +5,16 @@ import type { AnaKnowledge } from '../../ana/knowledge/types'
 export const REL_BURNIN_KNOWLEDGE: AnaKnowledge = {
   terms: [
     {
+      id: 'static-burn-in',
+      term: 'Static Burn-in',
+      name: loc('静态老化', 'Static burn-in'),
+      def: loc(
+        '老化时只加偏置，电路不翻转。夹具简单、功耗低，覆盖的节点比动态老化少，动作相关的潜在缺陷可能漏掉。见 {@relBurnIn}。',
+        'Burn-in with bias applied and the circuit idle. The fixture is simpler and power is lower, but fewer nodes are exercised than in dynamic burn-in, so activity-related latent defects can be missed. See {@relBurnIn}.',
+      ),
+      lessons: ['relBurnIn'],
+    },
+    {
       id: 'dynamic-burn-in',
       term: 'Dynamic Burn-in',
       name: loc('动态老化', 'Dynamic burn-in'),

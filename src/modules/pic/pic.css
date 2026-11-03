@@ -1,0 +1,23 @@
+.pic-fig {
+  margin: 0;
+}
+
+.pic-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.pic-summary {
+  margin: 8px 0 0;
+  color: var(--muted, #8b949e);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.pic-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}

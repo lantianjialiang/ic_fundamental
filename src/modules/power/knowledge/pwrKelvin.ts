@@ -15,6 +15,16 @@ export const PWR_KELVIN_KNOWLEDGE: AnaKnowledge = {
       lessons: ['pwrKelvin'],
     },
     {
+      id: 'triax',
+      term: 'Triax',
+      name: loc('三同轴（triax）', 'Triaxial cable (triax)'),
+      def: loc(
+        '中心导体外面还有一层保护导体，再外面才是屏蔽地。保护层接到 guard，把电缆绝缘上的漏电引走，不进电流表。高压测 nA 级漏电时，普通同轴不够，要用 triax。见 {@pwrKelvin}。',
+        'A center conductor, then a guard conductor, then the shield at ground. The guard layer is driven to the guard potential so leakage on the cable insulation goes there, not into the ammeter. Ordinary coax is not enough for nanoamp leakage at high voltage; use triax. See {@pwrKelvin}.',
+      ),
+      lessons: ['pwrKelvin'],
+    },
+    {
       id: 'guard',
       term: 'Guard',
       name: loc('保护环（guard）', 'Guard ring'),

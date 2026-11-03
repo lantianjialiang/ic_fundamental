@@ -9,8 +9,18 @@ export const REL_FLOW_KNOWLEDGE: AnaKnowledge = {
       term: 'DPPM',
       name: loc('每百万缺陷件数（DPPM）', 'Defective parts per million (DPPM)'),
       def: loc(
-        '每一百万颗出货器件中的缺陷（失效）件数，常用于车规量产的质量目标。本课用期望值计算 ppm，见 {@relFlow}。',
-        'The number of defective (failed) parts per million shipped; a common quality target in automotive production. This lesson computes the expected ppm; see {@relFlow}.',
+        '每一百万颗出货器件中的缺陷（失效）件数，常用于车规量产的质量目标。本课用期望值计算现场 ppm，见 {@relFlow}。',
+        'The number of defective (failed) parts per million shipped; a common quality target in automotive production. This lesson computes the expected field ppm; see {@relFlow}.',
+      ),
+      lessons: ['relFlow'],
+    },
+    {
+      id: 'field-ppm',
+      term: 'Field ppm',
+      name: loc('现场 ppm（出货缺陷率）', 'Field ppm (outgoing defect rate)'),
+      def: loc(
+        '现场或出货后按每百万颗计的缺陷比例，和 DPPM 是同一类量。它不是锁相环、时钟里的频率 ppm。见 {@relFlow}。',
+        'Defects per million in the field or at shipment, the same kind of quantity as DPPM. It is not the frequency ppm used for PLLs and clocks. See {@relFlow}.',
       ),
       lessons: ['relFlow'],
     },
@@ -24,16 +34,6 @@ export const REL_FLOW_KNOWLEDGE: AnaKnowledge = {
       ),
       lessons: ['relFlow'],
     },
-    {
-      id: 'three-temperature-test',
-      term: 'Three-temperature test',
-      name: loc('三温测试', 'Three-temperature test'),
-      def: loc(
-        '同一颗器件分别在低温、室温、高温下测试。温度相关的参数偏移只在对应温度超限，常温测试看不到，所以三温覆盖不能用常温代替。见 {@relFlow}。',
-        'The same device is tested at low, room and high temperature. A temperature-dependent parameter shift only exceeds its limit at one temperature and a room test cannot see it, so room testing cannot replace the three temperatures. See {@relFlow}.',
-      ),
-      lessons: ['relFlow'],
-    },
   ],
   extraLessons: {
     'burn-in': ['relFlow'],
@@ -41,6 +41,7 @@ export const REL_FLOW_KNOWLEDGE: AnaKnowledge = {
     ft: ['relFlow'],
     stdf: ['relFlow'],
     yield: ['relFlow'],
+    'three-temp-test': ['relFlow'],
   },
   faqs: [
     {
@@ -67,6 +68,24 @@ export const REL_FLOW_KNOWLEDGE: AnaKnowledge = {
       a: loc(
         '不能完全代替。PAT 用统计限值找出参数偏离中位数较大的器件，抓的是“参数上的离群”；Burn-in 让弱群体在加速条件下提前失效，抓的是“时间上的早夭”。两者针对的失效不同，应当互补使用。Burn-in 的加速原理见 {@relBurnIn}，PAT 的限值计算见 {@relPat}。',
         'Not completely. PAT uses statistical limits to find devices whose parameters sit far from the median, catching parametric outliers; burn-in brings the weak population’s failures forward under acceleration, catching early-life failures. The two target different failures and should complement each other. The acceleration principle of burn-in is in {@relBurnIn}, and the PAT limit calculation is in {@relPat}.',
+      ),
+      lessons: ['relFlow'],
+    },
+    {
+      id: 'rel-flow-more-tests',
+      q: loc('测试项是不是越多越安全？', 'Do more test items always make the product safer?'),
+      a: loc(
+        '不是。多一项就多时间、多夹具、多过杀。覆盖要用失效模式来选：三温抓温度偏移，Burn-in 抓早期，PAT 抓规格内离群，不是把能测的都测一遍。见 {@relFlow}。',
+        'No. Each extra item adds time, fixtures and overkill. Coverage is chosen from failure modes: three temperatures for thermal shift, burn-in for early life, PAT for in-spec outliers — not every test you can think of. See {@relFlow}.',
+      ),
+      lessons: ['relFlow'],
+    },
+    {
+      id: 'rel-flow-trace-later',
+      q: loc('追溯信息能不能测试之后再补？', 'Can traceability be filled in after test?'),
+      a: loc(
+        '不能指望事后补。Lot、晶圆坐标、温度站必须在测试时写入 STDF。事后回忆既对不上当时的站，也补不回已经丢掉的记录。见 {@relFlow}。',
+        'Do not count on filling it in later. Lot, wafer coordinates and temperature stations must be written to the STDF during test. Recalling afterwards neither matches the station at the time nor restores a record that was never kept. See {@relFlow}.',
       ),
       lessons: ['relFlow'],
     },

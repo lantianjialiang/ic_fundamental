@@ -34,6 +34,56 @@ export const REL_STRESS_KNOWLEDGE: AnaKnowledge = {
       ),
       lessons: ['relStress'],
     },
+    {
+      id: 'htol',
+      term: 'HTOL',
+      name: loc('高温工作寿命（HTOL）', 'High-temperature operating life (HTOL)'),
+      def: loc(
+        '器件在高温下加电工作一段时间，用来加速使用中的磨损机理。它给出的是失效率上限，不是“零失效”。条件是教学示例，以现行标准为准。见 {@relStress}。',
+        'The device is biased and operated at high temperature for a stated time, to accelerate wear-out mechanisms that appear in use. It yields a failure-rate upper bound, not “zero failures”. Conditions are teaching examples; follow the current standard. See {@relStress}.',
+      ),
+      lessons: ['relStress'],
+    },
+    {
+      id: 'htsl',
+      term: 'HTSL',
+      name: loc('高温存储寿命（HTSL）', 'High-temperature storage life (HTSL)'),
+      def: loc(
+        '器件在高温下不加电存放，加速与偏置无关的存储老化（如封装材料、金属界面）。它和 HTOL 的差别是有没有工作偏置。见 {@relStress}。',
+        'The device is stored at high temperature with no bias, accelerating storage aging that does not need bias (package materials, metal interfaces). The difference from HTOL is the absence of operating bias. See {@relStress}.',
+      ),
+      lessons: ['relStress'],
+    },
+    {
+      id: 'temp-cycle',
+      term: 'Temperature cycling (TC)',
+      name: loc('温度循环（TC）', 'Temperature cycling (TC)'),
+      def: loc(
+        '在高低温之间反复循环，用热膨胀差加速封装疲劳。加速用 Coffin-Manson，看的是温差幅度 ΔT，不是最高温度。见 {@relStress} 和 {@relAccel}。',
+        'Repeated cycles between hot and cold, using thermal-expansion mismatch to accelerate package fatigue. Acceleration uses Coffin-Manson and looks at the swing ΔT, not the peak temperature. See {@relStress} and {@relAccel}.',
+      ),
+      lessons: ['relStress'],
+    },
+    {
+      id: 'hast',
+      term: 'HAST',
+      name: loc('高加速温湿度应力（HAST）', 'Highly accelerated temperature and humidity stress (HAST)'),
+      def: loc(
+        '高温、高湿、常加压，加速潮气进入封装引起的腐蚀或漏电。本课的 AF 只算温度项，湿度项是教学简化，未计入。见 {@relStress}。',
+        'High temperature, high humidity and often bias, to accelerate moisture entering the package and causing corrosion or leakage. This lesson’s AF uses only the temperature term; the humidity term is left out as a teaching simplification. See {@relStress}.',
+      ),
+      lessons: ['relStress'],
+    },
+    {
+      id: 'elfr',
+      term: 'ELFR',
+      name: loc('早期失效率试验（ELFR）', 'Early life failure rate (ELFR)'),
+      def: loc(
+        '用较短的加电应力估计早期失效率，对准浴盆曲线的下降段，不是磨损寿命。它和 Burn-in 都针对早期失效，但 ELFR 是鉴定抽样，Burn-in 是量产筛选。见 {@relStress} 和 {@relBurnIn}。',
+        'A short biased stress used to estimate the early-life failure rate. It targets the falling infant-mortality segment of the bathtub, not wear-out life. Both ELFR and burn-in address early failures, but ELFR is a qualification sample and burn-in is a production screen. See {@relStress} and {@relBurnIn}.',
+      ),
+      lessons: ['relStress'],
+    },
   ],
   extraLessons: {
     esd: ['relStress'],
@@ -64,6 +114,15 @@ export const REL_STRESS_KNOWLEDGE: AnaKnowledge = {
       a: loc(
         '这里只是教学简化：课程只用温度的 Arrhenius 项算 AF，湿度项没有计入，实际的湿度加速要用专门的模型并以现行标准为准。见 {@relStress} 与 {@relAccel}。',
         'This is a teaching simplification: the lesson uses only the temperature Arrhenius term for AF and leaves out the humidity term. Real humidity acceleration needs a dedicated model, and the current standard governs. See {@relStress} and {@relAccel}.',
+      ),
+      lessons: ['relStress'],
+    },
+    {
+      id: 'rel-stress-sample-not-bigger',
+      q: loc('样本量是不是越大越好？', 'Is a larger sample always better?'),
+      a: loc(
+        '上限会随 n 变紧，但时间和夹具成本也线性上升。零失效公式里 n 和试验小时、AF 一起进分母，该用多少由目标 FIT、CL 和预算共同决定，不是越多越安全。见 {@relStress}。',
+        'The bound tightens with n, but time and fixture cost rise in proportion. In the zero-failure formula n shares the denominator with hours and AF. How many units you need is set by the target FIT, the CL and the budget, not by “more is safer”. See {@relStress}.',
       ),
       lessons: ['relStress'],
     },

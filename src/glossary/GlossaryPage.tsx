@@ -44,7 +44,7 @@ const VIEWS = [
 
 type ViewId = (typeof VIEWS)[number]['id']
 
-/** 分组顺序：先 D 轨，再 F 轨，然后 T（MOS）、L（PCB）、A（模拟）、H（高速）轨 */
+/** 分组顺序：先 D / F，再 T（MOS）、L（PCB）、A、H、R、M，然后 P（功率）、S（传感器）、Q（可靠性）、C（硅光） */
 const LESSON_ORDER: ModuleId[] = [
   ...new Set([
     ...(trackById('digital')?.lessons ?? []),
@@ -55,6 +55,10 @@ const LESSON_ORDER: ModuleId[] = [
     ...(trackById('hs')?.lessons ?? []),
     ...(trackById('rf')?.lessons ?? []),
     ...(trackById('memory')?.lessons ?? []),
+    ...(trackById('power')?.lessons ?? []),
+    ...(trackById('sensor')?.lessons ?? []),
+    ...(trackById('qual')?.lessons ?? []),
+    ...(trackById('cpo')?.lessons ?? []),
   ]),
 ]
 
