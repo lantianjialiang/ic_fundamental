@@ -22,6 +22,7 @@ export const WIDTH_S = {
   thick: loc('铜厚度', 'Thickness'),
   r10: loc('每 10 mm 电阻', 'R per 10 mm'),
   drop10: loc('每 10 mm 压降', 'Drop per 10 mm'),
+  shop: loc('厂里习惯线宽', 'Shop width'),
   cap: loc(
     '曲线：当前铜厚、温升、层别下，线宽随电流增长的关系。圆点是上面输入对应的工作点。电流翻倍，线宽要增加得比一倍还多一点（指数 1/0.725 ≈ 1.38）。',
     'Curve: required width against current for the chosen copper, rise and layer. The dot is the operating point from the inputs above. Doubling the current needs a bit more than double the width (exponent 1/0.725 ≈ 1.38).',
@@ -38,6 +39,10 @@ export const WIDTH_NOTES: LText[] = [
   loc(
     'IPC-2221 的曲线数据大致覆盖 35 A 以内、温升 10–100 °C、铜厚 0.5–3 oz，超出范围就是外推，结果不可靠。它不考虑板厚、附近的铜平面和是否有风，所以偏保守。更新的 IPC-2152 用实测数据修正了这些影响（例如内层靠近平面时散热比 2221 估得好），更准确，但需要查图表；做初步估算时 IPC-2221 够用，要卡极限时改用 IPC-2152 或做热测试。',
     'The IPC-2221 data roughly cover up to 35 A, 10–100 °C rise and 0.5–3 oz copper; beyond that the result is an extrapolation and not reliable. It ignores board thickness, nearby copper planes and airflow, so it is conservative. The newer IPC-2152 corrects these with measured data (an inner trace next to a plane sheds heat better than 2221 predicts) and is more accurate, but needs chart lookup. IPC-2221 is fine for a first estimate; use IPC-2152 or a thermal test when you are near the limit.',
+  ),
+  loc(
+    '上面算出的是理论下限。厂里电源线一般不卡这个数：表层常用 1 oz 铜箔再电镀，成品比标称厚，习惯按 0.5 mm 走；内层常用 0.5 oz、没有电镀，习惯按 1 mm 走。这是带安全余量的规定，不是公式结果。1 A、温升 20 °C、1 oz 外层理论约 0.20 mm（8 mil）；网上计算器常默认温升 10 °C，同一条件约 0.30 mm（12 mil），公式相同，差在 ΔT。',
+    'The number above is the theoretical floor. Shop power traces usually ignore it: outer foil is typically 1 oz plus plating, so finished copper is thicker than the label, and 0.5 mm is the usual width; inner foil is typically 0.5 oz with no plating, and 1 mm is the usual width. Those are rules with safety margin, not the formula. At 1 A, 20 °C rise and 1 oz outer, theory is about 0.20 mm (8 mil). Many web calculators default to a 10 °C rise, which gives about 0.30 mm (12 mil) for the same copper — same formula, different ΔT.',
   ),
   loc(
     '线宽只是其中一环：焊盘、过孔、颈缩处和连接器引脚的载流常常比线更小，瓶颈由最窄的那一段决定。线短时压降和发热都小，可以放宽；线长则要按压降（右侧读数）再核一遍。',

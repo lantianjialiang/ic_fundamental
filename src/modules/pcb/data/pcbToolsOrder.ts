@@ -87,8 +87,8 @@ export const PARAMS: Param[] = [
   {
     id: 'hole',
     name: loc('最小孔径', 'Min hole'),
-    usual: loc('0.3 mm', '0.3 mm'),
-    change: loc('设计里最小的钻孔不得小于这一档。更小的孔要用更细的钻头，容易断，工厂会加价。', 'The smallest drilled hole in the design must not be below this tier. Smaller holes need finer drill bits, which break easily, so fabs charge extra.'),
+    usual: loc('0.2 mm', '0.2 mm'),
+    change: loc('一般打样厂机械钻常用下限是 0.2 mm；0.3 mm 更便宜、钻头不容易断、良率更高。再细（0.15 mm 及以下）要更细的钻头或激光，会加价。', 'Typical proto shops mechanically drill down to 0.2 mm; 0.3 mm is cheaper, breaks fewer bits and yields better. Finer still (0.15 mm and below) needs a finer bit or laser and costs extra.'),
   },
   {
     id: 'imp',

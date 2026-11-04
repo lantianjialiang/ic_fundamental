@@ -64,13 +64,31 @@ export function spokeCurrent(spokeMm: number, count: number) {
   return count * currentForWidthMil(mmToMil(spokeMm), 20, 1, 'ext')
 }
 
-/* ---------- 微带线阻抗（IPC-2141） ---------- */
+/* ---------- 阻抗（IPC-2141） ---------- */
 
 export const T_1OZ_MM = 0.035
+
+/** 厂里电源线常用余量：表层 1 oz（加电镀）走 0.5 mm，内层 0.5 oz 走 1 mm */
+export const SHOP_EXT_MM = 0.5
+export const SHOP_INT_MM = 1.0
 
 export function microstripZ0(er: number, h: number, w: number, t = T_1OZ_MM) {
   const z = (87 / Math.sqrt(er + 1.41)) * Math.log((5.98 * h) / (0.8 * w + t))
   return Math.max(0, z)
+}
+
+/**
+ * 对称带状线：h 是线到一侧平面的介质厚度，两平面间距 b = 2h + t。
+ * 与 IPC-2141 / 常见网上计算器同一式：60/√Er · ln(1.9·b / (0.8w + t))。
+ */
+export function striplineZ0(er: number, h: number, w: number, t = T_1OZ_MM) {
+  const b = 2 * h + t
+  const z = (60 / Math.sqrt(er)) * Math.log((1.9 * b) / (0.8 * w + t))
+  return Math.max(0, z)
+}
+
+export function impedanceZ0(layer: LayerKind, er: number, h: number, w: number, t = T_1OZ_MM) {
+  return layer === 'ext' ? microstripZ0(er, h, w, t) : striplineZ0(er, h, w, t)
 }
 
 /** IPC-2141 公式常引用的适用范围：0.1 < w/h < 2.0，1 < Er < 15 */
@@ -79,11 +97,16 @@ export function microstripValid(er: number, h: number, w: number) {
   return r > 0.1 && r < 2 && er > 1 && er < 15
 }
 
+export function impedanceValid(_layer: LayerKind, er: number, h: number, w: number) {
+  return microstripValid(er, h, w)
+}
+
 export type ZVar = 'h' | 'w' | 'er'
 
 /** 某个量放大 20 % 时 Z0 的变化百分比 */
-export function zSensitivity(er: number, h: number, w: number, v: ZVar) {
-  const base = microstripZ0(er, h, w)
-  const next = microstripZ0(v === 'er' ? er * 1.2 : er, v === 'h' ? h * 1.2 : h, v === 'w' ? w * 1.2 : w)
+export function zSensitivity(er: number, h: number, w: number, v: ZVar, layer: LayerKind = 'ext') {
+  const base = impedanceZ0(layer, er, h, w)
+  const next = impedanceZ0(layer, v === 'er' ? er * 1.2 : er, v === 'h' ? h * 1.2 : h, v === 'w' ? w * 1.2 : w)
+  if (base <= 0) return 0
   return ((next - base) / base) * 100
 }

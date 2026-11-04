@@ -24,9 +24,9 @@ export const ERRORS: DfmError[] = [
   {
     id: 'ring',
     title: loc('孔太小 / 孔环太薄', 'Drill too small / annular ring too thin'),
-    cause: loc('这个过孔焊盘 0.6 mm 却配 0.5 mm 钻孔，孔环单边只剩 0.05 mm；钻头稍偏就钻破焊盘边。旁边另一个过孔是 0.2 mm 小孔，低于常规能力。', 'This via has a 0.6 mm pad with a 0.5 mm drill, leaving only 0.05 mm of ring per side, so a slightly wandering drill breaks out of the pad. The via beside it uses a 0.2 mm drill, below standard capability.'),
-    effect: loc('破环处走线和孔壁只连一点点，热循环后开裂成开路；小孔需要激光或精密钻，打样价和交期都上去。', 'At the breakout the trace barely touches the barrel and cracks open after thermal cycling; tiny holes need laser or precision drilling, raising price and lead time.'),
-    fix: loc('常规用 0.3 mm 钻孔 + 0.6 mm 焊盘（单边孔环 0.15 mm）；把板厂的最小孔径和孔环填进 DRC。', 'Use a 0.3 mm drill with a 0.6 mm pad (0.15 mm ring per side) as standard, and put the fab’s minimum drill and ring into DRC.'),
+    cause: loc('这个过孔焊盘 0.6 mm 却配 0.5 mm 钻孔，孔环单边只剩 0.05 mm；钻头稍偏就钻破焊盘边。旁边另一个过孔是 0.15 mm 小孔，已经低于一般打样厂机械钻的常用下限 0.2 mm。', 'This via has a 0.6 mm pad with a 0.5 mm drill, leaving only 0.05 mm of ring per side, so a slightly wandering drill breaks out of the pad. The via beside it uses a 0.15 mm drill, already below the typical proto-shop mechanical floor of 0.2 mm.'),
+    effect: loc('破环处走线和孔壁只连一点点，热循环后开裂成开路；比 0.2 mm 更细的孔要更细的钻头或激光，打样价和交期都上去。', 'At the breakout the trace barely touches the barrel and cracks open after thermal cycling; holes finer than 0.2 mm need a finer bit or laser, raising price and lead time.'),
+    fix: loc('一般打样能力按 0.2 mm 钻孔 + 0.4 mm 焊盘（单边孔环 0.1 mm）；想便宜、良率高再用 0.3 mm 孔 + 0.6 mm 盘（0.15 mm 孔环）。把板厂能力表填进 DRC。', 'Typical proto capability is a 0.2 mm drill with a 0.4 mm pad (0.1 mm ring per side); use 0.3 mm / 0.6 mm (0.15 mm ring) when you want cheaper, higher yield. Put the fab’s capability table into DRC.'),
     caught: loc('DRC（孔径 / 孔环规则）和板厂 DFM 报告。', 'DRC (hole size / annular ring rules) and the fab’s DFM report.'),
   },
   {

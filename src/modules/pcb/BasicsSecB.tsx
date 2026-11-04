@@ -7,7 +7,7 @@ import { RefP, RefParas, Related } from '../prep/common'
 import { MarksFig, MicrostripFig } from './BasicsFigs3'
 import { PourFig } from './BasicsFigs2'
 import { type SecProps } from './BasicsSecA'
-import { microstripValid, microstripZ0, spokeCurrent, zSensitivity } from './data/pcbBasicsModel'
+import { impedanceValid, impedanceZ0, spokeCurrent, zSensitivity, type LayerKind } from './data/pcbBasicsModel'
 import { MARKS, MARKS_S, POURS, POUR_S, type MarkId, type PourId } from './data/pcbBasicsText2'
 import { Z_NOTES, Z_S, Z_VARS } from './data/pcbBasicsText3'
 
@@ -88,32 +88,49 @@ export function MarksSection({ onOpen, setNote }: SecProps) {
 
 /* ---------- 阻抗 ---------- */
 
+const Z_LAYERS: Array<{ id: LayerKind; label: typeof Z_S.ext }> = [
+  { id: 'ext', label: Z_S.ext },
+  { id: 'int', label: Z_S.int },
+]
+
 export function ImpedanceSection({ onOpen, setNote }: SecProps) {
   const { t } = useLocale()
+  const [layer, setLayer] = useState<LayerKind>(Z_LAYERS[0].id)
   const [er, setEr] = useState(4.3)
   const [h, setH] = useState(0.2)
   const [w, setW] = useState(0.35)
-  const touch = () => setNote({ kicker: Z_S.kicker, title: Z_S.title, text: Z_NOTES[1] })
-  const z0 = microstripZ0(er, h, w)
-  const valid = microstripValid(er, h, w)
+  const touch = () => setNote({ kicker: Z_S.kicker, title: Z_S.title, text: Z_NOTES[0] })
+  const z0 = impedanceZ0(layer, er, h, w)
+  const valid = impedanceValid(layer, er, h, w)
   const ratio = w / h
+  const kindName = layer === 'ext' ? loc('表层微带线', 'outer microstrip') : loc('内层带状线', 'inner stripline')
   const sentence = valid
     ? loc(
-        `w/h = ${ratio.toFixed(2)}，在 0.1–2.0 之内，Z0 ≈ ${z0.toFixed(1)} Ω（近似值，误差可达百分之十几）。`,
-        `w/h = ${ratio.toFixed(2)}, inside 0.1–2.0, so Z0 ≈ ${z0.toFixed(1)} Ω (approximate, errors of ten-odd percent are possible).`,
+        `${kindName.zh}：w/h = ${ratio.toFixed(2)}，在 0.1–2.0 之内，Z0 ≈ ${z0.toFixed(1)} Ω（近似值，误差可达百分之十几）。`,
+        `${kindName.en}: w/h = ${ratio.toFixed(2)}, inside 0.1–2.0, so Z0 ≈ ${z0.toFixed(1)} Ω (approximate, errors of ten-odd percent are possible).`,
       )
     : loc(
-        `w/h = ${ratio.toFixed(2)}，不在 0.1–2.0 之内（或 Er 超出 1–15），公式失去依据，Z0 = ${z0.toFixed(1)} Ω 不可信，要用场求解器。`,
-        `w/h = ${ratio.toFixed(2)} is outside 0.1–2.0 (or Er is outside 1–15), so the formula has no basis and Z0 = ${z0.toFixed(1)} Ω cannot be trusted; use a field solver.`,
+        `${kindName.zh}：w/h = ${ratio.toFixed(2)}，不在 0.1–2.0 之内（或 Er 超出 1–15），公式失去依据，Z0 = ${z0.toFixed(1)} Ω 不可信，要用场求解器。`,
+        `${kindName.en}: w/h = ${ratio.toFixed(2)} is outside 0.1–2.0 (or Er is outside 1–15), so the formula has no basis and Z0 = ${z0.toFixed(1)} Ω cannot be trusted; use a field solver.`,
       )
   return (
     <Section title={t(Z_S.title)} note={t(Z_S.note)}>
+      <div className="prep-actions">
+        <Seg
+          options={Z_LAYERS}
+          value={layer}
+          onChange={(id) => {
+            setLayer(id)
+            touch()
+          }}
+        />
+      </div>
       <div className="knob-row">
         <Knob label={Z_S.er} value={er} unit="" min={2.2} max={10} step={0.1} onChange={(v) => { setEr(v); touch() }} />
         <Knob label={Z_S.h} value={h} unit="mm" min={0.05} max={0.5} step={0.01} onChange={(v) => { setH(v); touch() }} />
         <Knob label={Z_S.w} value={w} unit="mm" min={0.05} max={1} step={0.01} onChange={(v) => { setW(v); touch() }} />
       </div>
-      <MicrostripFig er={er} h={h} w={w} z0={z0} valid={valid} />
+      <MicrostripFig layer={layer} er={er} h={h} w={w} z0={z0} valid={valid} />
       <Readout
         items={[
           { label: Z_S.z0, value: `${z0.toFixed(1)} Ω`, state: valid ? 'pass' : 'fail' },
@@ -129,7 +146,7 @@ export function ImpedanceSection({ onOpen, setNote }: SecProps) {
       <p className="prep-muted">{t(Z_S.sens)}</p>
       <Readout
         items={Z_VARS.map((v) => {
-          const d = zSensitivity(er, h, w, v.id)
+          const d = zSensitivity(er, h, w, v.id, layer)
           return { label: v.label, value: `${d >= 0 ? '+' : ''}${d.toFixed(1)} % → ${d >= 0 ? '↑' : '↓'}` }
         })}
       />

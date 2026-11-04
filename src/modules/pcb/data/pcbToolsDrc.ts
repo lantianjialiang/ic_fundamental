@@ -92,8 +92,8 @@ export const DRC_RULES: DrcRule[] = [
     name: 'Routing » Routing Via Style',
     checks: loc('自动打的过孔的孔径和焊盘直径', 'Hole size and pad diameter of vias placed while routing'),
     fab: [
-      { k: wHole, mm: 0.3 },
-      { k: wDia, mm: 0.6 },
+      { k: wHole, mm: 0.2 },
+      { k: wDia, mm: 0.4 },
     ],
     set: [
       { k: wHole, mm: 0.4 },
@@ -108,7 +108,7 @@ export const DRC_RULES: DrcRule[] = [
     id: 'hole',
     name: 'Manufacturing » Hole Size',
     checks: loc('所有钻孔（过孔和插件孔）允许的最小和最大孔径', 'Minimum and maximum diameter allowed for every drilled hole (vias and through-hole parts)'),
-    fab: [{ k: wMin, mm: 0.3 }],
+    fab: [{ k: wMin, mm: 0.2 }],
     set: [{ k: wMin, mm: 0.3 }],
     why: loc(
       '小于最小钻头的孔，工厂要么拒做、要么加价用更细的钻头；检查的是成品孔径，和孔环那条规则互不替代（见 {@pcbFab}）。',

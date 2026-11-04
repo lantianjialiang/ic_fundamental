@@ -19,6 +19,8 @@ import {
   widthMilForCurrent,
   GROOVE_DEPTH_MM,
   GROOVE_MIN_MM,
+  SHOP_EXT_MM,
+  SHOP_INT_MM,
   type LayerKind,
 } from './data/pcbBasicsModel'
 import { SPACE_NOTES, SPACE_S, WIDTH_NOTES, WIDTH_S } from './data/pcbBasicsText'
@@ -141,11 +143,25 @@ export function WidthSection({ onOpen, setNote }: SecProps) {
           { label: WIDTH_S.thick, value: `${(oz * OZ_MIL).toFixed(2)} mil · ${(oz * OZ_MIL * 25.4).toFixed(0)} µm` },
           { label: WIDTH_S.r10, value: `${(r10 * 1000).toFixed(1)} mΩ` },
           { label: WIDTH_S.drop10, value: `${(r10 * current * 1000).toFixed(1)} mV` },
+          { label: WIDTH_S.shop, value: layer === 'ext' ? `${SHOP_EXT_MM.toFixed(1)} mm` : `${SHOP_INT_MM.toFixed(1)} mm` },
         ]}
       />
       <Callout tone={current > 35 ? 'bad' : 'ok'}>
         <p>
           <b>{t(sentence)}</b>
+        </p>
+        <p>
+          {t(
+            layer === 'ext'
+              ? loc(
+                  `这是 IPC-2221 理论下限。厂里表层一般是 1 oz 铜箔再电镀，电源线习惯走 ${SHOP_EXT_MM.toFixed(1)} mm，留安全余量。`,
+                  `That is the IPC-2221 theoretical floor. Shop outer copper is usually 1 oz foil plus plating, and power traces are drawn at ${SHOP_EXT_MM.toFixed(1)} mm for safety margin.`,
+                )
+              : loc(
+                  `这是 IPC-2221 理论下限。厂里内层一般是 0.5 oz、没有电镀，电源线习惯走 ${SHOP_INT_MM.toFixed(1)} mm，留安全余量。`,
+                  `That is the IPC-2221 theoretical floor. Shop inner copper is usually 0.5 oz with no plating, and power traces are drawn at ${SHOP_INT_MM.toFixed(1)} mm for safety margin.`,
+                ),
+          )}
         </p>
         {current > 35 ? <p>{t(L.over)}</p> : null}
       </Callout>

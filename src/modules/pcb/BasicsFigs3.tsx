@@ -3,7 +3,7 @@ import { loc } from '../../i18n/locale'
 import { Hit } from '../prep/common'
 import { C, T } from './BasicsFigs'
 import { MARKS, MARKS_S, type MarkId } from './data/pcbBasicsText2'
-import { T_1OZ_MM } from './data/pcbBasicsModel'
+import { T_1OZ_MM, type LayerKind } from './data/pcbBasicsModel'
 import { Z_S } from './data/pcbBasicsText3'
 
 const LAMINATE = '#c9b77a'
@@ -119,44 +119,102 @@ export function MarksFig({ active, onPick, open }: { active: MarkId; onPick: (id
 
 /* ---------- 微带线剖面 + Z0 标尺 ---------- */
 
-const ZS = 200 // 每 mm 的像素
-export function MicrostripFig({ er, h, w, z0, valid }: { er: number; h: number; w: number; z0: number; valid: boolean }) {
+const ZS_EXT = 200
+const ZS_INT = 140
+
+export function MicrostripFig({
+  layer,
+  er,
+  h,
+  w,
+  z0,
+  valid,
+}: {
+  layer: LayerKind
+  er: number
+  h: number
+  w: number
+  z0: number
+  valid: boolean
+}) {
   const { t } = useLocale()
-  const gnd = 206
-  const top = gnd - h * ZS
-  const tw = T_1OZ_MM * ZS
+  const inner = layer === 'int'
+  const zs = inner ? ZS_INT : ZS_EXT
+  const tw = T_1OZ_MM * zs
+  const die = h * zs
   const cx = 250
-  const xl = cx - (w * ZS) / 2
-  const xr = cx + (w * ZS) / 2
+  const half = (w * zs) / 2
+  const xl = cx - half
+  const xr = cx + half
+  const gnd = 206
+  const top = gnd - die
+  const mid = 122
+  const trTop = inner ? mid - tw / 2 : top - tw
+  const trBot = trTop + tw
+  const topPlane = mid - tw / 2 - die
+  const botPlane = mid + tw / 2 + die
   const gx = (z: number) => 510 + (Math.min(z, 120) / 120) * 230
   const rows = [`Er = ${er.toFixed(1)}`, `h = ${h.toFixed(2)} mm`, `w = ${w.toFixed(2)} mm`, `t = ${T_1OZ_MM.toFixed(3)} mm`]
+  const caption = inner ? Z_S.capInner : Z_S.cap
   return (
     <figure className="term-fig">
-      <svg viewBox="0 0 760 260" className="term-fig__svg" role="img" aria-label={t(Z_S.cap)}>
+      <svg viewBox="0 0 760 260" className="term-fig__svg" role="img" aria-label={t(caption)}>
         <rect width="760" height="260" rx="10" fill="var(--well)" />
-        <rect x="30" y={top} width="440" height={h * ZS} fill={LAMINATE} />
-        <rect x="30" y={gnd} width="440" height={tw} fill={C.copper} />
-        <rect x={xl} y={top - tw} width={xr - xl} height={tw} fill={C.copper} />
-        <g fill="none" stroke="var(--blue)" strokeWidth="1.3" strokeDasharray="4 3">
-          <path d={`M${cx} ${top} V${gnd}`} />
-          <path d={`M${xl + 6} ${top} V${gnd}`} />
-          <path d={`M${xr - 6} ${top} V${gnd}`} />
-          <path d={`M${xl} ${top - tw} Q${xl - h * ZS * 0.7 - 12} ${top - 30} ${xl - h * ZS * 0.9 - 14} ${gnd}`} />
-          <path d={`M${xr} ${top - tw} Q${xr + h * ZS * 0.7 + 12} ${top - 30} ${xr + h * ZS * 0.9 + 14} ${gnd}`} />
-        </g>
-        <T x={60} y={36} anchor="start" color="var(--muted)" size={11}>
-          {t(Z_S.capAir)}
-        </T>
-        <T x={44} y={gnd + 26} anchor="start" color="var(--muted)" size={11}>
-          {t(Z_S.capGnd)}
-        </T>
-        <T x={cx} y={top - tw - 8} color="var(--text-2)" size={11}>
-          {`${t(Z_S.capW)} · ${t(Z_S.capT)}`}
-        </T>
-        <rect x="330" y={gnd + 17} width="12" height="12" fill={LAMINATE} />
-        <T x={348} y={gnd + 27} anchor="start" color="var(--muted)" size={11}>
-          {t(Z_S.capH)}
-        </T>
+        {inner ? (
+          <>
+            <rect x="30" y={topPlane} width="440" height={botPlane - topPlane} fill={LAMINATE} />
+            <rect x="30" y={topPlane - tw} width="440" height={tw} fill={C.copper} />
+            <rect x="30" y={botPlane} width="440" height={tw} fill={C.copper} />
+            <rect x={xl} y={trTop} width={xr - xl} height={tw} fill={C.copper} />
+            <g fill="none" stroke="var(--blue)" strokeWidth="1.3" strokeDasharray="4 3">
+              <path d={`M${cx} ${trTop} V${topPlane}`} />
+              <path d={`M${cx} ${trBot} V${botPlane}`} />
+              <path d={`M${xl + 6} ${trTop} V${topPlane}`} />
+              <path d={`M${xl + 6} ${trBot} V${botPlane}`} />
+              <path d={`M${xr - 6} ${trTop} V${topPlane}`} />
+              <path d={`M${xr - 6} ${trBot} V${botPlane}`} />
+            </g>
+            <T x={44} y={topPlane - tw - 6} anchor="start" color="var(--muted)" size={11}>
+              {t(Z_S.capTop)}
+            </T>
+            <T x={44} y={botPlane + tw + 14} anchor="start" color="var(--muted)" size={11}>
+              {t(Z_S.capBot)}
+            </T>
+            <T x={Math.min(xr + 70, 430)} y={mid + 4} color="var(--text-2)" size={11}>
+              {`${t(Z_S.capW)} · ${t(Z_S.capT)}`}
+            </T>
+            <rect x="42" y={mid + 16} width="12" height="12" fill={LAMINATE} />
+            <T x={60} y={mid + 26} anchor="start" color="var(--muted)" size={11}>
+              {t(Z_S.capH)}
+            </T>
+          </>
+        ) : (
+          <>
+            <rect x="30" y={top} width="440" height={die} fill={LAMINATE} />
+            <rect x="30" y={gnd} width="440" height={tw} fill={C.copper} />
+            <rect x={xl} y={trTop} width={xr - xl} height={tw} fill={C.copper} />
+            <g fill="none" stroke="var(--blue)" strokeWidth="1.3" strokeDasharray="4 3">
+              <path d={`M${cx} ${top} V${gnd}`} />
+              <path d={`M${xl + 6} ${top} V${gnd}`} />
+              <path d={`M${xr - 6} ${top} V${gnd}`} />
+              <path d={`M${xl} ${trTop} Q${xl - die * 0.7 - 12} ${top - 30} ${xl - die * 0.9 - 14} ${gnd}`} />
+              <path d={`M${xr} ${trTop} Q${xr + die * 0.7 + 12} ${top - 30} ${xr + die * 0.9 + 14} ${gnd}`} />
+            </g>
+            <T x={60} y={36} anchor="start" color="var(--muted)" size={11}>
+              {t(Z_S.capAir)}
+            </T>
+            <T x={44} y={gnd + 26} anchor="start" color="var(--muted)" size={11}>
+              {t(Z_S.capGnd)}
+            </T>
+            <T x={cx} y={trTop - 8} color="var(--text-2)" size={11}>
+              {`${t(Z_S.capW)} · ${t(Z_S.capT)}`}
+            </T>
+            <rect x="330" y={gnd + 17} width="12" height="12" fill={LAMINATE} />
+            <T x={348} y={gnd + 27} anchor="start" color="var(--muted)" size={11}>
+              {t(Z_S.capH)}
+            </T>
+          </>
+        )}
         {rows.map((r, i) => (
           <T key={r} x={510} y={30 + i * 18} anchor="start" color="var(--text-2)" size={12} mono>
             {r}
@@ -181,7 +239,7 @@ export function MicrostripFig({ er, h, w, z0, valid }: { er: number; h: number; 
           120 Ω
         </T>
       </svg>
-      <figcaption>{t(Z_S.cap)}</figcaption>
+      <figcaption>{t(caption)}</figcaption>
     </figure>
   )
 }

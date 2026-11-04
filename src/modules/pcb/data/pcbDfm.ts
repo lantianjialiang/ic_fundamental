@@ -84,8 +84,8 @@ export const GROUPS: CheckGroup[] = [
       },
       {
         id: 'm2',
-        text: loc('最小钻孔 ≥ 0.3 mm，孔环单边 ≥ 0.15 mm', 'Minimum drill ≥ 0.3 mm, annular ring ≥ 0.15 mm per side'),
-        why: loc('钻头会偏、层间对位有误差；孔环太窄时孔会钻破焊盘边（破环），连接变弱甚至断开。', 'Drills wander and layers misregister; with a thin ring the hole breaks out of the pad edge, weakening or breaking the connection.'),
+        text: loc('最小钻孔 ≥ 0.2 mm，孔环单边 ≥ 0.1 mm（想便宜、良率高再用 0.3 / 0.15）', 'Minimum drill ≥ 0.2 mm, annular ring ≥ 0.1 mm per side (use 0.3 / 0.15 for cheaper, higher-yield builds)'),
+        why: loc('一般打样厂机械钻八九年前就能做到 0.2 / 0.1，现在还能更细。0.3 / 0.15 是便宜高良率的常用档，不是今天的能力下限。钻头会偏、层间对位有误差；孔环太窄时孔会钻破焊盘边（破环），连接变弱甚至断开。', 'Typical proto shops could already do 0.2 / 0.1 mechanically eight or nine years ago, and can go finer now. 0.3 / 0.15 is the cheap, high-yield default, not today’s capability floor. Drills wander and layers misregister; with a thin ring the hole breaks out of the pad edge, weakening or breaking the connection.'),
       },
       {
         id: 'm3',

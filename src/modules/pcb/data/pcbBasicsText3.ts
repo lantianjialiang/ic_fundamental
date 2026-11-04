@@ -3,12 +3,14 @@ import { loc, type LText } from '../../../i18n/locale'
 export const Z_S = {
   title: loc('阻抗控制：线宽、介质厚度与介电常数', 'Controlled impedance: width, dielectric height and Er'),
   note: loc(
-    '信号边沿很快时，走线像一根传输线，每一点都有特性阻抗 Z0。拖滑块，看哪些量让 Z0 变大，哪些让它变小。',
-    'When edges are fast, a trace behaves as a transmission line with a characteristic impedance Z0 at every point. Drag the sliders to see what raises Z0 and what lowers it.',
+    '信号边沿很快时，走线像一根传输线，每一点都有特性阻抗 Z0。先选表层微带或内层带状，再拖滑块，看哪些量让 Z0 变大，哪些让它变小。',
+    'When edges are fast, a trace behaves as a transmission line with a characteristic impedance Z0 at every point. Pick outer microstrip or inner stripline, then drag the sliders to see what raises Z0 and what lowers it.',
   ),
   kicker: loc('阻抗', 'Impedance'),
+  ext: loc('表层微带线', 'Outer microstrip'),
+  int: loc('内层带状线', 'Inner stripline'),
   er: loc('介电常数 Er', 'Dielectric constant Er'),
-  h: loc('介质厚度 h（线到参考层）', 'Dielectric height h (trace to reference)'),
+  h: loc('介质厚度 h（线到一侧参考层）', 'Dielectric height h (trace to one plane)'),
   w: loc('线宽 w', 'Trace width w'),
   z0: loc('特性阻抗 Z0', 'Characteristic impedance Z0'),
   ratio: loc('w / h', 'w / h'),
@@ -20,8 +22,14 @@ export const Z_S = {
     '表层微带线剖面：铜线在上，下面隔着介质（厚度 h）是参考平面（地），上方是空气。铜厚固定为 1 oz = 0.035 mm。电场线从线的两侧和底部连到参考平面；线越宽、离平面越近，电容越大，Z0 越低。',
     'Cross-section of a surface microstrip: copper trace on top, dielectric of height h below it, then the reference plane (ground), air above. Copper is fixed at 1 oz = 0.035 mm. Field lines run from the trace sides and bottom to the plane; a wider trace or a nearer plane gives more capacitance and a lower Z0.',
   ),
+  capInner: loc(
+    '内层对称带状线剖面：走线夹在上下两个参考平面之间，两侧介质厚度都是 h，上方没有空气。同样的 w 和 h，对地电容大约是微带的两倍，所以 Z0 明显更低。铜厚固定为 1 oz = 0.035 mm。',
+    'Cross-section of a centered inner stripline: the trace sits between two reference planes, each a height h away, with no air above. For the same w and h the capacitance to the planes is about twice that of microstrip, so Z0 is clearly lower. Copper is fixed at 1 oz = 0.035 mm.',
+  ),
   capH: loc('介质 h', 'Dielectric h'),
   capGnd: loc('参考平面（地）', 'Reference plane (ground)'),
+  capTop: loc('上参考平面', 'Upper plane'),
+  capBot: loc('下参考平面', 'Lower plane'),
   capAir: loc('空气', 'Air'),
   capW: loc('线宽 w', 'Width w'),
   capT: loc('铜厚 t', 'Copper t'),
@@ -29,12 +37,12 @@ export const Z_S = {
 
 export const Z_NOTES: LText[] = [
   loc(
-    '公式（IPC-2141）：Z0 = 87 / √(Er + 1.41) × ln(5.98·h / (0.8·w + t))，单位 Ω，h、w、t 用同一单位。常引用的适用范围是 0.1 < w/h < 2.0 且 1 < Er < 15。它是近似式：误差常有百分之十几，没有考虑阻焊、线的梯形截面和板材 Er 随频率的变化。真正做 50 Ω 或 90 Ω 差分，要用板厂给的叠层和场求解器（或板厂的阻抗计算）核对，板厂还会按公差调线宽。',
-    'Formula (IPC-2141): Z0 = 87 / √(Er + 1.41) × ln(5.98·h / (0.8·w + t)), in ohms, with h, w and t in the same unit. The range usually quoted is 0.1 < w/h < 2.0 and 1 < Er < 15. It is approximate: errors of ten-odd percent are common, and it ignores solder mask, the trapezoid trace section and Er varying with frequency. For a real 50 Ω or 90 Ω differential target, check against the fab\'s stack-up with a field solver (or the fab\'s own calculator); the fab also adjusts width to its tolerance.',
+    '表层是微带线（IPC-2141）：Z0 = 87 / √(Er + 1.41) × ln(5.98·h / (0.8·w + t))。内层是对称带状线：Z0 = 60 / √Er × ln(1.9·(2h + t) / (0.8·w + t))，h 是线到一侧平面的介质厚度。单位 Ω，h、w、t 用同一单位。常引用的适用范围是 0.1 < w/h < 2.0 且 1 < Er < 15。两式都是近似：误差常有百分之十几，没有考虑阻焊、线的梯形截面和板材 Er 随频率的变化。真正做 50 Ω 或 90 Ω 差分，要用板厂给的叠层和场求解器（或板厂的阻抗计算）核对，板厂还会按公差调线宽。',
+    'Outer layers are microstrip (IPC-2141): Z0 = 87 / √(Er + 1.41) × ln(5.98·h / (0.8·w + t)). Inner layers are centered stripline: Z0 = 60 / √Er × ln(1.9·(2h + t) / (0.8·w + t)), with h the dielectric to one plane. Values are in ohms, with h, w and t in the same unit. The range usually quoted is 0.1 < w/h < 2.0 and 1 < Er < 15. Both formulas are approximate: errors of ten-odd percent are common, and they ignore solder mask, the trapezoid trace section and Er varying with frequency. For a real 50 Ω or 90 Ω differential target, check against the fab’s stack-up with a field solver (or the fab’s own calculator); the fab also adjusts width to its tolerance.',
   ),
   loc(
-    '定性规律：介质越厚（h 大），线离参考平面越远，对地电容小，Z0 变大；线越宽（w 大），对地电容大，Z0 变小；Er 越大，电容越大，Z0 变小；铜越厚，Z0 稍微变小。所以同样要 50 Ω，介质薄就要细线，介质厚就要宽线，这正是叠层（见 {@pcbStack}）和线宽要一起定的原因。',
-    'The qualitative rules: a thicker dielectric (larger h) puts the trace farther from the plane, so capacitance falls and Z0 rises; a wider trace (larger w) adds capacitance and lowers Z0; a larger Er adds capacitance and lowers Z0; thicker copper lowers Z0 slightly. So for the same 50 Ω a thin dielectric needs a narrow trace and a thick dielectric a wide one, which is why the stack-up (see {@pcbStack}) and the trace width are decided together.',
+    '定性规律两边一样：介质越厚（h 大），线离参考平面越远，对地电容小，Z0 变大；线越宽（w 大），对地电容大，Z0 变小；Er 越大，电容越大，Z0 变小；铜越厚，Z0 稍微变小。同样的 w、h、Er，带状线夹在两张平面中间，电容大约是微带的两倍，所以 Z0 更低——同样要 50 Ω，内层通常要比表层走得更宽，或者把介质做得更厚。这正是叠层（见 {@pcbStack}）和线宽要一起定的原因。',
+    'The qualitative rules are the same on both layers: a thicker dielectric (larger h) puts the trace farther from the plane, so capacitance falls and Z0 rises; a wider trace (larger w) adds capacitance and lowers Z0; a larger Er adds capacitance and lowers Z0; thicker copper lowers Z0 slightly. For the same w, h and Er a stripline sits between two planes, so capacitance is about twice that of microstrip and Z0 is lower — the same 50 Ω target usually needs a wider inner trace or a thicker dielectric. That is why the stack-up (see {@pcbStack}) and the trace width are decided together.',
   ),
 ]
 
@@ -46,11 +54,11 @@ export const Z_VARS: Array<{ id: 'h' | 'w' | 'er'; label: LText }> = [
 
 export const TAKEAWAY: LText[] = [
   loc('网络是「连在一起的引脚」，网表是网络清单，位号全板唯一；封装 = 焊盘 + 轮廓。', 'A net is pins tied together, the netlist lists the nets, and designators are unique on the board; a footprint is pads plus an outline.'),
-  loc('线宽按 I = k·ΔT^0.44·A^0.725 估算：内层 k 只有外层一半，因为散热差，所以内层要更宽；IPC-2152 更新更准，2221 偏保守。', 'Estimate width from I = k·ΔT^0.44·A^0.725: the internal k is half the external one because heat escapes poorly, so inner traces must be wider; IPC-2152 is newer and more accurate, 2221 is conservative.'),
+  loc('线宽按 I = k·ΔT^0.44·A^0.725 估算：内层 k 只有外层一半，散热差所以更宽；厂里电源线常按表层 0.5 mm、内层 1 mm 走，留余量。IPC-2152 更新更准，2221 偏保守。', 'Estimate width from I = k·ΔT^0.44·A^0.725: the internal k is half the external one because heat escapes poorly, so inner traces must be wider; shop power traces are often 0.5 mm outer and 1 mm inner, with margin. IPC-2152 is newer and more accurate, 2221 is conservative.'),
   loc('爬电距离沿表面量，电气间隙在空气里量；开槽只加长爬电，而且槽要够宽，否则灰尘填满就没用。', 'Creepage is measured along the surface and clearance through air; a slot only lengthens creepage, and it must be wide enough or dust fills it and it does nothing.'),
   loc('接地大铜皮上的通孔脚用热焊盘，让焊盘能升温；孤岛要删，否则成了天线。', 'Use thermal reliefs on through-hole pins in a big ground pour so the pad can heat up; remove islands, which act as antennas.'),
   loc('Fiducial：1 mm 铜点加 2–3 mm 阻焊开窗；极性、1 脚要标在装好后看得见的位置；关键网络留测试点。', 'Fiducial: a 1 mm copper dot in a 2–3 mm mask opening; mark polarity and pin 1 where they stay visible once placed; leave test points on key nets.'),
-  loc('微带线 Z0 随介质厚度变大、随线宽和 Er 变小；公式只是近似，在 0.1 < w/h < 2 内用。', 'Microstrip Z0 rises with dielectric height and falls with width and Er; the formula is approximate and meant for 0.1 < w/h < 2.'),
+  loc('表层微带、内层带状的 Z0 都随介质厚度变大、随线宽和 Er 变小；同样几何下内层 Z0 更低。公式只是近似，在 0.1 < w/h < 2 内用，以板厂叠层为准。', 'Both outer microstrip and inner stripline Z0 rise with dielectric height and fall with width and Er; for the same geometry the inner Z0 is lower. The formulas are approximate and meant for 0.1 < w/h < 2; the fab stack-up is authoritative.'),
   loc('钢网开口决定焊料量：体积 = 开口面积 × 钢网厚度；散热焊盘用小方块窗格，覆盖约 50–80 %。', 'The stencil aperture sets the solder amount: volume = aperture area × stencil thickness; use a windowpane for the exposed pad at about 50–80 % coverage.'),
 ]
 

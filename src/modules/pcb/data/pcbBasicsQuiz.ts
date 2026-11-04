@@ -12,8 +12,8 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'a',
     explain: loc(
-      '铜本身一样，差别在散热：k 外层 0.048、内层 0.024，按 A = (I / (k·ΔT^0.44))^(1/0.725) 算，内层所需面积约是外层的 2.6 倍（2^1.38）。IPC-2152 对靠近平面的内层给出更宽松的结果。',
-      'The copper is the same; the difference is heat removal: k is 0.048 external and 0.024 internal, and in A = (I / (k·ΔT^0.44))^(1/0.725) the inner trace needs about 2.6 times the area (2^1.38). IPC-2152 is more lenient for inner traces near a plane.',
+      '公式假定铜厚相同，差别只在散热：k 外层 0.048、内层 0.024，按 A = (I / (k·ΔT^0.44))^(1/0.725) 算，内层所需面积约是外层的 2.6 倍（2^1.38）。真板上表层还会电镀约 25 µm，同样标称 oz 时表层成品更厚，这是额外原因，不是 k 取一半的原因。IPC-2152 对靠近平面的内层更宽松。',
+      'The formula assumes the same copper thickness; the difference is heat removal: k is 0.048 external and 0.024 internal, so in A = (I / (k·ΔT^0.44))^(1/0.725) the inner trace needs about 2.6 times the area (2^1.38). On a real board the outer layer also gets about 25 µm of plating, so finished outer copper is thicker at the same oz label — a second reason, not why k is halved. IPC-2152 is more lenient for inner traces near a plane.',
     ),
   },
   {
@@ -54,8 +54,8 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'a',
     explain: loc(
-      '公式里 h 在对数项的分子上，h 变大 Z0 变大；线宽、Er 变大则相反。IPC-2141 只在 0.1 < w/h < 2 内适用，是近似。',
-      'In the formula h sits in the numerator of the logarithm, so a larger h gives a higher Z0; larger width or Er does the opposite. IPC-2141 is an approximation valid for 0.1 < w/h < 2.',
+      '表层微带和内层带状都是这样：h 在对数项的分子上，h 变大 Z0 变大；线宽、Er 变大则相反。同样几何下带状线夹在两张平面中间，Z0 比微带低。公式只在 0.1 < w/h < 2 内适用，是近似。',
+      'Both outer microstrip and inner stripline work this way: h sits in the numerator of the logarithm, so a larger h gives a higher Z0; larger width or Er does the opposite. For the same geometry a stripline sits between two planes, so its Z0 is lower than microstrip. The formulas are approximations valid for 0.1 < w/h < 2.',
     ),
   },
   {

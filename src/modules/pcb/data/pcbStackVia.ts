@@ -82,7 +82,7 @@ export const TERMS: Array<{ id: TermId; title: LText; sub: LText; text: LText; r
       '孔环是孔壁到焊盘外沿之间那圈铜。钻头会有定位误差，孔环给它留余量；孔环太薄，钻头稍偏就会钻出焊盘外面，孔壁和焊盘只剩一点点相连，热循环后容易裂开成开路。',
       'The annular ring is the copper between the hole wall and the outer edge of the pad. The drill has positioning error, and the ring is the margin for it; if the ring is too thin, a slightly wandering drill breaks out of the pad, the barrel touches the pad only a little, and it can crack open after thermal cycling.',
     ),
-    rule: loc('孔环 = (焊盘直径 − 钻孔直径) ÷ 2；常规做法单边 0.15 mm 左右，以板厂能力表为准。', 'Annular ring = (pad − drill) ÷ 2; about 0.15 mm per side is common, but follow the fab’s capability table.'),
+    rule: loc('孔环 = (焊盘直径 − 钻孔直径) ÷ 2；一般打样能力单边 0.1 mm，想留余量再用 0.15 mm，以板厂能力表为准。', 'Annular ring = (pad − drill) ÷ 2; typical proto capability is 0.1 mm per side, 0.15 mm if you want more margin, but follow the fab’s capability table.'),
   },
   {
     id: 'antipad',
