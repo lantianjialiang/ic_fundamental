@@ -28,6 +28,7 @@ import { BER_LIMIT, DEFAULT_SAMPLE, DEVICE_NAME, SPEC_EH_MV, SPEC_EW_UI, buildCs
 import { HS_META } from './meta'
 import './hs.css'
 import './hsCapstone.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -119,7 +120,20 @@ export function HsCapstonePage({ moduleId, onModuleChange }: Props) {
         <Related ids={['hsEye', 'hsJitter', 'hsInterface', 'hsAteLimit']} onOpen={onModuleChange} />
       </Section>
 
+      <PrereqSection title={S.prereqTitle} note={S.prereqNote} items={PREREQ} />
+
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(sample, shown, csvDone)} />
+
         <Steps items={STEPS} />
 
         <div className="hs-controls">
@@ -180,13 +194,7 @@ export function HsCapstonePage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">
@@ -198,7 +206,7 @@ export function HsCapstonePage({ moduleId, onModuleChange }: Props) {
         <QuizList questions={QUIZ} yes={t(ui.fund.yes)} no={t(ui.fund.no)} />
       </Section>
 
-      <PrereqSection title={S.prereqTitle} note={S.prereqNote} items={PREREQ} />
+      
     </LessonFrame>
   )
 }

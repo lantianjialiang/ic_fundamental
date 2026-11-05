@@ -77,6 +77,33 @@ export function MosRegionPage({ moduleId, onModuleChange }: Props) {
         <RefParas paras={INTRO} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.formulaTitle)} note={t(S.formulaNote)}>
+        <Cards
+          cols={4}
+          items={FORMULAS}
+          activeId={formulaId}
+          onPick={(f) => {
+            setFormulaId(f.id)
+            setNote({ kicker: S.kickerFormula, title: f.title, text: f.formula })
+          }}
+        />
+        <Callout tone="ok">
+          <p>
+            <b>{t(formula.title)}</b> · {t(formula.sub)}
+          </p>
+          <p>{t(formula.formula)}</p>
+          <p>{t(formula.why)}</p>
+        </Callout>
+        <Readout
+          items={[
+            { label: S.fValue, value: fmtId(check.value) },
+            { label: S.fModel, value: fmtId(id) },
+            { label: S.fApplies, value: t(check.applies ? S.fYes : S.fNo), state: check.applies ? 'pass' : 'fail' },
+          ]}
+        />
+        <Related ids={['mosSwitch', 'mosInverter', 'pParts', 'fDc']} onOpen={onModuleChange} />
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
         <Seg
           options={REGIONS.map((r) => ({ id: r.id, label: r.name }))}
@@ -133,32 +160,7 @@ export function MosRegionPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['mosChannel', 'dc', 'fDc']} onOpen={onModuleChange} />
       </Section>
 
-      <Section title={t(S.formulaTitle)} note={t(S.formulaNote)}>
-        <Cards
-          cols={4}
-          items={FORMULAS}
-          activeId={formulaId}
-          onPick={(f) => {
-            setFormulaId(f.id)
-            setNote({ kicker: S.kickerFormula, title: f.title, text: f.formula })
-          }}
-        />
-        <Callout tone="ok">
-          <p>
-            <b>{t(formula.title)}</b> · {t(formula.sub)}
-          </p>
-          <p>{t(formula.formula)}</p>
-          <p>{t(formula.why)}</p>
-        </Callout>
-        <Readout
-          items={[
-            { label: S.fValue, value: fmtId(check.value) },
-            { label: S.fModel, value: fmtId(id) },
-            { label: S.fApplies, value: t(check.applies ? S.fYes : S.fNo), state: check.applies ? 'pass' : 'fail' },
-          ]}
-        />
-        <Related ids={['mosSwitch', 'mosInverter', 'pParts', 'fDc']} onOpen={onModuleChange} />
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="warn">

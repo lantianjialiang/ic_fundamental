@@ -92,7 +92,7 @@ const BLURB: Record<FlowId, LText> = {
 export const S = {
   kickerNow: loc('这一条流程', 'This flow'),
   introTitle: loc('从晶圆到共封装的插入点', 'Insertions from the wafer to the co-package'),
-  coreTitle: loc('拨一拨：KGD、对准时间与并行度', 'Try it: KGD, align time and parallelism'),
+  coreTitle: loc('练一练：KGD、对准时间与并行度', 'Practice: KGD, align time and parallelism'),
   coreNote: loc(
     '从左到右是测试插入点。金边是启用的，灰色是停用的。点一个节点就选中它；下面的开关只改当前这个节点。报废成本按阶段变贵：晶圆便宜，贴上 ASIC 之后贵。',
     'Test insertions run from left to right. A gold outline is enabled, and grey is disabled. Click a node to select it. The switch below changes only that node. Scrap cost grows by stage: a wafer is cheap, and a scrap after the ASIC is attached is expensive.',

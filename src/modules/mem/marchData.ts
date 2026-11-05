@@ -73,7 +73,7 @@ export const INTRO: LText[] = [
 export const S = {
   kickerNow: loc('这一次 March 测试', 'This March test'),
   introTitle: loc('March：一组元素按地址顺序扫一遍', 'March: a sequence of elements that sweep the addresses'),
-  coreTitle: loc('拨一拨：选算法和故障，逐步执行', 'Try it: pick an algorithm and a fault, then step through'),
+  coreTitle: loc('练一练：选算法和故障，逐步执行', 'Practice: pick an algorithm and a fault, then step through'),
   coreNote: loc(
     '每一步是对一个地址做一次读或写。读出时比较期望与实际，不一致就失效。阵列 8 个单元，最多注入一个故障。',
     'Each step reads or writes one address. A read compares the actual value with the expected one; a mismatch is a failure. The array has 8 cells and at most one fault is injected.',

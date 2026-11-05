@@ -27,7 +27,7 @@ export const DEEMBED_OPTIONS = DEEMBED_MODES.map((id) => ({ id, label: DEEMBED_L
 export const S = {
   kickerNow: loc('这一次测试设置', 'This test setup'),
   introTitle: loc('ATE 也是测量路径的一部分', 'The ATE is part of the measurement path'),
-  coreTitle: loc('拨一拨：ATE 带宽、夹具损耗与去嵌入', 'Try it: ATE bandwidth, fixture loss and de-embedding'),
+  coreTitle: loc('练一练：ATE 带宽、夹具损耗与去嵌入', 'Practice: ATE bandwidth, fixture loss and de-embedding'),
   coreNote: loc(
     '左边是器件本身的眼（真实眼）；右边是同一个器件经过 ATE 通道与夹具后测得的眼。两个眼用同一个 PRBS7 码型、同一个 mask。',
     'Left is the device’s own eye (real eye); right is the eye measured after the same device goes through the ATE channel and the fixture. Both use the same PRBS7 pattern and the same mask.',
@@ -63,10 +63,10 @@ export const S = {
   takeawayTitle: loc('带走这几句', 'Key takeaways'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
-  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqTitle: loc('先看懂：公式怎么来的', 'Learn this first: where the formulas come from'),
   prereqNote: loc(
-    '正文里的夹具带宽、级联上升时间与去嵌入都从这一节列出的几条推出。读完正文再回来看。',
-    'The fixture bandwidth, cascaded rise time and de-embedding in the body are derived from the items below. Read the body first, then come back here.',
+    '正文里的夹具带宽、级联上升时间与去嵌入都从这一节列出的几条推出。先读完这一节，再做下面的练习。',
+    'The fixture bandwidth, cascaded rise time and de-embedding in the body are derived from the items below. Read this section before the exercise below.',
   ),
   asideLater: loc(
     '真实的 ATE 还要考虑时钟抖动、串扰、电源噪声和接触电阻；这里只练带宽、夹具损耗与去嵌入三件事。SerDes 的 BER 与时序扫描见下一课。',

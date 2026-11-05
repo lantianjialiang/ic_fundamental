@@ -13,6 +13,7 @@ import { INTRO, MISCONCEPTIONS, MODE_OPTIONS, QUIZ, S, TAKEAWAY, WIRE_OPTIONS, t
 import { HookupFig, RangeFig } from './MeasureFig'
 import { DEFAULT_STATE, I_FORCE_PRESETS, I_RANGES, LIMIT_PCT, R_PRESETS, V_RANGES, fmtPct, fmtSI, measure, type MeasureState } from './measureModel'
 import './ana.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -49,7 +50,18 @@ export function AnaMeasurePage({ moduleId, onModuleChange }: Props) {
         <Related ids={['pMeasure', 'pmu', 'anaResources']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, result)} />
+
         <div className="ana-controls">
           <div className="ana-field">
             <span className="ana-field__label">{t(S.modeLabel)}</span>
@@ -102,13 +114,7 @@ export function AnaMeasurePage({ moduleId, onModuleChange }: Props) {
         <RangeFig state={state} />
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

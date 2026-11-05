@@ -25,6 +25,7 @@ import {
 } from './snsAccelData'
 import { DEFAULT_ACCEL, analyseAccel, type AccelState } from './snsAccelModel'
 import './sns.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 const asId = (id: string): ModuleId => id as ModuleId
 
@@ -57,7 +58,18 @@ export function SnsAccelPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaTrim']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state)} />
+
         <Callout>{t(S.callout)}</Callout>
         <div className="hs-controls">
           <Knob label={S.sLabel} value={state.sVg} unit="V/g" min={0.1} max={1} step={0.01} onChange={(v) => update({ sVg: Math.round(v * 100) / 100 })} />
@@ -125,13 +137,7 @@ export function SnsAccelPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

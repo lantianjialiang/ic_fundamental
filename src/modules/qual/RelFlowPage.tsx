@@ -25,6 +25,7 @@ import {
   type PopParams,
 } from './relFlowModel'
 import './relFlow.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -134,7 +135,18 @@ export function RelFlowPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['genStdf', 'genMultisite', 'anaStats']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(r, schemes, soakSeen, exported)} />
+
         <div className="rf-lab">
           <FlowEditor flow={flow} onFlow={setFlow} />
           <FlowControls flow={flow} onFlow={setFlow} pop={pop} onPop={setPop} />
@@ -165,13 +177,7 @@ export function RelFlowPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

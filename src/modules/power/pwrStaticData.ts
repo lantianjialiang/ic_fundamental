@@ -115,7 +115,7 @@ export const S = {
   tableForce: loc('Force（施加）', 'Force'),
   tableMeasure: loc('Measure（测量）', 'Measure'),
   tableNote: loc('说明', 'Note'),
-  coreTitle: loc('拨一拨：选参数、设条件，看读数', 'Try it: pick a parameter, set the conditions, read the result'),
+  coreTitle: loc('练一练：选参数、设条件，看读数', 'Practice: pick a parameter, set the conditions, read the result'),
   coreNote: loc(
     '选一个参数后，下面的强制值与 compliance 会回到该参数的默认值。图只在测 Rds(on) 时出现，因为只有它受自热影响。这里的器件是虚构的教学模型（VDUT-MOS1），数值仅用于理解趋势。',
     'After you pick a parameter, the force and compliance values reset to that parameter’s defaults. The figure appears only for Rds(on), the only parameter that self-heats. The device is a fictional teaching model (VDUT-MOS1); the numbers are for understanding trends.',
@@ -179,8 +179,8 @@ export const S = {
     'Measure BVdss: force 100–500 µA (example 250 µA) and set the voltage compliance within ±1 V of BV (99–101 V).',
   ),
   task2: loc(
-    'I = 50 A 时先看 10 ms 和 100 µs 的误差差多少，再把脉宽收到约 1.7 ms（误差刚低于 1% 的最长窗口）。',
-    'At I = 50 A, first compare the error at 10 ms and at 100 µs, then bring the pulse to about 1.7 ms (the longest window where the error just stays below 1%).',
+    'I = 50 A 时先看 10 ms 和 100 µs 的误差差多少，再把脉宽收到误差刚低于 1% 的最长窗口。',
+    'At I = 50 A, first compare the error at 10 ms and at 100 µs, then bring the pulse to the longest window where the error just stays below 1%.',
   ),
   task3: loc(
     '在不同 Id 下读 Vth：把 Id 从默认的 250 µA 改到至少 2.5 mA，说明 Vth 没有唯一值。',

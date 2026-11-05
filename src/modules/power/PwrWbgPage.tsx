@@ -27,6 +27,7 @@ import {
 } from './pwrWbgData'
 import { analyseWbg, DEFAULT_WBG, GAN_R0_MOHM, type WbgState } from './pwrWbgModel'
 import './pwrWbg.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -62,7 +63,18 @@ export function PwrWbgPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['pwrSelector', 'pwrStatic', 'pwrDpt']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <Seg options={TAB_SEG} value={state.tab} onChange={(tab) => update({ tab })} />
 
         {state.tab === 'material' ? (
@@ -153,13 +165,7 @@ export function PwrWbgPage({ moduleId, onModuleChange }: Props) {
         ) : null}
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

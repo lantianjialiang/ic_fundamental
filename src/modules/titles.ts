@@ -12,6 +12,8 @@ import { REL_META } from './qual/meta'
 import { PWR_META } from './power/meta'
 import { SNS_META } from './sns/meta'
 import { PIC_META } from './pic/meta'
+import { MFG_META } from './mfg/meta'
+import { APK_META } from './apk/meta'
 
 export const LESSON_TITLE: Record<ModuleId, LText> = {
   mosPrimer: MOS_META.mosPrimer.title,
@@ -145,6 +147,26 @@ export const LESSON_TITLE: Record<ModuleId, LText> = {
   picCutback: PIC_META.picCutback.title,
   picLink: PIC_META.picLink.title,
   picFlow: PIC_META.picFlow.title,
+  mfgOverview: MFG_META.mfgOverview.title,
+  mfgFab: MFG_META.mfgFab.title,
+  mfgNre: MFG_META.mfgNre.title,
+  mfgWat: MFG_META.mfgWat.title,
+  mfgCp: MFG_META.mfgCp.title,
+  mfgHw: MFG_META.mfgHw.title,
+  mfgSubstrate: MFG_META.mfgSubstrate.title,
+  mfgSubFab: MFG_META.mfgSubFab.title,
+  mfgFlying: MFG_META.mfgFlying.title,
+  mfgAssembly: MFG_META.mfgAssembly.title,
+  mfgRamp: MFG_META.mfgRamp.title,
+  apkOverview: APK_META.apkOverview.title,
+  apkBond: APK_META.apkBond.title,
+  apkTsv: APK_META.apkTsv.title,
+  apkHbm: APK_META.apkHbm.title,
+  apkInterposer: APK_META.apkInterposer.title,
+  apkStack: APK_META.apkStack.title,
+  apkD2d: APK_META.apkD2d.title,
+  apkThermal: APK_META.apkThermal.title,
+  apkFlow: APK_META.apkFlow.title,
   fBasics: ui.fBasics.title,
   fAte: ui.fAte.title,
   fIntro: ui.fIntro.title,

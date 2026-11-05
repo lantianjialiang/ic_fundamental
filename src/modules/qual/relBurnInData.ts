@@ -38,7 +38,7 @@ export const SCREEN_OPTIONS = [
 export const S = {
   kickerNow: loc('这一次 Burn-in', 'This burn-in'),
   introTitle: loc('Burn-in：用加速条件提前暴露早期失效', 'Burn-in: expose early failures sooner with acceleration'),
-  coreTitle: loc('拨一拨：BI 时间、温度与成本', 'Try it: burn-in time, temperature and cost'),
+  coreTitle: loc('练一练：BI 时间、温度与成本', 'Practice: burn-in time, temperature and cost'),
   coreNote: loc(
     '群体 10⁵ 件，其中一部分带潜在缺陷（缺陷子群）。BI 按加速因子把 h 小时折合成 h·AF 个现场小时，这段时间里失效的缺陷被剔除，留下的残余才会流到现场。BI 温度与电压的数值是教学示例，以现行标准为准。',
     'The population is 10⁵ parts; some carry latent defects (a defect subgroup). Burn-in turns h hours into h·AF use hours: defects that fail in that span are removed, and the residue reaches the field. The BI temperature and voltage values are teaching examples; follow the current standard.',

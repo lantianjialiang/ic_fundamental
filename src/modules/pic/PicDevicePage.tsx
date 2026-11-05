@@ -24,6 +24,7 @@ import {
 } from './picDeviceData'
 import { DEFAULT_DEVICE, analyseDevice, fmtT, type DeviceState } from './picDeviceModel'
 import './pic.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -56,7 +57,18 @@ export function PicDevicePage({ moduleId, onModuleChange }: Props) {
         <Related ids={['picUnits', 'picSweep', 'picMod']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(analysis)} />
+
         <Callout tone="warn">
           <p>{t(S.teach)}</p>
         </Callout>
@@ -136,13 +148,7 @@ export function PicDevicePage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

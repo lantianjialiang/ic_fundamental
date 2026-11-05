@@ -10,6 +10,8 @@ import { PWR_FAQ_GROUP } from './faqPower'
 import { QUAL_FAQ_GROUP } from './faqQual'
 import { SNS_FAQ_GROUP } from './faqSns'
 import { PIC_FAQ_GROUP } from './faqPic'
+import { MFG_FAQ_GROUP } from './faqMfg'
+import { APK_FAQ_GROUP } from './faqApk'
 
 /**
  * 常见问题。
@@ -486,8 +488,8 @@ const BASE_FAQ_GROUPS: FaqGroup[] = [
         id: 'lesson-codes',
         q: loc('课程编号 D04、F06 是什么意思？', 'What do lesson codes like D04 and F06 mean?'),
         a: loc(
-          '字母是轨道，数字是这一课在轨道里的顺序：D 是“基础”轨道（D01–D16），F 是“数字测试基础”轨道（F01–F16），X 是“交互实验”（虚拟 ATE 工作站是 {@vate}）。文中出现的编号都可以点，直接跳到那一课。',
-          'The letter is the track and the number is the lesson’s place in it: D is the Basics track (D01–D16), F is Digital Test Fundamentals (F01–F16), and X is the Interactive lab (the virtual ATE workstation is {@vate}). Every code in the text is clickable and jumps to that lesson.',
+          '字母是轨道，数字是这一课在轨道里的顺序：D 是“基础”，F 是“数字测试基础”，W 是“制造与封装流程”，K 是“先进封装”，X 是“交互实验”（虚拟 ATE 工作站是 {@vate}）。文中出现的编号都可以点，直接跳到那一课。',
+          'The letter is the track and the number is the lesson’s place in it: D is Basics, F is Digital Test Fundamentals, W is Manufacturing and package flow, K is Advanced packaging, and X is the Interactive lab (the virtual ATE workstation is {@vate}). Every code in the text is clickable and jumps to that lesson.',
         ),
         lessons: ['intro', 'fBasics'],
       },
@@ -504,6 +506,6 @@ const BASE_FAQ_GROUPS: FaqGroup[] = [
   },
 ]
 
-export const FAQ_GROUPS: FaqGroup[] = [...BASE_FAQ_GROUPS, MOS_FAQ_GROUP, PCB_FAQ_GROUP, ANA_FAQ_GROUP, HS_FAQ_GROUP, RF_FAQ_GROUP, MEM_FAQ_GROUP, QUAL_FAQ_GROUP, PWR_FAQ_GROUP, SNS_FAQ_GROUP, PIC_FAQ_GROUP]
+export const FAQ_GROUPS: FaqGroup[] = [...BASE_FAQ_GROUPS, MOS_FAQ_GROUP, PCB_FAQ_GROUP, ANA_FAQ_GROUP, HS_FAQ_GROUP, RF_FAQ_GROUP, MEM_FAQ_GROUP, QUAL_FAQ_GROUP, PWR_FAQ_GROUP, SNS_FAQ_GROUP, PIC_FAQ_GROUP, MFG_FAQ_GROUP, APK_FAQ_GROUP]
 
 export const FAQ_ITEMS: FaqItem[] = FAQ_GROUPS.flatMap((group) => group.items)

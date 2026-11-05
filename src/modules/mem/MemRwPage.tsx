@@ -25,6 +25,7 @@ import {
   verdictOf,
 } from './rwData'
 import { DEFAULT_RW, SIZE, buildSlots, sequenceOf, type RwState } from './rwModel'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -68,7 +69,18 @@ export function MemRwPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['memStructure', 'timing', 'memFault']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, total)} />
+
         <div className="mrw-controls">
           <Knob label={S.addrLabel} value={state.addr} unit="" min={0} max={SIZE - 1} step={1} onChange={(addr) => setParam({ addr })} />
           <div className="mrw-field">
@@ -118,13 +130,7 @@ export function MemRwPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

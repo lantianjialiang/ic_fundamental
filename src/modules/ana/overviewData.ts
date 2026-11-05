@@ -29,7 +29,7 @@ export function joinText(parts: LText[], sep: LText): LText {
 export const S = {
   kickerNow: loc('这一份规格书', 'This datasheet'),
   introTitle: loc('模拟测试量的是连续的量', 'Analog test measures continuous quantities'),
-  coreTitle: loc('拨一拨：勾选需要在 ATE 上测的项', 'Try it: check the items to test on ATE'),
+  coreTitle: loc('练一练：勾选需要在 ATE 上测的项', 'Practice: check the items to test on ATE'),
   coreNote: loc(
     '下表是一份虚构的规格书 VDUT-MIX1（运放加基准的混合信号芯片，数值均为示意）。勾选你认为需要在 ATE 上逐颗测的项；系统会比对“关键项是否遗漏”和“是否勾了不必测的项”。',
     'The table is a fictional datasheet for VDUT-MIX1, an op-amp plus reference mixed-signal chip (all values are illustrative). Check the items you think need per-part testing on ATE; the system compares missing key items with items that need no per-part test.',

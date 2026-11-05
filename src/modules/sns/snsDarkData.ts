@@ -32,7 +32,7 @@ export const FOCUS_OPTIONS = FOCUS_IDS.map((id) => ({
 export const S = {
   kickerNow: loc('这一次暗场', 'This dark frame'),
   introTitle: loc('暗电流、DSNU 与热像素', 'Dark current, DSNU and hot pixels'),
-  coreTitle: loc('拨一拨：暗帧、平均与阈值', 'Try it: dark frames, averaging and the threshold'),
+  coreTitle: loc('练一练：暗帧、平均与阈值', 'Practice: dark frames, averaging and the threshold'),
   coreNote: loc(
     '翻倍温度间隔是教学示意，用来演示暗电流每隔若干度加倍，不是某一款真实传感器的固定值。画面是 VDUT-CIS1 的 64×64 暗帧，照度为 0。金色是超过阈值的像素，蓝色是其余。',
     'The doubling interval is a teaching illustration of dark current doubling every few degrees. It is not a fixed value of any real sensor. The picture is a 64x64 dark frame of VDUT-CIS1 with illumination set to 0. Gold marks pixels over the threshold. Blue marks the rest.',
@@ -86,7 +86,7 @@ export const S = {
   task2: loc('把曝光调到 1 s，对照旁边 0.1 s 的暗电子数。', 'Set the exposure to 1 s and compare it with the 0.1 s dark-electron line.'),
   task3: loc('把平均帧数调到 16 或更多，看去掉热像素后的标准差按 1/sqrt(N) 下降。', 'Set the average to 16 frames or more and watch the hot-pixel-free std fall as 1/sqrt(N).'),
   task4: loc(
-    '把热像素阈值调到大约 500 DN，使掩膜里的热像素大多被抓住，而且正常像素的误判低于 1%。',
+    '把热像素阈值调到 500 DN 附近，使掩膜里的热像素大多被抓住，而且正常像素的误判低于 1%。',
     'Set the hot-pixel threshold near 500 DN so most mask hot pixels are caught and false calls on normal pixels stay under 1%.',
   ),
   vDsnu: loc('单帧标准差不是 DSNU', 'A single-frame standard deviation is not DSNU'),

@@ -13,6 +13,7 @@ import { SNS_META } from './meta'
 import { INTRO, MISCONCEPTIONS, QUIZ, S, SOURCE_OPTIONS, TAKEAWAY, taskItems, verdictOf } from './snsOpticalData'
 import { DEFAULT_OPTICAL, analyseOptical, type OpticalState } from './snsOpticalModel'
 import './sns.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 const asId = (id: string): ModuleId => id as ModuleId
 
@@ -44,7 +45,18 @@ export function SnsOpticalPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['genMultisite']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state)} />
+
         <Callout>{t(S.callout)}</Callout>
         <div className="hs-controls">
           <div className="hs-field">
@@ -80,13 +92,7 @@ export function SnsOpticalPage({ moduleId, onModuleChange }: Props) {
         />
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

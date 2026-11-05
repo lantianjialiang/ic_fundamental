@@ -40,7 +40,7 @@ export const PATH_OPTIONS = PATHS.map((id) => ({ id, label: PATH_LABEL[id] }))
 export const S = {
   kickerNow: loc('这一次测试', 'This test run'),
   introTitle: loc('高速接口测试：用误码率说话', 'High-speed interface test: judge by bit error rate'),
-  coreTitle: loc('拨一拨：码型、路径与采样相位', 'Try it: pattern, path and sampling phase'),
+  coreTitle: loc('练一练：码型、路径与采样相位', 'Practice: pattern, path and sampling phase'),
   coreNote: loc(
     '每个点都是对 40000 位的实测：用 PRBS 码型逐位取样，错误位数除以总位数就是 BER。横轴是采样相位，纵轴是 log10(BER)；虚线是双狄拉克模型对更低 BER 的外推。',
     'Each point is a measurement over 40000 bits: the PRBS pattern is sampled bit by bit, and errors divided by bits gives the BER. The x-axis is the sampling phase and the y-axis is log10(BER); the dashed line extrapolates to lower BER with a dual-Dirac model.',
@@ -74,10 +74,10 @@ export const S = {
   takeawayTitle: loc('带走这几句', 'Key takeaways'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
-  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqTitle: loc('先看懂：公式怎么来的', 'Learn this first: where the formulas come from'),
   prereqNote: loc(
-    '正文里的 PRBS 码型、0 错误上限 3 ÷ N 与浴盆外推都从这一节列出的几条推出。读完正文再回来看。',
-    'The PRBS pattern, the 3 ÷ N bound for zero errors and bathtub extrapolation in the body are derived from the items below. Read the body first, then come back here.',
+    '正文里的 PRBS 码型、0 错误上限 3 ÷ N 与浴盆外推都从这一节列出的几条推出。先读完这一节，再做下面的练习。',
+    'The PRBS pattern, the 3 ÷ N bound for zero errors and bathtub extrapolation in the body are derived from the items below. Read this section before the exercise below.',
   ),
   asideLater: loc(
     '真实测试还要去嵌入夹具与板级走线的损耗、统计远多于 4 万位的数据，并用更完整的模型外推；码型也要覆盖长连与最坏情况。这里只练浴盆曲线、码型阶数和 Loopback 三件事。',

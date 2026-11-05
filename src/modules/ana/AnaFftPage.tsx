@@ -24,6 +24,7 @@ import {
 import { BIN_KHZ, DEFAULT_FFT, F_MAX_KHZ, F_MIN_KHZ, TRUE_FUND_V, TRUE_HD2_PCT, TRUE_HD3_PCT, analyze, fmtPct, type FftState } from './fftModel'
 import { ANA_META } from './meta'
 import './ana.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -56,7 +57,18 @@ export function AnaFftPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaSampling', 'anaSignal', 'anaDynamic']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, result)} />
+
         <div className="ana-controls">
           <div className="ana-field">
             <span className="ana-field__label">{t(S.modeLabel)}</span>
@@ -109,13 +121,7 @@ export function AnaFftPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

@@ -13,6 +13,7 @@ import { BIT_OPTIONS, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, WINDOW_OPTIONS, 
 import { SpectrumFig } from './DynamicFig'
 import { DEFAULT_DYNAMIC, HD_MAX_DB, HD_MIN_DB, NOISE_MAX_LSB, SINAD_SPEC, analyze, type DynamicState } from './dynamicModel'
 import './ana.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -44,7 +45,18 @@ export function AnaDynamicPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaSampling', 'anaFft', 'anaStatic']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, result)} />
+
         <div className="ana-controls">
           <div className="ana-field">
             <span className="ana-field__label">{t(S.bitsLabel)}</span>
@@ -78,13 +90,7 @@ export function AnaDynamicPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

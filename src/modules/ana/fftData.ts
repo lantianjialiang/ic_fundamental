@@ -41,7 +41,7 @@ export const S = {
   kickerNow: loc('这一次记录', 'This record'),
   nextPrefix: loc('下一课：', 'Next: '),
   introTitle: loc('时域的波形，频域的谱线', 'A waveform in time, lines in frequency'),
-  coreTitle: loc('拨一拨：采样方式、窗函数与 f_in', 'Try it: sampling mode, window and f_in'),
+  coreTitle: loc('练一练：采样方式、窗函数与 f_in', 'Practice: sampling mode, window and f_in'),
   coreNote: loc(
     '上图是 N 点时域记录，下图是它的幅度谱。基波的真值是 1 V，HD2 为 1.0%，HD3 为 0.3%；看看谱线读数离真值有多远。',
     'The top plot is the N-point time record and the bottom plot is its amplitude spectrum. The true fundamental is 1 V, HD2 is 1.0% and HD3 is 0.3%; check how far the line readings sit from these.',

@@ -40,7 +40,7 @@ function closeCount(got: number, want: number): boolean {
 export const S = {
   kickerNow: loc('这一次亮场', 'This bright frame'),
   introTitle: loc('PRNU、shading、线性度与缺陷', 'PRNU, shading, linearity and defects'),
-  coreTitle: loc('拨一拨：平场、阈值与非线性', 'Try it: flat field, thresholds and nonlinearity'),
+  coreTitle: loc('练一练：平场、阈值与非线性', 'Practice: flat field, thresholds and nonlinearity'),
   coreNote: loc(
     'PRNU 用没有缺陷像素的平场来算，这是量产里先挖掉坏点再算不均匀的做法。热图和缺陷图仍来自带缺陷的 VDUT-CIS1。画面 64×64。公式：PRNU_meas^2 = PRNU^2 + (σt/μ)^2 / N。shading 是左右渐变，不是像素级 PRNU。',
     'PRNU is computed on a flat field with defective pixels left out, the same order production uses: remove bad pixels, then measure non-uniformity. The heat map and the defect map still come from VDUT-CIS1 with its defects. The frame is 64x64. Formula: PRNU_meas^2 = PRNU^2 + (st/mu)^2 / N. Shading is a left-to-right ramp. It is not pixel PRNU.',

@@ -35,7 +35,7 @@ export const S = {
   nextPrefix: loc('下一课：', 'Next: '),
   devName: loc('器件 VDUT-LKG1（虚构型号，数值为示意）', 'Device VDUT-LKG1 (fictional model, numbers are illustrative)'),
   introTitle: loc('加了电压，电流不是立刻就稳', 'After forcing voltage, the current does not settle at once'),
-  coreTitle: loc('拨一拨：测哪一项、加多少电压、等多久、留多少保护带', 'Try it: which item, how much voltage, how long to wait, how much guardband'),
+  coreTitle: loc('练一练：测哪一项、加多少电压、等多久、留多少保护带', 'Practice: which item, how much voltage, how long to wait, how much guardband'),
   coreNote: loc(
     '上图是 PMU 经 R_S 加压到引脚、引脚旁有去耦电容的电路。下图是三颗器件的读数随时间的变化，虚线是限值，点是当前设置下的读数。',
     'The top figure shows the PMU forcing voltage through R_S to the pin, with a decoupling capacitor at the pin. The bottom figure shows the reading of each device over time; the dashed line is the limit and the dot is the reading at the current settings.',
@@ -80,8 +80,8 @@ export const S = {
     'Under the spec condition (5.0 V, enough wait), judge the fault part as FAIL.',
   ),
   task2: loc(
-    '保护带不小于仪器不确定度（1 µA），并且边缘件在规格条件下判 PASS。',
-    'Set a guardband no smaller than the instrument uncertainty (1 µA), and judge the edge part as PASS under the spec condition.',
+    '保护带不小于仪器不确定度，并且边缘件在规格条件下判 PASS。',
+    'Set a guardband no smaller than the instrument uncertainty, and judge the edge part as PASS under the spec condition.',
   ),
   task3: loc(
     '在规格条件下，把良品判成 PASS。',

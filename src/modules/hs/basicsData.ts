@@ -12,15 +12,15 @@ const f2 = (value: number) => value.toFixed(2)
 export const S = {
   kickerNow: loc('这一次的波形', 'This waveform'),
   introTitle: loc('数据速率、UI 与上升时间', 'Data rate, UI and rise time'),
-  coreTitle: loc('拨一拨：速率与上升时间', 'Try it: data rate and rise time'),
+  coreTitle: loc('练一练：速率与上升时间', 'Practice: data rate and rise time'),
   coreNote: loc(
-    '一位占的时间是 UI = 1000 / 速率（ps，推导见本页最后的补充一节）。上升时间 tr 由通道带宽决定（BW ≈ 350 / tr，tr 用 ps、BW 用 GHz）。下图是一段 0/1 码型经过一阶 RC 通道后的波形，虚线是理想方波。',
-    'One bit lasts UI = 1000 / rate in ps (derived in the supplement at the end of this page). Rise time tr is set by the channel bandwidth (BW ≈ 350 / tr, with tr in ps and BW in GHz). The chart shows a 0/1 pattern after a first-order RC channel; the dashed line is the ideal square wave.',
+    '一位占的时间是 UI = 1000 / 速率（ps，推导在上面「先看懂」）。上升时间 tr 由通道带宽决定（BW ≈ 350 / tr，tr 用 ps、BW 用 GHz）。下图是一段 0/1 码型经过一阶 RC 通道后的波形，虚线是理想方波。',
+    'One bit lasts UI = 1000 / rate in ps (derived in Learn this first, above). Rise time tr is set by the channel bandwidth (BW ≈ 350 / tr, with tr in ps and BW in GHz). The chart shows a 0/1 pattern after a first-order RC channel; the dashed line is the ideal square wave.',
   ),
-  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqTitle: loc('先看懂：公式怎么来的', 'Learn this first: where the formulas come from'),
   prereqNote: loc(
-    '正文里的 1000、0.35、9、0.7 都从这一节列出的几条推出。读完正文再回来看。',
-    'The 1000, 0.35, 9 and 0.7 in the body are derived from the items below. Read the body first, then come back here.',
+    '正文里的 1000、0.35、9、0.7 都从这一节列出的几条推出。先读完这一节，再做下面的练习。',
+    'The 1000, 0.35, 9 and 0.7 in the body are derived from the items below. Read this section before the exercise below.',
   ),
   rateLabel: loc('数据速率', 'Data rate'),
   trLabel: loc('上升时间 tr（10%–90%）', 'Rise time tr (10%–90%)'),
@@ -50,8 +50,8 @@ export const S = {
     'Switch to 16 Gb/s and bring tr to 30 ps or less so the waveform reaches steady state (PASS).',
   ),
   task3: loc(
-    '设为 10 Gb/s、tr = 50 ps：BW 读数应为 7 GHz，正好卡在判据边界上。',
-    'Set 10 Gb/s and tr = 50 ps: the BW readout should read 7 GHz, right on the criterion boundary.',
+    '设为 10 Gb/s、tr = 50 ps，再读带宽 BW，看它落在判据的哪一侧。',
+    'Set 10 Gb/s and tr = 50 ps, then read BW and see which side of the criterion it lands on.',
   ),
 }
 

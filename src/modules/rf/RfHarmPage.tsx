@@ -14,6 +14,7 @@ import { HarmFig } from './RfHarmFig'
 import { INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, taskItems, verdictOf } from './rfHarmData'
 import { analyseHarm, DEFAULT_HARM, type HarmState } from './rfHarmModel'
 import './rfHarm.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -44,7 +45,18 @@ export function RfHarmPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['rfP1db', 'rfIp3', 'anaFft']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <div className="hs-controls">
           <Knob label={S.h2Label} value={state.h2} unit="dBc" min={-60} max={-10} step={1} onChange={(h2) => update({ h2 })} />
           <Knob label={S.h3Label} value={state.h3} unit="dBc" min={-70} max={-10} step={1} onChange={(h3) => update({ h3 })} />
@@ -67,13 +79,7 @@ export function RfHarmPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

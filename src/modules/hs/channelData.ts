@@ -17,7 +17,7 @@ const f2 = (value: number) => value.toFixed(2)
 export const S = {
   kickerNow: loc('这一次的接收波形', 'This received waveform'),
   introTitle: loc('信号怎么在通道里变形', 'How a signal gets distorted in the channel'),
-  coreTitle: loc('拨一拨：损耗、终端失配与预加重', 'Try it: loss, termination mismatch and pre-emphasis'),
+  coreTitle: loc('练一练：损耗、终端失配与预加重', 'Practice: loss, termination mismatch and pre-emphasis'),
   coreNote: loc(
     '通道是一段 50 Ω 传输线加一阶低通（损耗）。终端 ZL 偏离 50 Ω 时，部分能量被反射回去，在波形上留下电平台阶和回声。下图是接收端波形；虚线是理想方波（同样时延，无损无反射）。',
     'The channel is a 50 Ω line plus a first-order low-pass (loss). When the termination ZL differs from 50 Ω, part of the energy reflects back, leaving level steps and echoes on the waveform. The chart shows the receiver waveform; the dashed line is the ideal square wave (same delay, no loss or reflection).',
@@ -39,10 +39,10 @@ export const S = {
   misTitle: loc('常见误区', 'Common misconceptions'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
-  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqTitle: loc('先看懂：公式怎么来的', 'Learn this first: where the formulas come from'),
   prereqNote: loc(
-    '正文里的 Γ、回波损耗、损耗 dB、f_N 与预加重比例都从这一节列出的几条推出。读完正文再回来看。',
-    'The Γ, return loss, loss in dB, f_N and pre-emphasis ratio in the body are derived from the items below. Read the body first, then come back here.',
+    '正文里的 Γ、回波损耗、损耗 dB、f_N 与预加重比例都从这一节列出的几条推出。先读完这一节，再做下面的练习。',
+    'The Γ, return loss, loss in dB, f_N and pre-emphasis ratio in the body are derived from the items below. Read this section before the exercise below.',
   ),
   asideLater: loc(
     '这里没有画串扰，只讲概念；真实的 CTLE、FFE、DFE 也只讲作用，不做参数设计。眼图的 mask 判定见 HS-05。',

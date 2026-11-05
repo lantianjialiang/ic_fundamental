@@ -18,7 +18,7 @@ export const SCHEME_OPTIONS: Array<{ id: Scheme; label: LText }> = SCHEMES.map((
 export const S = {
   kickerNow: loc('这一次星座', 'This constellation'),
   introTitle: loc('I/Q 两路：两个正交的载波', 'I/Q: two orthogonal carriers'),
-  coreTitle: loc('拨一拨：调制方式与 I/Q 失衡', 'Try it: modulation and I/Q imbalance'),
+  coreTitle: loc('练一练：调制方式与 I/Q 失衡', 'Practice: modulation and I/Q imbalance'),
   coreNote: loc(
     '空心 × 是理想点，虚线是判决边界；实心点是接收端看到的符号（每个符号都加了一点噪声）。ε 是 Q 路相对 I 路的增益误差，φ 是 Q 路相对 I 路的相位误差，两者都为 0 时没有失衡。',
     'Hollow × marks are the ideal points and dashed lines are decision boundaries; solid dots are the symbols the receiver sees (each has a little noise). ε is the Q-path gain error relative to I, and φ is the Q-path phase error relative to I; both zero means no imbalance.',

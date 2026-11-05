@@ -37,6 +37,7 @@ import {
   type StatsState,
 } from './statsModel'
 import './ana.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -75,7 +76,18 @@ export function AnaStatsPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaStatic', 'anaMeasure', 'anaCapstone']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, result)} />
+
         <div className="ana-controls">
           <Knob label={S.muLabel} value={state.mu} unit="mV" min={-20} max={20} step={1} onChange={(mu) => update({ mu })} />
           <Knob label={S.sigmaLabel} value={state.sigma} unit="mV" min={5} max={30} step={0.5} onChange={(sigma) => update({ sigma })} />
@@ -115,13 +127,7 @@ export function AnaStatsPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

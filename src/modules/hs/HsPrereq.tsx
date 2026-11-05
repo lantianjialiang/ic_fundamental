@@ -5,7 +5,7 @@ import { Callout } from '../fund/parts'
 
 type Props = { title: LText; note: LText; items: LText[] }
 
-/** 课程最后的“预设知识”一节：正文里的数字与公式都从这里推出 */
+/** 练习前的推导：正文里的数字与公式都从这里推出 */
 export function PrereqSection({ title, note, items }: Props) {
   const { t } = useLocale()
   return (

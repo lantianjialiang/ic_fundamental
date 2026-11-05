@@ -13,6 +13,7 @@ import { StructureFig } from './StructureFig'
 import './memStructure.css'
 import { INTRO, MAP_OPTIONS, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, taskItems, verdictOf } from './structureData'
 import { DEFAULT_STRUCTURE, SIZE, analyseStructure, type StructureState } from './structureModel'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -49,7 +50,18 @@ export function MemStructurePage({ moduleId, onModuleChange }: Props) {
         <Related ids={['vector', 'memRw', 'memFault']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <div className="mst-controls">
           <Knob label={S.addrLabel} value={state.addr} unit="" min={0} max={SIZE - 1} step={1} onChange={(addr) => update({ addr })} />
           <div className="mst-field">
@@ -75,13 +87,7 @@ export function MemStructurePage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

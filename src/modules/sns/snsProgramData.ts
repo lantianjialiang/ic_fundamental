@@ -49,7 +49,7 @@ export const STEP_BIN_LABEL: Record<StepId, string> = {
 export const S = {
   kickerNow: loc('这一版程序', 'This program'),
   introTitle: loc('VDUT-CIS1 的量产程序', 'A production program for VDUT-CIS1'),
-  coreTitle: loc('拨一拨：帧数、分级与导出', 'Try it: frames, grades and the export'),
+  coreTitle: loc('练一练：帧数、分级与导出', 'Practice: frames, grades and the export'),
   coreNote: loc(
     '1000 颗来自固定种子，改参数会变分布，同一组参数每次一样。不逐颗画帧。时间 = 帧数 × {ft} s + 光源稳定 {settle} s + 传输 {xfer} s。颜色步固定 {color} 帧。五项必测是上电、接口、暗场、亮场、OTP。等级 A 的示意上限是缺陷数 {aSpec}。',
     '1000 dice come from a fixed seed. Changing a knob changes the mix, and the same knobs always repeat. No frame is drawn per die. Time = frames x {ft} s + light settle {settle} s + transfer {xfer} s. The color step uses a fixed {color} frames. The five required steps are power, interface, dark, bright and OTP. The teaching limit for grade A is {aSpec} defects.',

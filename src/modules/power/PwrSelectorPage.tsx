@@ -41,6 +41,7 @@ import {
   defaultSelector,
 } from './pwrSelectorModel'
 import './pwrSelector.css'
+import { LEARN_TITLE, PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -113,7 +114,22 @@ export function PwrSelectorPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaMeasure', 'mosSelect', 'mosDynamic']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(LEARN_TITLE)}>
+                    <p className="pwr-formula">{t(S.formulaNote)}</p>
+      </Section>
+
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, assign)} />
+
         <Cards items={APP_CARDS} activeId={state.appId} onPick={(item) => update({ appId: item.id })} cols={4} />
         <div className="hs-controls">
           <div className="hs-field">
@@ -130,7 +146,6 @@ export function PwrSelectorPage({ moduleId, onModuleChange }: Props) {
           <div className="pwr-figs">
             <RdsFig pick={pick} />
             <LossFig app={app} pick={pick} />
-            <p className="pwr-formula">{t(S.formulaNote)}</p>
           </div>
           <div className="hs-cell">
             <Readout
@@ -186,13 +201,7 @@ export function PwrSelectorPage({ moduleId, onModuleChange }: Props) {
         {assigned.length > 0 ? <p className="pwr-formula">{t(classStatus)}</p> : null}
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

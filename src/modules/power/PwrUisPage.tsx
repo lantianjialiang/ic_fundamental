@@ -16,6 +16,7 @@ import { SoaPlot, UisCircuitFig } from './PwrUisFig'
 import { PULSE_SEG, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, taskItems, uisVerdictOf, soaVerdictOf, type PulseKey } from './pwrUisData'
 import { SOA_BV, SOA_IDMAX, UIS_DEFAULT, simulateUis, soaBounds, soaCurves, thermalReadout, type UisState } from './pwrUisModel'
 import './pwrUis.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -111,7 +112,18 @@ export function PwrUisPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['pwrDpt', 'pwrStatic', 'pwrKelvin']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.uisTitle)} note={t(S.uisNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(uis, uisRes, pulseSec, pw, tMs)} />
+
         <div className="hs-controls">
           <Knob label={S.kL} value={uis.lMh} unit="mH" min={0.1} max={10} step={0.1} onChange={(lMh) => updateUis({ lMh })} />
           <Knob label={S.kIpk} value={uis.ipk} unit="A" min={1} max={100} step={1} onChange={(ipk) => updateUis({ ipk })} />
@@ -228,13 +240,7 @@ export function PwrUisPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

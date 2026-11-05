@@ -14,6 +14,7 @@ import { DefectMapView, FrameView } from './plots'
 import { FOCUS_OPTIONS, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, fill, taskItems, verdictOf } from './snsFlatData'
 import { DEFAULT_FLAT, FLAT_W, analyseFlat, type FlatState } from './snsFlatModel'
 import './sns.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 const BG = '#0d1117'
 const BOX = '#161b22'
@@ -109,7 +110,18 @@ export function SnsFlatPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaStats']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <Callout>{t(S.callout)}</Callout>
         <div className="hs-controls">
           <Knob label={S.prnuLabel} value={state.prnuPct} unit="%" min={0.2} max={3} step={0.1} onChange={(v) => update({ prnuPct: Math.round(v * 10) / 10 })} />
@@ -190,13 +202,7 @@ export function SnsFlatPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

@@ -25,7 +25,7 @@ export const SEG_OPTIONS = SEG_IDS.map((id) => ({ id, label: SEG_LABEL[id] }))
 export const S = {
   kickerNow: loc('这一次曲线', 'This curve'),
   introTitle: loc('失效率、可靠度与浴盆曲线', 'Failure rate, reliability and the bathtub curve'),
-  coreTitle: loc('拨一拨：三段失效与可靠度', 'Try it: the three failure segments and reliability'),
+  coreTitle: loc('练一练：三段失效与可靠度', 'Practice: the three failure segments and reliability'),
   coreNote: loc(
     '群体是 5000 颗器件的蒙特卡洛样本，随机种子固定，所以同样的设置每次结果一样。左图是失效率 h(t)（FIT，对数纵轴），中图是可靠度 R(t)，右图是失效数直方图（蓝柱为蒙特卡洛计数，金线为解析期望）。阴影是“ELFR 覆盖的段”，由下方的选择决定。',
     'The population is a Monte Carlo sample of 5000 devices with a fixed random seed, so the same settings always give the same result. The left plot is the failure rate h(t) (FIT, log scale), the middle plot is the reliability R(t), and the right plot is the failure histogram (blue bars: Monte Carlo counts; gold line: analytic expectation). The shaded band is the segment covered by ELFR, chosen below.',
@@ -58,10 +58,10 @@ export const S = {
     'Acceleration factors (REL-02), test duration and sample size (REL-03) and Weibull fitting (REL-04) come in later lessons; here we only build the idea of the three failure segments.',
   ),
   next: loc('下一课：失效机理与加速模型', 'Next: Failure mechanisms and acceleration models'),
-  task1: loc('把随机段 λ 设为 100 FIT，读出随机段 MTTF（应为 10⁷ h）。', 'Set the random-segment λ to 100 FIT and read the random-segment MTTF (it should be 10⁷ h).'),
+  task1: loc('把随机段 λ 设为 100 FIT，读出随机段 MTTF。', 'Set the random-segment λ to 100 FIT and read the random-segment MTTF.'),
   task2: loc(
-    '把早期比例设为 0、磨损段 η 推到 10⁶ h，只剩随机段，读出 5 年可靠度（应为 0.99563）。',
-    'Set the early fraction to 0 and push the wear-out η to 10⁶ h, leaving only the random segment; read the 5-year reliability (it should be 0.99563).',
+    '把早期比例设为 0、磨损段 η 推到 10⁶ h，只剩随机段，读出 5 年可靠度。',
+    'Set the early fraction to 0 and push the wear-out η to 10⁶ h, leaving only the random segment; read the 5-year reliability.',
   ),
   task3: loc(
     '调高筛选时间，让出货残余早期缺陷降到 1000 ppm 以下（教学目标）。',

@@ -17,7 +17,7 @@ const fmt2 = (value: number) => value.toFixed(2)
 export const S = {
   kickerNow: loc('这一次双音测试', 'This two-tone test'),
   introTitle: loc('双音测试：交调失真与 IIP3 / OIP3', 'Two-tone test: intermodulation and IIP3 / OIP3'),
-  coreTitle: loc('拨一拨：两音频率、输入功率与器件 IIP3', 'Try it: tone frequencies, input power and device IIP3'),
+  coreTitle: loc('练一练：两音频率、输入功率与器件 IIP3', 'Practice: tone frequencies, input power and device IIP3'),
   coreNote: loc(
     '两个音 f1、f2 同时加入器件，非线性在 2f1−f2 与 2f2−f1 处产生三阶交调（IM3）。下图是仿真得到的输出频谱，蓝点是基波，红点是 IM3。',
     'Two tones f1 and f2 enter the device together, and the nonlinearity creates third-order intermodulation (IM3) at 2f1−f2 and 2f2−f1. The spectrum below is the simulated output: blue dots are the fundamentals, red dots are the IM3 products.',

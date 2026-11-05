@@ -14,6 +14,7 @@ import { gateVerdict, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, taskItems } from
 import { PwrGateLab } from './PwrGateLab'
 import { analyseGate, DEFAULT_GATE, type GateState } from './pwrGateModel'
 import './pwrGate.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -51,7 +52,18 @@ export function PwrGatePage({ moduleId, onModuleChange }: Props) {
         <Related ids={['pwrSelector', 'pwrStatic', 'pwrKelvin', 'anaDynamic']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(gate, a, guess)} />
+
         <PwrGateLab
           gate={gate}
           onGate={(patch) => setGate((prev) => ({ ...prev, ...patch }))}
@@ -60,13 +72,7 @@ export function PwrGatePage({ moduleId, onModuleChange }: Props) {
         />
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

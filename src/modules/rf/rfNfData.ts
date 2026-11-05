@@ -14,7 +14,7 @@ const pct = (share: number) => (share * 100).toFixed(0)
 export const S = {
   kickerNow: loc('这一次链路', 'This chain'),
   introTitle: loc('噪声系数：电路给信号添了多少噪声', 'Noise figure: how much noise a circuit adds to the signal'),
-  coreTitle: loc('拨一拨：前级增益与各级噪声', 'Try it: front-stage gain and each stage’s noise'),
+  coreTitle: loc('练一练：前级增益与各级噪声', 'Practice: front-stage gain and each stage’s noise'),
   coreNote: loc(
     '下图是三级链路。LNA 的增益和三级的噪声系数可以拨；混频器增益 −7 dB（变频损耗）、中频放大器增益 20 dB 是固定的教学取值。条形图把超出信源噪声的部分（F − 1）按级分开，每一条的长度就是这一级的份额。',
     'The chain has three stages. You can adjust the LNA gain and the three noise figures; the mixer gain (−7 dB, conversion loss) and the IF amplifier gain (20 dB) are fixed teaching values. The bars split the excess noise above the source (F − 1) by stage; each bar’s length is that stage’s share.',

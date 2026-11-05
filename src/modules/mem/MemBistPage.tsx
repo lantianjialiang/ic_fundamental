@@ -13,6 +13,7 @@ import { MemBistFig } from './MemBistFig'
 import { ECC_OPTIONS, INTRO, MISCONCEPTIONS, QUIZ, S, SAMPLE_OPTIONS, TAKEAWAY, taskItems, verdictOf } from './memBistData'
 import { analyseBist, type BistState, DEFAULT_BIST, type RepairStep, SPARE_COLS, SPARE_ROWS } from './memBistModel'
 import './memBist.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -51,7 +52,18 @@ export function MemBistPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['memMarch', 'memFault', 'memBin']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, result)} />
+
         <div className="mbist-controls">
           <div className="mbist-field">
             <span className="mbist-field__label">{t(S.sampleLabel)}</span>
@@ -91,13 +103,7 @@ export function MemBistPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

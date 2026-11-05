@@ -1,0 +1,157 @@
+.mfg-lab {
+  display: grid;
+  gap: 14px;
+}
+
+.mfg-map,
+.mfg-bars,
+.mfg-stack,
+.mfg-chart {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-l);
+  background: var(--well);
+}
+
+.mfg-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.mfg-summary {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.mfg-node {
+  cursor: pointer;
+}
+
+.mfg-node.is-on {
+  filter: brightness(1.15);
+}
+
+.mfg-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  font-size: 13px;
+}
+
+.mfg-bar > i {
+  display: block;
+  height: 10px;
+  border-radius: 99px;
+  background: var(--gold, #d4a017);
+}
+
+.mfg-lab .knobs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px 24px;
+}
+
+.mfg-lab .knobs label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.mfg-lab .knobs label b {
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--gold);
+}
+
+.mfg-sort {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.mfg-sort li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mfg-sort button {
+  min-height: 36px;
+  min-width: 36px;
+}
+
+.mfg-drill {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-l);
+  background: var(--well);
+}
+
+.mfg-drill h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.mfg-assign {
+  display: grid;
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line-soft, var(--line));
+}
+
+.mfg-assign__picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mfg-assign__picks button {
+  appearance: none;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--panel, transparent);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.mfg-assign__picks button.is-active {
+  border-color: var(--gold-line);
+  background: var(--gold-bg);
+  color: var(--text);
+}
+
+.mfg-def {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.mfg-def div {
+  display: grid;
+  gap: 2px;
+}
+
+.mfg-def dt {
+  font-weight: 650;
+}
+
+.mfg-def dd {
+  margin: 0;
+  color: var(--text-2);
+}

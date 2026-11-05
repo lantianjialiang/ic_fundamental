@@ -13,7 +13,7 @@ export const FLOW_SEG = FLOW_OPTIONS_HZ.map((hz) => ({ id: String(hz), label: fm
 export const S = {
   kickerNow: loc('这一次相位噪声', 'This phase noise'),
   introTitle: loc('相位噪声：信号的相位在“抖”', 'Phase noise: the signal’s phase wanders'),
-  coreTitle: loc('拨一拨：偏移频率、积分与抖动', 'Try it: offset, integration and jitter'),
+  coreTitle: loc('练一练：偏移频率、积分与抖动', 'Practice: offset, integration and jitter'),
   coreNote: loc(
     '下图是模型算出的 L(f)（dBc/Hz，对数频率轴）。拖滑块，或在曲线上点一下，选偏移频率；右侧读出该点的 L(f)。金色阴影是积分区间，把它积分、开方得到 rad rms，再除以 2π·f0 就是时间抖动。',
     'The plot shows the modelled L(f) in dBc/Hz on a log frequency axis. Drag the slider, or click the curve, to pick an offset; the readout gives L(f) there. The gold band is the integration range: integrate it, take the root to get rad rms, and divide by 2π·f0 to get the time jitter.',
@@ -44,8 +44,8 @@ export const S = {
   ),
   next: loc('下一课：调制基础', 'Next: Modulation Basics'),
   task1: loc(
-    '把 L(1 kHz) 抬到 −75 dBc/Hz 以上，让积分抖动超过 1.0 ps（FAIL）。',
-    'Raise L(1 kHz) above −75 dBc/Hz so the integrated jitter exceeds 1.0 ps (FAIL).',
+    '把 L 抬到 −75 dBc/Hz 以上，让积分抖动超过 1.0 ps（FAIL）。',
+    'Raise L above −75 dBc/Hz so the integrated jitter exceeds 1.0 ps (FAIL).',
   ),
   task2: loc('把积分下限从 1 kHz 提到 10 kHz，看 1/f² 段的积分怎么变。', 'Raise the integration lower limit from 1 kHz to 10 kHz and watch how the 1/f² integral changes.'),
   task3: loc('把载波换成 5 GHz：同样的 dBc/Hz，时间抖动变成 1 GHz 时的 1/5。', 'Switch the carrier to 5 GHz: with the same dBc/Hz, the time jitter becomes one fifth of the 1 GHz value.'),

@@ -6,7 +6,7 @@ export const M = {
   nextPrefix: loc('下一课：', 'Next: '),
   kickerNow: loc('这一组参数的结果', 'Result for these settings'),
   introTitle: loc('Multi-site：一次碰几颗，效率和成本怎么变', 'Multi-site: how efficiency and cost change with sites per touchdown'),
-  coreTitle: loc('拨一拨：Site 数、时间与成本', 'Try it: site count, time and cost'),
+  coreTitle: loc('练一练：Site 数、时间与成本', 'Practice: site count, time and cost'),
   coreNote: loc(
     '测试机一次可以同时接 N 颗（N 个 Site）。Index 时间和并行的测试时间不随 N 变，但共享资源（电源、数字通道、逐颗执行的测量步骤）要排队，随 N 线性增加。下面的参数都是教学示意值，拨动它们看 UPH、并行效率和 COT 怎么变。',
     'The tester can test N devices at once (N sites). Index time and the parallel test time do not change with N, but shared resources (supplies, digital channels, measurement steps run device by device) queue up and grow linearly with N. The values below are illustrative; move them to see how UPH, parallel efficiency and COT change.',
@@ -34,7 +34,7 @@ export const M = {
   ),
   curveX: loc('Site 数 N', 'Site count N'),
   curveY: loc('COT（美分 / 颗）', 'COT (cents per part)'),
-  formulaTitle: loc('公式（当前参数代入）', 'Formulas (with the current settings)'),
+  formulaTitle: loc('公式', 'Formulas'),
   formulaNote: loc(
     '吞吐与效率由时间决定，成本由费用与吞吐共同决定。η 下降来自 T_ser 随 N 线性增加，而 T_idx 与 T_par 不变。',
     'Throughput and efficiency come from the timing; cost comes from the hourly cost divided by throughput. η falls because T_ser grows linearly with N while T_idx and T_par stay fixed.',
@@ -78,7 +78,7 @@ export const M = {
   takeawayTitle: loc('带走这几句', 'Key takeaways'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
-  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background used in this lesson'),
+  prereqTitle: loc('先看懂：公式怎么来的', 'Learn this first: where the formulas come from'),
   prereqNote: loc('正文里的吞吐、效率与成本公式都从这里推出。', 'The throughput, efficiency and cost formulas in the lesson are built from these.'),
   tasksNote: loc('完成情况由当前参数与操作自动判定。', 'Judged automatically from your settings and actions.'),
   task1: loc(

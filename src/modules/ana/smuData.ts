@@ -22,7 +22,7 @@ import {
 export const S = {
   kickerNow: loc('这一次测量', 'This measurement'),
   introTitle: loc('PMU / SMU：一个通道，加一个量、测另一个量', 'PMU / SMU: one channel, force one quantity, measure the other'),
-  coreTitle: loc('拨一拨：模式、DUT 与限值', 'Try it: mode, DUT and compliance'),
+  coreTitle: loc('练一练：模式、DUT 与限值', 'Practice: mode, DUT and compliance'),
   coreNote: loc(
     '下面的仪器是教学模型，DUT 是虚拟器件 VDUT-SMU1，数值都是示意。FVMI 加压测流，FIMV 加流测压；没有被强制的那个量由限值钳住。',
     'The instrument below is a teaching model. The DUT is the virtual device VDUT-SMU1 and all numbers are illustrative. FVMI forces voltage and measures current; FIMV forces current and measures voltage. The quantity that is not forced is held by the compliance limit.',

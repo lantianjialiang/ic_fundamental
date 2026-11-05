@@ -18,7 +18,7 @@ import {
 export const S = {
   kickerNow: loc('这一次测量', 'This measurement'),
   introTitle: loc('测量 = Force 一个量，Measure 另一个量', 'A measurement = force one quantity, measure another'),
-  coreTitle: loc('拨一拨：接法、量程与误差', 'Try it: hookup, range and error'),
+  coreTitle: loc('练一练：接法、量程与误差', 'Practice: hookup, range and error'),
   coreNote: loc(
     'PMU / SMU 只做两件事：在 DUT 上 Force 一个量（电压或电流），同时 Measure 另一个量。下面的仪器是教学模型，误差带与导线电阻都是示意数字。',
     'A PMU / SMU does two things: it forces one quantity (voltage or current) on the DUT and measures the other. The instrument below is a teaching model; the error band and lead resistance are illustrative numbers.',

@@ -30,6 +30,7 @@ import {
   type ValidationIssue,
 } from './model/stdf'
 import './gen.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -191,7 +192,20 @@ export function GenStdfPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['ate', 'vate', 'anaStats', 'genMultisite']} onOpen={onModuleChange} />
       </Section>
 
+      <PrereqSection title={S.prereqTitle} note={S.prereqNote} items={PREREQ} />
+
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={tasks} />
+
         <Seg options={VIEW_OPTIONS} value={view} onChange={setView} />
 
         {view === 'bytes' ? (
@@ -266,13 +280,7 @@ export function GenStdfPage({ moduleId, onModuleChange }: Props) {
         ) : null}
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">
@@ -284,7 +292,7 @@ export function GenStdfPage({ moduleId, onModuleChange }: Props) {
         <QuizList questions={QUIZ} yes={t(ui.fund.yes)} no={t(ui.fund.no)} />
       </Section>
 
-      <PrereqSection title={S.prereqTitle} note={S.prereqNote} items={PREREQ} />
+      
     </LessonFrame>
   )
 }

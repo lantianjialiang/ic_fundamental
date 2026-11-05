@@ -25,6 +25,7 @@ import {
   type P1dbState,
 } from './rfP1dbModel'
 import './rfP1db.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -68,7 +69,18 @@ export function RfP1dbPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['rfGain', 'rfDb', 'rfEvm']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <div className="rfp1-controls">
           <Knob label={S.gainLabel} value={state.gain} unit="dB" min={GAIN_MIN} max={GAIN_MAX} step={1} onChange={(gain) => update({ gain })} />
           <Knob label={S.psatLabel} value={state.psat} unit="dBm" min={PSAT_MIN} max={PSAT_MAX} step={1} onChange={(psat) => update({ psat })} />
@@ -84,13 +96,7 @@ export function RfP1dbPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

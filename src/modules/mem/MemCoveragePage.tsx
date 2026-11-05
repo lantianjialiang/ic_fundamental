@@ -22,6 +22,7 @@ import {
 import { CoverageCurveFig, FaultTable } from './MemCoverageFig'
 import { analyseCoverage, type CoverageState, DEFAULT_COVERAGE } from './memCoverageModel'
 import './memCoverage.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -51,7 +52,18 @@ export function MemCoveragePage({ moduleId, onModuleChange }: Props) {
         <Related ids={['memFault', 'memPattern', 'memBin']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, result)} />
+
         <div className="mcov-controls">
           <div className="mcov-field">
             <span className="mcov-field__label">{t(S.algLabel)}</span>
@@ -86,13 +98,7 @@ export function MemCoveragePage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

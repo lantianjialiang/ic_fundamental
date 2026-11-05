@@ -26,6 +26,7 @@ import {
 } from './staticData'
 import { DEFAULT_STATIC, staticResult, type DeviceId, type StaticState } from './staticModel'
 import './ana.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -67,7 +68,18 @@ export function AnaStaticPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaSampling', 'anaDynamic', 'anaStats']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, result, predicted)} />
+
         <div className="ana-controls">
           <div className="ana-field">
             <span className="ana-field__label">{t(S.deviceLabel)}</span>
@@ -126,13 +138,7 @@ export function AnaStaticPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

@@ -15,7 +15,7 @@ function gapBelowPsat(p: number): number {
 export const S = {
   kickerNow: loc('这一次工作点', 'This operating point'),
   introTitle: loc('输出功率、压缩与 P1dB', 'Output power, compression and P1dB'),
-  coreTitle: loc('拨一拨：增益、Psat、平滑系数与输入功率', 'Try it: gain, Psat, smoothness and input power'),
+  coreTitle: loc('练一练：增益、Psat、平滑系数与输入功率', 'Practice: gain, Psat, smoothness and input power'),
   coreNote: loc(
     '放大器用 Rapp 型压缩模型（线性域的电压关系）：输入增大时输出先按 1:1 增长，再逼近饱和功率 Psat。虚线是理想的 1:1 增长；蓝线偏离它的地方就是压缩。',
     'The amplifier uses a Rapp-type compression model in the linear voltage domain: the output first rises 1:1 with input, then approaches the saturated power Psat. The dashed line is ideal 1:1 growth; where the blue curve bends away from it is compression.',
@@ -38,8 +38,8 @@ export const S = {
   ),
   next: loc('下一课：线性度：IP3 与 IMD', 'Next: Linearity: IP3 and IMD'),
   task1: loc(
-    '把 Pin 调到 P1dB 工作点附近，让增益压缩约 1 dB（0.7–1.3 dB 之间）。',
-    'Set Pin near the P1dB operating point so the gain compresses by about 1 dB (between 0.7 and 1.3 dB).',
+    '把 Pin 调到 P1dB 工作点附近，让增益压缩落在 0.7–1.3 dB 之间。',
+    'Set Pin near the P1dB operating point so the gain compression lands between 0.7 and 1.3 dB.',
   ),
   task2: loc('把输入推到增益压缩 3 dB 以上，进入饱和区。', 'Drive the input until the gain compresses by 3 dB or more, into saturation.'),
   task3: loc('把饱和输出功率 Psat 降到 15 dBm 以下，看 P1dB 随之下降。', 'Lower Psat below 15 dBm and watch P1dB drop with it.'),

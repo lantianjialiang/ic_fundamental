@@ -14,6 +14,7 @@ import { CouplingHeat } from './plots'
 import { ALG_OPTIONS, DELTA_OPTIONS, FIG_SUMMARY, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, compareLine, fill, taskItems, verdictOf } from './picAlignData'
 import { DEFAULT_ALIGN, PEAK_X, PEAK_Y, analyseAlign, type AlignState } from './picAlignModel'
 import './pic.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -49,7 +50,18 @@ export function PicAlignPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['picUnits', 'rfDb']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <Callout tone="warn">
           <p>{t(S.teach)}</p>
         </Callout>
@@ -111,13 +123,7 @@ export function PicAlignPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

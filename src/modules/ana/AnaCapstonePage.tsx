@@ -41,6 +41,7 @@ import {
 } from './capstoneModel'
 import './ana.css'
 import './capstone.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -127,7 +128,18 @@ export function AnaCapstonePage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaStats', 'anaLdo', 'anaStatic', 'anaTrim']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(batch, stopOnFail, csv)} />
+
         <div className="ana-field">
           <span className="ana-field__label">{t(S.stopLabel)}</span>
           <Seg options={STOP_OPTIONS} value={stopMode} onChange={setStopMode} />
@@ -219,13 +231,7 @@ export function AnaCapstonePage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

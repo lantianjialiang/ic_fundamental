@@ -34,7 +34,7 @@ export const INTRO: LText[] = [
 export const S = {
   kickerNow: loc('这一次读出的时序', 'The read timing in this run'),
   introTitle: loc('时序：采样点必须落在数据有效窗口里', 'Timing: the strobe must land inside the data-valid window'),
-  coreTitle: loc('拨一拨：选器件和周期，移动采样点', 'Try it: pick a part and a period, then move the strobe'),
+  coreTitle: loc('练一练：选器件和周期，移动采样点', 'Practice: pick a part and a period, then move the strobe'),
   coreNote: loc(
     '采样点 s 是 ATE 相对地址改变的时刻。绿色带是数据有效窗口 [tAA, T + tOH]：左边缘是 tAA，右边缘是 T + tOH。',
     'The strobe s is the ATE sampling time measured from the address change. The green band is the data-valid window [tAA, T + tOH]: its left edge is tAA and its right edge is T + tOH.',

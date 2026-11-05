@@ -6,7 +6,7 @@ export const S = {
   nextPrefix: loc('下一课：', 'Next: '),
   kickerNow: loc('这一次的判断', 'Current check'),
   introTitle: loc('STDF：ATE 测试结果的标准文件', 'STDF: the standard file for ATE results'),
-  coreTitle: loc('拨一拨：字节、记录与统计', 'Try it: bytes, records and statistics'),
+  coreTitle: loc('练一练：字节、记录与统计', 'Practice: bytes, records and statistics'),
   coreNote: loc(
     '三个视图用的是同一套记录：字节浏览器看“字节怎么排”，组装看“记录该按什么顺序排”，本地解析看“统计从哪里来”。示例批次由仿真生成，不含任何真实客户数据。',
     'The three views use the same records: the byte browser shows how bytes are laid out, the assembler shows the required record order, and local parsing shows where the statistics come from. The sample lot is simulated and contains no real customer data.',
@@ -97,7 +97,7 @@ export const S = {
   takeawayTitle: loc('带走这几句', 'Key takeaways'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
-  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background used in this lesson'),
+  prereqTitle: loc('先看懂：公式怎么来的', 'Learn this first: where the formulas come from'),
   prereqNote: loc('正文里的字节、字段宽度和统计公式都从这里推出。', 'The byte layouts, field widths and statistics formulas in the lesson are built from these.'),
   asideLater: loc(
     '这里只实现 STDF V4 的教学子集：FAR、MIR、PIR、PTR、PRR、PCR、HBR、SBR、MRR。WIR / WRR（晶圆级）、FTR、MPR 等记录读取时整段跳过。规范字段以 STDF V4 为准。',

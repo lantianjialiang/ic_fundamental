@@ -96,7 +96,7 @@ export const CLASS_LABEL: Record<ParamClass, LText> = {
 export const S = {
   kickerNow: loc('这一次选型', 'This selection'),
   introTitle: loc('功率器件是什么，参数代表什么', 'What power devices are and what their parameters mean'),
-  coreTitle: loc('拨一拨：为四个应用选器件与耐压', 'Try it: pick a device and rating for four applications'),
+  coreTitle: loc('练一练：为四个应用选器件与耐压', 'Practice: pick a device and rating for four applications'),
   coreNote: loc(
     '先点一个应用，再选器件类型与额定耐压；图和读数都按当前应用计算。这里的数值全部是教学示意，不引用任何标准或真实型号，损耗只是教学简化估算。',
     'Pick an application, then the device type and rated voltage; the charts and readouts follow the current application. All values here are teaching illustrations: no standard or real part is quoted, and the losses are teaching-simplified estimates.',
@@ -166,8 +166,8 @@ export const S = {
   next: loc('下一课：静态参数测试', 'Next: Static parameter tests'),
   task1: loc('为四个应用各选一个额定耐压，都落在母线电压的 1.5～2 倍之内。', 'Pick a rating for each of the four applications, all within 1.5–2× the bus voltage.'),
   task2: loc(
-    '用小计算器算 I = 10 A、Rds(on) = 5 mΩ 的导通损耗，读数应为 0.50 W（P = I²R）。',
-    'With the calculator, work out I = 10 A and Rds(on) = 5 mΩ: the conduction loss should read 0.50 W (P = I²R).',
+    '用小计算器算 I = 10 A、Rds(on) = 5 mΩ 的导通损耗，再读这个数。损耗按 P = I²R 算。',
+    'With the calculator, work out I = 10 A and Rds(on) = 5 mΩ, then read the conduction loss. It is P = I²R.',
   ),
   task3: loc('把 12 个参数全部分到正确的一类。', 'Assign all 12 parameters to the correct class.'),
   task4: loc(

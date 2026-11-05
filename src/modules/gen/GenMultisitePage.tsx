@@ -16,6 +16,7 @@ import { SiteGroups } from './SiteGroups'
 import { LOT_TESTS, buildLot, encodeFile, parseStdf, summarizeStdf } from './model/stdf'
 import { bestSites, cotCents, efficiency, hourlyCost, maxSites, MAX_SITES_SHOWN, sweep, touchdownS, uph, type MsParams } from './model/multisite'
 import './gen.css'
+import { LEARN_TITLE, PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -90,7 +91,32 @@ export function GenMultisitePage({ moduleId, onModuleChange }: Props) {
         <Related ids={['genStdf', 'vate', 'sim']} onOpen={onModuleChange} />
       </Section>
 
+      <PrereqSection title={M.prereqTitle} note={M.prereqNote} items={PREREQ} />
+
+      <Section title={t(LEARN_TITLE)}>
+        <Callout>
+          <p>{t(M.formulaTitle)}</p>
+          {FORMULAS.map((line) => (
+            <p key={line} className="gen-formula">
+              {line}
+            </p>
+          ))}
+          <p>{t(M.formulaNote)}</p>
+        </Callout>
+      </Section>
+
+      <Section title={t(M.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(M.coreTitle)} note={t(M.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={tasks} />
+
         <div className="gen-controls">
           <Knob label={M.nLabel} value={n} unit="sites" min={1} max={MAX_SITES_SHOWN} step={1} onChange={setN} />
           <Knob label={M.indexLabel} value={p.indexS} unit="s" min={0.5} max={5} step={0.1} onChange={(indexS) => update({ indexS })} />
@@ -130,15 +156,7 @@ export function GenMultisitePage({ moduleId, onModuleChange }: Props) {
 
         <MultisiteFig points={points} current={n} best={best} limit={limit} />
 
-        <Callout>
-          <p>{t(M.formulaTitle)}</p>
-          {FORMULAS.map((line) => (
-            <p key={line} className="gen-formula">
-              {line}
-            </p>
-          ))}
-          <p>{t(M.formulaNote)}</p>
-        </Callout>
+        
       </Section>
 
       <Section title={t(M.siteTitle)} note={t(M.siteNote)}>
@@ -165,13 +183,7 @@ export function GenMultisitePage({ moduleId, onModuleChange }: Props) {
         </Callout>
       </Section>
 
-      <Section title={t(M.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(M.takeawayTitle)}>
         <Callout tone="ok">
@@ -183,7 +195,7 @@ export function GenMultisitePage({ moduleId, onModuleChange }: Props) {
         <QuizList questions={QUIZ} yes={t(ui.fund.yes)} no={t(ui.fund.no)} />
       </Section>
 
-      <PrereqSection title={M.prereqTitle} note={M.prereqNote} items={PREREQ} />
+      
     </LessonFrame>
   )
 }

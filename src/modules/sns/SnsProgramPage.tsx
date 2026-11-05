@@ -13,6 +13,7 @@ import { SNS_META } from './meta'
 import { INTRO, MISCONCEPTIONS, QUIZ, S, STEP_BIN_LABEL, STEP_LABEL, TAKEAWAY, coreNote, gradeLater, taskItems, verdictOf } from './snsProgramData'
 import { DEFAULT_PROGRAM, STEP_IDS, analyseProgram, exportSummary, type ProgramState, type StepId } from './snsProgramModel'
 import './sns.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 const BG = '#0d1117'
 const GOLD = '#e8c45a'
@@ -99,7 +100,18 @@ export function SnsProgramPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['snsFlat', 'genStdf', 'genMultisite']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(coreNote())}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis, exported !== null)} />
+
         <Callout>{t(S.callout)}</Callout>
         <div className="pick pick--3">
           {STEP_IDS.map((id) => (
@@ -172,13 +184,7 @@ export function SnsProgramPage({ moduleId, onModuleChange }: Props) {
         <pre style={{ whiteSpace: 'pre-wrap', maxHeight: 180, overflow: 'auto', margin: 0 }}>{exported ? preview : t(S.exportEmpty)}</pre>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

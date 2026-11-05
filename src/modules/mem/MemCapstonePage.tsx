@@ -40,6 +40,7 @@ import {
   toCsv,
 } from './memCapstoneModel'
 import { MEM_META } from './meta'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -96,7 +97,18 @@ export function MemCapstonePage({ moduleId, onModuleChange }: Props) {
         <Related ids={['memBin', 'memMarch', 'memDram', 'memBist']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, summary)} />
+
         <div className="mcap-controls">
           <div className="mcap-field">
             <span className="mcap-field__label">{t(S.devLabel)}</span>
@@ -171,13 +183,7 @@ export function MemCapstonePage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

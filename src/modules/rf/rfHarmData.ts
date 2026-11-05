@@ -34,7 +34,7 @@ const LIST_SEP = loc('；', '; ')
 export const S = {
   kickerNow: loc('这一次频谱', 'This spectrum'),
   introTitle: loc('谐波与杂散：频谱上多出来的分量', 'Harmonics and spurs: the extra components on a spectrum'),
-  coreTitle: loc('拨一拨：谐波电平与频谱掩模', 'Try it: harmonic levels and the spectrum mask'),
+  coreTitle: loc('练一练：谐波电平与频谱掩模', 'Practice: harmonic levels and the spectrum mask'),
   coreNote: loc(
     '下图是一次频谱测量的结果（假设见下文）：基波在 100 MHz，2 次、3 次谐波与一个 137 MHz 杂散都用 dBc（相对基波的 dB）标注。阶梯线是频谱掩模，超过它的分量标红并判 FAIL。假设：采样率 1024 MHz，记录 1024 点，基波恰好落在整数个频率格上，频谱由加了 Blackman–Harris 窗的 FFT 得到。',
     'The plot is a measured spectrum (assumptions below): a fundamental at 100 MHz, 2nd and 3rd harmonics and a 137 MHz spur, each labelled in dBc (dB relative to the fundamental). The stepped line is the spectrum mask; any component above it turns red and fails. Assumptions: 1024 MHz sample rate, 1024 points, the fundamental falls on a whole number of frequency bins, and the spectrum is an FFT with a Blackman–Harris window.',

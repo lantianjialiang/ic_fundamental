@@ -105,7 +105,7 @@ export const S = {
   colSymptom: loc('表现', 'Symptom'),
   colTest: loc('典型试验（示例，以现行标准为准）', 'Typical test (example; follow the current standard)'),
   colModel: loc('所用模型', 'Model used'),
-  coreTitle: loc('拨一拨：选机理，看各分项 AF 怎样相乘', 'Try it: pick a mechanism and see how the AF factors multiply'),
+  coreTitle: loc('练一练：选机理，看各分项 AF 怎样相乘', 'Practice: pick a mechanism and see how the AF factors multiply'),
   coreNote: loc(
     '先选机理：它决定哪些应力分项计入总 AF。未计入的分项仍显示数值，但标注“本机理不计入”。时间单位为小时，换算年数按每年 8760 h。',
     'The mechanism sets which stress factors count toward the total AF. Factors not counted still show their value, marked as not counted for this mechanism. Time is in hours; years use 8760 h per year.',
@@ -143,10 +143,10 @@ export const S = {
     'Test duration and sample size are covered in REL-03; here we practise computing acceleration factors and matching Ea to mechanisms.',
   ),
   next: loc('下一课：可靠性试验方法与样本量', 'Next: Reliability test methods and sample size'),
-  task1: loc('Ea = 0.7 eV，Tuse = 55 °C，Tstress 调到 125 °C，读出 AF_T（约 77.7）。', 'Ea = 0.7 eV, Tuse = 55 °C, Tstress = 125 °C; read AF_T (about 77.7).'),
-  task2: loc('ΔTuse = 65 °C、ΔTstress = 165 °C、n = 2，读出温度循环 AF_CM（约 6.44）。', 'ΔTuse = 65 °C, ΔTstress = 165 °C, n = 2; read AF_CM for temperature cycling (about 6.44).'),
+  task1: loc('Ea = 0.7 eV，Tuse = 55 °C，Tstress 调到 125 °C，读出 AF_T。', 'Ea = 0.7 eV, Tuse = 55 °C, Tstress = 125 °C; read AF_T.'),
+  task2: loc('ΔTuse = 65 °C、ΔTstress = 165 °C、n = 2，读出温度循环 AF_CM。', 'ΔTuse = 65 °C, ΔTstress = 165 °C, n = 2; read AF_CM for temperature cycling.'),
   task3: loc('Black：电流密度比 J 调到 2、n = 2，看 MTTF 比变为 1/4。', 'Black: set the current-density ratio J to 2 with n = 2 and see the MTTF ratio become 1/4.'),
-  task4: loc('把 Ea 改为 0.5 eV（Tuse 55 °C、Tstress 125 °C），AF 变为约 22.4，并看 Ea ± 0.1 的范围。', 'Change Ea to 0.5 eV (Tuse 55 °C, Tstress 125 °C): AF falls to about 22.4; also look at the Ea ± 0.1 range.'),
+  task4: loc('把 Ea 改为 0.5 eV（Tuse 55 °C、Tstress 125 °C），再读 AF，并看 Ea ± 0.1 的范围。', 'Change Ea to 0.5 eV (Tuse 55 °C, Tstress 125 °C), then read AF and look at the Ea ± 0.1 range.'),
   vTemp: loc('按温度加速（Arrhenius）', 'Accelerated by temperature (Arrhenius)'),
   vTempText: loc(
     '本机理计入温度项：AF_T = {afT}。原因：温度升高，热激活的反应速率按 exp(−Ea/kT) 增大。Ea = {ea} eV，但 Ea 不确定：Ea ± 0.1 时 AF_T 落在 {lo}–{hi} 之间，结论要带上这个范围。',

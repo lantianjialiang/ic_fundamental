@@ -7,6 +7,7 @@ export type TrackId =
   | 'pcb'
   | 'digital'
   | 'fund'
+  | 'mfg'
   | 'bench'
   | 'analog'
   | 'memory'
@@ -16,6 +17,7 @@ export type TrackId =
   | 'sensor'
   | 'qual'
   | 'cpo'
+  | 'apk'
   | 'glossary'
   | 'faq'
 
@@ -399,6 +401,65 @@ export const TRACKS: Array<{
         text: loc(
           '那边先用动画立名词：{@pmu}、{@dc}、{@func}、{@timing}、{@scan}。这里用一颗 256×4 SRAM 把量产测法走一遍：{@fOpens}、{@fDc}、{@fFunc}、{@fAc}。课页底有「对应课」互链，不必当两遍新课上。',
           'That track plants the names with animations: {@pmu}, {@dc}, {@func}, {@timing}, {@scan}. This one walks a 256×4 SRAM through production: {@fOpens}, {@fDc}, {@fFunc}, {@fAc}. Each lesson footer links to its match; they are not a second copy of the same class.',
+        ),
+      },
+    ],
+  },
+  {
+    id: 'mfg',
+    title: loc('制造与封装流程', 'Manufacturing and package flow'),
+    blurb: loc(
+      '从设计到出货：光罩与 NRE、WAT、CP、测试硬件、基板、飞针、组装与量产爬坡。ATE / CP / FT 的设备概念见 {@ate}、{@connection}，这里只放回全流程。现课 {@mfgOverview}–{@mfgRamp}。',
+      'From design to ship: masks and NRE, WAT, CP, test hardware, substrates, flying probe, assembly and the production ramp. Equipment names for ATE / CP / FT live in {@ate} and {@connection}; this track puts them back in the full flow. Lessons {@mfgOverview}–{@mfgRamp}.',
+    ),
+    ready: true,
+    lessons: [
+      'mfgOverview',
+      'mfgFab',
+      'mfgNre',
+      'mfgWat',
+      'mfgCp',
+      'mfgHw',
+      'mfgSubstrate',
+      'mfgSubFab',
+      'mfgFlying',
+      'mfgAssembly',
+      'mfgRamp',
+    ],
+    knowledge: [
+      {
+        title: loc('全流程', 'The full flow'),
+        text: loc(
+          '设计 → 光罩 → 晶圆 → WAT → CP →（基板并行）→ 组装 → FT。角色与数据见 {@mfgOverview}。',
+          'Design → mask → wafer → WAT → CP → (substrate in parallel) → assembly → FT. Roles and data: {@mfgOverview}.',
+        ),
+      },
+      {
+        title: loc('前道与晶圆级', 'Front-end and wafer level'),
+        text: loc(
+          'FEOL/BEOL 与 DPW {@mfgFab}；光罩 / MPW / NRE {@mfgNre}；WAT 测工艺 {@mfgWat}；CP 分选与晶圆图 {@mfgCp}。',
+          'FEOL/BEOL and DPW {@mfgFab}; masks / MPW / NRE {@mfgNre}; WAT measures the process {@mfgWat}; CP sorts and maps {@mfgCp}.',
+        ),
+      },
+      {
+        title: loc('测试硬件', 'Test hardware'),
+        text: loc(
+          '探针卡、DIB、Socket 的设计、NRE 与每次插拔成本。{@mfgHw}。架构见 {@ate}、{@connection}。',
+          'Probe card, DIB and socket design, NRE and cost per insertion. {@mfgHw}. Architecture: {@ate}, {@connection}.',
+        ),
+      },
+      {
+        title: loc('基板', 'Substrate'),
+        text: loc(
+          '扇出与阻抗 {@mfgSubstrate}；积层与面板 {@mfgSubFab}；飞针对治具 {@mfgFlying}。',
+          'Escape and impedance {@mfgSubstrate}; build-up and panels {@mfgSubFab}; flying probe versus fixture {@mfgFlying}.',
+        ),
+      },
+      {
+        title: loc('后道与爬坡', 'Back-end and ramp'),
+        text: loc(
+          '组装与 FT {@mfgAssembly}；Poisson / Murphy / 负二项、SPC 与盈亏平衡 {@mfgRamp}。',
+          'Assembly and FT {@mfgAssembly}; Poisson / Murphy / negative binomial, SPC and break-even {@mfgRamp}.',
         ),
       },
     ],
@@ -936,6 +997,56 @@ export const TRACKS: Array<{
     ],
   },
   {
+    id: 'apk',
+    title: loc('先进封装', 'Advanced packaging'),
+    blurb: loc(
+      'chiplet、中介层、TSV、HBM、2.5D/3D、混合键合与 D2D；落到 KGD/KGS 和流程成本。厂商技术名只作概念示例。现课 {@apkOverview}–{@apkFlow}。',
+      'Chiplets, interposers, TSVs, HBM, 2.5D/3D, hybrid bonding and D2D; then KGD/KGS and flow cost. Vendor names are conceptual examples only. Lessons {@apkOverview}–{@apkFlow}.',
+    ),
+    ready: true,
+    lessons: [
+      'apkOverview',
+      'apkBond',
+      'apkTsv',
+      'apkHbm',
+      'apkInterposer',
+      'apkStack',
+      'apkD2d',
+      'apkThermal',
+      'apkFlow',
+    ],
+    knowledge: [
+      {
+        title: loc('为什么拆 chiplet', 'Why split into chiplets'),
+        text: loc(
+          '光罩极限、大 die 良率、异构工艺。入口 {@apkOverview}。互连演进 {@apkBond}。',
+          'Reticle limit, large-die yield, heterogeneous processes. Start at {@apkOverview}. Interconnect evolution: {@apkBond}.',
+        ),
+      },
+      {
+        title: loc('结构件', 'Building blocks'),
+        text: loc(
+          'TSV {@apkTsv}；HBM 堆栈 {@apkHbm}；中介层与 2.5D {@apkInterposer}。',
+          'TSVs {@apkTsv}; HBM stacks {@apkHbm}; interposers and 2.5D {@apkInterposer}.',
+        ),
+      },
+      {
+        title: loc('堆叠与互连', 'Stacks and links'),
+        text: loc(
+          'W2W / D2W 良率连乘 {@apkStack}；岸线带宽 {@apkD2d}；热阻与 CTE {@apkThermal}。',
+          'W2W / D2W yield product {@apkStack}; shoreline bandwidth {@apkD2d}; Rth and CTE {@apkThermal}.',
+        ),
+      },
+      {
+        title: loc('测试', 'Test'),
+        text: loc(
+          'KGD / KGS、探测难点与流程成本。{@apkFlow}。基板与 CP 见 {@mfgFlying}、{@mfgCp}。',
+          'KGD / KGS, probe limits and flow cost. {@apkFlow}. Substrate and CP: {@mfgFlying}, {@mfgCp}.',
+        ),
+      },
+    ],
+  },
+  {
     id: 'bench',
     title: loc('交互实验', 'Interactive lab'),
     blurb: loc(
@@ -986,8 +1097,8 @@ export const TRACKS: Array<{
     id: 'glossary',
     title: loc('术语表', 'Glossary'),
     blurb: loc(
-      '把 D、F、T（MOS）、L（PCB）、A（模拟）、H（高速）、R（射频）、M（存储器）、P（功率）、S（传感器）、Q（可靠性）、C（硅光）几条轨道里讲到的名词收在一起：原文、中英文名、一句话解释和出处课程。可以搜索，可以按课程或按 A–Z 看。',
-      'Terms from the D, F, T (MOS), L (PCB), A (analog), H (high-speed), R (RF), M (memory), P (power), S (sensor), Q (reliability) and C (silicon photonics) tracks in one place: the original name, Chinese and English names, a one-line definition and the lessons it comes from. Search it, or browse by lesson or A–Z.',
+      '把 D、F、T（MOS）、L（PCB）、A（模拟）、H（高速）、R（射频）、M（存储器）、P（功率）、S（传感器）、Q（可靠性）、C（硅光）、W（制造）、K（先进封装）几条轨道里讲到的名词收在一起：原文、中英文名、一句话解释和出处课程。可以搜索，可以按课程或按 A–Z 看。',
+      'Terms from the D, F, T (MOS), L (PCB), A (analog), H (high-speed), R (RF), M (memory), P (power), S (sensor), Q (reliability), C (silicon photonics), W (manufacturing) and K (advanced packaging) tracks in one place: the original name, Chinese and English names, a one-line definition and the lessons it comes from. Search it, or browse by lesson or A–Z.',
     ),
     ready: true,
     lessons: [],
@@ -1017,6 +1128,7 @@ const PREFIX: Record<TrackId, string> = {
   pcb: 'L',
   digital: 'D',
   fund: 'F',
+  mfg: 'W',
   bench: 'X',
   analog: 'A',
   memory: 'M',
@@ -1026,6 +1138,7 @@ const PREFIX: Record<TrackId, string> = {
   sensor: 'S',
   qual: 'Q',
   cpo: 'C',
+  apk: 'K',
   // 术语表、FAQ 没有课程，前缀只是占位，不参与任何编号
   glossary: 'G',
   faq: 'FAQ',

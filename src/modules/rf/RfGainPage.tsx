@@ -13,6 +13,7 @@ import { RF_META } from './meta'
 import { DEVICE_OPTIONS, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, taskItems, verdictOf } from './rfGainData'
 import { BAND_MAX, BAND_MIN, DEFAULT_GAIN, F0_MAX, F0_MIN, Q_MAX, Q_MIN, analyseGain, type GainState } from './rfGainModel'
 import './rfGain.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -62,7 +63,18 @@ export function RfGainPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['rfDb', 'rfSparam', 'anaSignal']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <div className="rfg-controls">
           <div className="rfg-field">
             <span className="rfg-field__label">{t(S.deviceLabel)}</span>
@@ -81,13 +93,7 @@ export function RfGainPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

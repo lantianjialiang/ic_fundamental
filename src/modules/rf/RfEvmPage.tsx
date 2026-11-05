@@ -16,6 +16,7 @@ import { FIG, INTRO, IBO, MISCONCEPTIONS, QUIZ, S, taskItems, TAKEAWAY, verdictO
 import { SCHEME_OPTIONS } from './rfModulationData'
 import './rfModulation.css'
 import './rfEvm.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -47,7 +48,18 @@ export function RfEvmPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['rfModulation', 'rfNf', 'rfSystem']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <div className="rf-controls">
           <div className="rf-field">
             <span className="rf-field__label">{t(S.schemeLabel)}</span>
@@ -79,13 +91,7 @@ export function RfEvmPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

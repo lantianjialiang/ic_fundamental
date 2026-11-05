@@ -16,7 +16,7 @@ export function orDash(value: number, digits: (v: number) => string): string {
 export const S = {
   kicker: loc('这一次寿命数据', 'This life data set'),
   introTitle: loc('寿命数据怎样画成直线，又怎样外推', 'How life data becomes a line, and how it is extrapolated'),
-  coreTitle: loc('拨一拨：样本量、截尾与种子怎样影响拟合', 'Try it: how sample size, censoring and seed affect the fit'),
+  coreTitle: loc('练一练：样本量、截尾与种子怎样影响拟合', 'Practice: how sample size, censoring and seed affect the fit'),
   coreNote: loc(
     '真值 β、η 决定样本怎样生成（逆 CDF 抽样）；拟合结果只是估计。图的横轴是对数时间，纵轴是 Weibull 概率坐标 ln(−ln(1−F))：数据近似成一条直线时，斜率就是 β̂，直线与真值的差就是估计误差。',
     'The true β and η decide how the sample is generated (inverse-CDF sampling); the fit is only an estimate. The x-axis is log time and the y-axis is the Weibull probability scale ln(−ln(1−F)). When the data lie near a line, its slope is β̂, and the gap from the true line is the estimation error.',

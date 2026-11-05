@@ -39,7 +39,7 @@ export const CLAIM_OPTIONS = CLAIM_IDS.map((id) => ({
 export const S = {
   kickerNow: loc('这一条链路', 'This link'),
   introTitle: loc('光眼图、OMA 与 BER', 'The optical eye, OMA and BER'),
-  coreTitle: loc('拨一拨：OMA、损耗与噪声', 'Try it: OMA, loss and noise'),
+  coreTitle: loc('练一练：OMA、损耗与噪声', 'Practice: OMA, loss and noise'),
   coreNote: loc(
     '上面的方块高度是发射 OMA，旁边标消光比。下面是 BER 对接收 OMA，虚线是 1e-12。游标从最左边开始，停在曲线最接近 1e-12 的那一点。',
     'The height of the upper block is the transmitted OMA, with the extinction ratio labeled beside it. Below, BER is plotted against received OMA, and the dashed line is 1e-12. The cursor starts at the left. Park it on the point closest to 1e-12.',
@@ -72,8 +72,8 @@ export const S = {
   ),
   next: loc('下一课：CPO 测试流程与成本', 'Next: CPO test flow and cost'),
   task1: loc(
-    `把 σ 调到 10 µA、R 调到 0.8 A/W，抖动保持 0。灵敏度应约为 ${REF_DBM} dBm（${REF_MW} mW）。`,
-    `Set σ to 10 µA and R to 0.8 A/W, and leave jitter at 0. The sensitivity should be about ${REF_DBM} dBm (${REF_MW} mW).`,
+    '把 σ 调到 10 µA、R 调到 0.8 A/W，抖动保持 0，再读灵敏度。',
+    'Set σ to 10 µA and R to 0.8 A/W, leave jitter at 0, and read the sensitivity.',
   ),
   task2: loc(
     '把 BER 曲线的游标停在最接近 1e-12 的那一点。',

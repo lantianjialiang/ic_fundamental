@@ -15,6 +15,7 @@ import { ShmooFig, WaveFig } from './TimingFig'
 import { DEFAULT_TIMING, DEVICE_OPTIONS, PERIOD_OPTIONS_NS, analyseTiming, bisectEdge, tAAOf, windowOf, type TimingState } from './memTimingModel'
 import { INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, fmt, taskItems, verdictOf } from './memTimingData'
 import { MEM_META } from './meta'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -53,7 +54,18 @@ export function MemTimingPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['memRw', 'memDram', 'hsTiming']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state)} />
+
         <div className="mtim-controls">
           <div className="mtim-field">
             <span className="mtim-field__label">{t(S.deviceLabel)}</span>
@@ -139,13 +151,7 @@ export function MemTimingPage({ moduleId, onModuleChange }: Props) {
         </p>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

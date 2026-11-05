@@ -15,6 +15,7 @@ import { fill } from './relStressData'
 import { INTRO, MISCONCEPTIONS, orDash, QUIZ, S, TAKEAWAY, taskItems, verdictOf, modeLabel } from './relWeibullData'
 import { analyseWeibull, DEFAULT_WEIBULL, failureMode, type WeibullState } from './relWeibullModel'
 import './relWeibull.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -45,7 +46,18 @@ export function RelWeibullPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['relStress', 'relBathtub', 'relAccel']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <div className="hs-controls">
           <Knob label={S.betaLabel} value={state.beta} unit="" min={0.5} max={4} step={0.1} onChange={(beta) => update({ beta })} />
           <Knob label={S.etaLabel} value={state.eta} unit="h" min={200} max={3000} step={50} onChange={(eta) => update({ eta })} />
@@ -85,13 +97,7 @@ export function RelWeibullPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

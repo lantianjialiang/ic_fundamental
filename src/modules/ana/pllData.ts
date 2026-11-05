@@ -29,7 +29,7 @@ const JITTER_RSS = Math.sqrt(Q_REF_JITTER ** 2 + VCO_JITTER_PS ** 2)
 export const S = {
   kickerNow: loc('这一次测试', 'This test run'),
   introTitle: loc('PLL 时钟测试：要测的四个量', 'PLL clock test: four quantities to measure'),
-  coreTitle: loc('拨一拨：参考、带宽与抖动', 'Try it: reference, bandwidth and jitter'),
+  coreTitle: loc('练一练：参考、带宽与抖动', 'Practice: reference, bandwidth and jitter'),
   coreNote: loc(
     '虚拟 PLL（VDUT-PLL1）把参考晶振倍频成输出时钟。f_ref 与 f_out 的组合决定整数分频比 N。BW 拨大锁得快，但超过 f_ref / 10 就不稳定。参考的 ppm 误差与抖动会直接传到输出。所有数值都是模型生成的示意结果。',
     'The virtual PLL (VDUT-PLL1) multiplies a reference crystal into the output clock. The f_ref and f_out pair sets the integer divider N. A wider BW locks faster, but above f_ref / 10 the loop is unstable. The reference ppm error and jitter pass straight through to the output. All values are illustrative model output.',
@@ -62,7 +62,7 @@ export const S = {
     'This lesson covers only lock, frequency error and period jitter; correcting the reference ppm error by trim comes in the next lesson.',
   ),
   nextPrefix: loc('下一课：', 'Next: '),
-  task1: loc('把锁定时间压到 10 µs 规格以内（BW 约 130 kHz 以上，且环路稳定）。', 'Bring the lock time within the 10 µs spec (BW about 130 kHz or more, with a stable loop).'),
+  task1: loc('把锁定时间压到 10 µs 规格以内（带宽提高到大约 130 kHz 以上，且环路稳定）。', 'Bring the lock time within the 10 µs spec (raise the bandwidth above about 130 kHz, with a stable loop).'),
   task2: loc(
     '让频率误差超过 ±50 ppm 规格，同时 PLL 仍然正常锁定（它不会修正参考的误差）。',
     'Push the output frequency error beyond the ±50 ppm spec while the PLL still locks normally (it does not correct the reference error).',

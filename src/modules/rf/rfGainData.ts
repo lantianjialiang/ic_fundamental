@@ -14,7 +14,7 @@ export const DEVICE_OPTIONS: Array<{ id: DeviceKind; label: LText }> = [
 export const S = {
   kickerNow: loc('这一条增益曲线', 'This gain curve'),
   introTitle: loc('增益、插损与频率响应', 'Gain, insertion loss and frequency response'),
-  coreTitle: loc('拨一拨：器件、Q 与工作带宽', 'Try it: device, Q and operating band'),
+  coreTitle: loc('练一练：器件、Q 与工作带宽', 'Practice: device, Q and operating band'),
   coreNote: loc(
     '频率响应用二阶带通做教学模型（不对应真实器件）：中心频率 f0 增益最高，离开 f0 衰减加快。金色带是工作带宽，平坦度只在它里面算；虚线是峰值下降 3 dB 的位置。',
     'The frequency response uses a second-order band-pass as a teaching model (not a real device): gain peaks at f0 and falls faster away from it. The gold band is the operating band where flatness is measured; the dashed line is 3 dB below the peak.',
@@ -38,7 +38,7 @@ export const S = {
   ),
   next: loc('下一课：输出功率与 P1dB', 'Next: Output Power and P1dB'),
   task1: loc('切到无源器件，读出插入损耗（IL 为正数）。', 'Switch to the passive device and read the insertion loss (IL is a positive number).'),
-  task2: loc('把 3 dB 带宽收窄到 1.2 GHz 以下（BW ≈ f0 ÷ Q）。', 'Narrow the 3 dB bandwidth below 1.2 GHz (BW ≈ f0 ÷ Q).'),
+  task2: loc('把 3 dB 带宽收窄到 1.2 GHz 以下。', 'Narrow the 3 dB bandwidth below 1.2 GHz.'),
   task3: loc('把工作带宽拉宽，让平坦度超过 1 dB（FAIL）。', 'Widen the operating band until the flatness goes above 1 dB (FAIL).'),
   task4: loc(
     '把工作带宽拉到 2 GHz 以上，同时平坦度通过（PASS）。提示：工作带宽占 f0 的比例越小，带内越平。',

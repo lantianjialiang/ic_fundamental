@@ -25,6 +25,7 @@ import {
 } from './snsPtcData'
 import { DEFAULT_PTC, analysePtc, buildPtcFrames, ptcFlags, type PtcState } from './snsPtcModel'
 import './sns.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -65,7 +66,18 @@ export function SnsPtcPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['snsPixel', 'anaStats', 'anaMeasure']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <Callout>{t(S.teach)}</Callout>
         <div className="hs-controls">
           <Knob label={S.kLabel} value={state.kTrue} unit="e-/DN" min={5} max={20} step={1} onChange={(v) => update({ kTrue: v })} />
@@ -119,13 +131,7 @@ export function SnsPtcPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

@@ -24,6 +24,7 @@ import {
 } from './rfPhaseNoiseData'
 import { analysePn, DEFAULT_PN, fmtFreq, offsetHz, type PnState } from './rfPhaseNoiseModel'
 import './rfPhaseNoise.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -53,7 +54,18 @@ export function RfPhaseNoisePage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaPll', 'rfHarm', 'rfEvm']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <div className="hs-controls">
           <div className="hs-field">
             <span className="hs-field__label">{t(S.f0Label)}</span>
@@ -105,13 +117,7 @@ export function RfPhaseNoisePage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

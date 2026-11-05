@@ -14,6 +14,7 @@ import { contactVerdict, hvVerdict, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, ta
 import { LAB_TAB_IDS, PwrKelvinLab, type LabTab } from './PwrKelvinLab'
 import { analyseContact, analyseHv, DEFAULT_CONTACT, DEFAULT_HV, type ContactState, type HvState } from './pwrKelvinModel'
 import './pwrKelvin.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -53,7 +54,18 @@ export function PwrKelvinPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['pwrStatic', 'anaMeasure', 'anaLeak', 'anaSmu']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(contact, ca, hv, ha)} />
+
         <PwrKelvinLab
           tab={tab}
           onTab={setTab}
@@ -64,13 +76,7 @@ export function PwrKelvinPage({ moduleId, onModuleChange }: Props) {
         />
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

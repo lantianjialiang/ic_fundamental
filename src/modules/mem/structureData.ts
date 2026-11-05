@@ -14,7 +14,7 @@ export const MAP_OPTIONS = MAPPINGS.map((id) => ({ id, label: MAP_LABEL[id] }))
 export const S = {
   kicker: loc('这一次地址', 'This address'),
   introTitle: loc('存储器里面是什么', 'What is inside a memory'),
-  coreTitle: loc('拨一拨：地址怎样落到行和列', 'Try it: how an address lands on a row and column'),
+  coreTitle: loc('练一练：地址怎样落到行和列', 'Practice: how an address lands on a row and column'),
   coreNote: loc(
     '每个 Cell 存 1 位。Cell 排成行（Row，同一条字线）和列（Column，同一条位线），一整块阵列叫一个 Bank，地址的最高位选 Bank。下图是 2 个 Bank，每个 8 行 × 8 列，共 128 个单元。',
     'Each cell stores one bit. Cells sit in rows (one word line each) and columns (one bit line each); a whole array is a bank, and the top address bit picks the bank. The figure shows 2 banks of 8 rows × 8 columns, 128 cells in all.',
@@ -44,7 +44,7 @@ export const S = {
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
   task1: loc('地址设为 9，线性映射下读出它在第几行、第几列（行 1、列 1）。', 'Set the address to 9 with linear mapping and read its row and column (row 1, column 1).'),
   task2: loc('切到交错映射，地址设为 0，看地址 0 与 1 为什么在同一列。', 'Switch to interleaved mapping, set the address to 0, and see why addresses 0 and 1 share a column.'),
-  task3: loc('地址设为 63，看 addr+1（64）为什么落在另一个 Bank。', 'Set the address to 63 and see why addr+1 (64) lands in another bank.'),
+  task3: loc('地址设为 63，看 addr+1 为什么落在另一个 Bank。', 'Set the address to 63 and see why addr+1 lands in another bank.'),
   task4: loc('找一个 addr+1 的物理距离大于 1 的地址（例如 7），看它与下一个地址隔了几格。', 'Find an address whose addr+1 is more than 1 cell away (for example 7) and count the cells between them.'),
 }
 

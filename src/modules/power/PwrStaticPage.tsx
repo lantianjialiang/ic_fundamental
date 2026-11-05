@@ -42,6 +42,7 @@ import {
   type StaticState,
 } from './pwrStaticModel'
 import './pwrStatic.css'
+import { LEARN_TITLE, PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -140,7 +141,24 @@ export function PwrStaticPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaSmu', 'anaStatic', 'anaLeak']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(LEARN_TITLE)}>
+                <p className="pwr-formula">{t(S.complianceNote)}</p>
+                <p className="pwr-formula">{t(S.thermalNote)}</p>
+                <p className="pwr-formula">{t(S.formulaNote)}</p>
+      </Section>
+
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state)} />
+
         <div className="hs-controls">
           <div className="hs-field">
             <span className="hs-field__label">{t(S.paramLabel)}</span>
@@ -213,8 +231,6 @@ export function PwrStaticPage({ moduleId, onModuleChange }: Props) {
             />
           ) : null}
         </div>
-        <p className="pwr-formula">{t(S.complianceNote)}</p>
-        <p className="pwr-formula">{t(S.thermalNote)}</p>
         {state.param === 'vth' ? <Callout tone="warn">{t(S.vthNote)}</Callout> : null}
 
         <div className="hs-grid">
@@ -223,16 +239,9 @@ export function PwrStaticPage({ moduleId, onModuleChange }: Props) {
             <Readout items={items} />
           </div>
         </div>
-        <p className="pwr-formula">{t(S.formulaNote)}</p>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

@@ -61,7 +61,7 @@ export const TEST_SEG = TEST_TYPES.map((id) => ({ id, label: TEST_INFO[id].name 
 export const S = {
   kicker: loc('这一次试验方案', 'This test plan'),
   introTitle: loc('试验为什么要抽样，又怎么换算成 FIT', 'Why test a sample, and how it becomes a FIT'),
-  coreTitle: loc('拨一拨：选试验类型，看样本与时间换来多少把握', 'Try it: pick a test and see what sample and time buy'),
+  coreTitle: loc('练一练：选试验类型，看样本与时间换来多少把握', 'Practice: pick a test and see what sample and time buy'),
   coreNote: loc(
     '试验类型决定应力：HTOL、HTSL、HAST 调应力温度，按 Arrhenius 算 AF；TC 调温度循环的温差，按 Coffin-Manson 算 AF。批次数乘以每批片数得到样本数 n。',
     'The test type sets the stress: HTOL, HTSL and HAST use the stress temperature with AF from Arrhenius; TC uses the cycle swing with AF from Coffin-Manson. Batches times units per batch gives the sample size n.',
@@ -128,14 +128,14 @@ export const S = {
   ),
   next: loc('下一课：Weibull 与 FIT', 'Next: Weibull and FIT'),
   task1: loc(
-    'n = 231（3 批 × 77 片）、h = 1000、r = 0、CL = 60%，读出 FIT 上限（约 51）。',
-    'n = 231 (3 batches × 77), h = 1000, r = 0, CL = 60%: read the FIT upper bound (about 51).',
+    'n = 231（3 批 × 77 片）、h = 1000、r = 0、CL = 60%，读出 FIT 上限。',
+    'n = 231 (3 batches × 77), h = 1000, r = 0, CL = 60%: read the FIT upper bound.',
   ),
-  task2: loc('其它条件同 T1，把 CL 改为 90%，上限约 128 FIT。', 'Same as T1 but CL = 90%: the bound is about 128 FIT.'),
+  task2: loc('其它条件同 T1，把 CL 改为 90%，再读上限。', 'Same as T1 but CL = 90%: read the bound again.'),
   task3: loc('其它条件同 T1，出现 r = 1 后重新计算上限。', 'Same as T1 but with r = 1 after the test: recompute the bound.'),
   task4: loc(
-    '目标 50 FIT、CL 60%、固定 1000 h，求出最少样本量（约 236）。',
-    'Target 50 FIT, CL 60%, fixed 1000 h: find the minimum sample size (about 236).',
+    '目标 50 FIT、CL 60%、固定 1000 h，求出最少样本量。',
+    'Target 50 FIT, CL 60%, fixed 1000 h: find the minimum sample size.',
   ),
 }
 

@@ -59,7 +59,7 @@ export const S = {
     'Teaching illustration: values are for the virtual device VDUT-PIC1 and do not match any foundry process.',
   ),
   introTitle: loc('波长、功率和可以相加的 dB', 'Wavelength, power, and dB that add'),
-  coreTitle: loc('拨一拨：从激光到输出光栅', 'Try it: from the laser to the output grating'),
+  coreTitle: loc('练一练：从激光到输出光栅', 'Practice: from the laser to the output grating'),
   coreNote: loc(
     'dB 损耗直接相加，再从激光的 dBm 里减去。mW 不能这样减。3 dB 大约是功率减半。波长只改频率，不改这条链路上的 dB 旋钮。',
     'Losses in dB add, then subtract from the laser dBm. Milliwatts do not subtract that way. 3 dB is about half the power. Wavelength changes the frequency only; it does not change the dB knobs on this link.',
@@ -92,12 +92,12 @@ export const S = {
     'The electrical use of dB and dBm is in {@rfDb}. Free spectral range uses the group index ng, which the next lesson computes.',
   ),
   next: loc('下一课：波导、MZI 与环形谐振器', 'Next: waveguides, the MZI and the ring'),
-  task1: loc('把波长设为 1550 nm，读出频率（应为 193.4 THz，容差 0.1 THz）。', 'Set the wavelength to 1550 nm and read the frequency (it should be 193.4 THz, within 0.1 THz).'),
+  task1: loc('把波长设为 1550 nm，读出频率。', 'Set the wavelength to 1550 nm and read the frequency.'),
   task2: loc(
-    '激光 10 dBm、输入光栅 3 dB、波导 0.5 cm、损耗 2.5 dB/cm、调制器 4 dB、输出光栅 3 dB，读出到达功率（应为 -1.25 dBm）。',
-    'Set the laser to 10 dBm, the input grating to 3 dB, the waveguide to 0.5 cm at 2.5 dB/cm, the modulator to 4 dB and the output grating to 3 dB. Read the arrival power (it should be -1.25 dBm).',
+    '激光 10 dBm、输入光栅 3 dB、波导 0.5 cm、损耗 2.5 dB/cm、调制器 4 dB、输出光栅 3 dB，读出到达功率。',
+    'Set the laser to 10 dBm, the input grating to 3 dB, the waveguide to 0.5 cm at 2.5 dB/cm, the modulator to 4 dB and the output grating to 3 dB. Read the arrival power.',
   ),
-  task3: loc('打开“换算 -3 dBm”，读出约 0.501 mW。', 'Turn on Convert -3 dBm and read about 0.501 mW.'),
+  task3: loc('打开“换算 -3 dBm”，读出对应的毫瓦数。', 'Turn on Convert -3 dBm and read the value in milliwatts.'),
   task4: loc('在四段损耗里选当前 dB 最大的那一段。旋钮一变，答案会跟着变。', 'Among the four loss terms, pick the one with the largest dB. The answer follows the knobs.'),
   arriveTitle: loc('到达功率由 dB 相加得到', 'Arrival power comes from adding dB'),
   arriveText: loc(

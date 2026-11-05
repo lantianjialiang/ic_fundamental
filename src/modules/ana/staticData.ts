@@ -67,7 +67,7 @@ export const S = {
   kickerNow: loc('这一次测量', 'This measurement'),
   next: loc('下一课', 'Next lesson'),
   introTitle: loc('ADC 怎样把电压变成码：静态参数先看什么', 'How an ADC turns voltage into codes: which static parameters come first'),
-  coreTitle: loc('拨一拨：器件与样本数', 'Try it: device and sample count'),
+  coreTitle: loc('练一练：器件与样本数', 'Practice: device and sample count'),
   coreNote: loc(
     '虚构 6 位 ADC VDUT-ADC1，共 64 个码。输入是一段覆盖 −2 ~ 66 LSB 的斜坡，统计每个码的命中数（码密度直方图）。数字是教学示意，不对应任何真实器件。',
     'Virtual 6-bit ADC VDUT-ADC1 with 64 codes. The input is a ramp covering −2 to 66 LSB; the hits in each code form the code-density histogram. The numbers are a teaching model, not a real device.',

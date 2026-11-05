@@ -22,7 +22,7 @@ export const S = {
   nextPrefix: loc('下一课：', 'Next: '),
   kickerNow: loc('这一次判定', 'This test decision'),
   introTitle: loc('限值与统计：测得值怎么变成合格或不合格', 'Limits and statistics: how a reading becomes pass or fail'),
-  coreTitle: loc('拨一拨：工艺分布、保护带与测量误差', 'Try it: process spread, guardband and measurement error'),
+  coreTitle: loc('练一练：工艺分布、保护带与测量误差', 'Practice: process spread, guardband and measurement error'),
   coreNote: loc(
     '规格是 LSL 1150 mV、USL 1250 mV，标称 1200 mV。器件的真实值服从工艺分布 μ、σ；测量会再叠加重复性 σm 和测试机偏置 bias。测试只看测得值，并用保护带把测试限值向规格内收缩。数字是教学示意。',
     'The spec is LSL 1150 mV and USL 1250 mV, nominal 1200 mV. True values follow the process distribution μ, σ; measurement adds repeatability σm and the tester bias. The test only sees the measured value and tightens the test limits inside the spec by the guardband. The numbers are illustrative.',

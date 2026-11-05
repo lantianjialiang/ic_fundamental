@@ -14,6 +14,7 @@ import { BathFig, HistFig, RelCurveFig } from './RelBathtubFig'
 import { INTRO, MISCONCEPTIONS, QUIZ, S, SEG_OPTIONS, TAKEAWAY, taskItems, verdictOf } from './relBathtubData'
 import { DEFAULT_BATH, PPM_TARGET, analyseBath, fmtHours, type BathState } from './relBathtubModel'
 import './relBathtub.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -44,7 +45,18 @@ export function RelBathtubPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['latch', 'relAccel']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <div className="hs-controls">
           <Knob label={S.earlyLabel} value={earlyPct} unit="%" min={0} max={5} step={0.5} onChange={(v) => update({ earlyFrac: v / 100 })} />
           <Knob label={S.betaEarlyLabel} value={state.betaEarly} unit="" min={0.3} max={0.9} step={0.05} onChange={(v) => update({ betaEarly: v })} />
@@ -92,13 +104,7 @@ export function RelBathtubPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

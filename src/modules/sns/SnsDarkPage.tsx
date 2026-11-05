@@ -14,6 +14,7 @@ import { FrameView } from './plots'
 import { FOCUS_OPTIONS, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, fill, taskItems, verdictOf } from './snsDarkData'
 import { COMPARE_S, DEFAULT_DARK, analyseDark, type DarkState, type HistBin } from './snsDarkModel'
 import './sns.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 const BG = '#0d1117'
 const BOX = '#161b22'
@@ -137,7 +138,18 @@ export function SnsDarkPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaStats']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <Callout>{t(S.callout)}</Callout>
         <div className="hs-controls">
           <Knob label={S.darkLabel} value={state.darkE25} unit="e-/s" min={1} max={100} step={1} onChange={(v) => update({ darkE25: Math.round(v) })} />
@@ -201,13 +213,7 @@ export function SnsDarkPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

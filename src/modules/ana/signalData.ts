@@ -15,7 +15,7 @@ import {
 export const S = {
   kickerNow: loc('这一次波形与滤波', 'This waveform and filter run'),
   introTitle: loc('连续信号：周期、频率、幅度与相位', 'Continuous signals: period, frequency, amplitude and phase'),
-  coreTitle: loc('拨一拨：频率、幅度与相位', 'Try it: frequency, amplitude and phase'),
+  coreTitle: loc('练一练：频率、幅度与相位', 'Practice: frequency, amplitude and phase'),
   coreNote: loc(
     '两路正弦共用频率 f。A 路是参考（相位 0°），B 路的相位可以调。相位差只在同频时才有确定的意义，所以两路必须用同一个 f。',
     'Both sine waves share the frequency f. Channel A is the reference at 0°, and you can set the phase of channel B. A phase difference only has a clear meaning at the same frequency, so both channels use one f.',

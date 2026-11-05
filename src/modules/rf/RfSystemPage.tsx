@@ -16,6 +16,7 @@ import { PRESETS, DEFAULT_SYSTEM, analyseLink, partsOf, type PresetId, type RfSy
 import { fmtFixed, formatSi } from './rfFormat'
 import { dbmToWatt } from './core/units'
 import './rfSystem.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -51,7 +52,18 @@ export function RfSystemPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['rfDb', 'hsAteLimit']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <div className="hs-controls">
           <div className="hs-field">
             <span className="hs-field__label">{t(S.presetLabel)}</span>
@@ -93,13 +105,7 @@ export function RfSystemPage({ moduleId, onModuleChange }: Props) {
         </Callout>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

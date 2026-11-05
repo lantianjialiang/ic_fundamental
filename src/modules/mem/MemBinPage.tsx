@@ -25,6 +25,7 @@ import {
 } from './memBinData'
 import { analyse, type BinState, DEFAULT_BIN, DEFAULT_SEED, genMap, type MapKind, NO_GUESS } from './memBinModel'
 import './memBin.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -67,7 +68,18 @@ export function MemBinPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['memBist', 'memCoverage', 'memMarch']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <div className="mem-bin-controls">
           <div className="mem-bin-field">
             <span className="mem-bin-field__label">{t(S.kindLabel)}</span>
@@ -100,13 +112,7 @@ export function MemBinPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

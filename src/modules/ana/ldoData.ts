@@ -39,7 +39,7 @@ export const S = {
   kickerNow: loc('这一次测量', 'This measurement'),
   next: loc('下一课', 'Next lesson'),
   introTitle: loc('LDO 把 Vin 稳成 Vout：四个指标各测什么', 'An LDO holds Vout steady: what each spec measures'),
-  coreTitle: loc('拨一拨：Vin、负载与纹波频率', 'Try it: Vin, load and ripple frequency'),
+  coreTitle: loc('练一练：Vin、负载与纹波频率', 'Practice: Vin, load and ripple frequency'),
   coreNote: loc(
     '虚构器件 VDUT-LDO1，标称输出 3.3 V。下面的数字来自教学模型，是示意结果，不对应任何真实器件；限值也是示意值。',
     'Virtual part VDUT-LDO1, nominal output 3.3 V. The numbers come from a teaching model and are illustrative; they do not describe a real part, and the limits are illustrative too.',

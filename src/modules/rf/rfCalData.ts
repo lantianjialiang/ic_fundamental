@@ -16,7 +16,7 @@ export const CAL_OPTIONS: Array<{ id: CalMethod; label: LText }> = [
 export const S = {
   kickerNow: loc('这一次校准', 'This calibration run'),
   introTitle: loc('线缆和夹具也被测进了结果', 'The cable and fixture are measured too'),
-  coreTitle: loc('拨一拨：损耗、纹波与校准方式', 'Try it: loss, ripple and calibration method'),
+  coreTitle: loc('练一练：损耗、纹波与校准方式', 'Practice: loss, ripple and calibration method'),
   coreNote: loc(
     '测得值 = 真值 × 误差因子，换成 dB 就是相加。红线是不校准时的误差，蓝线是按当前方式补偿后的误差，金色带是 ±0.3 dB 的规格。',
     'Measured = true × error factor; in dB the two add. The red line is the error without calibration, the blue line is the error after the chosen compensation, and the gold band is the ±0.3 dB spec.',

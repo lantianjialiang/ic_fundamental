@@ -23,7 +23,7 @@ export const S = {
   nextPrefix: loc('下一课：', 'Next: '),
   kickerNow: loc('这一次修调', 'This trim run'),
   introTitle: loc('修调：用芯片里的一组码抵消工艺偏差', 'Trim: a code stored on chip cancels the process offset'),
-  coreTitle: loc('拨一拨：选 die 和搜索方法，再写入 OTP', 'Try it: pick a die and a search method, then program the OTP'),
+  coreTitle: loc('练一练：选 die 和搜索方法，再写入 OTP', 'Practice: pick a die and a search method, then program the OTP'),
   coreNote: loc(
     '虚拟基准源 VDUT-REF1 的目标输出是 1.200 V。未修调时，工艺偏差让它偏离目标。5 位修调码每码 2 mV，码 16 就是未修调的输出。写入 OTP 之后，die 和搜索方法都锁定。数字是教学示意。',
     'The virtual reference VDUT-REF1 targets 1.200 V. Untrimmed, process variation moves it off target. The 5-bit trim code steps 2 mV per code, and code 16 is the untrimmed output. Once the OTP is programmed, the die and search method lock. The numbers are illustrative.',

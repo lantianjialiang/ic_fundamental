@@ -55,7 +55,7 @@ export const TRACE_NAME: Record<TraceKey, LText> = {
 export const S = {
   kickerNow: loc('这一次流程', 'This flow'),
   introTitle: loc('从 CP 到 FT：一颗车规芯片要过几道关', 'From CP to FT: the gates an automotive chip passes'),
-  coreTitle: loc('拨一拨：排流程、开关站点、调 soak 与 Burn-in', 'Try it: order the flow, switch stations, tune soak and burn-in'),
+  coreTitle: loc('练一练：排流程、开关站点、调 soak 与 Burn-in', 'Practice: order the flow, switch stations, tune soak and burn-in'),
   coreNote: loc(
     '下面的虚拟群体约 2500 颗（8 片晶圆）。每个站只能抓到它覆盖的缺陷；每次温度切换都要 soak，直接影响 UPH 与测试成本。所有数字都是教学示意值，用来比较方案。',
     'The virtual population is about 2500 devices (8 wafers). Each station only catches the defects it covers; every temperature change needs a soak, which directly affects UPH and test cost. All numbers are teaching illustrations for comparing options.',

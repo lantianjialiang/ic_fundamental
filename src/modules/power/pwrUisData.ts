@@ -98,10 +98,10 @@ export const S = {
     'TSEP (estimating junction temperature from the body-diode drop) is covered as a concept only: the slope of V_F against temperature depends on the device and must be calibrated first.',
   ),
   next: loc('下一课：宽禁带器件（SiC 与 GaN）', 'Next: Wide-bandgap devices (SiC and GaN)'),
-  task1: loc('设 L = 1 mH、Ipk = 10 A、Vdd = 50 V、BV = 100 V，读出 E_AS（0.1 J）与 t_av（200 µs）。', 'Set L = 1 mH, Ipk = 10 A, Vdd = 50 V, BV = 100 V; read E_AS (0.1 J) and t_av (200 µs).'),
-  task2: loc('把额定 E_AS 调到 0.5 J，读出此时的最大 Ipk（约 22.4 A）。', 'Set the rated E_AS to 0.5 J and read the maximum Ipk at that rating (about 22.4 A).'),
+  task1: loc('设 L = 1 mH、Ipk = 10 A、Vdd = 50 V、BV = 100 V，读出 E_AS 与 t_av。', 'Set L = 1 mH, Ipk = 10 A, Vdd = 50 V, BV = 100 V; read E_AS and t_av.'),
+  task2: loc('把额定 E_AS 调到 0.5 J，读出此时的最大 Ipk。', 'Set the rated E_AS to 0.5 J and read the maximum Ipk at that rating.'),
   task3: loc('选 1 ms 或更长的脉宽，读出热限制线的允许电流（低于 150 A 的最大电流限）。', 'Pick a pulse of 1 ms or longer and read the allowed current on the thermal line (below the 150 A maximum-current limit).'),
-  task4: loc('设 P = 100 W、t = 1 ms，读出脉冲温升（约 9.06 K）。', 'Set P = 100 W and t = 1 ms; read the pulse temperature rise (about 9.06 K).'),
+  task4: loc('设 P = 100 W、t = 1 ms，读出脉冲温升。', 'Set P = 100 W and t = 1 ms; read the pulse temperature rise.'),
   vInvalidT: loc('参数无效', 'Invalid settings'),
   vUisFailT: loc('能量超过额定值', 'Energy above the rating'),
   vUisFailX: loc(

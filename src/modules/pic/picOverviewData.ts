@@ -149,8 +149,8 @@ export const S = {
   ),
   next: loc('下一课：波长、功率与 dB', 'Next: wavelength, power and dB'),
   task1: loc(
-    '把功率设为 10 W、速率设为 1.6 Tbps，读出每比特能量（应为 6.25 pJ/bit）。',
-    'Set the power to 10 W and the rate to 1.6 Tbps, and read the energy per bit (it should be 6.25 pJ/bit).',
+    '把功率设为 10 W、速率设为 1.6 Tbps，读出每比特能量。',
+    'Set the power to 10 W and the rate to 1.6 Tbps, and read the energy per bit.',
   ),
   task2: loc(
     '给 PIC、EIC、ELS、FAU、交换 ASIC、光纤、光栅耦合器、调制器八张卡片都选上正确角色。',

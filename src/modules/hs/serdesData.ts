@@ -74,10 +74,10 @@ export const S = {
   takeawayTitle: loc('带走这几句', 'Key takeaways'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
-  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqTitle: loc('先看懂：公式怎么来的', 'Learn this first: where the formulas come from'),
   prereqNote: loc(
-    '正文里的眼宽、眼高、总误码率与最佳相位都从这一节列出的几条推出。读完正文再回来看。',
-    'The eye width, eye height, total BER and best phase in the body are derived from the items below. Read the body first, then come back here.',
+    '正文里的眼宽、眼高、总误码率与最佳相位都从这一节列出的几条推出。先读完这一节，再做下面的练习。',
+    'The eye width, eye height, total BER and best phase in the body are derived from the items below. Read this section before the exercise below.',
   ),
   asideLater: loc(
     '真实的高速测试还要做 PRBS 同步、环回配置、CDR 的锁定与均衡器设置，并在多个温度与电压下重复。这里的样片与规格都是示意的，见 {@hsInterface}。',

@@ -47,7 +47,7 @@ export const S = {
   kickerNow: loc('这一路读出', 'This readout'),
   introTitle: loc('4T 像素怎么读出来', 'How a 4T pixel is read'),
   figAria: loc('4T 像素时序：左栏是 RST、TX、SEL，下方是 FD 电压', '4T pixel timing: RST, TX, and SEL in the left gutter, FD voltage below'),
-  coreTitle: loc('拨一拨：从电子到 DN', 'Try it: from electrons to DN'),
+  coreTitle: loc('练一练：从电子到 DN', 'Practice: from electrons to DN'),
   coreNote: loc(
     'VDUT-CIS1 的像素是 4T：复位 RST、转移 TX、行选 SEL，电荷落到浮空扩散 FD。转换增益 CG = q/C。总增益是 CG 乘源跟随增益再乘列增益。K = Vref / (2^N · 总增益)。模型里固定拿 5 e- 的读出噪声和量化噪声比，CDS 只从噪声和里拿走 kTC。',
     'A VDUT-CIS1 pixel is 4T: reset RST, transfer TX, row select SEL, and the charge lands on the floating diffusion FD. Conversion gain CG = q/C. Total gain is CG times the source-follower gain times the column gain. K = Vref / (2^N * total gain). The model compares quantization noise with a fixed read noise of 5 e-. CDS removes only kTC from the noise sum.',
@@ -80,16 +80,16 @@ export const S = {
   asideLater: loc('下一课用 PTC 从图像反推这里的 K，不需要打开像素去量电容。', 'The next lesson recovers this K from images with a PTC, without opening the pixel to measure the capacitor.'),
   next: loc('下一课：光子传递曲线（PTC）与转换增益', 'Next: Photon transfer curve (PTC) and conversion gain'),
   task1: loc(
-    '把 FD 电容调到 1 fF。转换增益应约为 160 µV/e-，因为 CG = q/C。',
-    'Set the FD capacitance to 1 fF. Conversion gain should be about 160 uV/e-, because CG = q/C.',
+    '把 FD 电容调到 1 fF，再读转换增益。它按 CG = q/C 算。',
+    'Set the FD capacitance to 1 fF, then read the conversion gain. It is CG = q/C.',
   ),
   task2: loc(
     '打开 CDS。噪声和里的 kTC 被减掉，残余只剩量化噪声。CDS 不去掉信号的散粒噪声，也不去掉那 5 e- 读出噪声。',
     'Turn CDS on. kTC leaves the noise sum and the residual equals the quantization noise alone. CDS does not remove shot noise of the signal, and it does not remove the 5 e- read noise.',
   ),
   task3: loc(
-    '把 ADC 调到 10 bit、Vref 调到 1 V，并把总增益调到约 100 µV/e-（例如 C = 1 fF、源跟随 0.78、列增益 0.80）。此时 K 约 9.77 e-/DN，量化噪声约 2.82 e-。再把“量化是否主导”拨到和 5 e- 读出噪声比较后的正确一侧。',
-    'Set the ADC to 10 bits and Vref to 1 V, and set the total gain near 100 uV/e- (for example C = 1 fF, source follower 0.78, column gain 0.80). Then K is about 9.77 e-/DN and quantization noise is about 2.82 e-. Set "does quantization dominate" to the side that matches the comparison with the 5 e- read noise.',
+    '把 ADC 调到 10 bit、Vref 调到 1 V，并把总增益调到约 100 µV/e-（例如 C = 1 fF、源跟随 0.78、列增益 0.80）。再读 K 和量化噪声，并把“量化是否主导”拨到和 5 e- 读出噪声比较后的正确一侧。',
+    'Set the ADC to 10 bits and Vref to 1 V, and set the total gain near 100 uV/e- (for example C = 1 fF, source follower 0.78, column gain 0.80). Then read K and the quantization noise, and set "does quantization dominate" to the side that matches the comparison with the 5 e- read noise.',
   ),
   task4: loc(
     '调节行时间和行数，使卷帘偏斜等于 10 ms。偏斜 = 行时间 × 行数，例如 10 µs 乘 1000 行。',

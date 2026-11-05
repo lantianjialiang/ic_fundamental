@@ -23,6 +23,7 @@ import {
   type Ip3State,
 } from './rfIp3Model'
 import './rfIp3.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -68,7 +69,18 @@ export function RfIp3Page({ moduleId, onModuleChange }: Props) {
         <Related ids={['rfP1db', 'anaFft', 'rfModulation']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <div className="rfip3-controls">
           <Knob label={S.f1Label} value={state.f1} unit="MHz" min={TONE_MIN_MHZ} max={TONE_MAX_MHZ} step={1} onChange={(f1) => update({ f1 })} />
           <Knob label={S.f2Label} value={state.f2} unit="MHz" min={TONE_MIN_MHZ} max={TONE_MAX_MHZ} step={1} onChange={(f2) => update({ f2 })} />
@@ -84,13 +96,7 @@ export function RfIp3Page({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

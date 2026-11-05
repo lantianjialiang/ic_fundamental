@@ -26,7 +26,7 @@ export const DELTA_OPTIONS = DELTA_IDS.map((id) => ({
 export const S = {
   kickerNow: loc('这一次对准', 'This alignment'),
   introTitle: loc('光栅、边缘耦合与主动对准', 'Grating, edge coupling and active alignment'),
-  coreTitle: loc('拨一拨：三种搜索', 'Try it: three searches'),
+  coreTitle: loc('练一练：三种搜索', 'Practice: three searches'),
   coreNote: loc(
     '热图是耦合读数（dBm，越亮越高）。白圈是真峰，金点是当前算法停下的位置，金线是它走过的点。三种算法的步数和时间始终都列在右边。',
     'The heat map is the coupling reading (dBm, brighter is higher). The white ring is the true peak, the gold dot is where the selected search stopped, and the gold line is the points it visited. Moves and time for all three searches stay listed on the right.',
@@ -61,8 +61,8 @@ export const S = {
   ),
   next: loc('下一课：晶圆级光电测试与参数提取', 'Next: Wafer-level photonic test and parameter extraction'),
   task1: loc(
-    '打开「Δ = w」的例子。附加损耗应当是 4.343 dB（L0 取 0）。',
-    'Turn on the Δ = w example. The extra loss should be 4.343 dB (with L0 set to 0).',
+    '打开「Δ = w」的例子，读出附加损耗（L0 取 0）。',
+    'Turn on the Δ = w example and read the extra loss, with L0 set to 0.',
   ),
   task2: loc(
     '把读数噪声调到 0，让当前选中的算法把附加损耗降到 0.2 dB 以内。噪声大于 0 时这项不算完成。',

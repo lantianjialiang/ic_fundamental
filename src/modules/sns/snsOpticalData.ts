@@ -29,7 +29,7 @@ export const SOURCE_OPTIONS = SOURCE_IDS.map((id) => ({
 export const S = {
   kickerNow: loc('这一套光路', 'This optical setup'),
   introTitle: loc('颜色、光谱与光学测试系统', 'Color, spectrum and the optical test system'),
-  coreTitle: loc('拨一拨：均匀度、校准与传输时间', 'Try it: uniformity, calibration and transfer time'),
+  coreTitle: loc('练一练：均匀度、校准与传输时间', 'Practice: uniformity, calibration and transfer time'),
   coreNote: loc(
     '测得 PRNU = sqrt(真 PRNU^2 + 光源非均匀^2)。更亮不会缩小这一项。数据量 = 像素数 × 位宽 / 8，传输时间 = 字节 × 帧数 × 8 / 链路速率。',
     'Measured PRNU = sqrt(true PRNU^2 + source non-uniformity^2). Making the source brighter does not shrink that term. Bytes = pixels x bits / 8. Transfer time = bytes x frames x 8 / link rate.',
@@ -63,8 +63,8 @@ export const S = {
   ),
   next: loc('下一课：MEMS 加速度计', 'Next: MEMS accelerometer'),
   task1: loc(
-    '把真 PRNU 调到 0.5%、光源非均匀调到 0.3%，读出测得 PRNU（应为 0.583%）。',
-    'Set true PRNU to 0.5% and source non-uniformity to 0.3%, and read the measured PRNU (it should be 0.583%).',
+    '把真 PRNU 调到 0.5%、光源非均匀调到 0.3%，读出测得 PRNU。',
+    'Set true PRNU to 0.5% and source non-uniformity to 0.3%, and read the measured PRNU.',
   ),
   task2: loc(
     '设成 12 MP、12 bit、50 帧、2.5 Gbps，读出每帧 18 MB 和传输时间 2.88 s。',

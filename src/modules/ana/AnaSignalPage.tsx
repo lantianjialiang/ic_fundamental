@@ -13,6 +13,7 @@ import { BodeFig, WaveFig } from './SignalFig'
 import { FILTER_OPTIONS, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, taskItems, verdictOf } from './signalData'
 import { DEFAULT_SIGNAL, signalResult, type SignalState } from './signalModel'
 import './ana.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -43,7 +44,18 @@ export function AnaSignalPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaMeasure', 'anaSampling', 'anaFft']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, result)} />
+
         <div className="ana-controls">
           <Knob label={S.fLabel} value={state.f} unit="kHz" min={0.5} max={5} step={0.1} onChange={(f) => update({ f })} />
           <Knob label={S.ampALabel} value={state.ampA} unit="V" min={0.2} max={2} step={0.1} onChange={(ampA) => update({ ampA })} />
@@ -77,13 +89,7 @@ export function AnaSignalPage({ moduleId, onModuleChange }: Props) {
         <BodeFig state={state} />
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

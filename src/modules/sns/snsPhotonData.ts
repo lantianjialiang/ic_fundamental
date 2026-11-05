@@ -43,7 +43,7 @@ export const S = {
   ),
   kickerNow: loc('这一档噪声', 'This noise term'),
   introTitle: loc('从光子到电子', 'From photons to electrons'),
-  coreTitle: loc('拨一拨：响应度与信噪比', 'Try it: responsivity and SNR'),
+  coreTitle: loc('练一练：响应度与信噪比', 'Practice: responsivity and SNR'),
   coreNote: loc(
     '功率、面积、曝光和量子效率用来算光子与光生电子。SNR 用单独的信号电子旋钮，方便对到 10000 或读噪的平方，不必反推光功率。蓝线是当前暗电子和读噪下的 SNR，金线是只剩散粒噪声的极限。',
     'Power, area, exposure, and quantum efficiency compute photons and photoelectrons. SNR uses a separate signal-electron knob so you can land on 10000 or on the square of the read noise without backing out an optical power. The blue line is SNR with the current dark electrons and read noise. The gold line is the shot-noise limit.',
@@ -80,16 +80,16 @@ export const S = {
   asideLater: loc('下一课把这些电子放进 4T 像素，看复位、转移和 ADC 怎样变成 DN。', 'The next lesson puts these electrons into a 4T pixel and follows reset, transfer, and the ADC into DN.'),
   next: loc('下一课：CMOS 图像传感器：像素与读出链', 'Next: CMOS image sensor: pixel and readout chain'),
   task1: loc(
-    '把波长调到 550 nm、量子效率调到 0.6。响应度应约为 0.266 A/W，因为 R = QE·λ(µm) / 1.2398。',
-    'Set the wavelength to 550 nm and the quantum efficiency to 0.6. Responsivity should be about 0.266 A/W, because R = QE * lambda(um) / 1.2398.',
+    '把波长调到 550 nm、量子效率调到 0.6，再读响应度。它按 R = QE·λ(µm) / 1.2398 算。',
+    'Set the wavelength to 550 nm and the quantum efficiency to 0.6, then read the responsivity. It is R = QE * lambda(um) / 1.2398.',
   ),
   task2: loc(
-    '把信号电子调到 10000，暗电流和读出噪声都调到 0。散粒噪声极限 SNR 是 40 dB，因为 √10000 = 100，20·log10(100) = 40。',
-    'Set the signal to 10000 electrons and set both dark current and read noise to 0. The shot-noise-limited SNR is 40 dB, because sqrt(10000) = 100 and 20*log10(100) = 40.',
+    '把信号电子调到 10000，暗电流和读出噪声都调到 0，再读散粒噪声极限下的 SNR。它是 20·log10(√N)。',
+    'Set the signal to 10000 electrons and set both dark current and read noise to 0, then read the shot-noise-limited SNR. It is 20·log10(√N).',
   ),
   task3: loc(
-    '把信号电子调到读出噪声的平方，误差在 5% 以内。例如读噪 20 e- 时信号约 400，因为散粒噪声等于读噪的位置是 σr²。',
-    'Set the signal electrons to the square of the read noise, within 5%. For example, with read noise 20 e- the signal is about 400, because shot noise equals read noise at sigma_r squared.',
+    '把信号电子调到读出噪声的平方，误差在 5% 以内。例如读噪 20 e- 时，信号就取这个平方。散粒噪声等于读噪的位置是 σr²。',
+    'Set the signal electrons to the square of the read noise, within 5%. With read noise 20 e-, the signal is that square. Shot noise equals read noise at sigma_r squared.',
   ),
   task4: loc(
     '看当前数字：读出噪声主导的条件是 σr² 大于信号电子加暗电子。把选择拨到真正主导的那一项。',

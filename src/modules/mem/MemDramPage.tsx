@@ -13,6 +13,7 @@ import { DramArrayFig, DramDecayFig, DramSweepFig } from './MemDramFig'
 import { INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, taskItems, verdictOf } from './memDramData'
 import { DEFAULT_DRAM, SWEEP_MS, TREF_MAX, TREF_MIN, TREF_STEP, analyseDram, failSweep, type DramState } from './memDramModel'
 import { MEM_META } from './meta'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -47,7 +48,18 @@ export function MemDramPage({ moduleId, onModuleChange }: Props) {
         <Steps items={[S.cmdAct, S.cmdRw, S.cmdPre, S.cmdRef]} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <div className="hs-controls">
           <Knob
             label={S.trefLabel}
@@ -81,13 +93,7 @@ export function MemDramPage({ moduleId, onModuleChange }: Props) {
         <DramSweepFig fails={sweep} tRef={state.tRef} />
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

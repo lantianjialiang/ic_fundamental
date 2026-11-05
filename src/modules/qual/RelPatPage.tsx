@@ -33,6 +33,7 @@ import {
 import { DEFAULT_PAT, type Limits, type PatState, TARGET_CAPTURE, TARGET_YIELD_LOSS, runPat, samplePat } from './relPatModel'
 import { WaferMap } from './WaferMap'
 import './relPat.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -116,7 +117,18 @@ export function RelPatPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaStats', 'genStdf', 'relAuto']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, run)} />
+
         <div className="hs-controls">
           <Knob label={S.meanLabel} value={state.mean} unit="µA" min={40} max={60} step={1} onChange={(mean) => update({ mean })} />
           <Knob label={S.sigmaLabel} value={state.sigma} unit="µA" min={0.5} max={4} step={0.5} onChange={(sigma) => update({ sigma })} />
@@ -214,13 +226,7 @@ export function RelPatPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

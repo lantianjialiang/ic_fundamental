@@ -35,10 +35,10 @@ export const S = {
   misTitle: loc('常见误区', 'Common misconceptions'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
-  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqTitle: loc('先看懂：公式怎么来的', 'Learn this first: where the formulas come from'),
   prereqNote: loc(
-    '正文里的 Setup / Hold 边界、有效窗口与裕量都从这一节列出的几条推出。读完正文再回来看。',
-    'The setup and hold boundaries, valid window and margin in the body are derived from the items below. Read the body first, then come back here.',
+    '正文里的 Setup / Hold 边界、有效窗口与裕量都从这一节列出的几条推出。先读完这一节，再做下面的练习。',
+    'The setup and hold boundaries, valid window and margin in the body are derived from the items below. Read this section before the exercise below.',
   ),
   asideLater: loc(
     '真实接收端的建立、保持时间随温度、电压和数据翻转方向变化，时钟还有自己的抖动；这里只练窗口、边界和裕量三件事。',

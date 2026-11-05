@@ -14,6 +14,7 @@ import { ArrFig, FactorFig } from './RelAccelFig'
 import { INTRO, MECHANISMS, MECH_SEG, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, taskItems, verdictOf } from './relAccelData'
 import { DEFAULT_ACCEL, MECH_FACTORS, analyseAccel, type AccelState } from './relAccelModel'
 import './relAccel.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -78,7 +79,18 @@ export function RelAccelPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state)} />
+
         <div className="hs-controls">
           <div className="hs-field">
             <span className="hs-field__label">{t(S.mechLabel)}</span>
@@ -126,13 +138,7 @@ export function RelAccelPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

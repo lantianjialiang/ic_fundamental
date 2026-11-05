@@ -14,6 +14,7 @@ import { INTRO, MISCONCEPTIONS, OUT_OPTIONS, QUIZ, REF_OPTIONS, S, TAKEAWAY, tas
 import { PllFig } from './PllFig'
 import { BW_MAX_KHZ, BW_MIN_KHZ, DEFAULT_PLL, REF_JITTER_MAX_PS, REF_PPM_MAX, analyzePll, type LockStatus, type PllState } from './pllModel'
 import './ana.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -53,7 +54,18 @@ export function AnaPllPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaDynamic', 'anaFft']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(result)} />
+
         <div className="ana-controls">
           <div className="ana-field">
             <span className="ana-field__label">{t(S.fRefLabel)}</span>
@@ -86,13 +98,7 @@ export function AnaPllPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

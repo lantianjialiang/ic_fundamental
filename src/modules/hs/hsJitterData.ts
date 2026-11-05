@@ -19,7 +19,7 @@ const TJ_Q2 = tjAtBer(20, 3, 1e-12)
 export const S = {
   kickerNow: loc('这一次抖动', 'This jitter setting'),
   introTitle: loc('抖动拆成两部分：有界的 DJ 与高斯的 RJ', 'Jitter splits into two parts: bounded DJ and Gaussian RJ'),
-  coreTitle: loc('拨一拨：DJ、RJ 与目标 BER', 'Try it: DJ, RJ and the target BER'),
+  coreTitle: loc('练一练：DJ、RJ 与目标 BER', 'Practice: DJ, RJ and the target BER'),
   coreNote: loc(
     '左边是固定种子抽样得到的直方图（蓝柱）和双峰高斯的理论曲线（金线）；右边是浴盆曲线，纵轴是误码率的对数。绿色区是目标 BER 下的眼开口。',
     'Left: a histogram of fixed-seed samples (blue bars) with the theoretical two-peak Gaussian (gold line). Right: the bathtub curve, with log BER on the vertical axis. The green band is the eye opening at the target BER.',
@@ -40,10 +40,10 @@ export const S = {
   misTitle: loc('常见误区', 'Common misconceptions'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
-  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqTitle: loc('先看懂：公式怎么来的', 'Learn this first: where the formulas come from'),
   prereqNote: loc(
-    '正文里的 Q⁻¹、双狄拉克 TJ 与开口公式都从这一节列出的几条推出。读完正文再回来看。',
-    'The Q⁻¹, dual-Dirac TJ and opening formulas in the body are derived from the items below. Read the body first, then come back here.',
+    '正文里的 Q⁻¹、双狄拉克 TJ 与开口公式都从这一节列出的几条推出。先读完这一节，再做下面的练习。',
+    'The Q⁻¹, dual-Dirac TJ and opening formulas in the body are derived from the items below. Read this section before the exercise below.',
   ),
   asideLater: loc(
     '直方图只抽了有限个样本，最低只能看到约 1/4000 的尾部概率，1e-12 要靠 Q 函数外推。真实的抖动分解还有码型相关的 DDJ、周期抖动和噪声耦合，这里只练 DJ、RJ 与 TJ 三件事。',

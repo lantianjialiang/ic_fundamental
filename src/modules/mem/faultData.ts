@@ -40,7 +40,7 @@ const KIND_NAME: Record<FaultKind, LText> = {
 export const S = {
   kicker: loc('这一次注入', 'This injection'),
   introTitle: loc('故障模型：把缺陷抽象成可以仿真的几类', 'Fault models: abstracting defects into simulatable classes'),
-  coreTitle: loc('拨一拨：注入一个故障，跑一遍 March C−', 'Try it: inject one fault and run March C−'),
+  coreTitle: loc('练一练：注入一个故障，跑一遍 March C−', 'Practice: inject one fault and run March C−'),
   coreNote: loc(
     '阵列是 64 个单元，8 行 × 8 列，逻辑地址就是物理位置。选一种故障和单元，然后按 March C− 把整个阵列读写一遍。只要有一次读出与期望不符，就判 FAIL。',
     'The array has 64 cells in 8 rows × 8 columns, and the logical address is the physical position. Choose a fault and a cell, then run March C− over the whole array. If any read differs from its expected value, the result is FAIL.',

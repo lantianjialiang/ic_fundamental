@@ -11,7 +11,7 @@ const BACKOFF_DB = 20 * Math.log10(INPUT_AMP)
 export const S = {
   kickerNow: loc('这一次采样', 'This capture'),
   introTitle: loc('动态参数：用一个正弦看 ADC 的频谱', 'Dynamic parameters: one sine wave, read the ADC spectrum'),
-  coreTitle: loc('拨一拨：位数、噪声与谐波', 'Try it: bits, noise and harmonics'),
+  coreTitle: loc('练一练：位数、噪声与谐波', 'Practice: bits, noise and harmonics'),
   coreNote: loc(
     '虚拟 ADC（VDUT-ADC2）的输入固定为 0.9 满量程的正弦。拨位数、输入噪声、HD2 与 HD3，下方频谱和读数随之变化；HD 拨到最左（−120 dBc）即关闭该项非线性。ENOB 公式里补上了 0.9 FS 输入的 0.92 dB 回退量。所有数值都是模型生成的示意结果。',
     'The virtual ADC (VDUT-ADC2) takes a sine fixed at 0.9 of full scale. Change the bits, input noise, HD2 and HD3, and the spectrum and readings follow; dragging an HD knob to the far left (−120 dBc) switches that nonlinearity off. The ENOB formula adds back the 0.92 dB backoff of this 0.9 FS input. All values are illustrative model output.',

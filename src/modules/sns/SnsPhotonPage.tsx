@@ -23,6 +23,7 @@ import {
 } from './snsPhotonData'
 import { DEFAULT_PHOTON, analysePhoton, photonFlags, snrCurve, type PhotonState, type SnrPoint } from './snsPhotonModel'
 import './sns.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -119,7 +120,18 @@ export function SnsPhotonPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaOverview', 'anaStats']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <Callout>{t(S.teach)}</Callout>
         <div className="hs-controls">
           <Knob label={S.lambdaLabel} value={state.lambdaNm} unit="nm" min={400} max={1000} step={10} onChange={(v) => update({ lambdaNm: v })} />
@@ -168,13 +180,7 @@ export function SnsPhotonPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

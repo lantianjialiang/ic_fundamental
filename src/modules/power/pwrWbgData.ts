@@ -51,7 +51,7 @@ export const MAT_SEG = MATERIAL_ORDER.map((id) => ({ id, label: MATERIAL_TEXT[id
 export const S = {
   kickerNow: loc('宽禁带', 'Wide bandgap'),
   introTitle: loc('Si 快到极限了：宽禁带器件为什么出现', 'Si is near its limit: why wide-bandgap devices appeared'),
-  coreTitle: loc('拨一拨：材料、Vth 滞回与动态 Rds(on)', 'Try it: materials, Vth hysteresis and dynamic Rds(on)'),
+  coreTitle: loc('练一练：材料、Vth 滞回与动态 Rds(on)', 'Practice: materials, Vth hysteresis and dynamic Rds(on)'),
   coreNote: loc(
     '三个标签页分别回答三个问题：这个耐压该选哪种材料；SiC 的 Vth 为什么测一次不够；GaN 的导通电阻为什么要过一段时间才稳定。图都是教学示意，数值不对应任何真实器件。',
     'The three tabs answer three questions: which material suits this voltage; why one Vth reading is not enough for SiC; why GaN on-resistance settles only after a delay. All figures are teaching illustrations; the values match no real device.',

@@ -39,6 +39,7 @@ import {
   type Summary,
 } from './rfCapstoneModel'
 import './rfCapstone.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -112,7 +113,18 @@ export function RfCapstonePage({ moduleId, onModuleChange }: Props) {
         <Related ids={['rfEvm', 'rfNf', 'rfCal', 'fProgram']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, device, summary, exported)} />
+
         <div className="rf-controls">
           <Knob label={S.spreadLabel} value={state.spread} unit="×" min={0.5} max={2} step={0.1} onChange={(spread) => update({ spread })} />
           <Knob label={S.rxTestLabel} value={state.rxTest} unit="dBm" min={-100} max={-90} step={0.5} onChange={(rxTest) => update({ rxTest })} />
@@ -250,13 +262,7 @@ export function RfCapstonePage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

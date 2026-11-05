@@ -10,7 +10,7 @@ export const S = {
   introTitle: loc('DRAM：一个电容存一位，会慢慢漏电', 'DRAM: one capacitor per bit, and it slowly leaks'),
   cmdTitle: loc('一次读写的命令序列（简化）', 'One read or write as a command sequence (simplified)'),
   cmdNote: loc('示意顺序，省略了 tRCD、tRAS、tRP、tRFC 等时序参数。', 'Shows the order only; timing parameters such as tRCD, tRAS, tRP and tRFC are left out.'),
-  coreTitle: loc('拨一拨：刷新间隔 tREF 与失效单元', 'Try it: refresh interval tREF and failing cells'),
+  coreTitle: loc('练一练：刷新间隔 tREF 与失效单元', 'Practice: refresh interval tREF and failing cells'),
   coreNote: loc(
     '每个红色方块是一个保持时间短于 tREF 的单元：它在下一次刷新前已经漏到门限以下，读出会错。教学模型按最坏情况计算，即所有单元都存 1。',
     'Each red square is a cell whose retention time is shorter than tREF: it leaks below the threshold before the next refresh, so its read is wrong. The model uses the worst case, where every cell stores a 1.',

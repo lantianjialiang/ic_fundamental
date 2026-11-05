@@ -14,6 +14,7 @@ import { PatternFig } from './PatternFig'
 import { COVERAGE, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, taskItems, verdictOf } from './patternData'
 import { DEFAULT_PATTERN, PATTERN_IDS, PATTERN_OPTIONS, type PatternState, opsPerCell } from './patternModel'
 import './memPattern.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -47,7 +48,18 @@ export function MemPatternPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['memFault', 'memStructure', 'memMarch']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(pattern, COVERAGE)} />
+
         <div className="mem-controls">
           <div className="mem-field">
             <span className="mem-field__label">{t(S.patLabel)}</span>
@@ -104,13 +116,7 @@ export function MemPatternPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

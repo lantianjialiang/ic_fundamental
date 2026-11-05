@@ -14,6 +14,7 @@ import { ChainFig, ShareFig } from './RfNfFig'
 import { ENR_SEG, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, taskItems, verdictOf } from './rfNfData'
 import { analyseNf, DEFAULT_NF, type NfState } from './rfNfModel'
 import './rfNf.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -45,7 +46,18 @@ export function RfNfPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['rfGain', 'rfDb', 'rfIp3']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <div className="hs-controls">
           <Knob label={S.gLabel} value={state.g1} unit="dB" min={0} max={30} step={1} onChange={(g1) => update({ g1 })} />
           <Knob label={S.nf1Label} value={state.nf1} unit="dB" min={0.5} max={5} step={0.1} onChange={(nf1) => update({ nf1 })} />
@@ -97,13 +109,7 @@ export function RfNfPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

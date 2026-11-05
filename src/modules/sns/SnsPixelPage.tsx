@@ -25,6 +25,7 @@ import {
 } from './snsPixelData'
 import { DEFAULT_PIXEL, READ_E, analysePixel, pixelFlags, type PixelState } from './snsPixelModel'
 import './sns.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -58,7 +59,18 @@ export function SnsPixelPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['snsPhoton', 'anaTrim', 'anaMeasure']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <Callout>{t(S.teach)}</Callout>
         <div className="hs-controls">
           <Knob label={S.cLabel} value={state.cFdFf} unit="fF" min={0.5} max={5} step={0.1} onChange={(v) => update({ cFdFf: q(v, 1) })} />
@@ -107,13 +119,7 @@ export function SnsPixelPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

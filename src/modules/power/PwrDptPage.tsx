@@ -15,6 +15,7 @@ import { DptCircuitFig } from './PwrDptFig'
 import { DPT_DEFAULT, VDRIVE, simulateDpt, type DptState, type WinKey } from './pwrDptModel'
 import { fill, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, WIN_SEG, taskItems, verdictOf } from './pwrDptData'
 import './pwrDpt.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -68,7 +69,18 @@ export function PwrDptPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['pwrGate', 'pwrKelvin', 'pwrUis']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, result)} />
+
         <div className="hs-controls">
           <Knob label={S.kVdc} value={state.vdc} unit="V" min={50} max={800} step={10} onChange={(vdc) => update({ vdc })} />
           <Knob label={S.kL} value={state.lUh} unit="µH" min={10} max={500} step={10} onChange={(lUh) => update({ lUh })} />
@@ -115,13 +127,7 @@ export function PwrDptPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

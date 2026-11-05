@@ -125,7 +125,7 @@ export const S = {
   ),
   kickerNow: loc('这一项激励', 'This stimulus'),
   introTitle: loc('传感器测什么', 'What a sensor test measures'),
-  coreTitle: loc('拨一拨：传递函数与激励', 'Try it: transfer function and stimulus'),
+  coreTitle: loc('练一练：传递函数与激励', 'Practice: transfer function and stimulus'),
   coreNote: loc(
     '虚拟器件的输出是 S·x + b + nl·x²，再加温漂和噪声。随机种子固定，同样的旋钮每次结果一样。两点法用 x = 0 和 x = 1；最小二乘用五个点。噪声不为 0 时，两点法斜率的理论标准差按 1/√N 缩小。',
     'The virtual device output is S*x + b + nl*x^2, plus temperature drift and noise. The random seed is fixed, so the same knobs always give the same result. Two-point uses x = 0 and x = 1; least squares uses five points. With noise above 0, the theoretical std of the two-point slope shrinks as 1/sqrt(N).',

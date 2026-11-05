@@ -40,7 +40,7 @@ function listOf(items: LText[]): LText {
 export const S = {
   kickerNow: loc('这一次 Pattern', 'This pattern'),
   introTitle: loc('Pattern：先写背景，再读回校验', 'Pattern: write a background, then read it back'),
-  coreTitle: loc('拨一拨：选一个 Pattern，看它覆盖什么、花多少时间', 'Try it: pick a pattern and see what it covers and what it costs'),
+  coreTitle: loc('练一练：选一个 Pattern，看它覆盖什么、花多少时间', 'Practice: pick a pattern and see what it covers and what it costs'),
   coreNote: loc(
     '每个预设故障单独注入到 8 单元的教学阵列里跑一遍：读回值与期望不一致就记为检出，表格里的地址是第一次失效的读出地址。',
     'Each preset fault is injected alone into an 8-cell teaching array: a read that differs from its expected value counts as a detection, and the address in the table is the first failing read.',

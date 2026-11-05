@@ -26,7 +26,7 @@ export const NORM_OPTIONS = NORM_IDS.map((id) => ({
 export const S = {
   kickerNow: loc('这一次扫描', 'This sweep'),
   introTitle: loc('光源、功率计与波长扫描', 'Source, power meter and the wavelength sweep'),
-  coreTitle: loc('拨一拨：步长、归一化与噪声底', 'Try it: step, normalization and the noise floor'),
+  coreTitle: loc('练一练：步长、归一化与噪声底', 'Practice: step, normalization and the noise floor'),
   coreNote: loc(
     '蓝线是原始读数，金线是减去光栅回环之后的归一化谱。回环是平坦的，里面只有耦合偏移。谷值和线宽从噪声底截断之前的线性透射读出。',
     'Blue is the raw reading. Gold is the spectrum after subtracting a flat grating loop, which contains only the coupling offset. The dip and the linewidth are read from the linear transmission before the noise floor is applied.',

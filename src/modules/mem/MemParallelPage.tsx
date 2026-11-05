@@ -23,6 +23,7 @@ import {
 } from './memParallelData'
 import { analyseParallel, CH_TOTAL, DEFAULT_PARALLEL, FAIL_DEPTH, type ParallelState } from './memParallelModel'
 import './memParallel.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -52,7 +53,18 @@ export function MemParallelPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['memMarch', 'memTiming', 'memBin']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, result)} />
+
         <div className="mpar-controls">
           <div className="mpar-field">
             <span className="mpar-field__label">{t(S.capLabel)}</span>
@@ -90,13 +102,7 @@ export function MemParallelPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

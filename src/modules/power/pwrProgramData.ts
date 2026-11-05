@@ -91,7 +91,7 @@ export const PAT_SEG: Array<{ id: PatMode; label: LText }> = PAT_ORDER.map((id) 
 export const S = {
   kickerNow: loc('综合', 'Capstone'),
   introTitle: loc('从单项测试到量产测试程序', 'From single tests to a production test program'),
-  coreTitle: loc('拨一拨：流程、UIS 抽样与漏检', 'Try it: flow, UIS sampling and escapes'),
+  coreTitle: loc('练一练：流程、UIS 抽样与漏检', 'Practice: flow, UIS sampling and escapes'),
   coreNote: loc(
     '1000 颗虚拟 DUT、4 个 Site，固定 seed，结果可以复现。流程按表中顺序执行，遇到第一个失效项就停止，Bin 由它决定。改顺序、关项目、调参数，看 Bin、时间、UPH、COT 与漏检怎么变。数据全部是教学示意。',
     '1000 virtual DUTs on 4 sites with a fixed seed, so results repeat. The flow runs in table order and stops at the first failing item, which sets the bin. Change the order, switch items off or tune parameters, and watch bins, time, UPH, COT and escapes. All data is a teaching illustration.',

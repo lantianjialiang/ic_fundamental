@@ -30,7 +30,7 @@ export const PLAN_OPTIONS = PLAN_IDS.map((id) => ({
 export const S = {
   kickerNow: loc('这一次激励', 'This stimulus'),
   introTitle: loc('0 g 偏移、灵敏度与噪声', '0 g offset, sensitivity and noise'),
-  coreTitle: loc('拨一拨：翻转、倾角与带宽', 'Try it: flip, tilt and bandwidth'),
+  coreTitle: loc('练一练：翻转、倾角与带宽', 'Practice: flip, tilt and bandwidth'),
   coreNote: loc(
     '初值来自 VDUT-ACC1：灵敏度 0.3 V/g，偏移 1.65 V。六位置表含 0 g 和 ±1 g，每个格子的随机种子是固定的。翻转读数取 X 轴的 +1 g 和 −1 g，再交给 flipCal。',
     'The starting knobs are VDUT-ACC1: sensitivity 0.3 V/g, offset 1.65 V. The six-position table includes 0 g and ±1 g, and each cell uses a fixed seed. The flip reading takes +1 g and -1 g on X and passes them to flipCal.',
@@ -77,10 +77,10 @@ export const S = {
     '关掉翻转噪声并把倾角调到 0°，使模型的 +1 g / −1 g 与 flipCal 对齐。',
     'Turn the flip noise off and set tilt to 0°, so the model +1 g / -1 g pair lines up with flipCal.',
   ),
-  task2: loc('把安装倾角调到 2°，读出灵敏度误差（约 0.061%）。', 'Set the mount tilt to 2° and read the sensitivity error (about 0.061%).'),
+  task2: loc('把安装倾角调到 2°，读出灵敏度误差。', 'Set the mount tilt to 2° and read the sensitivity error.'),
   task3: loc(
-    '把噪声密度放到 150 µg/√Hz、带宽放到 50 Hz，读出带宽内噪声（约 1.06 mg）。这是 VDUT-ACC1 的标称值，不是页面初值。',
-    'Set the noise density to 150 ug/rtHz and the bandwidth to 50 Hz, and read the in-band noise (about 1.06 mg). These are the VDUT-ACC1 ratings, not the page defaults.',
+    '把噪声密度放到 150 µg/√Hz、带宽放到 50 Hz，读出带宽内噪声。这是 VDUT-ACC1 的标称值，不是页面初值。',
+    'Set the noise density to 150 ug/rtHz and the bandwidth to 50 Hz, and read the in-band noise. These are the VDUT-ACC1 ratings, not the page defaults.',
   ),
   task4: loc('把测试方案选成自检，并在侧栏读它为什么代替不了物理激励。', 'Choose self-test as the plan, and read in the side panel why it does not replace a physical stimulus.'),
   vFlip: loc('翻转用两次重力把偏移和灵敏度分开', 'A flip separates offset and sensitivity with two gravity readings'),

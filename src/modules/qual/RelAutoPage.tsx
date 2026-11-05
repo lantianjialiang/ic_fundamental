@@ -51,6 +51,7 @@ import {
   VDUT_GRADE,
 } from './relAutoModel'
 import './relAuto.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -137,7 +138,18 @@ export function RelAutoPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['relStress', 'relFlow']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.gradeTitle)} note={t(S.gradeNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state)} />
+
         <Cards items={PRODUCT_CARDS} activeId={product} onPick={(item) => pickProduct(item.id)} cols={4} />
         {product === 'vdut' ? (
           <p className="rel-auto-note">{t(S.vdutFixed)}</p>
@@ -242,13 +254,7 @@ export function RelAutoPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

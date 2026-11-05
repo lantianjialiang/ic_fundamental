@@ -35,6 +35,7 @@ import {
 import { HS_META } from './meta'
 import './hs.css'
 import './hsAteLimit.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -79,7 +80,20 @@ export function HsAteLimitPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['pmu', 'hsEye', 'fAte', 'hsJitter']} onOpen={onModuleChange} />
       </Section>
 
+      <PrereqSection title={S.prereqTitle} note={S.prereqNote} items={PREREQ} />
+
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, real, measured, baseline)} />
+
         <div className="hs-controls">
           <Knob label={S.knobAte} value={state.ateBw} unit="GHz" min={4} max={20} step={1} onChange={(ateBw) => update({ ateBw })} />
           <Knob
@@ -135,13 +149,7 @@ export function HsAteLimitPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['scan', 'memBist', 'hsInterface']} onOpen={onModuleChange} />
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">
@@ -153,7 +161,7 @@ export function HsAteLimitPage({ moduleId, onModuleChange }: Props) {
         <QuizList questions={QUIZ} yes={t(ui.fund.yes)} no={t(ui.fund.no)} />
       </Section>
 
-      <PrereqSection title={S.prereqTitle} note={S.prereqNote} items={PREREQ} />
+      
     </LessonFrame>
   )
 }

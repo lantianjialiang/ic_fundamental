@@ -51,7 +51,7 @@ export const COLOR_SEG: Array<{ id: ColorId; label: LText }> = [
 export const S = {
   kickerNow: loc('这一次 Lot', 'This lot'),
   introTitle: loc('规格内的坏 die 怎样找出来', 'Finding bad dies that sit inside spec'),
-  coreTitle: loc('拨一拨：动态限值与邻近规则', 'Try it: dynamic limits and the neighbourhood rule'),
+  coreTitle: loc('练一练：动态限值与邻近规则', 'Practice: dynamic limits and the neighbourhood rule'),
   coreNote: loc(
     '一个 Lot 有 8 片晶圆，每片约 300 颗 die。潜在缺陷的参数在规格内，但偏离群体中心；PAT 用中位数与 MAD 算限值，把它们挑出来。颜色里的“真值”只用于检查结果，PAT 本身看不到。PAT 系数 k 的 3–8 为示例，以现行标准为准。',
     'A lot has 8 wafers of about 300 die each. Latent defects sit inside spec but away from the population centre; PAT uses the median and MAD to set limits and picks them out. The truth labels and the colours are for checking the result only; PAT itself never sees them. The PAT factor k range of 3–8 is an example; follow the current standard.',

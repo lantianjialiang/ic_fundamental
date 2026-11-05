@@ -27,7 +27,7 @@ export const S = {
   ),
   kickerNow: loc('这一条 PTC', 'This PTC'),
   introTitle: loc('用图像反推 K', 'Recover K from images'),
-  coreTitle: loc('拨一拨：差帧和 ROI', 'Try it: difference frames and the ROI'),
+  coreTitle: loc('练一练：差帧和 ROI', 'Practice: difference frames and the ROI'),
   coreNote: loc(
     'VDUT-CIS1 的帧是 128×128，曝光点不超过 12。每个点采两帧。差帧用 var(f1−f2)/2，固定图案被减掉，斜率的倒数是 K。单帧改用 f1 自己的方差，PRNU 留在里面，斜率变大，K 偏小。初值是差帧、PRNU = 0、ROI 边长 32、K = 8；要把 ROI 加大，K 估计才会稳到 3% 以内。',
     'A VDUT-CIS1 frame here is 128 by 128, with at most 12 exposure points. Each point takes two frames. Difference mode uses var(f1-f2)/2, so fixed pattern cancels and K is the reciprocal of the slope. Single-frame mode uses the variance of f1 alone, so PRNU stays in and the slope rises, which makes K low. The start is difference mode, PRNU = 0, ROI side 32, and K = 8; enlarge the ROI before the K estimate settles within 3%.',

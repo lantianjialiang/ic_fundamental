@@ -24,7 +24,7 @@ import {
 export const S = {
   kickerNow: loc('这一次配置', 'This configuration'),
   introTitle: loc('ATE 上的仪器怎么接到引脚', 'How ATE instruments reach the pins'),
-  coreTitle: loc('拨一拨：资源、建立时间与屏蔽', 'Try it: resources, settling time and shielding'),
+  coreTitle: loc('练一练：资源、建立时间与屏蔽', 'Practice: resources, settling time and shielding'),
   coreNote: loc(
     '给 DUT 的每个引脚选一个资源（Off 表示不接）。资源经负载板上的 Relay 接到引脚；建立时间决定误差有没有收敛，接地屏蔽决定读数抖不抖。下面的 DUT 与参数都是示意值。',
     'Pick one resource for each DUT pin (Off means not connected). Resources reach the pin through relays on the load board; settling time decides whether the error has converged, and the ground shield decides whether the reading jitters. The DUT and all parameters are illustrative.',

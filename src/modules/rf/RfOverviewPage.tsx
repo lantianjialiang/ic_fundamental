@@ -15,6 +15,7 @@ import { MISCONCEPTIONS, QUIZ, S, INTRO, TAKEAWAY, taskItems, verdictOf } from '
 import { formatSi } from './rfFormat'
 import { DEFAULT_OVERVIEW, SCENARIOS, SLIDER_STEPS, analyseFreq, freqFromPos, posFromFreq, type OverviewState } from './rfOverviewModel'
 import './rfOverview.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -46,7 +47,18 @@ export function RfOverviewPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['anaSignal']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state.freqHz)} />
+
         <div className="hs-controls">
           <div className="hs-field">
             <span className="hs-field__label">{t(S.scenarioLabel)}</span>
@@ -100,13 +112,7 @@ export function RfOverviewPage({ moduleId, onModuleChange }: Props) {
         <Steps items={S.scenarios} />
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

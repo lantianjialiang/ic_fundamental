@@ -22,7 +22,7 @@ export const RADIAL_OPTIONS = RADIAL_IDS.map((id) => ({
 export const S = {
   kickerNow: loc('这一次提取', 'This extraction'),
   introTitle: loc('晶圆上的电学筛选与 cut-back', 'Electrical screen and cut-back on the wafer'),
-  coreTitle: loc('拨一拨：长度、噪声与晶圆图', 'Try it: lengths, noise and the wafer map'),
+  coreTitle: loc('练一练：长度、噪声与晶圆图', 'Practice: lengths, noise and the wafer map'),
   coreNote: loc(
     '左上是插入损耗对长度。蓝点是测量，金线是回归。斜率是传输损耗（dB/cm），截距是两端耦合损耗之和，所以 GC 损耗是截距的一半。下面的晶圆图是每颗 die 提取出的斜率。',
     'The upper plot is insertion loss against length. Blue points are measurements and the gold line is the fit. The slope is propagation loss (dB/cm). The intercept is the sum of the two couplers, so the GC loss is half the intercept. The wafer map below is the extracted slope of each die.',

@@ -15,6 +15,7 @@ import { RfSparamFig } from './RfSparamFig'
 import { FORMULAS, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, taskItems, verdictOf } from './rfSparamData'
 import { DEFAULT_SPARAM, LOAD_OPTIONS, analyseSparam, applyPreset, setLoadValue, type LoadId, type SparamState } from './rfSparamModel'
 import './rfSparam.css'
+import { LEARN_TITLE, PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -51,7 +52,27 @@ export function RfSparamPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['rfDb', 'hsChannel']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(LEARN_TITLE)}>
+        <Callout>
+          <p>{t(S.formulaTitle)}</p>
+          {FORMULAS.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
+        </Callout>
+      </Section>
+
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis)} />
+
         <div className="hs-controls">
           <div className="hs-field">
             <span className="hs-field__label">{t(S.loadLabel)}</span>
@@ -100,21 +121,10 @@ export function RfSparamPage({ moduleId, onModuleChange }: Props) {
           </div>
         </div>
 
-        <Callout>
-          <p>{t(S.formulaTitle)}</p>
-          {FORMULAS.map((line) => (
-            <p key={line}>{line}</p>
-          ))}
-        </Callout>
+        
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

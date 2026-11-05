@@ -19,7 +19,7 @@ const EX_QAM_0 = analyseEvm({ scheme: 'qam16', ibo: 0 })
 export const S = {
   kickerNow: loc('这一次失真', 'This distortion'),
   introTitle: loc('EVM 与 ACPR：一个看符号，一个看频谱', 'EVM and ACPR: one looks at symbols, one at the spectrum'),
-  coreTitle: loc('拨一拨：输入回退与调制方式', 'Try it: input back-off and modulation'),
+  coreTitle: loc('练一练：输入回退与调制方式', 'Practice: input back-off and modulation'),
   coreNote: loc(
     '功放用 Rapp 模型压缩幅度：输入越接近饱和，压缩越重。左图是星座：空心叉是理想符号，实心点是功放输出经过接收滤波、对齐后的符号。右图是 AM/AM 曲线。下方是频谱：灰线是线性输出，橙线是失真输出。',
     'The amplifier compresses amplitude with a Rapp model: the closer the input is to saturation, the stronger the compression. Left: the constellation, with hollow crosses for ideal symbols and solid dots for the amplifier output after receive filtering and alignment. Right: the AM/AM curve. Below: the spectrum, with grey for the linear output and orange for the distorted output.',

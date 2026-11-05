@@ -8,7 +8,7 @@ const f1 = (value: number) => value.toFixed(1)
 export const S = {
   kickerNow: loc('这一次采样', 'This sampling run'),
   introTitle: loc('采样就是每隔 1/fs 读一次', 'Sampling reads the signal once every 1/fs'),
-  coreTitle: loc('拨一拨：采样率、输入频率与 AAF', 'Try it: sampling rate, input frequency and the AAF'),
+  coreTitle: loc('练一练：采样率、输入频率与 AAF', 'Practice: sampling rate, input frequency and the AAF'),
   coreNote: loc(
     '蓝线是输入信号，圆点是 ADC 在每个采样时刻读到的值。下方的频谱标出奈奎斯特频率 fs/2：超过它的输入会折叠回来。',
     'The blue curve is the input and the dots are the values the ADC reads at each sample instant. The spectrum below marks the Nyquist frequency fs/2: any input above it folds back.',

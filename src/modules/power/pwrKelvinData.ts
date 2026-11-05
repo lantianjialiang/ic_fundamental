@@ -24,7 +24,7 @@ import {
 export const S = {
   kickerNow: loc('这一次测量', 'This measurement'),
   introTitle: loc('毫欧与高压：误差从哪里来', 'Milliohms and high voltage: where the error comes from'),
-  coreTitle: loc('拨一拨：接触电阻与夹具漏电', 'Try it: contact resistance and fixture leakage'),
+  coreTitle: loc('练一练：接触电阻与夹具漏电', 'Practice: contact resistance and fixture leakage'),
   coreNote: loc(
     '上面两个标签页互不影响。先在“接触电阻”里比较 2 线与 4 线的读数，再到“高压漏电”里看 guard 的作用。',
     'The two tabs do not affect each other. On the contact tab compare 2-wire and 4-wire readings first; on the leakage tab see what guard does.',

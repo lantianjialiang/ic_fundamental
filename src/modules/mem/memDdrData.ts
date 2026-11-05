@@ -20,7 +20,7 @@ export const S = {
     'DQS（选通）：与 DQ 同时送出，接收端用它的边沿决定在哪一刻采样 DQ。',
     'DQS (strobe): sent alongside DQ; the receiver uses its edges to decide when to sample DQ.',
   ),
-  coreTitle: loc('拨一拨：DQS 延迟 d 与每一位的窗口', 'Try it: DQS delay d and each bit’s window'),
+  coreTitle: loc('练一练：DQS 延迟 d 与每一位的窗口', 'Practice: DQS delay d and each bit’s window'),
   coreNote: loc(
     '每一行是一根 DQ 数据线。绿色 = 在 d 处能正确采样（PASS），深色 = 采样点落在这一位的窗口之外（FAIL）。金色框是所有位窗口的交集，也就是 8 位能同时 PASS 的范围。',
     'Each row is one DQ line. Green = sampled correctly at d (PASS); dark = the sample falls outside that bit’s window (FAIL). The gold box is the intersection of all windows: the range where all 8 bits pass together.',

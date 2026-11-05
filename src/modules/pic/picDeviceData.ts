@@ -64,10 +64,10 @@ export const S = {
     'How narrow the resonance is sets the wavelength-sweep step, which is a later optical-test lesson. If temperature is not stable, the resonance walks out of the sweep window.',
   ),
   next: loc('下一课：调制器与探测器', 'Next: modulators and photodetectors'),
-  task1: loc('在 MZI 上把 ΔL 设为 100 µm、ng 设为 4.2，读出 FSR（应为 5.72 nm）。', 'On the MZI, set dL to 100 µm and ng to 4.2, and read the FSR (it should be 5.72 nm).'),
-  task2: loc('在环上把半径设为 10 µm、ng 设为 4.2，读出 FSR（应为 9.10 nm）。', 'On the ring, set the radius to 10 µm and ng to 4.2, and read the FSR (it should be 9.10 nm).'),
+  task1: loc('在 MZI 上把 ΔL 设为 100 µm、ng 设为 4.2，读出 FSR。', 'On the MZI, set dL to 100 µm and ng to 4.2, and read the FSR.'),
+  task2: loc('在环上把半径设为 10 µm、ng 设为 4.2，读出 FSR。', 'On the ring, set the radius to 10 µm and ng to 4.2, and read the FSR.'),
   task3: loc('调节 a 和 r，使 |a - r| < 0.02，并看到谐振处透射 T < 0.05。', 'Adjust a and r until |a - r| < 0.02, and see the transmission at resonance drop below 0.05.'),
-  task4: loc('保持 ng = 4.2，把温升设为 10 K，读出谐振移动（约为 0.66 nm）。', 'Keep ng = 4.2, set the temperature rise to 10 K, and read the resonance shift (about 0.66 nm).'),
+  task4: loc('保持 ng = 4.2，把温升设为 10 K，读出谐振移动。', 'Keep ng = 4.2, set the temperature rise to 10 K, and read the resonance shift.'),
   mziEr: loc(
     '理想 MZI 的透射可以到 0，所以消光比是无穷大。谱线上低于 -40 dB 的部分被画在 -40，不能拿图上的谷底去除以峰值来算消光比。',
     'An ideal MZI can transmit 0, so the extinction ratio is infinite. The plot draws anything below -40 dB at -40, so the drawn valley cannot be divided by the peak to get the extinction ratio.',

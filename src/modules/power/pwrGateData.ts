@@ -7,7 +7,7 @@ import { FLAT_MIN_US, LOW_IG_MA, type GateAnalysis, type GateState } from './pwr
 export const S = {
   kickerNow: loc('这一次充电', 'This charge'),
   introTitle: loc('栅极电荷：用电荷量看开关过程', 'Gate charge: reading the switching process as charge'),
-  coreTitle: loc('拨一拨：恒流充电时栅压与漏压怎么走', 'Try it: how Vgs and Vds move under constant-current charging'),
+  coreTitle: loc('练一练：恒流充电时栅压与漏压怎么走', 'Practice: how Vgs and Vds move under constant-current charging'),
   coreNote: loc(
     '恒定的 Ig 向栅极注入电荷，Q = Ig·t。曲线分三段：充 Cgs 到平台、米勒平台（Vds 下降）、再充到驱动电压。金色阴影是米勒平台。',
     'A constant Ig injects charge into the gate, Q = Ig·t. The curve has three parts: charging Cgs up to the plateau, the Miller plateau (Vds falls), then charging to the drive voltage. The gold band is the Miller plateau.',
@@ -67,8 +67,8 @@ export const S = {
     'T2: Raise Vdd to 80 V or more, see how Qgd changes, and explain why (Cgd falls as Vds falls, so a higher Vdd makes the plateau sweep a wider Vds range).',
   ),
   task3: loc(
-    'T3：Qg = 60 nC、Vdrive = 10 V、fsw = 500 kHz 时驱动损耗为 0.3 W；把参数调到驱动损耗读数约 0.3 W（±5%）。',
-    'T3: Drive loss is P = Qg·Vdrive·fsw. Tune Cgs or fsw until the drive-loss readout is 0.3 W (within ±0.015 W).',
+    'T3：把 Qg、Vdrive、fsw 调到 60 nC、10 V、500 kHz，再读驱动损耗。损耗按 P = Qg·Vdrive·fsw 算。',
+    'T3: Set Qg, Vdrive and fsw to 60 nC, 10 V and 500 kHz, then read the drive loss. It is P = Qg·Vdrive·fsw.',
   ),
   task4: loc(
     'T4：找出 Ig 过大或过小时平台难辨的情况（平台短于 0.5 µs，或 Ig 不超过 2 mA），说明原因。',

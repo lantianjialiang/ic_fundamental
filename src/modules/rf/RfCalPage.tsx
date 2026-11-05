@@ -13,6 +13,7 @@ import { ErrorFig, PathFig } from './RfCalFig'
 import { CAL_OPTIONS, INTRO, MISCONCEPTIONS, PATH_CAP, QUIZ, S, TAKEAWAY, taskItems, verdictOf } from './rfCalData'
 import { calibrate, DEFAULT_CAL, SPEC_DB, type CalState } from './rfCalModel'
 import './rfCal.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -44,7 +45,18 @@ export function RfCalPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['rfSystem', 'rfSparam', 'rfDb']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, result)} />
+
         <div className="rf-controls">
           <div className="rf-field">
             <span className="rf-field__label">{t(S.methodLabel)}</span>
@@ -81,13 +93,7 @@ export function RfCalPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

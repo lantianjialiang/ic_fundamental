@@ -11,7 +11,7 @@ const f2 = (value: number) => value.toFixed(2)
 export const S = {
   kickerNow: loc('这一次眼图', 'This eye diagram'),
   introTitle: loc('眼图：把许多个 UI 叠在一起看', 'Eye diagram: many UIs stacked on top of each other'),
-  coreTitle: loc('拨一拨：速率、带宽与抖动', 'Try it: rate, bandwidth and jitter'),
+  coreTitle: loc('练一练：速率、带宽与抖动', 'Practice: rate, bandwidth and jitter'),
   coreNote: loc(
     '信道是一阶 RC 低通，带宽越低，边沿越慢。下图是 PRBS7 码型叠成的眼图，白色六边形是 mask 禁区；有采样点落进去就判 FAIL。',
     'The channel is a first-order RC low-pass; the lower the bandwidth, the slower the edges. The eye below is PRBS7 stacked on itself, and the hexagon is the mask: any sample inside it fails.',
@@ -31,10 +31,10 @@ export const S = {
   misTitle: loc('常见误区', 'Common misconceptions'),
   quizTitle: loc('复习题', 'Review questions'),
   quizNote: loc('选完立刻出对错和解释。', 'Pick an answer to see right or wrong with an explanation.'),
-  prereqTitle: loc('补充：本课用到的预设知识', 'Supplement: background this lesson assumes'),
+  prereqTitle: loc('先看懂：公式怎么来的', 'Learn this first: where the formulas come from'),
   prereqNote: loc(
-    '正文里的眼图画法、眼高与眼宽、mask 形状和 350 ÷ BW 都从这一节列出的几条推出。读完正文再回来看。',
-    'The eye construction, eye height and width, mask shape and 350 ÷ BW in the body are derived from the items below. Read the body first, then come back here.',
+    '正文里的眼图画法、眼高与眼宽、mask 形状和 350 ÷ BW 都从这一节列出的几条推出。先读完这一节，再做下面的练习。',
+    'The eye construction, eye height and width, mask shape and 350 ÷ BW in the body are derived from the items below. Read this section before the exercise below.',
   ),
   asideLater: loc(
     '真实的眼图还要看均衡（CTLE / FFE / DFE）、串扰、电源噪声，以及用统计方法外推到 BER 10⁻¹²；这里只练 UI、上升时间和 mask 三件事。',

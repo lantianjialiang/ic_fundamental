@@ -18,7 +18,7 @@ export const WIN_SEG: Array<{ id: WinKey; label: LText }> = [
 export const S = {
   kickerNow: loc('这一次波形', 'This waveform'),
   introTitle: loc('双脉冲：两个脉冲测一次开关能量', 'Double pulse: two pulses measure one switching event'),
-  coreTitle: loc('拨一拨：电流怎么来，开关沿怎么走', 'Try it: how the current is set and how the edges move'),
+  coreTitle: loc('练一练：电流怎么来，开关沿怎么走', 'Practice: how the current is set and how the edges move'),
   coreNote: loc(
     '测试条件为教学示例，示例，以现行标准为准。第一脉冲把电感电流打到 I = Vdc·t1/L；关断时测 Eoff；续流后第二脉冲开通，测 Eon（含续流二极管的反向恢复 Qrr）。',
     'Test conditions are teaching examples; example, follow the current standard. The first pulse sets the inductor current to I = Vdc·t1/L; turn-off gives Eoff; after freewheeling, the second pulse turns on and gives Eon (including the freewheel diode reverse recovery Qrr).',
@@ -88,8 +88,8 @@ export const S = {
     'Real devices have di/dt and dv/dt that vary with temperature and voltage, and parasitics and probes must be calibrated by measurement; here we only practise current setting, overshoot, skew and integration.',
   ),
   next: loc('下一课：雪崩（UIS）、SOA 与热阻', 'Next: Avalanche (UIS), SOA and thermal resistance'),
-  task1: loc('目标 I = 30 A，求第一脉冲 t1（Vdc 400 V、L 100 µH 时应为 7.5 µs）。', 'Target I = 30 A: find t1 (7.5 µs with Vdc 400 V and L 100 µH).'),
-  task2: loc('把 Rg 调到使 di/dt 约 2 A/ns，再看 Lstray = 20 nH 时的过冲（应为 40 V）。', 'Set Rg so di/dt is about 2 A/ns, then read the overshoot with Lstray = 20 nH (should be 40 V).'),
+  task1: loc('目标 I = 30 A。把 Vdc 设为 400 V、L 设为 100 µH，再读第一脉冲 t1。', 'Target I = 30 A. Set Vdc to 400 V and L to 100 µH, then read the first-pulse t1.'),
+  task2: loc('把 Rg 调到使 di/dt 约 2 A/ns，再看 Lstray = 20 nH 时的过冲。', 'Set Rg so di/dt is about 2 A/ns, then read the overshoot with Lstray = 20 nH.'),
   task3: loc('加入 5 ns 的探头偏斜，读 Eoff 的测量误差，并说明它的方向。', 'Add 5 ns of probe deskew, read the Eoff measurement error, and explain its sign.'),
   task4: loc('Rg 增大到 20 Ω 以上，比较开关能量与过冲，说出这个折中。', 'Raise Rg to 20 Ω or more; compare switching energy and overshoot and state the trade-off.'),
   vOverT: loc('过冲偏大', 'Overshoot too large'),

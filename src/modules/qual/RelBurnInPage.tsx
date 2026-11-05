@@ -14,6 +14,7 @@ import { BiCostFig, BiPpmFig } from './RelBurnInFig'
 import { INTRO, MISCONCEPTIONS, QUIZ, S, SCREEN_OPTIONS, TAKEAWAY, taskItems, U, verdictOf } from './relBurnInData'
 import { analyseBi, bestFeasible, bestUnconstrained, type BiState, costCurve, DEFAULT_BI, minHForTarget, REF_T_BI, TARGET_PPM } from './relBurnInModel'
 import './relBurnIn.css'
+import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -49,7 +50,18 @@ export function RelBurnInPage({ moduleId, onModuleChange }: Props) {
         <Related ids={['relBathtub', 'relAccel', 'relStress']} onOpen={onModuleChange} />
       </Section>
 
+      <Section title={t(S.misTitle)}>
+        <Callout tone="warn">
+          {MISCONCEPTIONS.map((item, index) => (
+            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
+          ))}
+        </Callout>
+      </Section>
+
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
+        <p className="intro__note">{t(PRACTICE_NOTE)}</p>
+        <PracticeSteps items={taskItems(state, analysis, curve, refCurve)} />
+
         <div className="hs-controls">
           <Knob label={S.pLabel} value={state.pDefectPct} unit="%" min={0.1} max={5} step={0.1} onChange={(pDefectPct) => update({ pDefectPct })} />
           <Knob label={S.betaLabel} value={state.betaD} unit={t(U.shape)} min={0.4} max={0.8} step={0.05} onChange={(betaD) => update({ betaD })} />
@@ -92,13 +104,7 @@ export function RelBurnInPage({ moduleId, onModuleChange }: Props) {
         </div>
       </Section>
 
-      <Section title={t(S.misTitle)}>
-        <Callout tone="warn">
-          {MISCONCEPTIONS.map((item, index) => (
-            <p key={index}>{`${index + 1}. ${t(item)}`}</p>
-          ))}
-        </Callout>
-      </Section>
+      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">
