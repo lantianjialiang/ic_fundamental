@@ -8,15 +8,17 @@ import { QuizList } from '../../lab/QuizList'
 import { type ModuleId } from '../catalog'
 import { Callout, Cards } from '../fund/parts'
 import { RefP, RefParas, Related, type PrepNote } from '../prep/common'
-import { INTRO, LEVELS, QUIZ, ROLES, S, TAKEAWAY, TYPES } from './data/pcbIntro'
-import { PCB_META } from './meta'
+import { INTRO, LEVELS, QUIZ, ROLES, S, SCENE_PARTS, TAKEAWAY, TYPES, type RoleId, type ScenePartId } from './data/pcbIntro'
 import { RoleFig } from './IntroFigs'
+import { Intro3dScene } from './Intro3d'
+import { PCB_META } from './meta'
 import { LevelFig } from './IntroFigs2'
 import { TypeFig } from './IntroFigs3'
 import '../prep/prep.css'
+import './pcbIntro.css'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
-type Focus = 'role' | 'level' | 'type'
+type Focus = 'role' | 'scene' | 'level' | 'type'
 
 function Line({ label, text, onOpen }: { label: LText; text: LText; onOpen: (id: ModuleId) => void }) {
   const { t } = useLocale()
@@ -32,27 +34,45 @@ export function PcbIntroPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [focus, setFocus] = useState<Focus>('role')
   const [roleId, setRoleId] = useState(ROLES[0].id)
+  const [partId, setPartId] = useState(SCENE_PARTS[0].id)
   const [levelId, setLevelId] = useState(LEVELS[0].id)
   const [typeId, setTypeId] = useState(TYPES[0].id)
+  const [exploded, setExploded] = useState(false)
+  const [labels, setLabels] = useState(true)
+  const [playing, setPlaying] = useState(false)
+  const [playKey, setPlayKey] = useState(0)
+  const [resetKey, setResetKey] = useState(0)
 
-  const role = ROLES.find((r) => r.id === roleId) ?? ROLES[0]
-  const level = LEVELS.find((l) => l.id === levelId) ?? LEVELS[0]
-  const type = TYPES.find((x) => x.id === typeId) ?? TYPES[0]
+  const role = ROLES.find((item) => item.id === roleId) ?? ROLES[0]
+  const part = SCENE_PARTS.find((item) => item.id === partId) ?? SCENE_PARTS[0]
+  const level = LEVELS.find((item) => item.id === levelId) ?? LEVELS[0]
+  const type = TYPES.find((item) => item.id === typeId) ?? TYPES[0]
 
   const notes: Record<Focus, PrepNote> = {
     role: { kicker: S.kickerRole, title: role.title, text: role.text },
+    scene: { kicker: S.kickerScene, title: part.title, text: part.text },
     level: { kicker: S.kickerLevel, title: level.title, text: level.text },
     type: { kicker: S.kickerType, title: type.title, text: type.text },
   }
   const shown = notes[focus]
 
-  const pickRole = (id: typeof roleId) => {
+  const pickRole = (id: RoleId) => {
     setRoleId(id)
     setFocus('role')
+  }
+  const pickPart = (id: ScenePartId) => {
+    setPartId(id)
+    setFocus('scene')
   }
   const pickLevel = (id: typeof levelId) => {
     setLevelId(id)
     setFocus('level')
+  }
+  const playSignal = () => {
+    setPartId('trace')
+    setFocus('scene')
+    setPlayKey((n) => n + 1)
+    setPlaying(true)
   }
 
   return (
@@ -82,6 +102,49 @@ export function PcbIntroPage({ moduleId, onModuleChange }: Props) {
           <RefP text={role.text} onOpen={onModuleChange} />
         </Callout>
         <Related ids={['pcbStack', 'pcbLayout']} onOpen={onModuleChange} />
+      </Section>
+
+      <Section title={t(S.sceneTitle)} note={t(S.sceneNote)}>
+        <Cards items={SCENE_PARTS} activeId={partId} cols={3} onPick={(item) => pickPart(item.id)} />
+        <Intro3dScene
+          selected={partId}
+          exploded={exploded}
+          labels={labels}
+          playing={playing}
+          playKey={playKey}
+          resetKey={resetKey}
+          onPick={pickPart}
+          onPlayEnd={() => setPlaying(false)}
+        />
+        <div className="pcb-intro-tools">
+          <button type="button" className="lab__btn lab__btn--primary" onClick={playSignal}>
+            {t(playing ? S.replaySignal : S.playSignal)}
+          </button>
+          <button type="button" className="lab__btn" onClick={() => setExploded((on) => !on)}>
+            {t(exploded ? S.assemble : S.explode)}
+          </button>
+          <label className="lab__check">
+            <input type="checkbox" checked={labels} onChange={(event) => setLabels(event.target.checked)} />
+            {t(S.labels)}
+          </label>
+          <button type="button" className="lab__btn" onClick={() => setResetKey((n) => n + 1)}>
+            {t(S.resetView)}
+          </button>
+          <span className="pcb-intro-hint">{t(S.hint)}</span>
+        </div>
+        {playing ? (
+          <p className="pcb-intro-legend">
+            <span className="pcb-intro-legend__go">{t(S.go)}</span>
+            <span className="pcb-intro-legend__back">{t(S.back)}</span>
+          </p>
+        ) : null}
+        <Callout>
+          <p>
+            <b>{t(part.title)}</b>
+          </p>
+          <RefP text={part.text} onOpen={onModuleChange} />
+        </Callout>
+        <Related ids={['pcbStack', 'connection']} onOpen={onModuleChange} />
       </Section>
 
       <Section title={t(S.levelTitle)} note={t(S.levelNote)}>

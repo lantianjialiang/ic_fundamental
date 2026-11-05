@@ -1368,7 +1368,7 @@ const BASE_TERMS: GlossaryTerm[] = [
     lessons: ['latch', 'fBasics', 'fLatch'],
   },
 
-  /* ---------------- D17 虚拟 ATE 操作系统（已合并 D15 实验台） ---------------- */
+  /* ---------------- X02 虚拟 ATE 操作系统（已合并原 D15 实验台；不再挂在 D 轨） ---------------- */
   {
     id: 'contact-resistance',
     term: 'Contact Resistance',

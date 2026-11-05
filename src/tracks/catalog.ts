@@ -185,8 +185,8 @@ export const TRACKS: Array<{
     id: 'digital',
     title: loc('基础 / 数字', 'Basics / Digital'),
     blurb: loc(
-      '先认名词、看动画：测什么、接到哪，再到 DC、功能、时序、Scan 和程序。现课 {@intro}–{@genMultisite}，综合实验 {@vate}（内含时序 / 漏电 / 图案台）。',
-      'Names and animations first: what is tested and how it connects, then DC, functional, timing, Scan and the program. Lessons {@intro}–{@genMultisite}; capstone lab {@vate} (includes the timing / leakage / pattern bench).',
+      '先认名词、看动画：测什么、接到哪，再到 DC、功能、时序、Scan 和程序。现课 {@intro}–{@genMultisite}。拧旋钮、跑工作站在交互实验 {@vate}。',
+      'Names and animations first: what is tested and how it connects, then DC, functional, timing, Scan and the program. Lessons {@intro}–{@genMultisite}. Turning knobs and running the workstation live in the Interactive lab {@vate}.',
     ),
     ready: true,
     lessons: [
@@ -206,7 +206,6 @@ export const TRACKS: Array<{
       'latch',
       'genStdf',
       'genMultisite',
-      'vate',
     ],
     knowledge: [
       {
@@ -242,8 +241,8 @@ export const TRACKS: Array<{
       {
         title: loc('功能与时间', 'Function and time'),
         text: loc(
-          '真值表、Pattern、Strobe、Setup / Hold、tPD、fMAX。{@func}–{@timing}。拧旋钮见 {@vate}。',
-          'Truth table, pattern, strobe, setup / hold, tPD, fMAX. {@func}–{@timing}. Turn the knobs in {@vate}.',
+          '真值表、Pattern、Strobe、Setup / Hold、tPD、fMAX。{@func}–{@timing}。拧旋钮去交互实验 {@vate}。',
+          'Truth table, pattern, strobe, setup / hold, tPD, fMAX. {@func}–{@timing}. Turn the knobs in the Interactive lab {@vate}.',
         ),
       },
       {
@@ -265,10 +264,17 @@ export const TRACKS: Array<{
         ),
       },
       {
-        title: loc('交互实验', 'Interactive lab'),
+        title: loc('动手去交互实验', 'Hands-on in the Interactive lab'),
         text: loc(
-          '{@vate}。先在基础台自己设 Period / Drive / Delay / Strobe 与漏电限流；再到虚拟 ATE 工作站跑 IDDQ 与开短路，Run、看 Datalog、诊断故障。',
-          '{@vate}. First set period / drive / delay / strobe and the leakage limit on the basic bench; then run IDDQ and opens / shorts on the virtual ATE workstation, read the datalog and diagnose the fault.',
+          '本轨不重复挂实验课。时序 / 漏电 / 图案台、虚拟 ATE 工作站见 {@vate}，整批 wafer 见 {@sim}。',
+          'This track does not host the lab again. The timing / leakage / pattern bench and virtual ATE workstation are {@vate}; whole-wafer runs are {@sim}.',
+        ),
+      },
+      {
+        title: loc('和「数字测试基础」的关系', 'How this relates to Digital Test Fundamentals'),
+        text: loc(
+          '这边用动画立名词：{@pmu}、{@dc}、{@func}、{@timing}、{@scan}。那边用一颗 256×4 SRAM 把量产测法走一遍：{@fOpens}、{@fDc}、{@fFunc}、{@fAc}。同一主题两课互相链，不必当两遍新课上。',
+          'This track uses animations to plant the names: {@pmu}, {@dc}, {@func}, {@timing}, {@scan}. That one walks a 256×4 SRAM through production: {@fOpens}, {@fDc}, {@fFunc}, {@fAc}. Matching lessons link to each other; they are not a second copy of the same class.',
         ),
       },
     ],
@@ -391,8 +397,8 @@ export const TRACKS: Array<{
       {
         title: loc('和「基础 / 数字」的关系', 'How this relates to Basics / Digital'),
         text: loc(
-          '那边先立名词（{@pmu}–{@timing}）；这里用一颗 256×4 SRAM 把量产测试走一遍。',
-          'That track introduces the names ({@pmu}–{@timing}); this one walks a 256×4 SRAM through production test.',
+          '那边先用动画立名词：{@pmu}、{@dc}、{@func}、{@timing}、{@scan}。这里用一颗 256×4 SRAM 把量产测法走一遍：{@fOpens}、{@fDc}、{@fFunc}、{@fAc}。课页底有「对应课」互链，不必当两遍新课上。',
+          'That track plants the names with animations: {@pmu}, {@dc}, {@func}, {@timing}, {@scan}. This one walks a 256×4 SRAM through production: {@fOpens}, {@fDc}, {@fFunc}, {@fAc}. Each lesson footer links to its match; they are not a second copy of the same class.',
         ),
       },
     ],
@@ -1052,3 +1058,41 @@ export function trackOfLesson(id: ModuleId, current?: TrackId): TrackId {
   const owner = TRACKS.find((item) => item.lessons.includes(id))
   return owner?.id ?? current ?? 'digital'
 }
+
+/**
+ * 「基础 / 数字」与「数字测试基础」同一主题的对应课。
+ * 课页底自动互链，避免两套课被当成两遍新课。
+ */
+export const SIBLING_LESSONS: Partial<Record<ModuleId, readonly ModuleId[]>> = {
+  intro: ['fAte'],
+  connection: ['fAte'],
+  ate: ['fIntro'],
+  pmu: ['fOpens', 'fIntro'],
+  spec: ['fSpec'],
+  dc: ['fDc'],
+  func: ['fFunc'],
+  timing: ['fAc'],
+  vector: ['fVector'],
+  scan: ['fScan'],
+  program: ['fProgram'],
+  shmoo: ['fChar'],
+  latch: ['fLatch'],
+  fBasics: ['pDigital', 'intro'],
+  fAte: ['intro', 'connection'],
+  fIntro: ['ate', 'pmu'],
+  fSpec: ['spec'],
+  fOpens: ['pmu'],
+  fDc: ['dc'],
+  fFunc: ['func'],
+  fAc: ['timing'],
+  fChar: ['shmoo'],
+  fVector: ['vector'],
+  fProgram: ['program'],
+  fCreate: ['program'],
+  fDebug: ['program'],
+  fQualify: ['program'],
+  fLatch: ['latch'],
+  fScan: ['scan'],
+}
+
+export const SIBLING_LABEL = loc('对应课（同一主题，不重复上）：', 'Matching lesson (same topic, not a second copy): ')

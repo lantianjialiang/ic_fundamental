@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react'
 import { LabShell } from './LabShell'
 import { PageFeedback } from './Feedback'
+import { LessonChips } from '../home/LessonRefText'
 import { type ModuleId } from '../modules/catalog'
-import { lessonCode } from '../tracks/catalog'
+import { lessonCode, SIBLING_LABEL, SIBLING_LESSONS } from '../tracks/catalog'
 
 type LessonFrameProps = {
   moduleId: ModuleId
@@ -33,10 +34,14 @@ export function LessonFrame({
   extra,
   children,
 }: LessonFrameProps) {
+  const siblings = SIBLING_LESSONS[moduleId] ?? []
   return (
     <LabShell moduleId={moduleId} onModuleChange={onModuleChange} title={title} goal={goal} scroll>
       <div className="lab__body intro">
-        <main className="intro__main">{children}</main>
+        <main className="intro__main">
+          {children}
+          {siblings.length > 0 ? <LessonChips label={SIBLING_LABEL} lessons={siblings} onOpenLesson={onModuleChange} /> : null}
+        </main>
         <aside className="legend intro__aside">
           <h2>{kicker}</h2>
           <p className="legend__path-title">{asideTitle}</p>

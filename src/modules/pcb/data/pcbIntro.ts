@@ -7,6 +7,32 @@ export const S = {
   introTitle: loc('一块板子，把零件变成产品', 'One board turns parts into a product'),
   roleTitle: loc('PCB 的四个作用', 'The four jobs of a PCB'),
   roleNote: loc('点一张卡片，剖面图里高亮负责这件事的结构。', 'Click a card; the cross-section highlights the structure that does that job.'),
+  sceneTitle: loc('在 3D 里看同一块板', 'The same board in 3D'),
+  sceneNote: loc(
+    '左键旋转、滚轮缩放、右键平移。点零件或卡片；分解叠层把四层拉开；播放信号看金色去程和蓝色回流。',
+    'Left-drag to orbit, wheel to zoom, right-drag to pan. Click a part or a card; explode the four layers; play a signal to see gold outbound and blue return.',
+  ),
+  kickerScene: loc('3D 板', '3D board'),
+  hint: loc('左键旋转 · 滚轮缩放 · 右键平移', 'Left-drag orbit · wheel zoom · right-drag pan'),
+  labels: loc('3D 标注', '3D labels'),
+  tagScrew: loc('螺丝', 'Screw'),
+  resetView: loc('重置视角', 'Reset view'),
+  playSignal: loc('播放信号', 'Play signal'),
+  replaySignal: loc('重播信号', 'Replay signal'),
+  nogl: loc('这个浏览器画不了 WebGL，3D 看不了。上面的剖面图讲的是同一块板。', 'This browser cannot draw WebGL, so the 3D view is unavailable. The cross-section above is the same board.'),
+  stageAria: loc('四层教学板的 3D 模型', '3D model of the four-layer teaching board'),
+  kickerBuild: loc('3D 里选中的结构', 'Selected in 3D'),
+  explode: loc('分解叠层', 'Explode layers'),
+  assemble: loc('合上叠层', 'Assemble'),
+  stepOf: loc('第 {i} / {n} 步', 'Step {i} of {n}'),
+  go: loc('金色 = 去程（信号）', 'Gold = outbound (signal)'),
+  back: loc('蓝色 = 回程（地回流）', 'Blue = return (ground)'),
+  l1tag: loc('L1 信号', 'L1 signal'),
+  l2tag: loc('L2 地', 'L2 GND'),
+  l3tag: loc('L3 电源', 'L3 PWR'),
+  pptag: loc('PP', 'PP'),
+  coretag: loc('芯板', 'Core'),
+  l4tag: loc('L4 信号', 'L4 signal'),
   levelTitle: loc('PCB 在产品里的位置', 'Where the PCB sits in a product'),
   levelNote: loc(
     '从左往右一层层放大：整机 → 单板 → 模块 → 元器件。点任意一格看这一层由谁负责、PCB 在这里做什么。',
@@ -91,7 +117,135 @@ export const ROLE_LABEL = {
     '4 层板剖面示意，纵向放大。左起：安装螺丝、带散热焊盘的 QFN、通孔连接器、屏蔽罩下的射频芯片。',
     'Four-layer board cross-section, vertically exaggerated. From left: mounting screw, a QFN with exposed pad, a through-hole connector, an RF chip under a shield can.',
   ),
+  fence: loc('过孔栅栏', 'Via fence'),
 }
+
+export type ScenePartId = 'screw' | 'trace' | 'via' | 'conn' | 'can' | 'gnd'
+
+export const SCENE_PARTS: Array<{ id: ScenePartId; role: RoleId; title: LText; text: LText }> = [
+  {
+    id: 'screw',
+    role: 'support',
+    title: loc('安装孔 + 螺丝', 'Mounting hole + screw'),
+    text: loc(
+      '螺丝穿过未金属化的安装孔，把整板拧在机壳上。板材托住零件；插拔连接器的力由板子和螺丝承担，不由焊点硬扛。安装孔一般不镀铜，只给螺丝穿过。',
+      'A screw through the unplated mounting hole holds the board to the chassis. The laminate carries the parts; insertion force is taken by the board and the screw, not by the joints. The hole is usually not plated — it is only for the screw.',
+    ),
+  },
+  {
+    id: 'trace',
+    role: 'connect',
+    title: loc('顶层走线', 'Top traces'),
+    text: loc(
+      '蚀刻铜线代替一根根导线。点「播放信号」：金色从 QFN 焊盘沿顶层走到连接器插针。铜导电、板材绝缘，所以相邻走线不会短路。',
+      'Etched copper replaces individual wires. Press “Play signal”: gold runs from the QFN pad along the top layer to the connector pin. Copper conducts and the laminate insulates, so neighbouring traces do not short.',
+    ),
+  },
+  {
+    id: 'via',
+    role: 'heat',
+    title: loc('散热过孔', 'Thermal vias'),
+    text: loc(
+      'QFN 底部散热焊盘下的过孔孔壁是铜。铜导热约 400 W/m·K，FR-4 只有约 0.3，所以热走孔壁进 L2 大地铜，比穿过板材快得多。不打这些孔，封装会烫。',
+      'Vias under the QFN exposed pad have copper barrels. Copper conducts heat at about 400 W/m·K, FR-4 at only about 0.3, so heat goes down the barrels into the large L2 ground pour, far faster than through the laminate. Without them the package runs hot.',
+    ),
+  },
+  {
+    id: 'conn',
+    role: 'connect',
+    title: loc('通孔连接器', 'Through-hole connector'),
+    text: loc(
+      '插件引脚穿过金属化通孔，两面都焊。走线在顶层到不了的地方，就靠过孔换到另一层。反复插拔时，力传到板子和安装螺丝，焊点只负责电气连接。',
+      'Through-hole pins pass plated barrels and are soldered on both sides. When a top trace cannot continue, a via hops to another layer. Insertion force goes into the board and the mounting screw; the joints only make the electrical contact.',
+    ),
+  },
+  {
+    id: 'can',
+    role: 'shield',
+    title: loc('屏蔽罩 + 过孔栅栏', 'Shield can + via fence'),
+    text: loc(
+      '金属罩焊在地环上，把射频芯片罩住。侧面再打一圈接地过孔（过孔栅栏），否则能量从罩子底下的缝漏出去。分解后能看见这些过孔一直连到 L2 地平面。',
+      'A metal can is soldered to a ground ring over the RF chip. A row of ground vias (a via fence) closes the sides — otherwise energy leaks out under the can. Explode the stack to see those vias tying down to the L2 ground plane.',
+    ),
+  },
+  {
+    id: 'gnd',
+    role: 'shield',
+    title: loc('L2 地平面', 'L2 ground plane'),
+    text: loc(
+      '完整的内层地铜给信号一条紧贴的回流路径。播放信号时蓝色沿地平面走回来：回流走阻抗最低的路，也就是走线正下方。没有完整地平面，回流绕远，辐射和串扰都会变大。',
+      'A solid inner ground pour gives the signal a return path right beneath it. When you play the signal, blue comes back on the plane: return current takes the lowest-impedance path, under the trace. Without a solid plane it detours, and radiation and crosstalk rise.',
+    ),
+  },
+]
+
+export type BuildId = 'board' | 'copper' | 'via' | 'parts' | 'heat' | 'shield' | 'signal'
+
+export const BUILD: Array<{ id: BuildId; role: RoleId; title: LText; text: LText }> = [
+  {
+    id: 'board',
+    role: 'support',
+    title: loc('光板：绝缘、托住、固定', 'Bare board: insulate, hold, mount'),
+    text: loc(
+      '先只有 FR-4 板材和安装孔。板材是绝缘体，本身不导电。螺丝穿过未金属化的安装孔，把整板拧在机壳上——这是支撑：零件以后焊在板上才站得住，插拔连接器时焊点才不会被拉裂。',
+      'Start with FR-4 and a mounting hole. The laminate is an insulator — it does not conduct. A screw through the unplated hole holds the board to the chassis. That is support: parts will sit on the board, and solder joints survive connector insertion.',
+    ),
+  },
+  {
+    id: 'copper',
+    role: 'connect',
+    title: loc('铺铜：走线代替导线', 'Copper: traces replace wires'),
+    text: loc(
+      '蚀刻出的铜走线代替一根根导线。内层是整片铜皮：L2 地平面、L3 电源平面。铜导电、板材绝缘，所以相邻走线不会短路。还没有过孔，顶层和内层、底层暂时各走各的。',
+      'Etched copper traces replace individual wires. Inner layers are solid pours: L2 ground, L3 power. Copper conducts and the laminate insulates, so neighbouring traces do not short. There are no vias yet, so top, inner and bottom layers are still separate.',
+    ),
+  },
+  {
+    id: 'via',
+    role: 'connect',
+    title: loc('过孔：把各层连通', 'Vias: join the layers'),
+    text: loc(
+      '钻孔后孔壁镀铜，就成了过孔：顶层、内层、底层被连起来。通孔贯穿整板。信号孔穿过电源平面时要挖反焊盘，否则信号会和电源短路。安装孔仍然不镀铜，只给螺丝穿过。',
+      'A drilled hole with a plated barrel becomes a via: top, inner and bottom layers are now joined. A through via runs the whole board. A signal via through a power plane needs an antipad, or it shorts to power. The mounting hole stays unplated — it is only for the screw.',
+    ),
+  },
+  {
+    id: 'parts',
+    role: 'support',
+    title: loc('焊上零件，变成 PCBA', 'Solder the parts: now a PCBA'),
+    text: loc(
+      '没焊零件叫 PCB（光板），焊好叫 PCBA。QFN 是贴片：焊在顶层焊盘上，底部散热焊盘对着一排过孔。连接器是插件：引脚穿过金属化孔，两面都焊，反复插拔的力由板子和螺丝承担，不由焊点硬扛。',
+      'Bare it is a PCB; with parts soldered it is a PCBA. The QFN is SMT: it sits on top pads, its exposed pad over a row of vias. The connector is through-hole: leads go through plated holes and are soldered on both sides. Insertion force is taken by the board and the screw, not by the joints alone.',
+    ),
+  },
+  {
+    id: 'heat',
+    role: 'heat',
+    title: loc('热量走铜，不走板材', 'Heat travels in copper, not laminate'),
+    text: loc(
+      '铜导热约 400 W/m·K，FR-4 只有约 0.3。芯片底部散热焊盘下的过孔把热经铜孔壁送到 L2 大面积地铜上散开。不打这些孔，热只能慢慢穿过板材，封装会烫、可靠性下降。所以散热过孔是热的捷径，不是多余的孔。',
+      'Copper conducts heat at about 400 W/m·K, FR-4 at only about 0.3. Thermal vias under the exposed pad take heat down the copper barrels into the large L2 ground pour. Without them heat must creep through the laminate, the package runs hot and reliability drops. The vias are a heat shortcut, not extra holes.',
+    ),
+  },
+  {
+    id: 'shield',
+    role: 'shield',
+    title: loc('地平面和屏蔽罩关住场', 'Planes and a can keep the field in'),
+    text: loc(
+      '完整的 L2 地平面给信号一条紧贴的回流路径，磁场被关在走线和平面之间，向外辐射小。射频再加一个焊在地环上的金属屏蔽罩，两侧用接地过孔（过孔栅栏）封侧面——否则能量从罩子底下的缝漏出去。',
+      'A solid L2 ground plane gives the signal a return path right beneath it, so the field stays between trace and plane and little radiates. RF adds a metal can soldered to a ground ring, with ground vias (a via fence) closing the sides — otherwise energy leaks out under the can.',
+    ),
+  },
+  {
+    id: 'signal',
+    role: 'connect',
+    title: loc('信号走一圈：去程加回流', 'One trip: outbound plus return'),
+    text: loc(
+      '互连不是一根线。金色去程：QFN 焊盘 → 顶层走线 → 连接器插针。蓝色回程：紧贴走线下方的 L2 地平面走回来。没有完整地平面，回流就得绕远，辐射和串扰都会变大——这就是多层板要有地平面的原因。',
+      'Interconnect is not one wire. Gold outbound: QFN pad → top trace → connector pin. Blue return: back along the L2 ground plane right under the trace. Without a solid plane the return detours, and radiation and crosstalk rise — that is why a multilayer board needs a ground plane.',
+    ),
+  },
+]
 
 export type LevelId = 'system' | 'board' | 'module' | 'part'
 
@@ -260,6 +414,10 @@ export const TAKEAWAY: LText[] = [
   loc('层级：系统 → 单板 → 模块 → 元器件；PCB 设计主要在单板这一层。', 'Levels: system → board → module → component; PCB design mostly works at the board level.'),
   loc('单面最便宜但走线不能交叉；双面靠金属化孔换面；多层靠内层平面保证高速信号。', 'Single-sided is cheapest but traces cannot cross; double-sided changes side through plated holes; multilayer relies on inner planes for high-speed signals.'),
   loc('软板用 PI 和压延铜所以能弯；铝基板绝缘层薄且导热，所以 LED 和功率板用它。', 'Flex uses PI and rolled copper, so it bends; aluminium boards have a thin conductive dielectric, so LED and power boards use them.'),
+  loc(
+    '互连是去程加回流：信号走铜线，回流走紧贴的地平面。没有完整地平面，回流绕远，辐射和串扰都会变大。',
+    'Interconnect is outbound plus return: the signal rides copper, the return rides the ground plane under it. Without a solid plane the return detours, and radiation and crosstalk rise.',
+  ),
 ]
 
 export const QUIZ: QuizQuestion[] = [
@@ -317,5 +475,19 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'b',
     explain: loc('上千个通道要走线，还要完整的地和电源平面控制阻抗和噪声，只能用多层板。', 'Thousands of channels must be routed, with solid ground and power planes for impedance and noise, so only a multilayer board works.'),
+  },
+  {
+    id: 'q6',
+    prompt: loc('QFN 的信号沿顶层走到连接器时，回流电流主要走哪？为什么？', 'When a QFN signal runs on the top layer to a connector, where does the return current mainly go, and why?'),
+    options: [
+      { id: 'a', text: loc('随便找一根地线绕回去，远近无所谓', 'Any ground wire, however far — distance does not matter') },
+      { id: 'b', text: loc('紧贴走线下方的地平面，因为那是阻抗最低的路径', 'The ground plane right under the trace, the lowest-impedance path') },
+      { id: 'c', text: loc('只走螺丝进机壳，因为机壳最大', 'Only through the mounting screw into the chassis, because the chassis is biggest') },
+    ],
+    answer: 'b',
+    explain: loc(
+      '回流走阻抗最低的路径，也就是紧贴走线的地平面。没有完整地平面，回流绕远，辐射和串扰都会变大。',
+      'Return current takes the lowest-impedance path — the ground plane right under the trace. Without a solid plane it detours, and radiation and crosstalk rise.',
+    ),
   },
 ]

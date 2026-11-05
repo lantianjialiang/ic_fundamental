@@ -19,8 +19,8 @@ export const PCB_META: Record<PcbLessonId, { title: LText; goal: LText }> = {
   pcbIntro: {
     title: loc('PCB 是什么', 'What a PCB Is'),
     goal: loc(
-      '说出 PCB 的四个作用和它在产品里的位置；分清单面、双面、多层、软板、软硬结合和金属基板。',
-      'Name the four jobs of a PCB and where it sits in a product; tell single-sided, double-sided, multilayer, flex, rigid-flex and metal-core boards apart.',
+      '说出 PCB 的四个作用和它在产品里的位置；在 3D 里指出螺丝、走线、过孔、地平面和屏蔽罩；分清单面、双面、多层、软板、软硬结合和金属基板。',
+      'Name the four jobs of a PCB and where it sits in a product; point out the screw, traces, vias, ground plane and shield can in 3D; tell single-sided, double-sided, multilayer, flex, rigid-flex and metal-core boards apart.',
     ),
   },
   pcbMaterial: {

@@ -49,6 +49,7 @@ const LESSON_ORDER: ModuleId[] = [
   ...new Set([
     ...(trackById('digital')?.lessons ?? []),
     ...(trackById('fund')?.lessons ?? []),
+    ...(trackById('bench')?.lessons ?? []),
     ...(trackById('mos')?.lessons ?? []),
     ...(trackById('pcb')?.lessons ?? []),
     ...(trackById('analog')?.lessons ?? []),

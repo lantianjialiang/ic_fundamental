@@ -1,6 +1,5 @@
 import { type ReactNode } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
-import { loc } from '../../i18n/locale'
 import { Hit } from '../prep/common'
 import { ROLE_LABEL, type RoleId } from './data/pcbIntro'
 
@@ -107,10 +106,6 @@ export function Note({ x, y, from, to, text, anchor = 'middle' }: { x: number; y
   )
 }
 
-const L = {
-  fence: loc('过孔栅栏', 'Via fence'),
-}
-
 const Y = { top: 150, l1: 152, pp1: 158, l2: 168, core: 173, l3: 195, pp2: 200, l4: 210, bot: 218 }
 const BX0 = 30
 const BX1 = 730
@@ -119,7 +114,7 @@ const VIAS = [178, 190, 202].map((x) => ({ x, r: 3 }))
 const PINS = [345, 380, 415].map((x) => ({ x, r: 4 }))
 const FENCE = [553, 667].map((x) => ({ x, r: 3 }))
 const HOLES = [SCREW, ...VIAS, ...PINS, ...FENCE]
-const gapOf = (hs: Array<{ x: number; r: number }>, pad = 0): Span[] => hs.map((h) => [h.x - h.r, h.x + h.r] as Span).map(([a, b]) => [a - pad, b + pad] as Span)
+const gapOf = (hs: Array<{ x: number; r: number }>, pad = 0): Span[] => hs.map((h) => [h.x - h.r - pad, h.x + h.r + pad] as Span)
 
 const L1_SEGS: Span[] = [[46, 78], [136, 146], [166, 214], [234, 354], [370, 390], [405, 425], [532, 566], [588, 598], [622, 632], [654, 688]]
 const L1_OPEN: Span[] = [[44, 80], [134, 148], [164, 216], [232, 248], [334, 356], [368, 392], [403, 427], [530, 568], [586, 600], [620, 634], [652, 690]]
@@ -225,7 +220,7 @@ export function RoleFig({ active, onPick }: { active: RoleId; onPick: (id: RoleI
         <Lead d="M292 240 V172" />
         <Txt x={470} y={252}>{t(ROLE_LABEL.pwr)}</Txt>
         <Lead d="M470 240 V198" />
-        <Txt x={610} y={252}>{t(L.fence)}</Txt>
+        <Txt x={610} y={252}>{t(ROLE_LABEL.fence)}</Txt>
         <Lead d="M596 242 L556 222 M624 242 L664 222" />
         <Txt x={118} y={274} anchor="start">{t(ROLE_LABEL.chassis)}</Txt>
       </svg>

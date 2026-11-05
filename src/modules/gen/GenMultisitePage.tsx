@@ -82,10 +82,12 @@ export function GenMultisitePage({ moduleId, onModuleChange }: Props) {
       asideText={t(M.curveWhy)}
       asideLater={t(M.asideLater)}
       extra={<TaskList items={tasks} onReset={reset} />}
+      nextId="vate"
+      nextLabel={`${t(M.nextPrefix)}${t(ui.vate.title)}`}
     >
       <Section title={t(M.introTitle)}>
         <RefParas paras={INTRO} onOpen={onModuleChange} />
-        <Related ids={['genStdf', 'memParallel', 'anaStats']} onOpen={onModuleChange} />
+        <Related ids={['genStdf', 'vate', 'sim']} onOpen={onModuleChange} />
       </Section>
 
       <Section title={t(M.coreTitle)} note={t(M.coreNote)}>
