@@ -183,7 +183,7 @@ export const TRACKS: Array<{
   },
   {
     id: 'digital',
-    title: loc('基础 / 数字', 'Basics / Digital'),
+    title: loc('基础', 'Basics'),
     blurb: loc(
       '先认名词、看动画：测什么、接到哪，再到 DC、功能、时序、Scan 和程序。现课 {@intro}–{@genMultisite}。拧旋钮、跑工作站在交互实验 {@vate}。',
       'Names and animations first: what is tested and how it connects, then DC, functional, timing, Scan and the program. Lessons {@intro}–{@genMultisite}. Turning knobs and running the workstation live in the Interactive lab {@vate}.',
@@ -395,7 +395,7 @@ export const TRACKS: Array<{
         ),
       },
       {
-        title: loc('和「基础 / 数字」的关系', 'How this relates to Basics / Digital'),
+        title: loc('和「基础」的关系', 'How this relates to Basics'),
         text: loc(
           '那边先用动画立名词：{@pmu}、{@dc}、{@func}、{@timing}、{@scan}。这里用一颗 256×4 SRAM 把量产测法走一遍：{@fOpens}、{@fDc}、{@fFunc}、{@fAc}。课页底有「对应课」互链，不必当两遍新课上。',
           'That track plants the names with animations: {@pmu}, {@dc}, {@func}, {@timing}, {@scan}. This one walks a 256×4 SRAM through production: {@fOpens}, {@fDc}, {@fFunc}, {@fAc}. Each lesson footer links to its match; they are not a second copy of the same class.',
@@ -1060,7 +1060,7 @@ export function trackOfLesson(id: ModuleId, current?: TrackId): TrackId {
 }
 
 /**
- * 「基础 / 数字」与「数字测试基础」同一主题的对应课。
+ * 「基础」与「数字测试基础」同一主题的对应课。
  * 课页底自动互链，避免两套课被当成两遍新课。
  */
 export const SIBLING_LESSONS: Partial<Record<ModuleId, readonly ModuleId[]>> = {

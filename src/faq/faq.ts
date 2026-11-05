@@ -486,8 +486,8 @@ const BASE_FAQ_GROUPS: FaqGroup[] = [
         id: 'lesson-codes',
         q: loc('课程编号 D04、F06 是什么意思？', 'What do lesson codes like D04 and F06 mean?'),
         a: loc(
-          '字母是轨道，数字是这一课在轨道里的顺序：D 是“基础 / 数字”轨道（D01–D16），F 是“数字测试基础”轨道（F01–F16），X 是“交互实验”（虚拟 ATE 工作站是 {@vate}）。文中出现的编号都可以点，直接跳到那一课。',
-          'The letter is the track and the number is the lesson’s place in it: D is Basics / Digital (D01–D16), F is Digital Test Fundamentals (F01–F16), and X is the Interactive lab (the virtual ATE workstation is {@vate}). Every code in the text is clickable and jumps to that lesson.',
+          '字母是轨道，数字是这一课在轨道里的顺序：D 是“基础”轨道（D01–D16），F 是“数字测试基础”轨道（F01–F16），X 是“交互实验”（虚拟 ATE 工作站是 {@vate}）。文中出现的编号都可以点，直接跳到那一课。',
+          'The letter is the track and the number is the lesson’s place in it: D is the Basics track (D01–D16), F is Digital Test Fundamentals (F01–F16), and X is the Interactive lab (the virtual ATE workstation is {@vate}). Every code in the text is clickable and jumps to that lesson.',
         ),
         lessons: ['intro', 'fBasics'],
       },

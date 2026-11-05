@@ -14,7 +14,7 @@ export function HomePage({ onOpenTrack }: HomePageProps) {
   const groups = [
     { title: ui.home.readyGroup, tracks: TRACKS.filter((item) => item.ready) },
     { title: ui.home.pendingGroup, tracks: TRACKS.filter((item) => !item.ready) },
-  ]
+  ].filter((group) => group.tracks.length > 0)
 
   return (
     <AppChrome title={t(ui.home.title)} goal={t(ui.home.goal)} brand>
