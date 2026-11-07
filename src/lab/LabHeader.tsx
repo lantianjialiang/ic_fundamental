@@ -20,23 +20,17 @@ export function LabHeader({ title, goal, nav, brand }: LabHeaderProps) {
   return (
     <header className={`lab__header${brand ? ' lab__header--home' : ''}`}>
       <div className="lab__head-row">
-        <div className="lab__titles">
-          {brand ? (
-            <a className="lab__brand" href="#/">
-              <img src={LOGO} alt="" width="48" height="48" />
-              <span>
-                <b>{t(ui.labName)}</b>
-                <small>{t(ui.labTagline)}</small>
-              </span>
-            </a>
-          ) : (
-            <a className="lab__eyebrow" href="#/">
-              <img src={LOGO} alt="" width="16" height="16" />
-              {t(ui.labName)}
-            </a>
-          )}
-          {!brand ? <h1>{title}</h1> : null}
-        </div>
+        {brand ? (
+          <a className="lab__brand" href="#/">
+            <img src={LOGO} alt="" width="40" height="40" />
+            <b>{t(ui.labName)}</b>
+          </a>
+        ) : (
+          <a className="lab__eyebrow" href="#/">
+            <img src={LOGO} alt="" width="16" height="16" />
+            {t(ui.labName)}
+          </a>
+        )}
         <div className="lab__switches">
           <div className="lab__lang" role="group" aria-label={t(ui.themeAria)}>
             <button
@@ -72,6 +66,7 @@ export function LabHeader({ title, goal, nav, brand }: LabHeaderProps) {
           </div>
         </div>
       </div>
+      {brand ? <p className="lab__tagline">{t(ui.labTagline)}</p> : <h1>{title}</h1>}
       {!brand ? <p className="lab__goal">{goal}</p> : null}
       <nav className="lab__nav" aria-label={t(ui.navAria)}>
         {nav}

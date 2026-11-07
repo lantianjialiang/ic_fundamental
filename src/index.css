@@ -131,6 +131,11 @@ button:focus-visible {
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 html,
 body,
 #root {
@@ -160,7 +165,7 @@ body {
 .lab__header {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   padding: 14px 28px 0;
   border-bottom: 1px solid var(--line-soft);
   background: var(--panel);
@@ -168,25 +173,23 @@ body {
 
 .lab__head-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.lab__titles {
-  min-width: 0;
+  justify-content: flex-end;
+  gap: 8px 12px;
 }
 
 .lab__eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin: 0 0 4px;
+  margin-right: auto;
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .lab__eyebrow:hover {
@@ -194,7 +197,7 @@ body {
 }
 
 .lab__header--home {
-  gap: 6px;
+  gap: 4px;
   padding-top: 10px;
 }
 
@@ -205,40 +208,38 @@ body {
 .lab__brand {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  margin: 0 0 14px;
+  gap: 10px;
+  margin-right: auto;
+  min-width: 0;
   color: var(--text);
   text-decoration: none;
 }
 
-.lab__header--home .lab__brand {
-  gap: 10px;
-  margin: 0 0 6px;
-}
-
-.lab__header--home .lab__brand b {
-  font-size: 19px;
-}
-
 .lab__brand img {
   flex: none;
-}
-
-.lab__brand span {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  width: 48px;
+  height: 48px;
 }
 
 .lab__brand b {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
-.lab__brand small {
+.lab__tagline {
+  margin: 0;
+  max-width: 880px;
   font-size: 13px;
+  line-height: 1.45;
   color: var(--muted);
+}
+
+@media (min-width: 901px) {
+  .lab__header--home .lab__tagline {
+    margin-left: 58px;
+  }
 }
 
 .lab--scroll {
@@ -251,9 +252,12 @@ body {
 
 .lab__header h1 {
   margin: 0;
+  max-width: 880px;
   font-size: 20px;
   font-weight: 600;
   letter-spacing: 0.01em;
+  line-height: 1.35;
+  text-wrap: balance;
 }
 
 /* 课程导航：单行，超出横向滚动，不再挤成两三行 */
@@ -265,6 +269,7 @@ body {
   scrollbar-width: thin;
   margin: 0 -4px;
   padding: 0 4px 10px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .lab__nav-sep {
@@ -452,6 +457,7 @@ body {
   padding: 24px 22px;
   border-left: 1px solid var(--line-soft);
   background: var(--panel-2);
+  -webkit-overflow-scrolling: touch;
 }
 
 .legend h2 {
@@ -501,6 +507,7 @@ body {
 .intro__main {
   overflow: auto;
   padding: 28px 40px 64px;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* 正文列居中、限宽，宽屏不再贴左留一大片空白 */
@@ -870,6 +877,41 @@ body {
 }
 
 @media (max-width: 900px) {
+  html,
+  body,
+  #root {
+    height: auto;
+    min-height: 100%;
+    min-height: 100dvh;
+  }
+
+  body {
+    overflow: auto;
+    overflow-x: hidden;
+  }
+
+  .lab:not(.lab--scroll) {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .lab--scroll {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .lab--scroll .lab__body,
+  .lab--scroll .intro,
+  .lab--scroll .intro__main {
+    overflow: visible;
+    min-height: 0;
+  }
+
+  .lab--scroll .lab__body {
+    grid-template-rows: auto auto;
+  }
+
   .track-split {
     grid-template-columns: 1fr;
   }
@@ -882,9 +924,117 @@ body {
   /* 窄屏把侧栏放到正文下面，不能隐藏：D02 的通道和分层按钮都在侧栏里 */
   .lab__body > .legend {
     max-height: 38vh;
-    padding: 14px 18px;
+    padding: 14px 16px;
     border-left: 0;
     border-top: 1px solid var(--line-soft);
+  }
+
+  .lab--scroll .lab__body > .legend {
+    max-height: none;
+  }
+
+  .lab__header {
+    gap: 6px;
+    padding: 10px 14px 0;
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+  }
+
+  .lab__header--home {
+    padding-top: 8px;
+  }
+
+  .lab__header h1 {
+    font-size: 18px;
+  }
+
+  .lab__brand img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .lab__brand b {
+    font-size: 18px;
+  }
+
+  .lab__lang-btn {
+    padding: 6px 10px;
+    min-height: 32px;
+  }
+
+  .lab__nav-item {
+    padding: 6px 12px;
+    min-height: 32px;
+  }
+
+  .intro__main {
+    padding: 16px 14px 40px;
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+  }
+
+  .lab__copyright {
+    padding: 8px 14px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .home__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pick--3,
+  .pick--4,
+  .pe,
+  .param {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .knob-row {
+    grid-template-columns: 1fr;
+  }
+
+  .intro__aside .lab__btn {
+    width: 100%;
+  }
+
+  .lab__toolbar {
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 560px) {
+  .pick--2,
+  .io,
+  .sim-grid,
+  .scale,
+  .cont,
+  .chips {
+    grid-template-columns: 1fr;
+  }
+
+  .home__card {
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .home__card-top {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .lab__header h1 {
+    font-size: 17px;
+  }
+
+  .sim-tabs {
+    width: 100%;
+  }
+
+  .sim-tabs__btn {
+    flex: 1 1 auto;
+    text-align: center;
   }
 }
 

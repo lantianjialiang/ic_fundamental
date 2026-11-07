@@ -27,7 +27,13 @@
 
 .lab__copyright .fb-report {
   margin-left: 10px;
-  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .lab__copyright .fb-report {
+    display: block;
+    margin: 4px 0 0;
+  }
 }
 
 .lab__copyright .fb-report__label {
