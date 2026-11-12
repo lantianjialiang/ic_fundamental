@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState, type ComponentType } from 'react'
 import type { FaqPageProps } from './faq/FaqPage'
 import type { GlossaryPageProps } from './glossary/GlossaryPage'
+import type { ToolsPageProps } from './tools/ToolsPage'
 import { HomePage } from './home/HomePage'
 import { TrackPage } from './home/TrackPage'
 import { useLocale } from './i18n/LocaleContext'
@@ -23,6 +24,7 @@ function page<P>(load: () => Promise<Record<string, unknown>>, name: string) {
 }
 
 const Module00Page = page<IntroProps>(() => import('./modules/module00/Module00Page'), 'Module00Page')
+const ToolsPage = page<ToolsPageProps>(() => import('./tools/ToolsPage'), 'ToolsPage')
 const GlossaryPage = page<GlossaryPageProps>(() => import('./glossary/GlossaryPage'), 'GlossaryPage')
 const FaqPage = page<FaqPageProps>(() => import('./faq/FaqPage'), 'FaqPage')
 const LESSONS: Record<Exclude<ModuleId, 'intro'>, ComponentType<LessonProps>> = {
@@ -226,7 +228,8 @@ export default function App() {
 
   const openTrack = (id: TrackId) => {
     const kind = trackById(id)?.page
-    if (kind === 'glossary') setScreen({ kind: 'glossary' })
+    if (kind === 'tools') setScreen({ kind: 'tools' })
+    else if (kind === 'glossary') setScreen({ kind: 'glossary' })
     else if (kind === 'faq') setScreen({ kind: 'faq' })
     else setScreen({ kind: 'track', track: id })
   }
@@ -246,6 +249,19 @@ export default function App() {
 
   if (screen.kind === 'home') {
     return <HomePage onOpenTrack={openTrack} />
+  }
+
+  if (screen.kind === 'tools') {
+    return (
+      <Suspense fallback={<Loading />}>
+        <ToolsPage
+          toolId={screen.toolId}
+          onSelect={(toolId, replace) => (replace ? replaceScreen : setScreen)({ kind: 'tools', toolId })}
+          onHome={() => setScreen({ kind: 'home' })}
+          onOpenLesson={(id) => openLesson(id)}
+        />
+      </Suspense>
+    )
   }
 
   if (screen.kind === 'glossary') {

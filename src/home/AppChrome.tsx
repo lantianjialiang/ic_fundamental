@@ -3,24 +3,25 @@ import { useLocale } from '../i18n/LocaleContext'
 import { ui } from '../i18n/ui'
 import { Copyright } from '../lab/Copyright'
 import { LabHeader } from '../lab/LabHeader'
-import { trackById } from '../tracks/catalog'
+import { trackById, type TrackPageKind } from '../tracks/catalog'
 import './extras.css'
 
 type AppChromeProps = {
   title: string
   goal: string
   onHome?: () => void
-  /** 当前是术语表或 FAQ 页时，顶部对应的链接高亮 */
-  active?: 'glossary' | 'faq'
+  /** 当前是常用工具、术语表或 FAQ 时，顶部对应的链接高亮 */
+  active?: TrackPageKind
   /** 首页显示大号站点图标 */
   brand?: boolean
   children: ReactNode
 }
 
-const TOOL_LINKS = [
+const TOOL_LINKS: Array<{ id: TrackPageKind; href: string }> = [
+  { id: 'tools', href: '#/tools' },
   { id: 'glossary', href: '#/glossary' },
   { id: 'faq', href: '#/faq' },
-] as const
+]
 
 export function AppChrome({ title, goal, onHome, active, brand, children }: AppChromeProps) {
   const { t } = useLocale()

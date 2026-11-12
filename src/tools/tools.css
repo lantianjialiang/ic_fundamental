@@ -1,0 +1,337 @@
+.tools-fields {
+  display: grid;
+  gap: 10px;
+  max-width: 640px;
+  margin: 0 0 14px;
+}
+
+.tools-field {
+  display: grid;
+  grid-template-columns: minmax(8.5rem, 12rem) minmax(0, 1fr);
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.tools-field label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.tools-field input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 16px;
+}
+
+.tools-field input:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+
+.tools-field.is-source input {
+  border-color: var(--gold-line);
+  background: var(--gold-bg);
+}
+
+.tools-field input.is-bad {
+  border-color: var(--red-line);
+}
+
+.tools-hint {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.tools-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.tools-nav__cat {
+  margin: 16px 0 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.tools-nav__group:first-child .tools-nav__cat {
+  margin-top: 0;
+}
+
+.tools-nav button {
+  display: block;
+  width: 100%;
+  margin: 0 0 4px;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tools-nav button:hover {
+  background: var(--panel-2);
+}
+
+.tools-nav button.is-active {
+  border-color: var(--gold-line);
+  background: var(--gold-bg);
+}
+
+.tools-field__box {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tools-field__box input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.tools-field select,
+.tools-field__box select {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--panel-2);
+  color: var(--text);
+  font: inherit;
+}
+
+.tools-check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tools-subhead {
+  margin: 22px 0 10px;
+  font-size: 16px;
+}
+
+.tools-circuit-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 224px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.tools-circuit-layout .tools-fields {
+  margin-bottom: 0;
+}
+
+.tools-schematic {
+  display: block;
+  width: min(100%, 224px);
+  height: auto;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  background: var(--panel-2);
+  color: var(--text);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tools-schematic text {
+  fill: currentColor;
+  stroke: none;
+  dominant-baseline: middle;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.tools-schematic__junction {
+  fill: currentColor;
+}
+
+.tools-schematic__target {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+@media (max-width: 960px) {
+  .tools-circuit-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.byte-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.byte {
+  min-width: 44px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--panel-2);
+  text-align: center;
+}
+
+.byte__hex,
+.byte__asc {
+  display: block;
+  font-family: var(--mono);
+}
+
+.byte__asc {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.float-card {
+  max-width: 720px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  background: var(--panel-2);
+}
+
+.float-card.is-source {
+  border-color: var(--gold-line);
+}
+
+.float-card__title {
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.bits {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.7;
+  word-break: break-all;
+}
+
+.bits span {
+  margin-right: 8px;
+}
+
+.bits__sign {
+  color: var(--red-2);
+}
+
+.bits__exp {
+  color: var(--gold);
+}
+
+.bits__man {
+  color: var(--blue);
+}
+
+.bits-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+}
+
+.stack-fig {
+  display: block;
+  width: min(100%, 420px);
+  height: auto;
+  margin: 0 0 8px;
+}
+
+.stack-fig__dielectric {
+  fill: var(--panel-2);
+  stroke: var(--line);
+}
+
+.stack-fig__plane {
+  fill: var(--gold-bg);
+  stroke: var(--gold-line);
+}
+
+.stack-fig__trace {
+  fill: var(--gold);
+}
+
+.stack-fig__label {
+  fill: var(--text);
+  font-size: 13px;
+  text-anchor: middle;
+}
+
+.resistor {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 0 0 14px;
+}
+
+.resistor__lead {
+  width: 28px;
+  height: 2px;
+  background: var(--muted);
+}
+
+.resistor__body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 16px;
+  border-radius: 14px;
+  background: #d2a679;
+}
+
+.resistor__body i {
+  width: 8px;
+  height: 28px;
+}
+
+.resistor__body i.is-tol {
+  margin-left: 10px;
+}
+
+@media (max-width: 800px) {
+  .tools-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .tools-nav__group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .tools-nav__cat {
+    flex-basis: 100%;
+  }
+
+  .tools-nav button {
+    width: auto;
+  }
+
+  .tools-field {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}

@@ -1,12 +1,18 @@
 import { Fragment } from 'react'
 import { useLocale } from '../i18n/LocaleContext'
 import { ui } from '../i18n/ui'
-import { TRACKS, type TrackId } from '../tracks/catalog'
+import { TRACKS, type TrackId, type TrackPageKind } from '../tracks/catalog'
 import { AppChrome } from './AppChrome'
 import { HOME_EXTRA } from './text'
 
 type HomePageProps = {
   onOpenTrack: (id: TrackId) => void
+}
+
+const OPEN_PAGE: Record<TrackPageKind, (typeof HOME_EXTRA)['openGlossary']> = {
+  tools: HOME_EXTRA.openTools,
+  glossary: HOME_EXTRA.openGlossary,
+  faq: HOME_EXTRA.openFaq,
 }
 
 export function HomePage({ onOpenTrack }: HomePageProps) {
@@ -52,7 +58,7 @@ export function HomePage({ onOpenTrack }: HomePageProps) {
                 <p>{t(track.blurb)}</p>
                 {track.page ? (
                   <span className="home__card-foot">
-                    {t(track.page === 'glossary' ? HOME_EXTRA.openGlossary : HOME_EXTRA.openFaq)}
+                    {t(OPEN_PAGE[track.page])}
                   </span>
                 ) : track.ready ? (
                   <span className="home__card-foot">

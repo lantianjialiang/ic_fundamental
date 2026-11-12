@@ -18,11 +18,12 @@ export type TrackId =
   | 'qual'
   | 'cpo'
   | 'apk'
+  | 'tools'
   | 'glossary'
   | 'faq'
 
-/** 不是课程列表、而是一整页工具的轨道（术语表、FAQ），首页照样显示成卡片 */
-export type TrackPageKind = 'glossary' | 'faq'
+/** 不是课程列表、而是一整页的轨道（常用工具、术语表、FAQ），首页照样显示成卡片 */
+export type TrackPageKind = 'tools' | 'glossary' | 'faq'
 
 export const TRACKS: Array<{
   id: TrackId
@@ -1094,6 +1095,18 @@ export const TRACKS: Array<{
     ],
   },
   {
+    id: 'tools',
+    title: loc('常用工具', 'Tools'),
+    blurb: loc(
+      '进制、补码、寄存器、字节序、浮点、定时器，以及 PCB 的尺寸、铜厚、线宽、阻抗，和电路里的欧姆定律、分压、RC、电阻。',
+      'Radix, two’s complement, registers, endianness, floats and timers, plus PCB dimensions, copper, trace width and impedance, and Ohm’s law, dividers, RC and resistors.',
+    ),
+    ready: true,
+    lessons: [],
+    knowledge: [],
+    page: 'tools',
+  },
+  {
     id: 'glossary',
     title: loc('术语表', 'Glossary'),
     blurb: loc(
@@ -1139,7 +1152,8 @@ const PREFIX: Record<TrackId, string> = {
   qual: 'Q',
   cpo: 'C',
   apk: 'K',
-  // 术语表、FAQ 没有课程，前缀只是占位，不参与任何编号
+  // 常用工具、术语表、FAQ 没有课程，前缀只是占位，不参与任何编号
+  tools: 'U',
   glossary: 'G',
   faq: 'FAQ',
 }

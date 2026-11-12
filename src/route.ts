@@ -5,6 +5,7 @@ export type Screen =
   | { kind: 'home' }
   | { kind: 'track'; track: TrackId }
   | { kind: 'lesson'; track: TrackId; moduleId: ModuleId }
+  | { kind: 'tools'; toolId?: string }
   | { kind: 'glossary'; termId?: string }
   | { kind: 'faq'; faqId?: string }
 
@@ -16,10 +17,12 @@ const isEntryId = (value: string | undefined): value is string => !!value && /^[
 
 /**
  * 地址格式：#/ 首页，#/轨道ID 轨道页，#/轨道ID/课程ID 单课；
+ * #/tools、#/tools/工具ID 常用工具；
  * #/glossary、#/glossary/术语ID 术语表；#/faq、#/faq/问题ID 常见问题
  */
 export function parseHash(hash: string): Screen {
   const [trackPart, lessonPart] = hash.replace(/^#\/?/, '').split('/')
+  if (trackPart === 'tools') return isEntryId(lessonPart) ? { kind: 'tools', toolId: lessonPart } : { kind: 'tools' }
   if (trackPart === 'glossary') return isEntryId(lessonPart) ? { kind: 'glossary', termId: lessonPart } : { kind: 'glossary' }
   if (trackPart === 'faq') return isEntryId(lessonPart) ? { kind: 'faq', faqId: lessonPart } : { kind: 'faq' }
   if (!trackPart || !isTrack(trackPart)) return { kind: 'home' }
@@ -30,6 +33,7 @@ export function parseHash(hash: string): Screen {
 
 export function screenHash(screen: Screen): string {
   if (screen.kind === 'home') return '#/'
+  if (screen.kind === 'tools') return screen.toolId ? `#/tools/${screen.toolId}` : '#/tools'
   if (screen.kind === 'glossary') return screen.termId ? `#/glossary/${screen.termId}` : '#/glossary'
   if (screen.kind === 'faq') return screen.faqId ? `#/faq/${screen.faqId}` : '#/faq'
   if (screen.kind === 'track') return `#/${screen.track}`
