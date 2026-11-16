@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
-import { type LText } from '../../i18n/locale'
+import { loc, type LText } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
 import { TaskList, type TaskItem } from '../../lab/TaskList'
+import { StepControls, useStepPlayer } from '../../lab/StepPlayer'
 import { type ModuleId } from '../catalog'
 import { Callout, Seg } from '../fund/parts'
 import { PrereqSection } from '../hs/HsPrereq'
@@ -52,6 +53,28 @@ const ENDIAN_OPTIONS: Array<{ id: Endian; label: LText }> = [
   { id: 'le', label: S.endianLE },
   { id: 'be', label: S.endianBE },
 ]
+
+const PART_TIMELINE = dutItems(2).filter(({ rec }) => rec.name === 'PIR' || rec.name === 'PTR' || rec.name === 'PRR')
+
+function PartTimeline() {
+  const { t } = useLocale()
+  const player = useStepPlayer(PART_TIMELINE.length, 2000)
+  const { rec } = PART_TIMELINE[player.step]
+  const { fields } = rec
+  const label = rec.name === 'PTR' ? `PTR · ${fields.TEST_TXT}` : rec.name
+  const detail = rec.name === 'PIR'
+    ? t(loc('开始一个器件的测试记录。', 'Start the records for one device.'))
+    : rec.name === 'PTR'
+      ? `TEST_NUM ${fields.TEST_NUM} · RESULT ${fields.RESULT}`
+      : `PART_ID ${fields.PART_ID} · HARD_BIN ${fields.HARD_BIN}`
+  return (
+    <Section title={t(loc('沿着站点看一颗 DUT 的记录', 'Follow one DUT through its site records'))}>
+      <StepControls player={player} stepLabels={PART_TIMELINE.map(({ key }) => loc(key, key))} />
+      <p role="status"><strong>{label}</strong> · HEAD_NUM {fields.HEAD_NUM} · SITE_NUM {fields.SITE_NUM} · {detail}</p>
+      <p className="intro__note">{t(loc('PIR 开始测试，PTR 记录单项结果，PRR 收尾并写入分箱。头号和站点号相同，因此可以把这些记录配到同一颗 DUT。', 'PIR starts the test, PTR records individual results, and PRR closes the part with a bin. The head and site numbers match across this device’s records.'))}</p>
+    </Section>
+  )
+}
 
 export function GenStdfPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
@@ -202,6 +225,7 @@ export function GenStdfPage({ moduleId, onModuleChange }: Props) {
         </Callout>
       </Section>
 
+      <PartTimeline />
       <Section title={t(S.coreTitle)} note={t(S.coreNote)}>
         <p className="intro__note">{t(PRACTICE_NOTE)}</p>
         <PracticeSteps items={tasks} />

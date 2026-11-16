@@ -1,3 +1,5 @@
+import { LessonComparison } from '../LessonComparison'
+import { testFlow } from '../lessonComparisons'
 import { useState } from 'react'
 import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
@@ -121,7 +123,7 @@ export function MfgOverviewPage({ moduleId, onModuleChange }: { moduleId: Module
       nextLabel={loc('下一课：晶圆制造基础', 'Next: wafer fab basics')}
       later={loc('测试插入点的设备细节见 {@ate}、{@connection}；STDF 见 {@genStdf}。', 'Equipment at the insertions: {@ate}, {@connection}; STDF: {@genStdf}.')}
       intro={INTRO}
-      related={['ate', 'connection', 'pIndustry']}
+      related={['ate', 'connection', 'pIndustry', 'mfgWat', 'mfgCp', 'relBurnIn']}
       kicker={COMMON.kicker}
       asideTitle={stage.title}
       asideText={stage.text}
@@ -142,6 +144,7 @@ export function MfgOverviewPage({ moduleId, onModuleChange }: { moduleId: Module
       }}
       learn={
         <div className="mfg-lab">
+          <LessonComparison {...testFlow} />
           <p>
             {t(loc(
               '出货要经过这些阶段。点一个阶段，读它产出什么、自己要几周。基板和晶圆是同时做的：日历取较长的那条，不能两边都加。',

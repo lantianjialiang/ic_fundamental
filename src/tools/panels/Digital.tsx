@@ -272,7 +272,7 @@ export function EndianTool({ onOpenLesson }: PanelProps) {
     <>
       <Seg label={loc('按哪种端序读整数', 'Which endianness reads the integer')} items={ENDIAN_MODES} activeId={mode} onPick={setMode} />
       <div className="tools-fields">
-        <Field id="tools-endian" label={loc('十六进制字节', 'Hex bytes')} value={text} inputMode="text" bad={problem?.tone === 'bad'} onChange={setText} />
+        <Field id="tools-endian" errorId="tools-endian-result" label={loc('十六进制字节', 'Hex bytes')} value={text} inputMode="text" bad={problem?.tone === 'bad'} onChange={setText} />
       </div>
       {bytes ? (
         <div className="byte-row">
@@ -284,7 +284,7 @@ export function EndianTool({ onOpenLesson }: PanelProps) {
           ))}
         </div>
       ) : null}
-      <Outcome tone={problem?.tone ?? 'ok'} text={problem?.text ?? result} />
+      <Outcome id="tools-endian-result" tone={problem?.tone ?? 'ok'} text={problem?.text ?? result} />
       <Note
         onOpenLesson={onOpenLesson}
         text={loc('STDF 的多字节整数按记录里的字节序拼回去。只把十六进制当文本翻转，数值会整个变掉。', 'Multi-byte integers in STDF are joined in the record’s byte order. Reversing the hex text as characters changes the whole value.')}

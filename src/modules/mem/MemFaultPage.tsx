@@ -1,3 +1,5 @@
+import { LessonComparison } from '../LessonComparison'
+import { memoryFaults } from '../lessonComparisons'
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
 import { ui } from '../../i18n/ui'
@@ -102,6 +104,8 @@ export function MemFaultPage({ moduleId, onModuleChange }: Props) {
       </Section>
 
       
+
+      <LessonComparison {...memoryFaults} />
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

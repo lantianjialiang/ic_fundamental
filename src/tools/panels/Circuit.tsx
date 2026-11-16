@@ -263,16 +263,19 @@ export function DividerTool({ onOpenLesson }: PanelProps) {
         </svg>
         <div className="tools-fields">
           <Field id="tools-led-vs" label={loc('电源 Vs（V）', 'Supply Vs (V)')} value={vsText} onChange={setVsText} />
-          <Field id="tools-led-vf" label={loc('正向压降 Vf（V）', 'Forward drop Vf (V)')} value={vfText} onChange={setVfText} />
-          <Field id="tools-led-i" label={loc('目标电流（mA）', 'Target current (mA)')} value={iText} onChange={setIText} />
+          <Field id="tools-led-vf" label={loc('正向压降 Vf（V）', 'Forward drop Vf (V)')} value={vfText} bad={led?.ok === false && (led.reason === 'forward' || led.reason === 'drop')} errorId="tools-led-result" onChange={setVfText} />
+          <Field id="tools-led-i" label={loc('目标电流（mA）', 'Target current (mA)')} value={iText} bad={led?.ok === false && led.reason === 'current'} errorId="tools-led-result" onChange={setIText} />
         </div>
       </div>
       <Outcome
+        id="tools-led-result"
         tone={ledResult ? 'ok' : ledBad ? 'bad' : 'hint'}
         text={
           ledResult ??
           (led && !led.ok
-            ? led.reason === 'drop'
+            ? led.reason === 'forward'
+              ? loc('正向压降 Vf 要大于 0。', 'Forward drop Vf must be greater than 0.')
+              : led.reason === 'drop'
               ? loc('正向压降不低于电源，电阻上没有正电压，限流电阻算不出来。', 'The forward drop is not below the supply, so there is no positive voltage left for a current-limit resistor.')
               : loc('目标电流要大于 0。', 'The target current must be greater than 0.')
             : loc('填电源、正向压降和目标电流。', 'Enter the supply, the forward drop and the target current.'))
@@ -474,6 +477,7 @@ export function ResistorTool({ onOpenLesson }: PanelProps) {
       <div className="tools-fields">
         <Field
           id="tools-res-ohm"
+          errorId="tools-res-color-result"
           label={loc('阻值（Ω）', 'Resistance (Ω)')}
           value={ohmsText}
           bad={!!ohmsText.trim() && !bands}
@@ -491,7 +495,7 @@ export function ResistorTool({ onOpenLesson }: PanelProps) {
                   value={DIGIT_COLORS[digit]}
                   onChange={(event) => setDigit(index, event.target.value)}
                 >
-                  {DIGIT_COLORS.map((color) => (
+                  {DIGIT_COLORS.slice(index === 0 ? 1 : 0).map((color) => (
                     <option key={color} value={color}>
                       {t(COLOR_NAME[color])}
                     </option>
@@ -523,7 +527,9 @@ export function ResistorTool({ onOpenLesson }: PanelProps) {
           </select>
         </div>
       </div>
-      <Outcome tone={colorResult ? 'ok' : 'bad'} text={colorResult ?? loc('阻值要大于 0。', 'Resistance must be greater than 0.')} />
+      <Outcome id="tools-res-color-result" tone={colorResult ? 'ok' : 'bad'} text={colorResult ?? (ohms !== null && ohms > 0
+        ? loc('该阻值超出所选色环和乘数可表示的范围。', 'This resistance is outside the range of the selected band count and multipliers.')
+        : loc('阻值要大于 0。', 'Resistance must be greater than 0.'))} />
       <h3 className="tools-subhead">{t(loc('标准阻值', 'Standard values'))}</h3>
       <Seg label={loc('系列', 'Series')} items={SERIES} activeId={seriesId} onPick={setSeriesId} />
       <div className="tools-fields">

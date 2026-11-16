@@ -1,3 +1,5 @@
+import { LessonComparison } from '../LessonComparison'
+import { reliabilityStages, yieldAndReliability } from '../lessonComparisons'
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
 import { ui } from '../../i18n/ui'
@@ -105,6 +107,9 @@ export function RelBathtubPage({ moduleId, onModuleChange }: Props) {
       </Section>
 
       
+
+      <LessonComparison {...reliabilityStages} />
+      <LessonComparison {...yieldAndReliability} />
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

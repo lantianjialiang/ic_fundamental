@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState, type ComponentType } from 'react'
+import { Component, lazy, Suspense, useEffect, useMemo, useState, type ComponentType, type ReactNode } from 'react'
 import type { FaqPageProps } from './faq/FaqPage'
 import type { GlossaryPageProps } from './glossary/GlossaryPage'
 import type { ToolsPageProps } from './tools/ToolsPage'
@@ -10,6 +10,7 @@ import { LabNavProvider } from './lab/LabNavContext'
 import { type ModuleId } from './modules/catalog'
 import { parseHash, screenHash, type Screen } from './route'
 import { type TrackId, trackById, trackOfLesson } from './tracks/catalog'
+import { loc } from './i18n/locale'
 
 type LessonProps = {
   moduleId: ModuleId
@@ -201,6 +202,30 @@ function Loading() {
   return <p className="app-loading">{t(ui.loading)}</p>
 }
 
+class PageErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false }
+
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+
+  render() {
+    return this.state.failed ? <PageLoadError /> : this.props.children
+  }
+}
+
+function PageLoadError() {
+  const { t } = useLocale()
+  return (
+    <main className="intro__section">
+      <p role="alert">{t(loc('页面加载失败。', 'The page could not be loaded.'))}</p>
+      <button type="button" onClick={() => window.location.reload()}>{t(loc('重新加载', 'Reload page'))}</button>
+      {' '}
+      <a href="#/">{t(loc('返回首页', 'Return home'))}</a>
+    </main>
+  )
+}
+
 export default function App() {
   const [screen, setScreenState] = useState<Screen>(() => parseHash(window.location.hash))
 
@@ -210,6 +235,14 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
 
+  return (
+    <PageErrorBoundary key={screen.kind === 'lesson' ? screen.moduleId : screen.kind}>
+      <AppScreen screen={screen} setScreenState={setScreenState} />
+    </PageErrorBoundary>
+  )
+}
+
+function AppScreen({ screen, setScreenState }: { screen: Screen; setScreenState: (screen: Screen) => void }) {
   const setScreen = (next: Screen) => {
     const hash = screenHash(next)
     if (window.location.hash === hash) setScreenState(next)
@@ -226,14 +259,6 @@ export default function App() {
     setScreen({ kind: 'lesson', track: trackOfLesson(moduleId, track), moduleId })
   }
 
-  const openTrack = (id: TrackId) => {
-    const kind = trackById(id)?.page
-    if (kind === 'tools') setScreen({ kind: 'tools' })
-    else if (kind === 'glossary') setScreen({ kind: 'glossary' })
-    else if (kind === 'faq') setScreen({ kind: 'faq' })
-    else setScreen({ kind: 'track', track: id })
-  }
-
   const navValue = useMemo(() => {
     if (screen.kind !== 'lesson') return null
     const track = trackById(screen.track)
@@ -248,7 +273,7 @@ export default function App() {
   }, [screen])
 
   if (screen.kind === 'home') {
-    return <HomePage onOpenTrack={openTrack} />
+    return <HomePage />
   }
 
   if (screen.kind === 'tools') {
@@ -295,7 +320,6 @@ export default function App() {
       <TrackPage
         trackId={screen.track}
         onHome={() => setScreen({ kind: 'home' })}
-        onOpenLesson={(id) => openLesson(id, screen.track)}
       />
     )
   }

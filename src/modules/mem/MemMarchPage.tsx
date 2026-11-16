@@ -1,3 +1,5 @@
+import { LessonComparison } from '../LessonComparison'
+import { memoryAlgorithms } from '../lessonComparisons'
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
 import { ui } from '../../i18n/ui'
@@ -204,6 +206,8 @@ export function MemMarchPage({ moduleId, onModuleChange }: Props) {
       </Section>
 
       
+
+      <LessonComparison {...memoryAlgorithms} />
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

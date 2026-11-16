@@ -2,18 +2,45 @@ import { useState } from 'react'
 import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
-import { Cards, Knob, Readout } from '../fund/parts'
+import { Knob, Readout } from '../fund/parts'
+import { StepControls, useStepPlayer } from '../../lab/StepPlayer'
 import { daisyChainResistance, tsvLinerCapacitance, tsvResistance } from './core'
 import { TEACH } from '../mfg/core'
 import { After, COMMON, Drill, PackLesson, near, useSticky } from '../mfg/shell'
 import { APK_META } from './meta'
 
 const STEPS = [
-  { id: 'etch', title: loc('刻蚀', 'Etch'), text: loc('在硅上打孔。via-first / middle / last 决定何时打。', 'A hole in silicon. Via-first / middle / last sets when.') },
+  { id: 'etch', title: loc('刻蚀盲孔', 'Etch a blind via'), text: loc('从正面刻蚀盲孔，孔底下方仍留有硅。via-first / middle / last 决定刻蚀时机。', 'Etch a blind via from the front, leaving silicon under it. Via-first, via-middle and via-last describe when it is etched.') },
   { id: 'lin', title: loc('绝缘 / 种子', 'Liner / seed'), text: loc('绝缘层决定对衬底电容和漏电。', 'The liner sets substrate capacitance and leakage.') },
   { id: 'fill', title: loc('铜填充', 'Cu fill'), text: loc('空洞会让电阻升高。', 'A void raises resistance.') },
-  { id: 'thin', title: loc('减薄 / 露出', 'Thin / reveal'), text: loc('减到数十 µm，需载片和临时键合。', 'Thinned to tens of µm; a carrier and temporary bond are needed.') },
+  { id: 'bond', title: loc('临时键合', 'Temporary bonding'), text: loc('把正面临时键合到载片，支撑接下来的背面加工。', 'Temporarily bond the front to a carrier for support during backside processing.') },
+  { id: 'thin', title: loc('背面减薄', 'Backside thinning'), text: loc('从背面去除大部分硅，接近盲孔底部。', 'Remove most of the silicon from the back, approaching the blind-via tip.') },
+  { id: 'reveal', title: loc('露铜', 'Reveal copper'), text: loc('去除孔底剩余的覆盖层，露出铜端。', 'Remove the remaining material over the via tip to expose copper.') },
+  { id: 'connect', title: loc('背面互连', 'Backside interconnect'), text: loc('背面金属接到露出的铜端，形成正面到背面布线的电路径。', 'Backside metal contacts the exposed copper and completes the path from front to backside routing.') },
 ]
+
+function TsvCrossSection({ step }: { step: number }) {
+  const { t } = useLocale()
+  const bottom = step < 4 ? 144 : step === 4 ? 112 : 94
+  return (
+    <svg viewBox="0 0 430 184" width="100%" style={{ maxWidth: 500 }} role="img" aria-label={t(STEPS[step].text)}>
+      <rect x="48" y="45" width="222" height={bottom - 45} fill="var(--panel-2)" stroke="var(--muted)" />
+      <rect x="143" y="45" width="34" height={step >= 5 ? 49 : 52} fill={step >= 1 ? 'var(--blue)' : 'var(--bg)'} />
+      {step >= 1 && <rect x="148" y="45" width="24" height={step >= 5 ? 49 : 47} fill={step >= 2 ? 'var(--gold)' : 'var(--bg)'} />}
+      {step >= 2 && <rect x="128" y="39" width="64" height="6" fill="var(--gold)" />}
+      {step >= 3 && <>
+        <rect x="48" y="30" width="222" height="9" fill="var(--muted)" />
+        <rect x="48" y="15" width="222" height="15" fill="var(--panel-2)" stroke="var(--muted)" />
+        <text x="282" y="26" fill="currentColor" fontSize="13">{t(loc('临时载片', 'Temporary carrier'))}</text>
+      </>}
+      {step >= 4 && <path d={`M48 ${bottom}h222`} fill="none" stroke="var(--blue)" strokeDasharray="4 3" />}
+      {step === 6 && <rect x="147" y="94" width="95" height="7" fill="var(--gold)" />}
+      <text x="282" y="53" fill="currentColor" fontSize="13">{t(loc('正面', 'Front'))}</text>
+      <text x="282" y={bottom + 4} fill="currentColor" fontSize="13">{t(loc('背面', 'Back'))}</text>
+      <text x="65" y="73" fill="currentColor" fontSize="13">{t(loc('硅', 'Silicon'))}</text>
+    </svg>
+  )
+}
 
 const QUIZ = [
   { id: 'q1', prompt: loc('直径 5 µm、长 50 µm 的 TSV 电阻？', 'TSV resistance at 5 µm diameter, 50 µm length?'), options: [
@@ -61,7 +88,7 @@ const QUIZ = [
 
 export function ApkTsvPage({ moduleId, onModuleChange }: { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }) {
   const { t } = useLocale()
-  const [stepId, setStepId] = useState(STEPS[0].id)
+  const player = useStepPlayer(STEPS.length, 2200)
   const [dia, setDia] = useState(8)
   const [len, setLen] = useState(80)
   const [tox, setTox] = useState(0.4)
@@ -69,7 +96,7 @@ export function ApkTsvPage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
   const [rBump, setRBump] = useState(0.05)
   const [defect, setDefect] = useState(false)
   const [seg, setSeg] = useState(1)
-  const step = STEPS.find((item) => item.id === stepId) ?? STEPS[0]
+  const step = STEPS[player.step]
   const r = tsvResistance(TEACH.rhoCu, len * 1e-6, (dia / 2) * 1e-6)
   const c = tsvLinerCapacitance(3.9, len * 1e-6, (dia / 2) * 1e-6, tox * 1e-6)
   const chain = daisyChainResistance(n, r, rBump, defect ? [{ index: 0, factor: 10 }] : [])
@@ -109,7 +136,7 @@ export function ApkTsvPage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
         { id: 't4', text: taskSeg, done: segHit.hit },
       ]}
       onReset={() => {
-        setStepId(STEPS[0].id)
+        player.reset()
         setDia(8)
         setLen(80)
         setTox(0.4)
@@ -125,7 +152,9 @@ export function ApkTsvPage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
       learn={
         <div className="mfg-lab">
           <p>{t(loc('点一步，读孔是什么时候打、什么时候填铜。', 'Click a step and read when the hole is etched and when the copper goes in.'))}</p>
-          <Cards items={STEPS} activeId={stepId} cols={4} onPick={(item) => setStepId(item.id)} />
+          <StepControls player={player} stepLabels={STEPS.map((item) => item.title)} />
+          <TsvCrossSection step={player.step} />
+          <p role="status"><strong>{t(step.title)}</strong> {t(step.text)}</p>
           <p>{t(step.text)}</p>
           <p>{t(loc('单孔电阻 R = ρ × 长度 / (π × 半径²)。铜的电阻率这一课用 1.68×10⁻⁸ Ω·m。孔又短又粗时，电阻只有几十毫欧，难测的不是这个数，而是空洞和开路。', 'Via resistance R = ρ × length / (π × radius²). This lesson uses 1.68×10⁻⁸ Ω·m for copper. A short, wide via is only tens of milliohms. The hard measurement is a void or an open, not this small number.'))}</p>
           <p>{t(loc('孔壁电容 C = 2π × ε × 长度 / ln( (半径+绝缘厚) / 半径 )。ε 用二氧化硅的 3.9×ε0。绝缘越薄，电容越大。', 'Liner capacitance C = 2π × ε × length / ln( (radius+liner) / radius ). ε uses silicon dioxide, 3.9×ε0. A thinner liner means more capacitance.'))}</p>

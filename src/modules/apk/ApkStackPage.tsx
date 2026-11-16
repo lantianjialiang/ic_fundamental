@@ -158,7 +158,7 @@ export function ApkStackPage({ moduleId, onModuleChange }: { moduleId: ModuleId;
       }
       misconceptions={[
         loc('KGD 就是 100% 好。它只在覆盖率里“已知”。', 'KGD is not 100% good. It is “known” only inside coverage.'),
-        loc('W2W 一定更便宜。连乘会浪费硅。', 'W2W is not always cheaper. The product wastes silicon.'),
+        loc('当单层良率较低时，W2W 的叠层良率会随层数增加而下降。良品出货减少，可能抵消晶圆级键合的成本优势。', 'When individual wafer yields are low, W2W stack yield falls as layers are added. Fewer good stacks can offset the cost advantage of wafer-level bonding.'),
         loc('键合良率可忽略。它要乘 n−1 次。', 'Bond yield is not optional. It is raised to n−1.'),
       ]}
       takeaway={[

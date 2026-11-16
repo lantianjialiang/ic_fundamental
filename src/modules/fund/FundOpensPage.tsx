@@ -20,14 +20,15 @@ import {
   type Verdict,
 } from './data/opens'
 import { OpensFig } from './OpensFig'
+import { StepControls, useStepPlayer } from '../../lab/StepPlayer'
 import { Callout, Knob, Readout, Seg, Steps, fmtV, type Note } from './parts'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
 const S = {
-  whyTitle: loc('为什么第一项永远是开短路', 'Why opens/shorts always comes first'),
+  whyTitle: loc('为什么通常先做开短路检查', 'Why continuity is usually checked early'),
   howTitle: loc('怎么测：PMU + 保护二极管', 'How: PMU + protection diodes'),
-  howNote: loc('每个管脚内部都有两只保护二极管：一只接 VDD，一只接 VSS。开短路测试就是借它们来判断接触。', 'Every pin has two internal protection diodes: one to VDD and one to VSS. The opens/shorts test uses them to judge contact.'),
+  howNote: loc('本课 DUT 的示例 I/O 有两条钳位路径，一条接 VDD，一条接 VSS。PMU 利用这两条路径检查接触。实际测试的电流方向、限值和执行顺序取决于引脚保护结构与测试流程。', 'The example DUT has two clamp paths on the I/O pin, one to VDD and one to VSS. The PMU uses these paths to check contact. The test polarity, limits, and sequence depend on the pin protection circuit and the test flow.'),
   simTitle: loc('自己测一个管脚', 'Test a pin yourself'),
   simNote: loc('选故障、选电流方向和大小，看读数落在哪个区间。', 'Pick a fault, current direction and magnitude, and see which region the reading falls in.'),
   polarity: loc('电流方向', 'Current direction'),
@@ -63,6 +64,9 @@ export function FundOpensPage({ moduleId, onModuleChange }: Props) {
   const volt = measure(fault, pos, amp)
   const verdict = judge(volt)
   const win = pos ? '+0.20 ~ +1.50 V' : '−1.50 ~ −0.20 V'
+  const demo = useStepPlayer(3, 2400)
+  const demoCase = FAULTS[demo.step]
+  const demoVoltage = measure(demoCase.id, false, 100)
 
   return (
     <LessonFrame
@@ -85,6 +89,15 @@ export function FundOpensPage({ moduleId, onModuleChange }: Props) {
 
       <Section title={t(S.howTitle)} note={t(S.howNote)}>
         <Steps items={HOW} />
+      </Section>
+
+      <Section title={t(loc('同一测试电流下的三种读数', 'Three readings at the same test current'))}>
+        <StepControls player={demo} stepLabels={FAULTS.slice(0, 3).map((item) => item.label)} />
+        <OpensFig fault={demoCase.id} pos={false} volt={demoVoltage} />
+        <p role="status">
+          <strong>{t(demoCase.label)} · −100 µA · {fmtV(demoVoltage)}</strong>
+          {' '}{t(demoCase.text)}
+        </p>
       </Section>
 
       <Section title={t(S.simTitle)} note={t(S.simNote)}>

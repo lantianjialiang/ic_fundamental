@@ -154,7 +154,7 @@ export function PrepPackagePage({ moduleId, onModuleChange }: Props) {
             </button>
           ))}
         </div>
-        <Related ids={['intro', 'connection', 'fAte', 'fOpens']} onOpen={onModuleChange} />
+        <Related ids={['intro', 'connection', 'fAte', 'fOpens', 'mfgOverview']} onOpen={onModuleChange} />
       </Section>
 
       <Section title={t(S.takeawayTitle)}>

@@ -1,3 +1,6 @@
+import { LessonComparison } from '../LessonComparison'
+import { FetCrossSections } from './FetCrossSections'
+import { fetStructures } from '../lessonComparisons'
 import { useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
 import { loc, type LText } from '../../i18n/locale'
@@ -237,6 +240,11 @@ export function MosIntroPage({ moduleId, onModuleChange }: Props) {
           <RefP text={CMP_LINE} onOpen={onModuleChange} />
         </Callout>
         <Related ids={['pParts', 'mosDynamic', 'mosInverter', 'mosRegion']} onOpen={onModuleChange} />
+      </Section>
+
+      <Section title={t(loc('对照栅极和沟道截面', 'Compare gate and channel cross-sections'))}>
+        <FetCrossSections />
+        <LessonComparison {...fetStructures} />
       </Section>
 
       <Section title={t(S.takeawayTitle)}>

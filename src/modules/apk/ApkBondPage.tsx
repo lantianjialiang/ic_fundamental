@@ -1,11 +1,44 @@
 import { useState } from 'react'
 import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
+import { StepControls, useStepPlayer } from '../../lab/StepPlayer'
 import { type ModuleId } from '../catalog'
 import { Cards, Knob, Readout } from '../fund/parts'
 import { energyPerBitPj, ioDensityPerMm2 } from './core'
 import { After, COMMON, Drill, PackLesson, near, useSticky } from '../mfg/shell'
 import { APK_META } from './meta'
+
+const BOND_STAGES = [
+  loc('铜焊盘与介质表面对齐', 'Align copper pads and dielectric surfaces'),
+  loc('介质表面接触并键合', 'Bring the dielectric surfaces into contact'),
+  loc('退火后铜焊盘接通', 'Anneal to connect the copper pads'),
+]
+
+function HybridBondFig() {
+  const { t } = useLocale()
+  const player = useStepPlayer(BOND_STAGES.length, 2200)
+  const upper = player.step === 0 ? 20 : 45
+  const contact = player.step === 2
+  return (
+    <div>
+      <StepControls player={player} stepLabels={BOND_STAGES} />
+      <svg viewBox="0 0 440 160" width="100%" style={{ maxWidth: 500 }} role="img" aria-label={t(BOND_STAGES[player.step])}>
+        <rect x="36" y={upper} width="246" height="34" fill="var(--panel-2)" stroke="var(--muted)" />
+        <rect x="36" y="79" width="246" height="34" fill="var(--panel-2)" stroke="var(--muted)" />
+        <path d="M36 79h246" stroke={player.step > 0 ? 'var(--blue)' : 'var(--line)'} strokeDasharray="5 3" />
+        {[89, 146, 203].map((x) => (
+          <g key={x}>
+            <rect x={x} y={upper + 18} width="24" height={contact ? 16 : 13} fill="var(--gold)" />
+            <rect x={x} y={contact ? 79 : 82} width="24" height={contact ? 16 : 13} fill="var(--gold)" />
+          </g>
+        ))}
+        <text x="295" y="75" fill="currentColor" fontSize="13">{t(loc('键合面', 'Bond interface'))}</text>
+        <text x="295" y="101" fill="var(--gold)" fontSize="13">{t(loc('铜焊盘', 'Copper pads'))}</text>
+      </svg>
+      <p role="status">{t(BOND_STAGES[player.step])}</p>
+    </div>
+  )
+}
 
 const KINDS = [
   { id: 'wb', title: loc('引线键合', 'Wire bond'), pitch: 120, text: loc('周边、节距大、电感大。', 'Peripheral, coarse pitch, large inductance.') },
@@ -123,6 +156,7 @@ export function ApkBondPage({ moduleId, onModuleChange }: { moduleId: ModuleId; 
         <div className="mfg-lab">
           <p>{t(loc('四种互连。点一种，读它用焊线、焊料还是铜对铜。', 'Four interconnects. Click one and read whether it uses a wire, solder or copper-to-copper.'))}</p>
           <Cards items={KINDS} activeId={kindId} cols={4} onPick={(item) => setKindId(item.id)} />
+          {kindId === 'hb' && <HybridBondFig />}
           <p>{t(kind.text)}</p>
           <p>{t(loc('面密度 = (1000 / 节距)²，节距用 µm，密度是每平方毫米多少个接点。节距缩小到 1/2，密度变成 4 倍。', 'Area density = (1000 / pitch)², with pitch in µm and density in contacts per square millimetre. Halving the pitch multiplies density by 4.'))}</p>
           <p>{t(loc('每位能量 ≈ α × C × V²。C 是这一位要充的电容，V 是摆幅，α 是它翻转的比例。降电压比把线再缩短一点更有效。', 'Energy per bit ≈ α × C × V². C is the capacitance that bit charges, V is the swing, and α is how often it toggles. Dropping voltage beats shortening the wire a little more.'))}</p>

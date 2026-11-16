@@ -9,6 +9,7 @@ import { Callout, Knob, Readout, Seg } from '../fund/parts'
 import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import { EyeFig } from './EyeFig'
+import { EyeFormation } from './EyeFormation'
 import { PrereqSection } from './HsPrereq'
 import { INTRO, MISCONCEPTIONS, PREREQ, QUIZ, RATE_OPTIONS, S, TAKEAWAY, taskItems, verdictOf } from './eyeData'
 import { DEFAULT_EYE, analyseEye, type EyeState } from './eyeModel'
@@ -68,6 +69,7 @@ export function HsEyePage({ moduleId, onModuleChange }: Props) {
           <Knob label={S.rjLabel} value={state.rj} unit="ps" min={0} max={8} step={0.5} onChange={(rj) => update({ rj })} />
         </div>
 
+        <EyeFormation analysis={analysis} />
         <div className="hs-grid">
           <EyeFig analysis={analysis} />
           <div className="hs-cell">

@@ -103,7 +103,7 @@ export function ApkFlowPage({ moduleId, onModuleChange }: { moduleId: ModuleId; 
         loc('先进封装的测试账是：在哪里插入、覆盖多少、晚发现会报废多贵。VDUT-APK1 默认 GPU + 4 个 HBM + 中介层。', 'The advanced-package test ledger is: where to insert, how much coverage, and how expensive a late find is. VDUT-APK1 defaults to a GPU + 4 HBM + interposer.'),
         loc('标准名（1838 / 1149.1 / 1500）只作概念，以现行标准为准。', 'Standard names (1838 / 1149.1 / 1500) are conceptual; follow the current standards.'),
       ]}
-      related={['genStdf', 'genMultisite', 'mfgFlying', 'mfgCp', 'apkStack']}
+      related={['genStdf', 'genMultisite', 'mfgFlying', 'mfgCp', 'apkStack', 'memFault', 'memMarch', 'memBist']}
       kicker={COMMON.kicker}
       asideTitle={ins.title}
       asideText={ins.text}

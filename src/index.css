@@ -1039,6 +1039,11 @@ body {
 }
 
 .home__card,
+.home__lesson {
+  text-decoration: none;
+}
+
+.home__card,
 .home__lesson,
 .home__know-item {
   appearance: none;

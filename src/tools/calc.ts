@@ -81,8 +81,10 @@ export function formatBits(value: bigint, width: number): string {
 }
 
 export function parseBytes(text: string): number[] | null {
-  const hex = text.trim().split(/[\s_,:-]+/).map((part) => part.replace(/^0x/i, '')).join('')
-  if (!/^(?:[\da-f]{2}){1,16}$/i.test(hex)) return null
+  const groups = text.trim().split(/[\s_,:-]+/).map((part) => part.replace(/^0x/i, ''))
+  if (!groups.every((group) => /^(?:[\da-f]{2})+$/i.test(group))) return null
+  const hex = groups.join('')
+  if (hex.length > 32) return null
   const bytes: number[] = []
   for (let i = 0; i < hex.length; i += 2) bytes.push(Number.parseInt(hex.slice(i, i + 2), 16))
   return bytes
@@ -250,6 +252,7 @@ export function dividerR2(vin: number, vout: number, r1: number) {
 }
 
 export function ledLimit(vs: number, vf: number, current: number) {
+  if (!(vf > 0)) return { ok: false as const, reason: 'forward' as const }
   if (!(current > 0)) return { ok: false as const, reason: 'current' as const }
   if (!(vs - vf > 0)) return { ok: false as const, reason: 'drop' as const }
   const drop = vs - vf
@@ -352,7 +355,8 @@ export function bandsFromValue(ohms: number, count: BandCount): { digits: number
     exp += 1
   }
   const rounded = Math.round(sig)
-  const expClamped = Math.min(9, Math.max(-2, exp + (rounded >= 10 ** figures ? 1 : 0)))
+  const bandExp = exp + (rounded >= 10 ** figures ? 1 : 0)
+  if (bandExp < -2 || bandExp > 9) return null
   const sigClamped = rounded >= 10 ** figures ? Math.round(rounded / 10) : rounded
   const digits: number[] = []
   let rest = sigClamped
@@ -361,6 +365,6 @@ export function bandsFromValue(ohms: number, count: BandCount): { digits: number
     digits.push(Math.floor(rest / place))
     rest %= place
   }
-  const rebuilt = valueFromBands(digits, expClamped)
-  return { digits, exp: expClamped, exact: Math.abs(rebuilt - ohms) <= ohms * 1e-9 }
+  const rebuilt = valueFromBands(digits, bandExp)
+  return { digits, exp: bandExp, exact: Math.abs(rebuilt - ohms) <= ohms * 1e-9 }
 }

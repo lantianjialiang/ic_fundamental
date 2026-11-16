@@ -97,8 +97,8 @@ export const PREREQ: LText[] = [
     'Definitions: at the centre (0.5 UI) sampling phase, eye height = min(samples of “1”) − max(samples of “0”), in mV. Eye width = the number of sampling phases where the opening is positive, divided by the samples per UI, in UI. Height is the amplitude margin; width is the timing margin.',
   ),
   loc(
-    '350 ÷ BW 的来源：一阶 RC 的 τ = 1 ÷ (2π·BW)，10%–90% 上升时间 = τ·ln 9 = ln 9 ÷ (2π·BW) ≈ 0.35 ÷ BW（BW 用赫兹、时间用秒）；BW 用 GHz、上升时间用 ps 时就是 350 ÷ BW。完整推导见 HS-01 的补充。',
-    'Where rise time ≈ 350 ÷ BW comes from: for a first-order RC, τ = 1 ÷ (2π·BW), and the 10%–90% rise time is τ·ln 9 = ln 9 ÷ (2π·BW) ≈ 0.35 ÷ BW (BW in hertz, time in seconds); with BW in GHz and rise time in ps this is 350 ÷ BW. The full derivation is in the HS-01 supplement.',
+    '350 ÷ BW 的来源：一阶 RC 的 τ = 1 ÷ (2π·BW)，10%–90% 上升时间 = τ·ln 9 = ln 9 ÷ (2π·BW) ≈ 0.35 ÷ BW（BW 用赫兹、时间用秒）；BW 用 GHz、上升时间用 ps 时就是 350 ÷ BW。完整推导见 {@hsBasics} 的补充。',
+    'Where rise time ≈ 350 ÷ BW comes from: for a first-order RC, τ = 1 ÷ (2π·BW), and the 10%–90% rise time is τ·ln 9 = ln 9 ÷ (2π·BW) ≈ 0.35 ÷ BW (BW in hertz, time in seconds); with BW in GHz and rise time in ps this is 350 ÷ BW. The full derivation is in the {@hsBasics} supplement.',
   ),
   loc(
     'mask 的形状：以眼中心为中心的六边形禁区。中心半高 200 mV；离中心水平距离 0.15 UI 以内是平顶（|v| ≤ 200 mV），0.15–0.35 UI 之间线性收窄到 0，超过 0.35 UI 的地方没有禁区。采样点落进去就判 FAIL。这些尺寸是本站的教学取值，不是任何标准的数字。',

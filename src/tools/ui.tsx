@@ -3,6 +3,7 @@ import { LessonChips, LessonRefText } from '../home/LessonRefText'
 import { useLocale } from '../i18n/LocaleContext'
 import { loc, type LText } from '../i18n/locale'
 import type { ModuleId } from '../modules/catalog'
+import { parseMeasure } from './convert'
 
 export type PanelProps = { onOpenLesson: (id: ModuleId) => void }
 
@@ -31,13 +32,13 @@ export function Seg({
   )
 }
 
-export function Outcome({ tone, text }: { tone: 'hint' | 'bad' | 'ok'; text: LText | null }) {
+export function Outcome({ tone, text, id }: { tone: 'hint' | 'bad' | 'ok'; text: LText | null; id?: string }) {
   const { t } = useLocale()
-  if (!text) return null
-  if (tone === 'hint') return <p className="tools-hint">{t(text)}</p>
   return (
-    <div className={tone === 'ok' ? 'callout callout--ok' : 'callout callout--bad'}>
-      <p>{t(text)}</p>
+    <div id={id} role="status" aria-atomic="true">
+      {text && (tone === 'hint'
+        ? <p className="tools-hint">{t(text)}</p>
+        : <div className={tone === 'ok' ? 'callout callout--ok' : 'callout callout--bad'}><p>{t(text)}</p></div>)}
     </div>
   )
 }
@@ -62,6 +63,7 @@ export function Field({
   onChange,
   readOnly,
   bad,
+  errorId,
   onFocus,
   inputMode = 'decimal',
   after,
@@ -72,11 +74,13 @@ export function Field({
   onChange?: (value: string) => void
   readOnly?: boolean
   bad?: boolean
+  errorId?: string
   onFocus?: () => void
   inputMode?: 'decimal' | 'text' | 'numeric'
   after?: ReactNode
 }) {
   const { t } = useLocale()
+  const badGrouping = inputMode === 'decimal' && value.includes(',') && parseMeasure(value) === null
   return (
     <div className={`tools-field${readOnly ? '' : ' is-source'}`}>
       <label htmlFor={id}>{t(label)}</label>
@@ -89,12 +93,15 @@ export function Field({
           spellCheck={false}
           maxLength={inputMode === 'text' ? 256 : 64}
           readOnly={readOnly}
-          className={bad ? 'is-bad' : undefined}
+          className={bad || badGrouping ? 'is-bad' : undefined}
+          aria-invalid={bad || badGrouping || undefined}
+          aria-describedby={badGrouping ? `${id}-format` : bad ? errorId : undefined}
           onFocus={onFocus}
           onChange={onChange ? (event) => onChange(event.target.value) : undefined}
         />
         {after}
       </div>
+      {badGrouping && <p id={`${id}-format`} className="tools-hint" role="status">{t(loc('小数用点，例如 1.5。逗号用于千位分组，例如 1,500。', 'Use a dot for decimals, as in 1.5. Use commas for thousands, as in 1,500.'))}</p>}
     </div>
   )
 }
@@ -141,11 +148,3 @@ export function CheckField({
 
 export const EMPTY = loc('输入一个数。', 'Enter a number.')
 export const BAD_NUM = loc('这里要填数字，例如 6 或 0.15。', 'Enter a number, such as 6 or 0.15.')
-
-export function readNumber(text: string): number | null {
-  const body = text.trim().replace(/,/g, '')
-  if (!body || body === '-' || body === '.' || body === '-.') return null
-  if (!/^-?(\d+\.?\d*|\.\d+)$/.test(body)) return null
-  const value = Number(body)
-  return Number.isFinite(value) ? value : null
-}

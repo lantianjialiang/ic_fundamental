@@ -1,6 +1,5 @@
 import { useLocale } from '../i18n/LocaleContext'
 import { ui } from '../i18n/ui'
-import { type ModuleId } from '../modules/catalog'
 import { LESSON_TITLE } from '../modules/titles'
 import { type TrackId, lessonCode, trackById } from '../tracks/catalog'
 import { AppChrome } from './AppChrome'
@@ -8,10 +7,9 @@ import { AppChrome } from './AppChrome'
 type TrackPageProps = {
   trackId: TrackId
   onHome: () => void
-  onOpenLesson: (id: ModuleId) => void
 }
 
-export function TrackPage({ trackId, onHome, onOpenLesson }: TrackPageProps) {
+export function TrackPage({ trackId, onHome }: TrackPageProps) {
   const { t } = useLocale()
   const track = trackById(trackId)
   if (!track) return null
@@ -36,15 +34,14 @@ export function TrackPage({ trackId, onHome, onOpenLesson }: TrackPageProps) {
             <h2>{t(ui.home.lessonsTitle)}</h2>
             <div className="home__lessons">
               {track.lessons.map((id) => (
-                <button
+                <a
                   key={id}
-                  type="button"
                   className="home__lesson"
-                  onClick={() => onOpenLesson(id)}
+                  href={"#/" + trackId + "/" + id}
                 >
                   <span>{lessonCode(id)}</span>
                   <strong>{t(LESSON_TITLE[id])}</strong>
-                </button>
+                </a>
               ))}
             </div>
           </section>

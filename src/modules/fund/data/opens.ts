@@ -2,7 +2,7 @@ import { loc, type LText } from '../../../i18n/locale'
 import { type QuizQuestion } from '../../../lab/QuizList'
 
 export const WHY: LText[] = [
-  loc('开短路（Continuity / Opens-Shorts）永远是第一项。它回答一个最朴素的问题：测试机的每一路，是不是真的接到了芯片的每一个管脚上？', 'Opens/shorts (continuity) always comes first. It answers the most basic question: is every tester channel really connected to every pin of the chip?'),
+  loc('开短路（Continuity / Opens-Shorts）通常安排在测试流程前段，用来检查测试通道与被测引脚之间是否有预期的导通路径。', 'Opens/shorts (continuity) is usually checked early in the test flow to verify the expected conduction paths between tester channels and DUT pins.'),
   loc('它能抓到：探针没扎上、Socket 接触不良、焊线断了（开路）；相邻管脚连锡、焊线碰在一起、管脚对电源或地短路（短路）。', 'It catches probes that missed the pad, poor socket contact and broken bond wires (opens); solder bridges between adjacent pins, touching bond wires, and pins shorted to power or ground (shorts).'),
   loc('它也是保护：短路的芯片如果直接上电跑功能，可能烧芯片、烧针卡、甚至伤测试机。先花几毫秒确认接触，后面的测试才有意义。', 'It is also protection: powering up a shorted chip and running functional tests can burn the chip, the probe card, or even damage the tester. A few milliseconds spent confirming contact make every later test meaningful.'),
 ]
@@ -70,13 +70,24 @@ export const DATALOG: Array<{ pin: string; volt: number; answer: Verdict; why: L
 ]
 
 export const TAKEAWAY: LText[] = [
-  loc('开短路是第一项测试：确认接触，也保护芯片和测试机。', 'Opens/shorts is the first test: it confirms contact and protects the chip and the tester.'),
-  loc('所有脚接 0 V，PMU 打 ±100 µA，钳位 ±3 V，读保护二极管约 0.65 V。', 'All pins at 0 V, PMU forces ±100 µA with a ±3 V clamp, and reads the protection diode at about 0.65 V.'),
-  loc('超过 1.5 V 是开路，不到 0.2 V 是短路。', 'Above 1.5 V is an open; below 0.2 V is a short.'),
+  loc('尽早检查开短路可以发现接触异常，也能在后续测试前发现低阻短接。', 'An early continuity check can catch contact problems and low-resistance shorts before later tests.'),
+  loc('本课示例中，未测引脚接 0 V，PMU 对当前引脚强加 ±100 µA，电压钳位设为 ±3 V。正常读数的绝对值约为 0.65 V。', 'In this example, untested pins are held at 0 V. The PMU forces ±100 µA on the pin under test with a ±3 V voltage clamp. A good reading has a magnitude of about 0.65 V.'),
+  loc('按本例限值，电压绝对值超过 1.5 V 判开路，低于 0.2 V 判短路。', 'Using the example limits, a voltage magnitude above 1.5 V is classified as an open and below 0.2 V as a short.'),
   loc('相邻脚互短看起来和对地短路一样；看 Datalog 时要把相邻脚放在一起看。', 'A short between adjacent pins looks like a short to ground; read adjacent pins together in the datalog.'),
 ]
 
 export const QUIZ: QuizQuestion[] = [
+  {
+    id: 'continuity-compare',
+    prompt: loc('按本课的判定窗口，另一颗 DUT 的某引脚在 −100 µA 下读到 −0.08 V，应先调查哪一种故障？', 'Using the lesson limits, a pin on another DUT reads −0.08 V at −100 µA. Which fault should you investigate first?'),
+    options: [
+      { id: 'good', text: loc('正常接触', 'Good contact') },
+      { id: 'open', text: loc('开路', 'Open') },
+      { id: 'short', text: loc('短路或其他低阻路径', 'Short or another low-resistance path') },
+    ],
+    answer: 'short',
+    explain: loc('读数绝对值 0.08 V 低于本例的 0.20 V 下限，先检查电流是否经低阻路径绕开了保护二极管。', 'The reading magnitude is 0.08 V, below the example’s 0.20 V lower limit. Check whether a low-resistance path bypasses the protection diode.'),
+  },
   {
     id: 'q3',
     prompt: loc('为什么要设电压钳位 ±3 V？', 'Why set a ±3 V voltage clamp?'),
@@ -112,7 +123,7 @@ export const QUIZ: QuizQuestion[] = [
   },
   {
     id: 'b1',
-    prompt: loc('开短路测试前，芯片的管脚要处于什么状态？', 'Before an opens/shorts test, what state must the chip pins be in?'),
+    prompt: loc('按本课 DUT 的测试设置，开始逐脚测量前，各引脚设到什么电位？', 'In this lesson’s DUT setup, what voltage are the pins set to before the pin-by-pin measurements begin?'),
     options: [
       { id: 'a', text: loc('全部接 VDD', 'All tied to VDD') },
       { id: 'b', text: loc('全部接地（0 V），包括 VDD 管脚', 'All grounded (0 V), including the VDD pin') },
@@ -124,7 +135,7 @@ export const QUIZ: QuizQuestion[] = [
   },
   {
     id: 'b2',
-    prompt: loc('用 PMU 做开短路测试时，强加的电流是？', 'When using the PMU for opens/shorts, the forced current is?'),
+    prompt: loc('对于本课有两条钳位路径的 I/O，PMU 可以采用哪个电流方向？', 'Which current polarity can the PMU use on the example I/O with two clamp paths?'),
     options: [
       { id: 'a', text: loc('只能是正电流', 'Positive only') },
       { id: 'b', text: loc('只能是负电流', 'Negative only') },
@@ -132,7 +143,7 @@ export const QUIZ: QuizQuestion[] = [
       { id: 'd', text: loc('以上都不对', 'None of the above') },
     ],
     answer: 'c',
-    explain: loc('负电流（约 −100 µA）让对地（VSS）二极管正偏，读到约 −0.65 V；正电流（约 +100 µA）让对 VDD 的二极管正偏，读到约 +0.65 V。两种都是标准做法，常常两只二极管都测。', 'Negative current (about −100 µA) forward-biases the diode to ground (VSS), reading about −0.65 V; positive current (about +100 µA) forward-biases the diode to VDD, reading about +0.65 V. Both are standard, and often both diodes are tested.'),
+    explain: loc('本例两种方向都可用。−100 µA 使 VSS 钳位二极管正偏，约读到 −0.65 V。+100 µA 使 VDD 钳位二极管正偏，约读到 +0.65 V。实际测试要根据引脚可用的导通路径选方向。', 'Both polarities work in this example. At −100 µA the VSS clamp diode conducts and reads about −0.65 V. At +100 µA the VDD clamp diode conducts and reads about +0.65 V. Choose the test polarity for the conduction paths available on the actual pin.'),
   },
   {
     id: 'b3',

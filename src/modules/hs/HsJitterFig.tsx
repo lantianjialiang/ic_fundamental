@@ -73,12 +73,19 @@ export function JitterHistFig({ analysis: a }: { analysis: JitterAnalysis }) {
 }
 
 /** 浴盆曲线：误码率（对数）随采样位置变化；目标 BER 下的开口为绿色区 */
-export function JitterBathFig({ analysis: a, ber }: { analysis: JitterAnalysis; ber: number }) {
+export function JitterBathFig({ analysis: a, ber, samplePs, sampleBer }: {
+  analysis: JitterAnalysis
+  ber: number
+  samplePs: number
+  sampleBer: number
+}) {
   const { t } = useLocale()
   const xOf = (ps: number) => PAD_L + (ps / a.ui) * PLOT_W
   const yOf = (log: number) => PAD_T + ((0 - log) / (0 - LOG_FLOOR)) * PLOT_H
   const curve = a.bath.map((point) => `${xOf(point.x).toFixed(1)},${yOf(point.log).toFixed(1)}`).join(' ')
   const targetY = yOf(Math.log10(ber))
+  const sampleX = xOf(samplePs)
+  const sampleY = yOf(Math.max(LOG_FLOOR, Math.log10(sampleBer)))
   const openWidth = xOf(a.openRight) - xOf(a.openLeft)
   const ticks = [0, -4, -8, -12, -16]
   const tickLabel = (log: number) => (log === 0 ? '1' : `1e${log}`)
@@ -104,6 +111,8 @@ export function JitterBathFig({ analysis: a, ber }: { analysis: JitterAnalysis; 
         ))}
         <line x1={PAD_L} x2={PAD_L + PLOT_W} y1={targetY} y2={targetY} stroke={MODEL} strokeWidth={1} strokeDasharray="5 3" />
         <polyline points={curve} fill="none" stroke="#58a6ff" strokeWidth={2} />
+        <line x1={sampleX} x2={sampleX} y1={PAD_T} y2={PAD_T + PLOT_H} stroke={MODEL} strokeDasharray="3 3" />
+        <circle cx={sampleX} cy={sampleY} r="4" fill={MODEL} />
         {a.pass && openWidth > 90 ? (
           <text x={(xOf(a.openLeft) + xOf(a.openRight)) / 2} y={PAD_T + 14} textAnchor="middle" fontSize={11} fill={OPEN_LINE}>
             {`${t(FIG.openLabel)} ${a.opening.toFixed(1)} ps`}

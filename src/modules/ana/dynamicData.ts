@@ -57,8 +57,8 @@ export const S = {
 export const FIG = {
   specAria: loc('频谱图：0 到 5 MHz，标出基波、HD2、HD3 与噪底', 'Spectrum: 0 to 5 MHz, marking the fundamental, HD2, HD3 and the noise floor'),
   specCap: loc(
-    '横轴是频率（0–5 MHz，示意 fs = 10 MS/s），纵轴是每个频点的幅度，满量程正弦为 0 dBFS。相干采样让基波与每次谐波各占一个频点，标注的是它们的峰值；虚线是其余频点的平均高度，即噪底。红点是限制 SFDR 的那根杂散。',
-    'The horizontal axis is frequency (0–5 MHz, illustrative fs = 10 MS/s); the vertical axis is each bin’s amplitude, with a full-scale sine at 0 dBFS. Coherent sampling puts the fundamental and each harmonic in one bin, and the labels mark their peaks; the dashed line is the average height of the other bins, the noise floor. The red dot is the spur that limits SFDR.',
+    '横轴是频率（0–5 MHz，示意 fs = 10 MS/s），纵轴是每个频点的幅度，满量程正弦为 0 dBFS。相干采样让基波和谐波的峰值对准 FFT 频点，加窗后的主瓣还会延伸到相邻频点；虚线是其余频点的平均高度，即噪底。红点是限制 SFDR 的那根杂散。',
+    'The horizontal axis is frequency (0–5 MHz, illustrative fs = 10 MS/s); the vertical axis is each bin’s amplitude, with a full-scale sine at 0 dBFS. Coherent sampling aligns the fundamental and harmonic peaks with FFT bins. Windowing spreads each main lobe into neighboring bins; the dashed line is the average height of the other bins, the noise floor. The red dot is the spur that limits SFDR.',
   ),
   fund: loc('基波', 'Fund'),
   noise: loc('噪底', 'Noise floor'),
@@ -101,8 +101,8 @@ export const MISCONCEPTIONS: LText[] = [
 ]
 
 export const TAKEAWAY: LText = loc(
-  '满量程正弦下，SNR 只算噪声，SINAD 再加上谐波，ENOB = (SINAD − 1.76) / 6.02 把它折算成有效位数；THD 把 HD2 … HDn 的 RMS 相加，SFDR 只看最大的那一根杂散。读数要用相干采样加 Blackman-Harris 窗才准。',
-  'For a full-scale sine, SNR counts only noise, SINAD adds harmonics, and ENOB = (SINAD − 1.76) / 6.02 turns that into effective bits; THD RMS-sums HD2 … HDn, and SFDR looks only at the largest spur. Readings are accurate only with coherent sampling and a Blackman-Harris window.',
+  '满量程正弦下，SNR 只算噪声，SINAD 再加上谐波，ENOB = (SINAD − 1.76) / 6.02 把它折算成有效位数；THD 把 HD2 … HDn 的 RMS 相加，SFDR 只看最大的那一根杂散。相干采样让记录包含整数个信号周期。选窗时，Hann 的主瓣较窄，Blackman-Harris 的旁瓣较低，有助于辨认强信号附近的弱杂散。本课按所选窗排除谱峰附近的频点，并用等效噪声带宽修正噪声功率。',
+  'For a full-scale sine, SNR counts only noise, SINAD adds harmonics, and ENOB = (SINAD − 1.76) / 6.02 turns that into effective bits; THD RMS-sums HD2 … HDn, and SFDR looks only at the largest spur. Coherent sampling captures a whole number of signal cycles. Hann has a narrower main lobe. Blackman-Harris has lower sidelobes, which helps reveal weak spurs near strong tones. The model excludes bins near the peaks and corrects noise power for the selected window’s equivalent noise bandwidth.',
 )
 
 /** 右侧说明栏：根据 SINAD 是否过限、主因是噪声还是谐波，给出结论和原因 */

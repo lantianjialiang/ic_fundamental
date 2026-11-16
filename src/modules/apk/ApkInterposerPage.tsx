@@ -1,3 +1,5 @@
+import { LessonComparison } from '../LessonComparison'
+import { interposerComparison } from '../lessonComparisons'
 import { useState } from 'react'
 import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
@@ -140,6 +142,7 @@ export function ApkInterposerPage({ moduleId, onModuleChange }: { moduleId: Modu
       }}
       learn={
         <div className="mfg-lab">
+          <LessonComparison {...interposerComparison} />
           <p>{t(loc('三种中介层。点一种，读细线做在整片硅上，还是只做在一小块桥上。厂商名只是分类例子。', 'Three interposers. Click one and read whether the fine wires sit on a full silicon plate or only on a small bridge. Vendor names are only category examples.'))}</p>
           <Cards items={KINDS} activeId={kindId} cols={3} onPick={(item) => setKindId(item.id)} />
           <p>{t(kind.text)}</p>

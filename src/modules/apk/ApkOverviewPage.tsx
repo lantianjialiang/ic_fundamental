@@ -174,7 +174,7 @@ export function ApkOverviewPage({ moduleId, onModuleChange }: { moduleId: Module
         </div>
       }
       misconceptions={[
-        loc('chiplet 一定更便宜。封装和测试账单可能把硅上的节省吃掉。', 'Chiplets are not automatically cheaper. Package and test can eat the silicon saving.'),
+        loc('如果新增的封装、互连与测试成本超过节省的硅成本，chiplet 方案就会更贵。', 'A chiplet design costs more if added packaging, interconnect, and test costs outweigh the silicon savings.'),
         loc('2.5D 与 3D 只是叫法。一个并排，一个堆叠。', '2.5D and 3D are not just names. One is side-by-side, the other stacks.'),
         loc('先进封装只为性能。良率和异构工艺同样是动因。', 'Advanced packaging is not only for speed. Yield and mixed processes matter too.'),
       ]}

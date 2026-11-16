@@ -106,7 +106,9 @@ export function formatEng(value: number, unit: string): string {
 }
 
 export function parseMeasure(text: string): number | null {
-  const body = text.trim().replace(/,/g, '')
+  const raw = text.trim()
+  if (raw.includes(',') && !/^[+-]?\d{1,3}(?:,\d{3})+(?:\.\d*)?(?:e[+-]?\d+)?$/i.test(raw)) return null
+  const body = raw.replace(/,/g, '')
   if (!body || body === '-' || body === '.' || body === '-.') return null
   if (!/^[+-]?(\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(body)) return null
   const value = Number(body)

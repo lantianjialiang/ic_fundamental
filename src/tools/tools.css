@@ -48,6 +48,11 @@
   font-size: 13px;
 }
 
+.tools-field > .tools-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
 .tools-layout {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
@@ -65,7 +70,9 @@
   margin-top: 0;
 }
 
-.tools-nav button {
+.tools-nav a {
+  box-sizing: border-box;
+  text-decoration: none;
   display: block;
   width: 100%;
   margin: 0 0 4px;
@@ -80,11 +87,11 @@
   cursor: pointer;
 }
 
-.tools-nav button:hover {
+.tools-nav a:hover {
   background: var(--panel-2);
 }
 
-.tools-nav button.is-active {
+.tools-nav a.is-active {
   border-color: var(--gold-line);
   background: var(--gold-bg);
 }
@@ -326,7 +333,7 @@
     flex-basis: 100%;
   }
 
-  .tools-nav button {
+  .tools-nav a {
     width: auto;
   }
 

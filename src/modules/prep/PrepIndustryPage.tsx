@@ -1,3 +1,5 @@
+import { LessonComparison } from '../LessonComparison'
+import { ecosystem, osatRevenue } from '../lessonComparisons'
 import { useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
 import { ui } from '../../i18n/ui'
@@ -99,6 +101,9 @@ export function PrepIndustryPage({ moduleId, onModuleChange }: Props) {
           <p className="prep-muted">{t(roleItem.examples)}</p>
         </Callout>
       </Section>
+
+          <LessonComparison {...ecosystem} />
+          <LessonComparison {...osatRevenue} />
 
       <Section title={t(S.testerTitle)}>
         <RefParas paras={TESTER} onOpen={onModuleChange} />

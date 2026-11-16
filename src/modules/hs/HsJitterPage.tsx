@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
@@ -22,7 +23,7 @@ import {
   taskItems,
   verdictOf,
 } from './hsJitterData'
-import { DEFAULT_JITTER, analyseJitter, type JitterState } from './hsJitterModel'
+import { DEFAULT_JITTER, analyseJitter, berAt, type JitterState } from './hsJitterModel'
 import { HS_META } from './meta'
 import './hs.css'
 import './hsJitter.css'
@@ -33,7 +34,10 @@ type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 export function HsJitterPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [state, setState] = useState<JitterState>(DEFAULT_JITTER)
+  const [samplePercent, setSamplePercent] = useState(50)
   const analysis = useMemo(() => analyseJitter(state), [state])
+  const samplePs = analysis.ui * samplePercent / 100
+  const sampleBer = berAt(samplePs, analysis.ui, state.dj, state.rj)
   const verdict = verdictOf(state, analysis)
   const update = (patch: Partial<JitterState>) => setState((prev) => ({ ...prev, ...patch }))
 
@@ -86,7 +90,9 @@ export function HsJitterPage({ moduleId, onModuleChange }: Props) {
         <div className="hs-grid">
           <div className="hs-stack">
             <JitterHistFig analysis={analysis} />
-            <JitterBathFig analysis={analysis} ber={state.ber} />
+            <JitterBathFig analysis={analysis} ber={state.ber} samplePs={samplePs} sampleBer={sampleBer} />
+            <Knob label={loc('采样相位', 'Sampling phase')} value={samplePercent} unit="% UI" min={0} max={100} step={1} onChange={setSamplePercent} />
+            <p className="intro__note" role="status">{samplePs.toFixed(1)} ps · BER {sampleBer.toExponential(2)}</p>
           </div>
           <div className="hs-cell">
             <Readout

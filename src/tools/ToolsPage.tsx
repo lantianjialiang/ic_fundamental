@@ -27,15 +27,14 @@ export function ToolsPage({ toolId, onSelect, onHome, onOpenLesson }: ToolsPageP
             <div key={cat.id} className="tools-nav__group">
               <p className="tools-nav__cat">{t(cat.title)}</p>
               {TOOLS.filter((tool) => tool.cat === cat.id).map((tool) => (
-                <button
+                <a
                   key={tool.id}
-                  type="button"
                   className={tool.id === active.id ? 'is-active' : ''}
                   aria-current={tool.id === active.id ? 'page' : undefined}
-                  onClick={() => onSelect(tool.id)}
+                  href={"#/tools/" + tool.id}
                 >
                   {t(tool.title)}
-                </button>
+                </a>
               ))}
             </div>
           ))}
