@@ -1,0 +1,15 @@
+---
+description: 改完学生能看到的内容后，在更新日志最前面加一条
+alwaysApply: true
+---
+
+# 更新日志
+
+学生能看到的改动（课程、工具、术语、常见问题、导航、文案）做完后，在 `src/changelog/log.ts` 的 `CHANGELOG` **最前面**加一条：
+
+- `id`：`YYYY-MM-DD-` 加短横线英文，只用小写字母、数字、连字符，定了就别改
+- `date`：`YYYY-MM-DD`
+- `title` 和 `body`：`loc('中文', 'English')`，英文里不要写中文
+- `lessons`：相关课程 id；没有就 `[]`
+
+不要改旧条目的 id。纯重构、学生界面不变时不用加。

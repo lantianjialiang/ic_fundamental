@@ -21,6 +21,7 @@ const TOOL_LINKS: Array<{ id: TrackPageKind; href: string }> = [
   { id: 'tools', href: '#/tools' },
   { id: 'glossary', href: '#/glossary' },
   { id: 'faq', href: '#/faq' },
+  { id: 'changelog', href: '#/changelog' },
 ]
 
 export function AppChrome({ title, goal, onHome, active, brand, children }: AppChromeProps) {

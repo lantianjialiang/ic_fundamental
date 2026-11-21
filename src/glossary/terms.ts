@@ -380,8 +380,8 @@ const BASE_TERMS: GlossaryTerm[] = [
     term: 'Space Transformer',
     name: loc('空间转换器', 'Space transformer'),
     def: loc(
-      '探针卡中央的一层，把 PCB 上较宽的间距缩小到探针的针距。',
-      'The layer in the center of a probe card that shrinks the PCB pitch down to the probe pitch.',
+      '探针卡中间的一层，把几十微米的针距放大到 PCB 能布线的间距。见 {@mfgProbe}。',
+      'The layer in the middle of a probe card that fans a pitch of tens of microns out to a pitch the PCB can route. See {@mfgProbe}.',
     ),
     lessons: ['connection'],
   },
@@ -390,8 +390,8 @@ const BASE_TERMS: GlossaryTerm[] = [
     term: 'Overdrive',
     name: loc('过驱动', 'Overdrive'),
     def: loc(
-      '针尖着陆（touchdown）后吸盘再抬一点：探针微弯，针尖在 pad 上划出 scrub 痕，保证接触可靠。',
-      'After touchdown the chuck lifts a little more: the probes bend and the tips scrub a mark into the pads, ensuring good contact.',
+      '针尖着陆后再多走一段：针尖刮开氧化，接触电阻才下来。走得太多会把焊盘刨伤。见 {@mfgProbe}。',
+      'After touchdown the chuck travels a little more: the tip scrubs oxide and only then does contact resistance fall. Too much travel gouges the pad. See {@mfgProbe}.',
     ),
     lessons: ['connection'],
   },
@@ -410,8 +410,8 @@ const BASE_TERMS: GlossaryTerm[] = [
     term: 'Cantilever / Vertical Probe',
     name: loc('悬臂针 / 垂直针', 'Cantilever / vertical probes'),
     def: loc(
-      '探针卡的两种针：悬臂针斜着伸向中心；垂直针直上直下，适合更密、更多的 pad。',
-      'Two probe styles: cantilever probes reach in at an angle toward the center; vertical probes go straight down and suit denser, larger pad arrays.',
+      '探针卡的针：悬臂针下压时会往前滑；垂直针直上直下，节距可以更细；MEMS 针用光刻做成，同一批更齐。见 {@mfgProbe}。',
+      'Probe-card needles: a cantilever tip slides forward as it lands; a vertical needle goes straight down and can take a finer pitch; MEMS needles are lithographed so one batch matches. See {@mfgProbe}.',
     ),
     lessons: ['connection'],
   },

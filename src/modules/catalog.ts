@@ -72,6 +72,8 @@ export const MODULE_IDS = [
   'mfgWat',
   'mfgCp',
   'mfgHw',
+  'mfgSocket',
+  'mfgProbe',
   'mfgSubstrate',
   'mfgSubFab',
   'mfgFlying',

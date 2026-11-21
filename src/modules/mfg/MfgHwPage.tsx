@@ -87,9 +87,9 @@ export function MfgHwPage({ moduleId, onModuleChange }: { moduleId: ModuleId; on
       moduleId={moduleId}
       onModuleChange={onModuleChange}
       meta={MFG_META.mfgHw}
-      nextId="mfgSubstrate"
-      nextLabel={loc('下一课：封装基板基础', 'Next: package substrate basics')}
-      later={loc('夹具损耗见 {@hsAteLimit}；Kelvin 接触见 {@pwrKelvin}；多 Site 见 {@genMultisite}。', 'Fixture loss: {@hsAteLimit}; Kelvin: {@pwrKelvin}; multi-site: {@genMultisite}.')}
+      nextId="mfgSocket"
+      nextLabel={loc('下一课：负载板上的测试座', 'Next: the socket on the load board')}
+      later={loc('夹具损耗见 {@hsAteLimit}；Kelvin 接触见 {@pwrKelvin}；多 Site 见 {@genMultisite}。Socket 的结构见 {@mfgSocket}，针卡见 {@mfgProbe}。', 'Fixture loss: {@hsAteLimit}; Kelvin: {@pwrKelvin}; multi-site: {@genMultisite}. Socket construction: {@mfgSocket}. The probe card: {@mfgProbe}.')}
       intro={[
         loc('探针卡服务晶圆，DIB+Socket 服务封装。这里看设计要素、带宽、每次插拔成本和 Site 上限，不重复数字课里的机台架构。', 'A probe card serves the wafer; a DIB plus socket serves the package. Here we look at design items, bandwidth, cost per insertion and the site cap — not the tester architecture already in the digital lessons.'),
         loc('金额和交期是教学示意。', 'Money and lead time are teaching illustrations.'),

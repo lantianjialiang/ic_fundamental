@@ -95,7 +95,7 @@ export function MfgCpPage({ moduleId, onModuleChange }: { moduleId: ModuleId; on
       meta={MFG_META.mfgCp}
       nextId="mfgHw"
       nextLabel={loc('下一课：测试硬件', 'Next: test hardware')}
-      later={loc('多 Site 见 {@genMultisite}；探针卡设计见 {@mfgHw}。设备架构见 {@connection}。', 'Multi-site: {@genMultisite}; probe-card design: {@mfgHw}. Equipment: {@connection}.')}
+      later={loc('多 Site 见 {@genMultisite}；探针卡设计见 {@mfgHw}，针的类型和过驱动见 {@mfgProbe}。设备架构见 {@connection}。', 'Multi-site: {@genMultisite}; probe-card design: {@mfgHw}; needle types and overdrive: {@mfgProbe}. Equipment: {@connection}.')}
       intro={[
         loc('CP 在 WAT 之后、切割之前，对每颗 die 做分选，产出晶圆图和 KGD。探针卡和 Handler 的机台结构见数字课；这一课看触点次数、效率和晶圆图图样。', 'CP sits after WAT and before saw. It sorts every die and produces a wafer map and KGD. Probe-card and handler architecture are in the digital lessons; this lesson is touchdowns, efficiency and wafer-map patterns.'),
         loc('先读触点时间和图样各代表什么，再改排布和参数。', 'Read what touchdown time and a map pattern mean, then change the layout and the settings.'),

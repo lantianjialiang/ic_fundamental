@@ -1,0 +1,8 @@
+.log-date {
+  flex: none;
+  margin-right: 8px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+}

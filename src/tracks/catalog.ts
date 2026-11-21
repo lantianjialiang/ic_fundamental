@@ -21,9 +21,10 @@ export type TrackId =
   | 'tools'
   | 'glossary'
   | 'faq'
+  | 'changelog'
 
 /** 不是课程列表、而是一整页的轨道（常用工具、术语表、FAQ），首页照样显示成卡片 */
-export type TrackPageKind = 'tools' | 'glossary' | 'faq'
+export type TrackPageKind = 'tools' | 'glossary' | 'faq' | 'changelog'
 
 export const TRACKS: Array<{
   id: TrackId
@@ -164,8 +165,8 @@ export const TRACKS: Array<{
       {
         title: loc('知道：从设计到成品', 'Know: from design to product'),
         text: loc(
-          '供应链、交付文件、SMT {@pcbSupply}。测试用的负载板和针卡见 {@connection}。',
-          'Supply chain, deliverables, SMT {@pcbSupply}. Load boards and probe cards used in test: {@connection}.',
+          '供应链、交付文件、SMT {@pcbSupply}。负载板上的 Socket 见 {@mfgSocket}，探针卡见 {@mfgProbe}，三维位置见 {@connection}。',
+          'Supply chain, deliverables, SMT {@pcbSupply}. The socket on the load board: {@mfgSocket}. The probe card: {@mfgProbe}. The 3D layout: {@connection}.',
         ),
       },
       {
@@ -220,7 +221,10 @@ export const TRACKS: Array<{
       },
       {
         title: loc('物理连接', 'Physical connection'),
-        text: loc('{@connection}。测试头 → 板 → Socket 或针卡 → DUT。', '{@connection}. Test head → board → socket or probe card → DUT.'),
+        text: loc(
+          '{@connection}。测试头 → 板 → Socket 或针卡 → DUT。Socket 装在负载板上，见 {@mfgSocket}；针在探针卡自己的板上，见 {@mfgProbe}。',
+          '{@connection}. Test head → board → socket or probe card → DUT. The socket sits on the load board: {@mfgSocket}. The needles sit on the probe card own board: {@mfgProbe}.',
+        ),
       },
       {
         title: loc('通道', 'The channel'),
@@ -421,6 +425,8 @@ export const TRACKS: Array<{
       'mfgWat',
       'mfgCp',
       'mfgHw',
+      'mfgSocket',
+      'mfgProbe',
       'mfgSubstrate',
       'mfgSubFab',
       'mfgFlying',
@@ -445,8 +451,8 @@ export const TRACKS: Array<{
       {
         title: loc('测试硬件', 'Test hardware'),
         text: loc(
-          '探针卡、DIB、Socket 的设计、NRE 与每次插拔成本。{@mfgHw}。架构见 {@ate}、{@connection}。',
-          'Probe card, DIB and socket design, NRE and cost per insertion. {@mfgHw}. Architecture: {@ate}, {@connection}.',
+          '探针卡、DIB、Socket 的成本和带宽 {@mfgHw}。Socket 怎样装在负载板上 {@mfgSocket}。针卡的针、转接和 PCB {@mfgProbe}。架构见 {@ate}、{@connection}。',
+          'Probe card, DIB and socket cost and bandwidth {@mfgHw}. How the socket sits on the load board {@mfgSocket}. Needles, the transformer and the probe-card PCB {@mfgProbe}. Architecture: {@ate}, {@connection}.',
         ),
       },
       {
@@ -1130,6 +1136,18 @@ export const TRACKS: Array<{
     knowledge: [],
     page: 'faq',
   },
+  {
+    id: 'changelog',
+    title: loc('更新日志', 'Changelog'),
+    blurb: loc(
+      '每次对学生能看到的改动记一条：日期、改了什么、相关课程。2026-09-24 之后的旧记录按 git 提交整理。',
+      'One entry for each change students can see: the date, what changed, and the related lessons. Older entries after 2026-09-24 are taken from git commits.',
+    ),
+    ready: true,
+    lessons: [],
+    knowledge: [],
+    page: 'changelog',
+  },
 ]
 
 /** 课程编号前缀：课程编号 = 前缀 + 它在所属轨道里的序号 */
@@ -1156,6 +1174,7 @@ const PREFIX: Record<TrackId, string> = {
   tools: 'U',
   glossary: 'G',
   faq: 'FAQ',
+  changelog: 'LOG',
 }
 
 /** 课程的显示编号。一课出现在多条轨道时，以第一条（所属轨道）为准。 */

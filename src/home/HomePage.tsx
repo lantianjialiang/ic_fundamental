@@ -9,6 +9,7 @@ const OPEN_PAGE: Record<TrackPageKind, (typeof HOME_EXTRA)['openGlossary']> = {
   tools: HOME_EXTRA.openTools,
   glossary: HOME_EXTRA.openGlossary,
   faq: HOME_EXTRA.openFaq,
+  changelog: HOME_EXTRA.openChangelog,
 }
 
 export function HomePage() {

@@ -105,8 +105,8 @@ export const LAYER_TEXT: Record<TestFlow, Partial<Record<LayerId, LayerText>>> =
       name: loc('Socket 测试座', 'Socket'),
       sub: loc('定位腔 + 弹簧针阵列', 'Pocket + pogo-pin array'),
       desc: loc(
-        '定位腔把芯片对准，里面一根根弹簧针 (pogo pin) 把芯片引脚接到 Load Board。可插拔、会磨损，要定期更换。',
-        'The pocket aligns the device; an array of spring-loaded pogo pins links each lead to the load board. Removable and wears out, so it is replaced regularly.',
+        '定位腔把芯片对准，里面一根根弹簧针 (pogo pin) 把芯片引脚接到 Load Board。可插拔、会磨损，要定期更换。本体、接触件和压盖见 {@mfgSocket}。',
+        'The pocket aligns the device; an array of spring-loaded pogo pins links each lead to the load board. Removable and wears out, so it is replaced regularly. Body, contacts and lid: {@mfgSocket}.',
       ),
     },
     loadboard: {
@@ -155,8 +155,8 @@ export const LAYER_TEXT: Record<TestFlow, Partial<Record<LayerId, LayerText>>> =
       name: loc('Probe Card 探针卡', 'Probe Card'),
       sub: loc('加强板 · 圆 PCB · 空间转换器 · 探针', 'Stiffener · round PCB · space transformer · probes'),
       desc: loc(
-        '顶部金属加强板防变形；大圆 PCB 边缘一圈焊盘接 Pogo；中央空间转换器把间距缩小到针距；探针扎在 die 的 pad 上。',
-        'A metal stiffener keeps it flat; the round PCB has a ring of pogo pads at the edge; the central space transformer shrinks the pitch down to probe pitch; the probes land on die pads.',
+        '顶部金属加强板防变形；大圆 PCB 边缘一圈焊盘接 Pogo；中央空间转换器把间距缩小到针距；探针扎在 die 的 pad 上。悬臂、垂直、MEMS 和过驱动见 {@mfgProbe}。',
+        'A metal stiffener keeps it flat; the round PCB has a ring of pogo pads at the edge; the central space transformer shrinks the pitch down to probe pitch; the probes land on die pads. Cantilever, vertical, MEMS and overdrive: {@mfgProbe}.',
       ),
     },
     wafer: {

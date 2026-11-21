@@ -44,7 +44,7 @@ const VIEWS = [
 
 type ViewId = (typeof VIEWS)[number]['id']
 
-/** 分组顺序：先 D / F，再 T（MOS）、L（PCB）、A、H、R、M，然后 P（功率）、S（传感器）、Q（可靠性）、C（硅光） */
+/** 分组顺序：先 D / F，再 T（MOS）、L（PCB）、A、H、R、M，然后 P（功率）、S（传感器）、Q（可靠性）、C（硅光）、W（制造）、K（先进封装） */
 const LESSON_ORDER: ModuleId[] = [
   ...new Set([
     ...(trackById('digital')?.lessons ?? []),
@@ -60,6 +60,8 @@ const LESSON_ORDER: ModuleId[] = [
     ...(trackById('sensor')?.lessons ?? []),
     ...(trackById('qual')?.lessons ?? []),
     ...(trackById('cpo')?.lessons ?? []),
+    ...(trackById('mfg')?.lessons ?? []),
+    ...(trackById('apk')?.lessons ?? []),
   ]),
 ]
 

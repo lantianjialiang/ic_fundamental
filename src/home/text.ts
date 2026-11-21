@@ -6,4 +6,5 @@ export const HOME_EXTRA = {
   openTools: loc('打开常用工具 →', 'Open the tools →'),
   openGlossary: loc('打开术语表 →', 'Open the glossary →'),
   openFaq: loc('打开常见问题 →', 'Open the FAQ →'),
+  openChangelog: loc('打开更新日志 →', 'Open the changelog →'),
 }

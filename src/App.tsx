@@ -1,4 +1,5 @@
 import { Component, lazy, Suspense, useEffect, useMemo, useState, type ComponentType, type ReactNode } from 'react'
+import type { ChangelogPageProps } from './changelog/ChangelogPage'
 import type { FaqPageProps } from './faq/FaqPage'
 import type { GlossaryPageProps } from './glossary/GlossaryPage'
 import type { ToolsPageProps } from './tools/ToolsPage'
@@ -28,6 +29,7 @@ const Module00Page = page<IntroProps>(() => import('./modules/module00/Module00P
 const ToolsPage = page<ToolsPageProps>(() => import('./tools/ToolsPage'), 'ToolsPage')
 const GlossaryPage = page<GlossaryPageProps>(() => import('./glossary/GlossaryPage'), 'GlossaryPage')
 const FaqPage = page<FaqPageProps>(() => import('./faq/FaqPage'), 'FaqPage')
+const ChangelogPage = page<ChangelogPageProps>(() => import('./changelog/ChangelogPage'), 'ChangelogPage')
 const LESSONS: Record<Exclude<ModuleId, 'intro'>, ComponentType<LessonProps>> = {
   pIndustry: page(() => import('./modules/prep/PrepIndustryPage'), 'PrepIndustryPage'),
   pHistory: page(() => import('./modules/prep/PrepHistoryPage'), 'PrepHistoryPage'),
@@ -181,6 +183,8 @@ const LESSONS: Record<Exclude<ModuleId, 'intro'>, ComponentType<LessonProps>> = 
   mfgWat: page(() => import('./modules/mfg/MfgWatPage'), 'MfgWatPage'),
   mfgCp: page(() => import('./modules/mfg/MfgCpPage'), 'MfgCpPage'),
   mfgHw: page(() => import('./modules/mfg/MfgHwPage'), 'MfgHwPage'),
+  mfgSocket: page(() => import('./modules/mfg/MfgSocketPage'), 'MfgSocketPage'),
+  mfgProbe: page(() => import('./modules/mfg/MfgProbePage'), 'MfgProbePage'),
   mfgSubstrate: page(() => import('./modules/mfg/MfgSubstratePage'), 'MfgSubstratePage'),
   mfgSubFab: page(() => import('./modules/mfg/MfgSubFabPage'), 'MfgSubFabPage'),
   mfgFlying: page(() => import('./modules/mfg/MfgFlyingPage'), 'MfgFlyingPage'),
@@ -295,6 +299,19 @@ function AppScreen({ screen, setScreenState }: { screen: Screen; setScreenState:
         <GlossaryPage
           termId={screen.termId}
           onSelect={(termId, replace) => (replace ? replaceScreen : setScreen)({ kind: 'glossary', termId })}
+          onHome={() => setScreen({ kind: 'home' })}
+          onOpenLesson={(id) => openLesson(id)}
+        />
+      </Suspense>
+    )
+  }
+
+  if (screen.kind === 'changelog') {
+    return (
+      <Suspense fallback={<Loading />}>
+        <ChangelogPage
+          entryId={screen.entryId}
+          onSelect={(entryId, replace) => (replace ? replaceScreen : setScreen)({ kind: 'changelog', entryId })}
           onHome={() => setScreen({ kind: 'home' })}
           onOpenLesson={(id) => openLesson(id)}
         />

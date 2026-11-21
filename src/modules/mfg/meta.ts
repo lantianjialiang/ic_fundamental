@@ -8,6 +8,8 @@ export const MFG_LESSONS = [
   'mfgWat',
   'mfgCp',
   'mfgHw',
+  'mfgSocket',
+  'mfgProbe',
   'mfgSubstrate',
   'mfgSubFab',
   'mfgFlying',
@@ -60,11 +62,25 @@ export const MFG_META: Record<MfgLessonId, LessonMeta> = {
       'Tell a probe card from a DIB plus socket; list the design items; estimate socket bandwidth and cost per insertion; estimate the maximum site count; explain hardware NRE and lead time.',
     ),
   },
+  mfgSocket: {
+    title: loc('负载板上的测试座', 'The socket on the load board'),
+    goal: loc(
+      '说出 Socket 装在负载板这块 PCB 上；分清本体、接触件和压盖；按弹簧针、弹性体、弹簧探针和用途选择；用 I×R 解释接触电阻怎样进电压读数。',
+      'Say that the socket sits on the load-board PCB; tell body, contacts and lid apart; choose among pogo, elastomer and spring probe, and among uses; use I×R to explain how contact resistance enters a voltage reading.',
+    ),
+  },
+  mfgProbe: {
+    title: loc('探针卡：针、转接和针卡 PCB', 'The probe card: needles, transformer and PCB'),
+    goal: loc(
+      '说出探针卡自带 PCB，针不装在成品测试的负载板上；分清悬臂、垂直和 MEMS；说出空间转换器把针距放大到 PCB；解释过驱动太小和太大会各自造成什么。',
+      'Say that the probe card has its own PCB and the needles are not on the final-test load board; tell cantilever, vertical and MEMS apart; say that the space transformer fans needle pitch out to the PCB; explain what too little and too much overdrive each do.',
+    ),
+  },
   mfgSubstrate: {
     title: loc('封装基板基础与设计', 'Package substrate basics and design'),
     goal: loc(
-      '说明基板如何把芯片节距扇出到板级；区分引线框架、有机积层和陶瓷；描述 core + 积层与过孔类型；估算微带阻抗和逃逸布线容量。',
-      'Explain how a substrate fans chip pitch out to board pitch; tell lead-frame, organic build-up and ceramic apart; describe core plus build-up and via types; estimate microstrip impedance and escape capacity.',
+      '说明基板如何把芯片节距扇出到板级；区分引线框架、有机积层和陶瓷；描述 core + 积层与过孔类型；估算微带阻抗和逃逸布线容量；认出主要基板厂，并说出日月光是封测。',
+      'Explain how a substrate fans chip pitch out to board pitch; tell lead-frame, organic build-up and ceramic apart; describe core plus build-up and via types; estimate microstrip impedance and escape capacity; name the main substrate makers and say that ASE is an OSAT.',
     ),
   },
   mfgSubFab: {

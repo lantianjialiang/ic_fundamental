@@ -8,6 +8,7 @@ export type Screen =
   | { kind: 'tools'; toolId?: string }
   | { kind: 'glossary'; termId?: string }
   | { kind: 'faq'; faqId?: string }
+  | { kind: 'changelog'; entryId?: string }
 
 const isTrack = (value: string): value is TrackId => TRACKS.some((item) => item.id === value)
 const isModule = (value: string): value is ModuleId => (MODULE_IDS as readonly string[]).includes(value)
@@ -18,13 +19,15 @@ const isEntryId = (value: string | undefined): value is string => !!value && /^[
 /**
  * 地址格式：#/ 首页，#/轨道ID 轨道页，#/轨道ID/课程ID 单课；
  * #/tools、#/tools/工具ID 常用工具；
- * #/glossary、#/glossary/术语ID 术语表；#/faq、#/faq/问题ID 常见问题
+ * #/glossary、#/glossary/术语ID 术语表；#/faq、#/faq/问题ID 常见问题；
+ * #/changelog、#/changelog/条目ID 更新日志
  */
 export function parseHash(hash: string): Screen {
   const [trackPart, lessonPart] = hash.replace(/^#\/?/, '').split('/')
   if (trackPart === 'tools') return isEntryId(lessonPart) ? { kind: 'tools', toolId: lessonPart } : { kind: 'tools' }
   if (trackPart === 'glossary') return isEntryId(lessonPart) ? { kind: 'glossary', termId: lessonPart } : { kind: 'glossary' }
   if (trackPart === 'faq') return isEntryId(lessonPart) ? { kind: 'faq', faqId: lessonPart } : { kind: 'faq' }
+  if (trackPart === 'changelog') return isEntryId(lessonPart) ? { kind: 'changelog', entryId: lessonPart } : { kind: 'changelog' }
   if (!trackPart || !isTrack(trackPart)) return { kind: 'home' }
   if (!lessonPart) return { kind: 'track', track: trackPart }
   if (!isModule(lessonPart)) return { kind: 'track', track: trackPart }
@@ -36,6 +39,7 @@ export function screenHash(screen: Screen): string {
   if (screen.kind === 'tools') return screen.toolId ? `#/tools/${screen.toolId}` : '#/tools'
   if (screen.kind === 'glossary') return screen.termId ? `#/glossary/${screen.termId}` : '#/glossary'
   if (screen.kind === 'faq') return screen.faqId ? `#/faq/${screen.faqId}` : '#/faq'
+  if (screen.kind === 'changelog') return screen.entryId ? `#/changelog/${screen.entryId}` : '#/changelog'
   if (screen.kind === 'track') return `#/${screen.track}`
   return `#/${screen.track}/${screen.moduleId}`
 }

@@ -85,6 +85,26 @@ export const MFG_KNOWLEDGE: AnaKnowledge[] = [
     ],
   ),
   k(
+    'mfgSocket',
+    [
+      { id: 'elastomer-socket', term: 'Elastomer socket', name: loc('弹性体测试座', 'Elastomer socket'), def: loc('用导电橡胶做很短的接触路径，高频电感比长弹簧针小，橡胶磨损更快。见 {@mfgSocket}。', 'A conductive-rubber contact with a very short path. Inductance is lower than a long pogo, and the rubber wears faster. See {@mfgSocket}.'), lessons: ['mfgSocket'] },
+    ],
+    { socket: ['mfgSocket'], 'load-board': ['mfgSocket'], 'pogo-pin': ['mfgSocket'] },
+    [
+      { id: 'mfg-socket-board', q: loc('Socket 是焊在晶圆上的吗？', 'Is the socket soldered to the wafer?'), a: loc('不是。它装在负载板这块 PCB 上，针尾落在板的焊盘上。扎晶圆的是探针卡。见 {@mfgSocket}、{@mfgProbe}。', 'No. It sits on the load-board PCB, and the pin tails land on the board pads. Wafer contact is the probe card. See {@mfgSocket}, {@mfgProbe}.'), lessons: ['mfgSocket'] },
+    ],
+  ),
+  k(
+    'mfgProbe',
+    [
+      { id: 'mems-probe', term: 'MEMS probe', name: loc('MEMS 探针', 'MEMS probe'), def: loc('用光刻和电镀在晶圆上做出的针，同一批更齐。常见叠法是针 + 空间转换基板 + 针卡 PCB。见 {@mfgProbe}。', 'Needles lithographed and plated on a wafer, so one batch matches. A common stack is needles, a space transformer and the probe-card PCB. See {@mfgProbe}.'), lessons: ['mfgProbe'] },
+    ],
+    { 'probe-card': ['mfgProbe'], 'space-transformer': ['mfgProbe'], overdrive: ['mfgProbe'], 'probe-type': ['mfgProbe'] },
+    [
+      { id: 'mfg-probe-board', q: loc('探针是焊在成品测试负载板上的吗？', 'Are the probes soldered to the final-test load board?'), a: loc('不是。探针卡有自己的 PCB，边缘接测试头 Pogo，针扎裸 die。成品测试那块板上装的是 Socket。见 {@mfgProbe}、{@mfgSocket}。', 'No. The probe card has its own PCB: the edge meets the test-head pogo and the needles land on a bare die. The final-test board carries a socket. See {@mfgProbe}, {@mfgSocket}.'), lessons: ['mfgProbe'] },
+    ],
+  ),
+  k(
     'mfgSubstrate',
     [
       { id: 'mfg-substrate', term: 'Package substrate / Build-up', name: loc('封装基板 / 积层', 'Package substrate / build-up'), def: loc('把芯片节距扇出到板级，core 两侧做积层。见 {@mfgSubstrate}。', 'Fans chip pitch out to board pitch; build-up sits on both sides of the core. See {@mfgSubstrate}.'), lessons: ['mfgSubstrate'] },
@@ -93,6 +113,7 @@ export const MFG_KNOWLEDGE: AnaKnowledge[] = [
     {},
     [
       { id: 'mfg-sub-pcb', q: loc('基板是不是就是小 PCB？', 'Is a substrate just a small PCB?'), a: loc('不是。节距、材料和翘曲要求都更严。见 {@mfgSubstrate}。', 'No. Pitch, materials and warpage are tighter. See {@mfgSubstrate}.'), lessons: ['mfgSubstrate'] },
+      { id: 'mfg-sub-who', q: loc('基板厂的名字会改变逃逸公式吗？', 'Do substrate-fab names change the escape formula?'), a: loc('不会。公式只看节距、焊盘和线距。名字用来认出谁做有机积层、谁做陶瓷。日月光的主业是封测。见 {@mfgSubstrate}。', 'No. The formula uses pitch, pad and space. The names say who builds organic build-up and who builds ceramic. ASE main business is assembly and test. See {@mfgSubstrate}.'), lessons: ['mfgSubstrate'] },
     ],
   ),
   k(

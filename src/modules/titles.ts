@@ -153,6 +153,8 @@ export const LESSON_TITLE: Record<ModuleId, LText> = {
   mfgWat: MFG_META.mfgWat.title,
   mfgCp: MFG_META.mfgCp.title,
   mfgHw: MFG_META.mfgHw.title,
+  mfgSocket: MFG_META.mfgSocket.title,
+  mfgProbe: MFG_META.mfgProbe.title,
   mfgSubstrate: MFG_META.mfgSubstrate.title,
   mfgSubFab: MFG_META.mfgSubFab.title,
   mfgFlying: MFG_META.mfgFlying.title,
