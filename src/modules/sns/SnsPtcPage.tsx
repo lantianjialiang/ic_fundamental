@@ -10,7 +10,7 @@ import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import '../hs/hs.css'
 import { SNS_META } from './meta'
-import { FrameView, PtcPlot } from './plots'
+import { SnsPtcPoint } from './SnsPtcPoint'
 import {
   INTRO,
   MISCONCEPTIONS,
@@ -18,8 +18,6 @@ import {
   QUIZ,
   S,
   TAKEAWAY,
-  frameSummary,
-  plotSummary,
   taskItems,
   verdictOf,
 } from './snsPtcData'
@@ -38,6 +36,7 @@ function fmtNum(n: number, digits: number): string {
 export function SnsPtcPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [state, setState] = useState<PtcState>(DEFAULT_PTC)
+  const [exposureIndex, setExposureIndex] = useState(2)
   const built = useMemo(
     () => buildPtcFrames(state),
     [state.kTrue, state.readNoiseE, state.fwcE, state.prnu, state.points],
@@ -59,7 +58,10 @@ export function SnsPtcPage({ moduleId, onModuleChange }: Props) {
       asideLater={t(S.asideLater)}
       nextId={'snsDark' as ModuleId}
       nextLabel={t(S.next)}
-      extra={<TaskList items={taskItems(state, analysis)} onReset={() => setState(DEFAULT_PTC)} />}
+      extra={<TaskList items={taskItems(state, analysis)} onReset={() => {
+        setState(DEFAULT_PTC)
+        setExposureIndex(2)
+      }} />}
     >
       <Section title={t(S.introTitle)}>
         <RefParas paras={INTRO} onOpen={onModuleChange} />
@@ -84,7 +86,10 @@ export function SnsPtcPage({ moduleId, onModuleChange }: Props) {
           <Knob label={S.readLabel} value={state.readNoiseE} unit="e-" min={0.5} max={8} step={0.5} onChange={(v) => update({ readNoiseE: q(v, 1) })} />
           <Knob label={S.fwcLabel} value={state.fwcE} unit="e-" min={20000} max={50000} step={2000} onChange={(v) => update({ fwcE: v })} />
           <Knob label={S.prnuLabel} value={state.prnu} unit="" min={0} max={0.05} step={0.005} onChange={(v) => update({ prnu: q(v, 3) })} />
-          <Knob label={S.pointsLabel} value={state.points} unit="" min={4} max={12} step={1} onChange={(v) => update({ points: v })} />
+          <Knob label={S.pointsLabel} value={state.points} unit="" min={4} max={12} step={1} onChange={(v) => {
+            update({ points: v })
+            setExposureIndex((index) => Math.min(index, v - 1))
+          }} />
           <Knob label={S.roiLabel} value={state.roiSide} unit="px" min={32} max={128} step={4} onChange={(v) => update({ roiSide: v })} />
         </div>
         <div className="hs-controls">
@@ -94,24 +99,7 @@ export function SnsPtcPage({ moduleId, onModuleChange }: Props) {
           </div>
         </div>
         <div className="hs-grid">
-          <div style={{ display: 'grid', gap: 12 }}>
-            <FrameView
-              frame={analysis.preview}
-              w={analysis.w}
-              mode="gray"
-              aria={t(S.frameAria)}
-              summary={t(frameSummary(analysis))}
-            />
-            <PtcPlot
-              points={analysis.points}
-              slope={analysis.slope}
-              intercept={analysis.intercept}
-              aria={t(S.plotAria)}
-              summary={t(plotSummary(analysis))}
-              xLabel={t(S.plotX)}
-              yLabel={t(S.plotY)}
-            />
-          </div>
+          <SnsPtcPoint built={built} analysis={analysis} mode={state.mode} index={exposureIndex} onSelect={setExposureIndex} />
           <div className="hs-cell">
             <Readout
               items={[

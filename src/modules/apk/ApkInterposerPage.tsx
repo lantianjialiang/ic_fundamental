@@ -9,12 +9,13 @@ import { floorplanArea, rcDelayPs, RETICLE_MM2 } from './core'
 import { TEACH } from '../mfg/core'
 import { After, COMMON, Drill, PackLesson, useSticky } from '../mfg/shell'
 import { APK_META } from './meta'
+import { ApkInterposerRouting, type InterposerKind, type InterposerRoute } from './ApkInterposerRouting'
 
 const KINDS = [
   { id: 'si', title: loc('硅中介层', 'Silicon interposer'), text: loc('含 TSV 的硅片 + 细线 RDL。CoWoS-S 类是概念示例。', 'Silicon with TSVs plus fine RDL. CoWoS-S-class is a conceptual example.') },
   { id: 'rdl', title: loc('RDL 中介层', 'RDL interposer'), text: loc('有机/重布线中介层。CoWoS-R 类是概念示例。', 'Organic / RDL interposer. CoWoS-R-class is a conceptual example.') },
   { id: 'bridge', title: loc('局部硅桥', 'Local silicon bridge'), text: loc('只在 die 缝里嵌一小块硅。EMIB / CoWoS-L 类是概念示例。', 'A small silicon bridge in the die seam. EMIB / CoWoS-L-class are conceptual examples.') },
-]
+] as const
 
 const FLOW = [
   { id: 'cow', title: loc('chip-on-wafer', 'chip-on-wafer') },
@@ -73,7 +74,8 @@ const QUIZ = [
 
 export function ApkInterposerPage({ moduleId, onModuleChange }: { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }) {
   const { t } = useLocale()
-  const [kindId, setKindId] = useState(KINDS[0].id)
+  const [kindId, setKindId] = useState<InterposerKind>(KINDS[0].id)
+  const [route, setRoute] = useState<InterposerRoute>('die')
   const [gpuW, setGpuW] = useState(20)
   const [hbmN, setHbmN] = useState(2)
   const [space, setSpace] = useState(2)
@@ -129,6 +131,7 @@ export function ApkInterposerPage({ moduleId, onModuleChange }: { moduleId: Modu
       ]}
       onReset={() => {
         setKindId(KINDS[0].id)
+        setRoute('die')
         setGpuW(20)
         setHbmN(2)
         setSpace(2)
@@ -145,6 +148,7 @@ export function ApkInterposerPage({ moduleId, onModuleChange }: { moduleId: Modu
           <LessonComparison {...interposerComparison} />
           <p>{t(loc('三种中介层。点一种，读细线做在整片硅上，还是只做在一小块桥上。厂商名只是分类例子。', 'Three interposers. Click one and read whether the fine wires sit on a full silicon plate or only on a small bridge. Vendor names are only category examples.'))}</p>
           <Cards items={KINDS} activeId={kindId} cols={3} onPick={(item) => setKindId(item.id)} />
+          <ApkInterposerRouting kind={kindId} route={route} onRoute={setRoute} />
           <p>{t(kind.text)}</p>
           <p>{t(loc('一次曝光大约 858 mm²。版图比这大，就要把图形拼起来，成本和翘曲一起涨。HBM 每颗按 12×8 mm 计，还要加上间距和边缘。', 'One exposure is about 858 mm². A larger floorplan has to be stitched, and cost and warpage rise with it. Each HBM here is 12×8 mm, plus spacing and margin.'))}</p>
           <p>{t(loc('短铜线仍是电阻和电容。R = ρ × 长度 / 截面积，这一课截面积用 2 µm × 1 µm，ρ 用铜的 1.68×10⁻⁸ Ω·m。电容按每毫米 0.2 pF 示意。延时 ≈ 0.38 × R × C。', 'A short copper trace is still resistance and capacitance. R = ρ × length / cross-section. This lesson uses 2 µm × 1 µm and copper at 1.68×10⁻⁸ Ω·m. Capacitance is illustrated as 0.2 pF per millimetre. Delay ≈ 0.38 × R × C.'))}</p>

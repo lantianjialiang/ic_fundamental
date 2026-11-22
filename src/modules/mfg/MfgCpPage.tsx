@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
-import { Cards, Knob, Readout, Seg } from '../fund/parts'
+import { Cards, Knob, Seg } from '../fund/parts'
 import { planTouchdowns, waferTestTime } from './core'
-import { WaferDisk } from './figs'
+import { CpWaferMap, TouchdownGrid } from './ProcessDiagrams'
+import { Formula, ScaleBars } from './FlowVisuals'
 import { MFG_META } from './meta'
 import { After, COMMON, Drill, PackLesson, useSticky } from './shell'
 
@@ -129,8 +130,7 @@ export function MfgCpPage({ moduleId, onModuleChange }: { moduleId: ModuleId; on
           <p>{t(loc('效率 = die 数 ÷ (触点次数 × 一次扎下的 site 数)。圆片边上经常凑不齐一整组，所以 4 个 site 不会正好快 4 倍。', 'Efficiency = dies ÷ (touchdowns × sites per landing). The round edge often cannot fill a whole group, so 4 sites are not exactly 4× faster.'))}</p>
           <p>{t(loc('晶圆图上的形状指向原因。点一张图，读它通常是什么造成的。', 'The shape on a wafer map points at a cause. Click a map and read what usually makes it.'))}</p>
           <Cards items={MAPS} activeId={mapId} cols={3} onPick={(item) => setMapId(item.id)} />
-          <WaferDisk dies={dies} good={Math.round(dies * yieldNow)} label={map.title} />
-          <p>{t(map.text)}</p>
+          <CpWaferMap dies={dies} good={Math.round(dies * yieldNow)} pattern={mapId} caption={map.text} />
           <p>{t(loc('重测是把可疑 die 再测一遍。这一课用 ×1.15 表示多出来的时间，是示意，不是某条产线的系数。', 'Retest measures suspicious dies again. This lesson uses ×1.15 for the extra time. That factor is an illustration, not a line’s coefficient.'))}</p>
         </div>
       }
@@ -138,24 +138,38 @@ export function MfgCpPage({ moduleId, onModuleChange }: { moduleId: ModuleId; on
         <div className="mfg-lab">
           <Drill n={1} title={taskPattern}>
             <Seg options={PATTERNS.map((item) => ({ id: item.id, label: item.title }))} value={patternId} onChange={setPatternId} />
-            <Knob label={loc('die 数', 'Die count')} value={dies} unit="" min={200} max={800} step={20} onChange={setDies} />
-            <Readout items={[
-              { label: loc('触点次数', 'Touchdowns'), value: `${plan.touchdowns}` },
-              { label: loc('凑不齐的次数', 'Partial landings'), value: `${plan.partial}` },
-              { label: loc('效率', 'Efficiency'), value: plan.efficiency.toFixed(3) },
-            ]} />
-            <After show={patternHit.hit} text={loc('2×2 一次扎 4 颗，触点次数下降，但圆边凑不齐，效率低于 1。所以时间不是简单变成四分之一。', '2×2 lands on 4 dies at once, so touchdowns fall, but the round edge leaves partial landings and efficiency stays below 1. Time does not become a simple quarter.')} />
+            <Knob label={loc('die 数', 'Die count')} value={dies} unit="" min={200} max={800} step={1} onChange={setDies} />
+            <TouchdownGrid cols={pattern.cols} rows={pattern.rows} partial={plan.partial} />
+            <Formula
+              rule="N_touch = ⌈N_die / (r × c)⌉"
+              value={`⌈${dies} / (${pattern.rows} × ${pattern.cols})⌉ = ${plan.touchdowns}`}
+              note={loc("即使最后只剩一颗，也要额外落针一次。空余 site 数量是总槽位减去实际 die 数。", "Even one leftover die needs one more touchdown. Unused sites equal total slots minus actual dies.")}
+            />
+            <Formula rule="η = N_die / (N_touch × r × c)" value={`${dies} / ${plan.touchdowns * pattern.rows * pattern.cols} = ${(100 * plan.efficiency).toFixed(1)}%`}
+              note={loc(`分母是所有落针能覆盖的槽位，本次最后一组空 ${plan.partial} 个。`, `The denominator is the total site capacity across all landings. The last group has ${plan.partial} unused positions.`)} />
+            <After show={patternHit.hit} text={loc('2×2 一次扎 4 颗，触点次数下降，最后一组可能有空余 site。即使每组排满，换片时间也不会随并测数缩短。', '2×2 lands on 4 dies at once, so touchdowns fall, and the final group can have unused sites. Loading time remains even when every group is full.')} />
           </Drill>
           <Drill n={2} title={taskTime}>
             <div className="knobs">
               <Knob label={loc('每次触点', 'Time / touchdown')} value={tTd} unit="s" min={1} max={5} step={1} onChange={setTTd} />
               <Knob label={loc('换片', 'Load time')} value={tLoad} unit="s" min={10} max={40} step={5} onChange={setTLoad} />
             </div>
-            <Readout items={[{ label: loc('你算出的每小时片数', 'Wafers per hour you got'), value: uph.toFixed(1) }]} />
+            <Formula
+              rule="T₀ = N_touch × t_td + t_load; WPH = 3600 / T"
+              value={`T = ${time.toFixed(1)} s → ${uph.toFixed(1)} wafer/h`}
+              note={loc("秒先累加成每片测试时间，再用每小时 3600 秒换算。启用重测时，教学模型在 T₀ 上额外加 15%。", "Sum seconds per wafer, then convert using 3600 seconds per hour. With retest enabled the model adds 15% to T₀.")}
+            >
+              <ScaleBars max={time} items={[
+                { title: loc('落针耗时（s）', 'Touchdown time (s)'), value: plan.touchdowns * tTd },
+                { title: loc('换片耗时（s）', 'Load time (s)'), value: tLoad },
+                { title: loc('重测附加（s）', 'Retest overhead (s)'), value: time - waferTestTime(plan.touchdowns, tTd, tLoad) },
+              ]} />
+            </Formula>
             <After show={timeHit.hit} text={loc('每次触点从 2 秒改成 1 秒，触点那一项时间减半。换片时间不动，所以每小时片数上升，但不是正好翻倍。', 'Cutting each touchdown from 2 s to 1 s halves the touchdown term. Load time stays, so wafers per hour rise, but not by a clean 2×.')} />
           </Drill>
           <Drill n={3} title={taskMap}>
-            <p>{t(loc('先选一个图样。选完再看原因是否对得上。', 'Pick a pattern. The reason shows after you pick.'))}</p>
+            <CpWaferMap dies={dies} good={Math.round(dies * 0.9)} pattern="scratch"
+              caption={loc('观察橙色失败 die 的空间分布，再选对应图样。', 'Inspect the spatial pattern of the amber failing dies, then choose its name.')} />
             <div className="mfg-assign__picks">
               {MAPS.map((item) => (
                 <button key={item.id} type="button" className={causeId === item.id ? 'is-active' : ''} onClick={() => setCauseId(item.id)}>
@@ -172,7 +186,11 @@ export function MfgCpPage({ moduleId, onModuleChange }: { moduleId: ModuleId; on
               <input type="checkbox" checked={retest} onChange={(event) => setRetest(event.target.checked)} />
               {t(loc('启用重测', 'Enable retest'))}
             </label>
-            <Readout items={[{ label: loc('你算出的整片时间', 'Wafer time you got'), value: `${time.toFixed(1)} s` }]} />
+            <Formula
+              rule="T = T₀ × k"
+              value={`${waferTestTime(plan.touchdowns, tTd, tLoad)} × ${retest ? 1.15 : 1} = ${time.toFixed(1)} s`}
+              note={loc("系数 k 把重测简化成每片固定比例的耗时。", "The factor k models retest as a fixed percentage of wafer time.")}
+            />
             <After show={retestHit.hit} text={loc('重测把整片时间乘 1.15，大约多出 15%。多出来的是再扎一次可疑 die，不是工艺本身变慢。', 'Retest multiplies wafer time by 1.15, about 15% more. The extra is another landing on suspicious dies, not a slower process.')} />
           </Drill>
         </div>

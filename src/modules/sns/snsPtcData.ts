@@ -46,10 +46,7 @@ export const S = {
   rSnr: loc('SNR 最大', 'SNR max'),
   rRel: loc('K 相对误差', 'K relative error'),
   rVar: loc('方差相对误差', 'Variance relative error'),
-  frameAria: loc('一帧灰度图，亮暗表示 DN', 'One grayscale frame; brightness is DN'),
   plotAria: loc('光子传递曲线，横轴对数均值，纵轴对数方差，金线是拟合', 'Photon transfer curve, log mean versus log variance, with a gold fit'),
-  plotX: loc('均值', 'mean'),
-  plotY: loc('方差', 'var'),
   misTitle: loc('常见误区', 'Common misconceptions'),
   takeawayTitle: loc('带走这几句', 'Key takeaways'),
   quizTitle: loc('复习题', 'Review questions'),
@@ -82,16 +79,6 @@ export const S = {
     '原因：单帧方差还包含像素之间的 PRNU。PRNU 越大，方差被抬得越高，斜率越大，K = 1/斜率就越小。当前 PRNU = {prnu}，K 估计 {k}，真值 {kt}，相对误差 {rel}%。满阱估计 {fwc}（旋钮 {fk}）。ROI {side} 像素的方差相对误差约 {ve}%。',
     'Reason: single-frame variance still contains PRNU between pixels. A larger PRNU inflates the variance, the slope gets steeper, and K = 1/slope comes out low. PRNU is {prnu} now, the K estimate is {k}, the true value is {kt}, and the relative error is {rel}%. Full-well estimate is {fwc} (knob {fk}). The variance relative error on {side} ROI pixels is about {ve}%. ',
   ),
-}
-
-export function frameSummary(a: PtcAnalysis): LText {
-  return fill(
-    loc(
-      '图是整帧 {w}×{w} 里的一档中等曝光，统计用左上角 {side}×{side} 的 ROI，平均 DN 约 {mean}。饱和与拟合数字见右侧和 PTC 图。',
-      'The picture is one mid exposure of the full {w} by {w} frame. Statistics use the {side} by {side} ROI at the top left, with a mean of about {mean} DN. Saturation and the fit are in the readouts and the PTC plot.',
-    ),
-    { w: String(a.w), side: String(a.roi.w), mean: a.previewMean.toFixed(1) },
-  )
 }
 
 export function plotSummary(a: PtcAnalysis): LText {

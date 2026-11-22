@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
-import { Cards, Knob, Readout } from '../fund/parts'
+import { Cards, Knob } from '../fund/parts'
 import { d0Learning, murphyYield, negBinomialYield, poissonYield, product, unitCost } from './core'
-import { ControlPlot, YieldBars } from './figs'
+import { Plot } from './ProcessDiagrams'
+import { Formula, ScaleBars, YieldStages } from './FlowVisuals'
 import { MFG_META } from './meta'
 import { After, COMMON, Drill, PackLesson, near, useSticky } from './shell'
 
@@ -63,6 +64,7 @@ export function MfgRampPage({ moduleId, onModuleChange }: { moduleId: ModuleId; 
   const [modelId, setModelId] = useState(MODELS[0].id)
   const [ad, setAd] = useState(0.3)
   const [d00, setD00] = useState(0.5)
+  const [sample, setSample] = useState(0)
   const [months, setMonths] = useState(2)
   const [lineY, setLineY] = useState(0.9)
   const [cpY, setCpY] = useState(0.8)
@@ -118,6 +120,7 @@ export function MfgRampPage({ moduleId, onModuleChange }: { moduleId: ModuleId; 
         setAd(0.3)
         setD00(0.5)
         setMonths(2)
+        setSample(0)
         setLineY(0.9)
         setCpY(0.8)
         setAsmY(0.95)
@@ -145,17 +148,18 @@ export function MfgRampPage({ moduleId, onModuleChange }: { moduleId: ModuleId; 
         <div className="mfg-lab">
           <Drill n={1} title={taskModel}>
             <Knob label={loc('AD', 'AD')} value={ad} unit="" min={0.2} max={0.6} step={0.1} onChange={setAd} />
-            <YieldBars items={[
-              { title: loc('Poisson', 'Poisson'), value: yPoiAd },
-              { title: loc('Murphy', 'Murphy'), value: yMur },
-              { title: loc('负二项', 'Neg. binomial'), value: yNb },
-            ]} />
-            <Readout items={[
-              { label: loc('Poisson', 'Poisson'), value: yPoiAd.toFixed(4) },
-              { label: loc('Murphy', 'Murphy'), value: yMur.toFixed(4) },
-              { label: loc('负二项', 'Neg. binomial'), value: yNb.toFixed(4) },
-            ]} />
-            <After show={modelHit.hit} text={loc('AD=0.5 时，Poisson = exp(−0.5) ≈ 0.6065，Murphy ≈ 0.6192，负二项（α=2）= (1+0.5/2)^(−2) = 0.64。成团越强，同样的平均缺陷下好 die 越多。', 'At AD=0.5, Poisson = exp(−0.5) ≈ 0.6065, Murphy ≈ 0.6192, and the negative binomial (α=2) = (1+0.5/2)^(−2) = 0.64. Stronger clustering leaves more good dies at the same average defect count.')} />
+            <Formula
+              rule="Y_P = e⁻ˣ · Y_M = [(1 − e⁻ˣ)/x]² · Y_NB = (1 + x/α)⁻ᵅ"
+              value={`x = ${ad.toFixed(1)}, α = 2`}
+              note={loc("x = A×D₀ 是单颗平均缺陷数。Poisson 假设独立均匀；Murphy 和负二项用不同分布描述不均匀性。图用同一个 0–100% 刻度。", "x = A×D₀ is the mean defect count per die. Poisson uses uniform independent defects. Murphy and the negative binomial use different distributions for uneven defects. All bars share a 0–100% scale.")}
+            >
+              <ScaleBars max={1} items={[
+                { title: loc('Poisson', 'Poisson'), value: yPoiAd, display: `${(100 * yPoiAd).toFixed(2)}%` },
+                { title: loc('Murphy', 'Murphy'), value: yMur, display: `${(100 * yMur).toFixed(2)}%` },
+                { title: loc('负二项', 'Negative binomial'), value: yNb, display: `${(100 * yNb).toFixed(2)}%` },
+              ]} />
+            </Formula>
+            <After show={modelHit.hit} text={loc('AD=0.5 时，Poisson = exp(−0.5) ≈ 0.6065，Murphy ≈ 0.6193，负二项（α=2）= (1+0.5/2)^(−2) = 0.64。成团越强，同样的平均缺陷下好 die 越多。', 'At AD=0.5, Poisson = exp(−0.5) ≈ 0.6065, Murphy ≈ 0.6193, and the negative binomial (α=2) = (1+0.5/2)^(−2) = 0.64. Stronger clustering leaves more good dies at the same average defect count.')} />
           </Drill>
           <Drill n={2} title={taskTotal}>
             <div className="knobs">
@@ -164,7 +168,10 @@ export function MfgRampPage({ moduleId, onModuleChange }: { moduleId: ModuleId; 
               <Knob label={loc('组装良率', 'Assembly yield')} value={asmY} unit="" min={0.95} max={0.99} step={0.01} onChange={setAsmY} />
               <Knob label={loc('FT 良率', 'FT yield')} value={ftY} unit="" min={0.97} max={0.995} step={0.005} onChange={setFtY} />
             </div>
-            <Readout items={[{ label: loc('你算出的总良率', 'Total yield you got'), value: total.toFixed(4) }]} />
+            <Formula rule="Y_total = Y_line × Y_CP × Y_asm × Y_FT" value={`${lineY} × ${cpY} × ${asmY} × ${ftY} ≈ ${total.toFixed(4)}`} note={loc("条形从同一批投入开始，逐段乘当前工序的条件通过率。", "Each bar starts with the same input population and applies the current step’s conditional pass rate.")}><YieldStages stages={[
+                { title: loc('过制造线', 'After line'), rate: lineY }, { title: loc('过 CP', 'After CP'), rate: cpY },
+                { title: loc('过组装', 'After assembly'), rate: asmY }, { title: loc('过 FT', 'After FT'), rate: ftY },
+              ]} /></Formula>
             <After show={totalHit.hit} text={loc('0.95×0.85×0.97×0.99 ≈ 0.7754。四段相乘，最差的 CP 把总良率拉到 0.85 以下，不是四段的平均。', '0.95×0.85×0.97×0.99 ≈ 0.7754. The four stages multiply, and the weakest one, CP, pulls the total below 0.85. That is not the average of the four.')} />
           </Drill>
           <Drill n={3} title={taskLearn}>
@@ -172,15 +179,20 @@ export function MfgRampPage({ moduleId, onModuleChange }: { moduleId: ModuleId; 
               <Knob label={loc('起始 D00', 'Start D00')} value={d00} unit="/cm²" min={0.2} max={0.6} step={0.1} onChange={setD00} />
               <Knob label={loc('月份 t', 'Month t')} value={months} unit="" min={0} max={12} step={1} onChange={setMonths} />
             </div>
-            <Readout items={[
-              { label: loc('你算出的 D0', 'D0 you got'), value: d0.toFixed(4) },
-              { label: loc('对应 Poisson', 'Poisson for that D0'), value: yPoi.toFixed(4) },
-            ]} />
+            <Formula rule="D(t) = D∞ + (D_start − D∞)exp(−t/τ)" value={`D(${months}) = ${d0.toFixed(4)} /cm²; Y = ${yPoi.toFixed(4)}`} note={loc("D∞ 是成熟缺陷密度 0.10/cm²，τ=6 月是时间常数。一个 τ 后，距离成熟值的差剩 e⁻¹。面积为 1 cm²，代入 Y=exp(−D·A)。", "D∞ is mature density, 0.10/cm², and τ=6 months. After one τ the excess remaining is e⁻¹. Area is 1 cm² for Y=exp(−D·A).")}><Plot title={loc('缺陷密度随爬坡月份变化', 'Defect density over the ramp')}
+                points={Array.from({ length: 13 }, (_, i) => d0Learning(d00, 0.1, 6, i))}
+                labels={Array.from({ length: 13 }, (_, i) => t(loc(`第 ${i} 月`, `Month ${i}`)))}
+                selected={months} onPick={setMonths} min={0.08} max={0.62} unit="/cm²"
+                guides={[{ label: 'D∞', value: 0.1 }]}
+                caption={loc('移动月份游标，观察曲线如何逐步接近成熟基线。', 'Move the month cursor to see the curve approach the mature baseline.')} /></Formula>
             <After show={learnHit.hit} text={loc('D0 = 0.1 + (0.5−0.1)×e^(−6/6) ≈ 0.2472。面积 1 cm² 时 Poisson = exp(−0.2472) ≈ 0.781。第 6 个月还没到成熟的 0.1，不能直接用成熟良率排产。', 'D0 = 0.1 + (0.5−0.1)×e^(−6/6) ≈ 0.2472. On 1 cm², Poisson = exp(−0.2472) ≈ 0.781. Month 6 has not reached the mature 0.1, so the mature yield cannot be used to plan output yet.')} />
           </Drill>
           <Drill n={4} title={taskDrift}>
             <Knob label={loc('月份 t', 'Month t')} value={months} unit="" min={0} max={12} step={1} onChange={setMonths} />
-            <ControlPlot points={points} mean={0.5} lcl={0.47} ucl={0.53} />
+            <Plot title={loc('爬坡批次控制图', 'Control chart for ramp lots')} points={points}
+              labels={points.map((_, i) => t(loc(`批次 ${i + 1}`, `Lot ${i + 1}`)))} selected={sample} onPick={setSample} min={0.45} max={0.62} unit="V"
+              guides={[{ label: 'LCL', value: 0.47, alert: true }, { label: 'CL', value: 0.5 }, { label: 'UCL', value: 0.53, alert: true }]}
+              caption={loc('此模拟在月份超过 4 时注入向上漂移。逐点读值，并区分中心线和控制限。', 'The example adds upward drift after month 4. Read individual points and distinguish the center line from the limits.')} />
             <After show={driftHit.hit} text={loc('后半段离开中心，是工艺在漂，不是月底平均还能看。这种偏移要回到 WAT 和 CP，不能只等 FT 的月报。', 'The later points leave the center, so the process is drifting. A month-end average will not show it. Map that shift back to WAT and CP; do not wait for the FT monthly report.')} />
           </Drill>
           <Drill n={5} title={taskCost}>
@@ -188,7 +200,16 @@ export function MfgRampPage({ moduleId, onModuleChange }: { moduleId: ModuleId; 
               <Knob label={loc('NRE（百万）', 'NRE (M)')} value={nre} unit="" min={1} max={4} step={0.5} onChange={setNre} />
               <Knob label={loc('月产量（千）', 'Monthly volume (k)')} value={volumeK} unit="k" min={10} max={200} step={10} onChange={setVolumeK} />
             </div>
-            <Readout items={[{ label: loc('你算出的单颗成本', 'Unit cost you got'), value: unit.toFixed(2) }]} />
+            <Formula
+              rule="C = NRE / Q + v"
+              value={`${(nre * 1e6).toLocaleString()} / ${(volumeK * 1000).toLocaleString()} + 8 = ${unit.toFixed(2)}`}
+              note={loc("这里用 Q 颗作为一次性费用的摊销分母，可变成本每颗为 8。", "Q is the volume over which the one-time cost is spread. Variable cost is 8 per unit.")}
+            >
+              <ScaleBars max={unit} items={[
+                { title: loc('固定费用摊销', 'Amortized NRE'), value: unit - 8 },
+                { title: loc('每颗可变成本', 'Variable cost per unit'), value: 8 },
+              ]} />
+            </Formula>
             <After show={costHit.hit} text={loc('单颗 = NRE ÷ 产量 + 8。NRE 停在 2 百万时，产量要到大约 17 万颗，摊销才降到让单颗低于 20。产量停在低位时，一次性费用会占掉单颗里的大部分。', 'Unit = NRE ÷ volume + 8. With NRE at 2 million, volume has to reach about 170,000 before amortization lets the unit fall below 20. At a low volume the one-time bill is most of the unit cost.')} />
           </Drill>
         </div>

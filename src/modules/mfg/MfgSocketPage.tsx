@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
-import { Cards, Knob, Readout } from '../fund/parts'
-import { LayerBars } from './figs'
+import { Knob } from '../fund/parts'
+import { SocketSection } from './SocketVisuals'
+import { DiagramChoices, Formula, ScaleBars } from './FlowVisuals'
+import { SocketUseCompare } from './TestSetupVisuals'
 import { MFG_META } from './meta'
 import { After, COMMON, Drill, PackLesson, useSticky } from './shell'
 
@@ -20,12 +22,6 @@ const USES = [
   { id: 'slt', title: loc('系统级 SLT', 'System-level SLT'), text: loc('插座按更接近真实系统板的接口来做，测的是芯片在板上会走的那条路径，不只是裸的直流参数。', 'The socket follows an interface closer to the real system board, so the path is the one the chip will see on a board, not only a bare DC parameter.') },
   { id: 'burn', title: loc('老化', 'Burn-in'), text: loc('芯片要在高温里停很久。塑料会蠕变，针会氧化，这是时间加温度，不只是插拔次数。老化座按这个工况单做。', 'The chip sits at high temperature for a long time. The plastic creeps and the pins oxidize: time plus temperature, as well as insertion count. A burn-in socket is built for that duty.') },
   { id: 'bench', title: loc('工作台', 'Bench'), text: loc('换芯片要快，同一颗要反复取下再装上。对准和接触电阻比每小时能测多少颗更要紧。', 'Chips are swapped often, and the same part comes off and goes back on. Alignment and contact resistance matter more than parts per hour.') },
-]
-
-const PARTS = [
-  { id: 'body', title: loc('本体', 'Body'), text: loc('金属或硬塑料做出定位腔。PEEK、PPS、Torlon、PEI 是常见例子：硬，温度一变也不轻易走形，同一颗球每次都落在同一根针上。牌号以图纸为准。', 'Metal or a stiff plastic forms the pocket. PEEK, PPS, Torlon and PEI are typical examples: stiff, and they hold shape when temperature changes, so the same ball hits the same pin. The drawing names the grade.') },
-  { id: 'pin', title: loc('接触件', 'Contacts'), text: loc('弹簧针、弹片或弹性体插在孔里，给高低略有差别的焊球一条还能导通的路。接触电阻要低，还要扛得住这一脚的电流。', 'Pogo pins, stamped contacts or elastomer sit in the holes and still conduct when the balls are not all the same height. Contact resistance stays low, and the pin has to carry that lead current.') },
-  { id: 'lid', title: loc('压盖', 'Lid'), text: loc('盖子或保持板把芯片压到针上，并把针留在孔里。压力不稳，这一次接触和下一次就会不一样。', 'A lid or retainer presses the chip onto the pins and keeps the pins in their holes. If the force wanders, this contact and the next one disagree.') },
 ]
 
 const PACKS = [
@@ -97,13 +93,12 @@ export function MfgSocketPage({ moduleId, onModuleChange }: { moduleId: ModuleId
   const { t } = useLocale()
   const [contactId, setContactId] = useState(CONTACTS[0].id)
   const [useId, setUseId] = useState(USES[0].id)
-  const [partId, setPartId] = useState(PARTS[0].id)
   const [packId, setPackId] = useState(PACKS[0].id)
   const [layerId, setLayerId] = useState(LAYERS[0].id)
+  const [stage, setStage] = useState(0)
+  const [useRunning, setUseRunning] = useState(false)
   const [rcMilli, setRcMilli] = useState(200)
   const contact = CONTACTS.find((item) => item.id === contactId) ?? CONTACTS[0]
-  const use = USES.find((item) => item.id === useId) ?? USES[0]
-  const part = PARTS.find((item) => item.id === partId) ?? PARTS[0]
   const pack = PACKS.find((item) => item.id === packId) ?? PACKS[0]
   const dropMv = rcMilli * (CURRENT_MA / 1000)
   const elasHit = useSticky(contactId === 'elastomer')
@@ -138,9 +133,10 @@ export function MfgSocketPage({ moduleId, onModuleChange }: { moduleId: ModuleId
       onReset={() => {
         setContactId(CONTACTS[0].id)
         setUseId(USES[0].id)
-        setPartId(PARTS[0].id)
         setPackId(PACKS[0].id)
         setLayerId(LAYERS[0].id)
+        setStage(0)
+        setUseRunning(false)
         setRcMilli(200)
         elasHit.reset()
         rcHit.reset()
@@ -148,35 +144,41 @@ export function MfgSocketPage({ moduleId, onModuleChange }: { moduleId: ModuleId
       }}
       learn={
         <div className="mfg-lab">
-          <p>{t(loc('三种接触件。点一种，读路径长短和更换频率。弹簧针的电感怎样把带宽算出来，在上一课。', 'Three contacts. Click one and read path length against how often it is replaced. How pogo inductance becomes a bandwidth number is in the previous lesson.'))}</p>
-          <Cards items={CONTACTS} activeId={contactId} cols={3} onPick={(item) => setContactId(item.id)} />
-          <p>{t(contact.text)}</p>
-          <p>{t(loc('同一只座的外形还要跟着场合变。点一种场合。', 'The same idea of a socket still changes with the job. Click a use.'))}</p>
-          <Cards items={USES} activeId={useId} cols={2} onPick={(item) => setUseId(item.id)} />
-          <p>{t(use.text)}</p>
-          <p>{t(loc('从上到下，座本身是三件。点一件。', 'The socket itself is three pieces. Click one.'))}</p>
-          <Cards items={PARTS} activeId={partId} cols={3} onPick={(item) => setPartId(item.id)} />
-          <p>{t(part.text)}</p>
-          <p>{t(loc('它压在一块 PCB 上。点一层，看力传到哪、信号走哪。', 'It presses onto a PCB. Click a layer and see where the force goes, and where the signal goes.'))}</p>
-          <LayerBars layers={LAYERS} activeId={layerId} onPick={setLayerId} />
-          <p>{t(LAYER_TEXT[layerId as keyof typeof LAYER_TEXT])}</p>
-          <p>{t(loc('腔体还得配封装。点一种，看针顶在球上、引脚上，还是平面焊盘上。', 'The pocket still has to match the package. Click one and see whether the pins meet balls, leads or flat lands.'))}</p>
-          <Cards items={PACKS} activeId={packId} cols={3} onPick={(item) => setPackId(item.id)} />
+          <div className="hardware-controls">
+            <span className="hardware-control-label">{t(loc('封装端子', 'Package terminal'))}</span>
+            <DiagramChoices label={loc('封装端子', 'Package terminal')} items={PACKS} value={packId} onPick={setPackId} />
+            <span className="hardware-control-label">{t(loc('测试座接触件', 'Socket contact'))}</span>
+            <DiagramChoices label={loc('测试座接触件', 'Socket contact')} items={CONTACTS} value={contactId} onPick={setContactId} />
+            <span className="hardware-control-label">{t(loc('高亮截面部件', 'Highlight a component'))}</span>
+            <DiagramChoices label={loc('高亮截面部件', 'Highlight a component')} items={LAYERS} value={layerId} onPick={setLayerId} />
+          </div>
+          <SocketSection pack={packId} contact={contactId} focus={layerId}
+            focusNote={LAYER_TEXT[layerId as keyof typeof LAYER_TEXT]} stage={stage} onStage={setStage} />
           <p>{t(pack.text)}</p>
+          <p>{t(contact.text)}</p>
+          <SocketUseCompare items={USES} value={useId} onPick={setUseId} running={useRunning} onRun={setUseRunning} />
           <p>{t(loc('接触电阻串在回路里。额外压降 = 电流 × 接触电阻。20 mA 走过 2 Ω 就是 40 mV。这 40 mV 不是芯片多出来的。', 'Contact resistance is in series with the measurement. Extra drop = current × contact resistance. 20 mA through 2 Ω is 40 mV. Those 40 mV are not extra voltage from the chip.'))}</p>
         </div>
       }
       practice={
         <div className="mfg-lab">
           <Drill n={1} title={taskElas}>
-            <p>{t(loc('用上面的三张接触件卡片。', 'Use the three contact cards above.'))}</p>
+            <p>{t(loc('切换截面上的接触件，比较接触路径和压合行程。', 'Change the contact in the cross-section and compare its path and compression.'))}</p>
             <After show={elasHit.hit} text={loc('弹性体路径短，寄生电感比长弹簧针小，所以高频更干净。橡胶会磨，更换更勤。又要高频、又要少停机时，两件事要一起看，不能只留一个优点。', 'The elastomer path is short, so its inductance is lower than a long pogo and high frequency stays cleaner. The rubber wears, so replacement is more often. When you need both high frequency and little downtime, both facts stay on the table.')} />
           </Drill>
           <Drill n={2} title={taskRc}>
             <div className="knobs">
               <Knob label={loc('接触电阻', 'Contact R')} value={rcMilli} unit="mΩ" min={50} max={5000} step={50} onChange={setRcMilli} />
             </div>
-            <Readout items={[{ label: loc('20 mA 下的额外压降', 'Extra drop at 20 mA'), value: `${dropMv.toFixed(1)} mV` }]} />
+            <Formula
+              rule="ΔV = I × R_contact"
+              value={`${CURRENT_MA} mA × ${(rcMilli / 1000).toFixed(2)} Ω = ${dropMv.toFixed(1)} mV`}
+              note={loc("先把 mΩ 换成 Ω，电源路径中耗掉的这段电压随接触电阻线性增大。", "Convert mΩ to Ω. The voltage lost across the contact grows linearly with its resistance.")}
+            >
+              <ScaleBars max={100} items={[
+                { title: loc('接触压降（mV）', 'Contact voltage drop (mV)'), value: dropMv, display: `${dropMv.toFixed(1)} mV` },
+              ]} />
+            </Formula>
             <After show={rcHit.hit} text={loc('2000 mΩ = 2 Ω。20 mA × 2 Ω = 40 mV。限值窗口如果只有几十毫伏，这 40 mV 足够把一颗好芯片推出去。所以先清针或换座，再改限值。', '2000 mΩ = 2 Ω. 20 mA × 2 Ω = 40 mV. If the limit window is only tens of millivolts, 40 mV is enough to push a good chip out. Clean or replace the socket before editing the limit.')} />
           </Drill>
           <Drill n={3} title={taskBurn}>

@@ -4,15 +4,17 @@ import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
 import { Cards, Knob, Readout } from '../fund/parts'
 import { escapeTraces, microstripZ0 } from './core'
-import { LayerBars } from './figs'
+import { CrossSection, EscapeDiagram } from './ProcessDiagrams'
+import { DiagramChoices, Formula } from './FlowVisuals'
 import { MFG_META } from './meta'
 import { After, COMMON, Drill, PackLesson, near, useSticky } from './shell'
+import { SubstrateSignalPath, type SubstrateKind } from './SubstrateTypes'
 
 const KINDS = [
   { id: 'lf', title: loc('引线框架', 'Lead-frame'), text: loc('金属框架 + 塑封。节距粗，成本低。', 'A metal frame plus mold. Coarse pitch, low cost.') },
   { id: 'org', title: loc('有机积层', 'Organic build-up'), text: loc('core + 积层膜。细线、多层，常见于 BGA。积层膜名为概念示例。', 'Core plus build-up film. Fine lines, many layers, common in BGA. Film names are conceptual examples.') },
   { id: 'cer', title: loc('陶瓷', 'Ceramic'), text: loc('耐高温、气密，成本高。', 'High temperature and hermetic, at higher cost.') },
-]
+] satisfies { id: SubstrateKind; title: ReturnType<typeof loc>; text: ReturnType<typeof loc> }[]
 
 const STACK = [
   { id: 'sm', title: loc('阻焊', 'Solder mask'), color: '#3d6b4a' },
@@ -86,7 +88,7 @@ const QUIZ = [
 
 export function MfgSubstratePage({ moduleId, onModuleChange }: { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }) {
   const { t } = useLocale()
-  const [kindId, setKindId] = useState(KINDS[0].id)
+  const [kindId, setKindId] = useState<SubstrateKind>(KINDS[0].id)
   const [stackId, setStackId] = useState(STACK[0].id)
   const [makerId, setMakerId] = useState(MAKERS[0].id)
   const [h, setH] = useState(70)
@@ -161,8 +163,18 @@ export function MfgSubstratePage({ moduleId, onModuleChange }: { moduleId: Modul
           <p>{t(loc('基板把芯片上的细间距扇出到板上的粗间距，同时走电源和地。点一种结构，读它适合什么。', 'A substrate fans the chip’s fine pitch out to the board’s coarse pitch, and it carries power and ground. Click a kind and read where it fits.'))}</p>
           <Cards items={KINDS} activeId={kindId} cols={3} onPick={(item) => setKindId(item.id)} />
           <p>{t(kind.text)}</p>
-          <p>{t(loc('从上到下点一层，看信号走在哪。', 'Click a layer from the top and see where the signal runs.'))}</p>
-          <LayerBars layers={STACK} activeId={stackId} onPick={setStackId} />
+          <SubstrateSignalPath key={kindId} kind={kindId} />
+          {kindId === 'org' && <>
+          <p>{t(loc('点一层，辨认有机积层基板中的阻焊、积层、芯板和球焊盘。', 'Select a layer to locate the mask, build-up layers, core and ball pads in the organic substrate.'))}</p>
+          <DiagramChoices label={loc('基板积层截面层', 'Substrate cross-section layers')} items={STACK} value={stackId} onPick={setStackId} />
+          <CrossSection title={loc('有机积层基板从芯片侧到球端', 'Organic substrate from die side to ball side')} active={stackId}
+            caption={loc('中心芯板提供支撑，上下积层布线通过微孔连接。阻焊在外层留出焊盘开口。', 'The core provides support. Microvias link the top and bottom build-up wiring to adjacent layers. Solder mask leaves pad openings on the outer surface.')}
+            parts={[
+              ['core', 10, 40, 80, 23, 'dielectric'], ['bu1', 10, 28, 80, 12, 'copper'],
+              ['bu2', 10, 63, 80, 12, 'copper'], ['sm', 10, 22, 32, 6, 'unit'], ['sm', 58, 22, 32, 6, 'unit'],
+              ['ball', 22, 75, 10, 7, 'seed'], ['ball', 45, 75, 10, 7, 'seed'], ['ball', 68, 75, 10, 7, 'seed'],
+            ]} />
+          </>}
           <p>{t(loc('微带线阻抗用 IPC 近似：Z0 = 87 / √(εr+1.41) × ln(5.98h / (0.8w+t))。介质更厚或线更窄，阻抗更高；εr 更大，阻抗更低。', 'Microstrip impedance uses an IPC approximation: Z0 = 87 / √(εr+1.41) × ln(5.98h / (0.8w+t)). A thicker dielectric or a narrower line raises impedance; a larger εr lowers it.'))}</p>
           <p>{t(loc('两颗焊盘之间能走的线数 = floor( (节距 − 焊盘 − 间距) / (线宽 + 间距) )。算出来是 0，这一层就扇不出去，要加一层或放宽线距。', 'Traces between two pads = floor( (pitch − pad − space) / (line + space) ). A result of 0 means this layer cannot escape, so add a layer or relax the line and space.'))}</p>
           <p>{t(loc('下面十个名字来自一张基板厂拼图，用来把结构和工厂对上。产品组合会变，这里不排名，也不当采购清单。点一家读它做什么。', 'The ten names below come from a collage of substrate fabs, so the structure can be matched to a factory. The product mix changes. This is not a ranking and not a shopping list. Click one and read what it builds.'))}</p>
@@ -179,7 +191,9 @@ export function MfgSubstratePage({ moduleId, onModuleChange }: { moduleId: Modul
               <Knob label={loc('线厚 t', 'Thickness t')} value={th} unit="µm" min={10} max={20} step={5} onChange={setTh} />
               <Knob label={loc('εr', 'εr')} value={eps} unit="" min={3} max={4.2} step={0.1} onChange={setEps} />
             </div>
-            <Readout items={[{ label: loc('你算出的 Z0', 'Z0 you got'), value: `${z0.toFixed(1)} Ω` }]} />
+            <Formula rule="Z₀ ≈ 87/√(εᵣ + 1.41) · ln(5.98h/(0.8w + t))" value={`${z0.toFixed(1)} Ω`} note={loc("图里上方是宽 w、厚 t 的铜走线；h 是走线底到参考平面之间的介质厚度，εᵣ 是相对介电常数。这个经验式用于教学微带近似。", "The upper trace is width w and thickness t. h is the dielectric height from its base to the reference plane. εᵣ is relative permittivity. This is a teaching approximation for microstrip.")}><CrossSection title={loc('走线与参考平面', 'Trace and reference plane')}
+              caption={loc(`w = ${w} µm，t = ${th} µm，h = ${h} µm，εᵣ = ${eps}`, `w = ${w} µm, t = ${th} µm, h = ${h} µm, εᵣ = ${eps}`)}
+              parts={[[ 'dielectric', 10, 72 - h / 2, 80, h / 2, 'dielectric' ], ['trace', 50 - w / 4, 72 - h / 2 - th / 2, w / 2, th / 2, 'copper'], ['plane', 10, 72, 80, 6, 'copper']]} /></Formula>
             <After show={zHit.hit} text={loc('这组尺寸代入近似式，得到约 74.2 Ω。它高于常见的 50 Ω，因为线相对介质偏窄。', 'Those sizes in the approximation give about 74.2 Ω. That is above the usual 50 Ω because the line is narrow for this dielectric.')} />
           </Drill>
           <Drill n={2} title={taskTune}>
@@ -193,7 +207,7 @@ export function MfgSubstratePage({ moduleId, onModuleChange }: { moduleId: Modul
               <Knob label={loc('焊盘', 'Pad')} value={pad} unit="µm" min={60} max={100} step={10} onChange={setPad} />
               <Knob label={loc('线/距', 'Line/space')} value={line} unit="µm" min={10} max={25} step={5} onChange={setLine} />
             </div>
-            <Readout items={[{ label: loc('你算出的逃逸根数', 'Escape traces you got'), value: `${escape}` }]} />
+            <Formula rule="n = max(0, ⌊(p − d − s) / (w + s)⌋)" value={`max(0, ⌊(${pitch} − ${pad} − ${line}) / (${line} + ${line})⌋) = ${escape}`} note={loc("节距 p 减去焊盘直径 d，得到可用间隙。n 根线占 n·w，包含两边的 n+1 个绝缘间距。这里 w=s，算出负数时按 0 根处理。", "Pitch p minus pad diameter d gives the gap. n traces take n·w plus n+1 clearance spaces including both edges. Here w=s. A negative result means zero traces.")}><EscapeDiagram pitch={pitch} pad={pad} line={line} count={escape} /></Formula>
             <After show={escHit.hit} text={loc('(150−80−15) / (15+15) = 1.83，向下取整是 1。两颗焊盘之间只够走一根线。', '(150−80−15) / (15+15) = 1.83, which floors to 1. Only one trace fits between the two pads.')} />
           </Drill>
           <Drill n={4} title={taskZero}>

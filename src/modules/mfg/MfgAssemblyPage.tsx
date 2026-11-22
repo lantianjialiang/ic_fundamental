@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
-import { Cards, Knob, Readout, Seg } from '../fund/parts'
+import { Knob, Readout, Seg } from '../fund/parts'
 import { flowYieldCost, product } from './core'
-import { YieldBars } from './figs'
+import { AssemblySection } from './AssemblySection'
+import { PathStrip } from './ProcessDiagrams'
+import { Formula, ScaleBars, YieldStages } from './FlowVisuals'
 import { MFG_META } from './meta'
 import { After, COMMON, Drill, PackLesson, near, useSticky } from './shell'
 
@@ -75,8 +77,16 @@ export function MfgAssemblyPage({ moduleId, onModuleChange }: { moduleId: Module
   const [burnIn, setBurnIn] = useState(false)
   const [folded, setFolded] = useState(false)
   const pkg = PKGS.find((item) => item.id === pkgId) ?? PKGS[0]
-  const step = STEPS_WB.find((item) => item.id === stepId) ?? STEPS_WB[0]
-  const ys = STEPS_WB.map((s) => (pkgId === 'fc' && s.id === 'bond' ? 0.993 : s.y))
+  const flip = pkgId === 'fc'
+  const steps = flip ? STEPS_WB.map((item) => ({
+    ...item,
+    title: item.id === 'attach' ? loc('倒装对位', 'Flip-chip alignment')
+      : item.id === 'bond' ? loc('凸点回流', 'Bump reflow')
+        : item.id === 'mold' ? loc('底填与保护', 'Underfill & protection') : item.title,
+  })) : STEPS_WB
+  const stage = steps.findIndex((item) => item.id === stepId)
+  const step = steps[stage]
+  const ys = STEPS_WB.map((s) => (flip && s.id === 'bond' ? 0.993 : s.y))
   const asmY = product(ys)
   const nodes = STEPS_WB.map((s, i) => ({ name: s.id, yield: ys[i], stepCost: s.cost, testCost: 0 }))
   const flow = flowYieldCost(nodes)
@@ -130,8 +140,10 @@ export function MfgAssemblyPage({ moduleId, onModuleChange }: { moduleId: Module
           <Seg options={PKGS.map((item) => ({ id: item.id, label: item.title }))} value={pkgId} onChange={setPkgId} />
           <p>{t(pkg.text)}</p>
           <p>{t(loc('点一步，看它自己的良率。每一步都小于 1，连乘之后会比任何单步都低。倒装时键合这一步用另一组示意良率。', 'Click a step and read its own yield. Every step is below 1, so the product sits below every single step. Flip-chip uses a different illustrative yield on the bond step.'))}</p>
-          <Cards items={STEPS_WB.map((s) => ({ id: s.id, title: s.title, text: loc(`这一步 ${s.y}`, `This step ${s.y}`) }))} activeId={stepId} cols={4} onPick={(item) => setStepId(item.id)} />
-          <p>{t(loc('CP 漏检示意 = (1−0.9) × (1−覆盖率)。0.9 是裸片里本来就坏的比例，覆盖率是 CP 抓到其中多少。抓得少，坏 die 会被封装进去，后面的钱已经花掉。', 'The CP-escape illustration is (1−0.9) × (1−coverage). 0.9 is the fraction of bare die that were already bad; coverage is how many of those CP catches. Catch fewer, and bad die get packaged after the money is spent.'))}</p>
+          <PathStrip title={loc("组装工序", "Assembly stages")} nodes={steps} active={stepId} onPick={setStepId}
+            caption={loc(`当前工序条件良率 ${ys[stage].toFixed(3)}`, `Selected step conditional yield: ${ys[stage].toFixed(3)}`)} />
+          <AssemblySection flip={flip} stage={stage} />
+          <p>{t(loc('CP 漏检示意 = (1−0.9) × (1−覆盖率)。0.9 是裸片本来合格的比例，覆盖率是 CP 能抓出的坏 die 占全部坏 die 的比例。抓得少，坏 die 会被封装进去，后面的钱已经花掉。', 'The CP-escape illustration is (1−0.9) × (1−coverage). 0.9 is the fraction of initially good bare dies; coverage is the fraction of defective bare dies detected by CP. Catch fewer, and bad die get packaged after the money is spent.'))}</p>
           <p>{t(loc('老化是加应力，把早期失效提前暴露。这一课用每颗 +0.4 表示多出来的成本，是示意。', 'Burn-in adds stress so infant fails show up early. This lesson uses +0.4 per unit for the extra cost. That is an illustration.'))}</p>
         </div>
       }
@@ -139,14 +151,23 @@ export function MfgAssemblyPage({ moduleId, onModuleChange }: { moduleId: Module
         <div className="mfg-lab">
           <Drill n={1} title={taskFold}>
             <p>{t(loc('确认上面停在引线键合，再连乘。倒装的键合良率不同，那一档留到第 3 步。', 'Leave the selector above on wire-bond, then multiply. Flip-chip uses a different bond yield; that is step 3.'))}</p>
-            <YieldBars items={STEPS_WB.map((s, i) => ({ title: s.title, value: ys[i] }))} />
+            <ScaleBars max={1} items={steps.map((s, i) => ({ title: s.title, value: ys[i], display: `${(ys[i] * 100).toFixed(2)}%` }))} />
             <button type="button" onClick={() => setFolded(true)}>{t(loc('连乘这七步', 'Multiply these seven steps'))}</button>
-            {folded ? <Readout items={[{ label: loc('你算出的累计良率', 'Product you got'), value: asmY.toFixed(4) }]} /> : null}
+            {folded ? <Formula rule="Y = y₁ × y₂ × … × y₇" value={`${ys.map((rate) => rate.toFixed(3)).join(" × ")} = ${asmY.toFixed(4)}`} note={loc("每道工序只对上一道留下的合格品继续加工。下面显示从 100% 开始，各步的累计剩余比例。", "Each step processes the previous step’s survivors. The bars show cumulative survival from the initial 100%.")}><YieldStages stages={steps.map((s, i) => ({ title: s.title, rate: ys[i] }))} /></Formula> : null}
             <After show={foldHit.hit} text={loc('0.999×0.998×0.998×0.995×0.998×0.997×0.999 ≈ 0.9841。每一步都接近 1，乘在一起大约掉到 98.4%，不能把组装良率当成 100%。', '0.999×0.998×0.998×0.995×0.998×0.997×0.999 ≈ 0.9841. Each step is near 1, and together they sit near 98.4%. Assembly yield is not 100%.')} />
           </Drill>
           <Drill n={2} title={taskCov}>
             <Knob label={loc('CP 覆盖率', 'CP coverage')} value={cpCov} unit="" min={0.9} max={0.99} step={0.01} onChange={setCpCov} />
-            <Readout items={[{ label: loc('你算出的漏检', 'Escape you got'), value: escape.toFixed(4) }]} />
+            <Formula
+              rule="P_escape = (1 − Y_die)(1 − C_CP)"
+              value={`0.10 × ${(1 - cpCov).toFixed(2)} = ${(escape * 100).toFixed(2)}%`}
+              note={loc("图中对比被 CP 抓到和漏过的坏 die，分母均为进入 CP 的全部 die。", "The bars compare detected and missed defects. Both are measured against all dies entering CP.")}
+            >
+              <ScaleBars max={0.1} items={[
+                { title: loc('CP 捕获的坏 die', 'Defective dies caught at CP'), value: 0.1 * cpCov, display: `${(10 * cpCov).toFixed(2)}%` },
+                { title: loc('流到组装的坏 die', 'Defective dies passed to assembly'), value: escape, display: `${(100 * escape).toFixed(2)}%` },
+              ]} />
+            </Formula>
             <After show={covHit.hit} text={loc('覆盖率 0.90 时，漏检 = 0.1 × 0.10 = 0.01。覆盖率 0.97 时只有 0.003。差出来的坏 die 会带着基板和组装的成本报废。', 'At coverage 0.90 the escape is 0.1 × 0.10 = 0.01. At 0.97 it is only 0.003. The extra bad dies scrap the substrate and assembly cost with them.')} />
           </Drill>
           <Drill n={3} title={taskFc}>
@@ -159,10 +180,14 @@ export function MfgAssemblyPage({ moduleId, onModuleChange }: { moduleId: Module
               <input type="checkbox" checked={burnIn} onChange={(event) => setBurnIn(event.target.checked)} />
               {t(loc('加入老化', 'Add burn-in'))}
             </label>
-            <Readout items={[
-              { label: loc('每颗好品成本', 'Cost per good unit'), value: (flow.costPerGood + extra).toFixed(3) },
-              { label: loc('报废成本', 'Scrap'), value: flow.scrapCost.toFixed(3) },
-            ]} />
+            <Formula rule="C_with = C_assembly + C_burn-in" value={`${flow.costPerGood.toFixed(3)} + ${extra.toFixed(2)} = ${(flow.costPerGood + extra).toFixed(3)}`}
+              note={loc('示例对每颗组装好品附加固定老化成本。组装报废成本单独记账，老化筛出的失效比例没有进入本例。', 'The example adds a fixed burn-in cost per assembled good unit. Assembly scrap is tracked separately. This example leaves out the fraction screened out by burn-in.')}>
+              <ScaleBars max={Math.max(flow.costPerGood + extra, 0.01)} items={[
+                { title: loc('每颗组装好品成本', 'Assembly cost per good unit'), value: flow.costPerGood, display: flow.costPerGood.toFixed(3) },
+                { title: loc('老化附加成本', 'Burn-in overhead per unit'), value: extra, display: extra.toFixed(2) },
+                { title: loc('组装报废成本（每颗投入）', 'Assembly scrap per input unit'), value: flow.scrapCost, display: flow.scrapCost.toFixed(3) },
+              ]} />
+            </Formula>
             <After show={biHit.hit} text={loc('老化在每颗上加 0.4。它抓的是早期失效，不是把 CP 或 FT 再做一遍，所以不能用它替代前面的测试。', 'Burn-in adds 0.4 on every unit. It catches infant fails. It is not another copy of CP or FT, so it does not replace the tests in front of it.')} />
           </Drill>
         </div>

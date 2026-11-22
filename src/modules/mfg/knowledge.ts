@@ -119,7 +119,7 @@ export const MFG_KNOWLEDGE: AnaKnowledge[] = [
   k(
     'mfgSubFab',
     [
-      { id: 'mfg-sap', term: 'Semi-additive process (SAP/mSAP)', name: loc('半加成法 / 改良半加成法', 'Semi-additive process (SAP/mSAP)'), def: loc('细线用化学铜种子 + 图形电镀 + 闪蚀，减成法侧蚀做不到 10 µm。见 {@mfgSubFab}。', 'Fine lines use an electroless seed, pattern plate and flash etch; subtractive undercut cannot hold 10 µm. See {@mfgSubFab}.'), lessons: ['mfgSubFab'] },
+      { id: 'mfg-sap', term: 'Semi-additive process (SAP/mSAP)', name: loc('半加成法 / 改良半加成法', 'Semi-additive process (SAP/mSAP)'), def: loc('SAP 常在介质上沉积薄种子铜；mSAP 通常从薄铜箔起步。两者图形电镀后清掉线间底铜。量产线宽/线距取决于工艺能力。见 {@mfgSubFab}。', 'SAP commonly deposits thin seed copper on dielectric; mSAP typically starts from thin copper foil. Both pattern-plate and then remove exposed base copper. Production line and space depend on process capability. See {@mfgSubFab}.'), lessons: ['mfgSubFab'] },
       { id: 'mfg-mask-finish', term: 'Solder mask / Surface finish', name: loc('阻焊 / 表面处理', 'Solder mask / surface finish'), def: loc('开窗后做可焊表面。ENIG 等名为概念示例。见 {@mfgSubFab}。', 'Openings then a solderable finish. Names such as ENIG are conceptual examples. See {@mfgSubFab}.'), lessons: ['mfgSubFab'] },
     ],
     {},

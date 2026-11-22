@@ -11,6 +11,7 @@ import '../prep/prep.css'
 import '../hs/hs.css'
 import { PIC_META } from './meta'
 import { CouplingHeat } from './plots'
+import { PicAlignGeometry } from './PicAlignGeometry'
 import { ALG_OPTIONS, DELTA_OPTIONS, FIG_SUMMARY, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, compareLine, fill, taskItems, verdictOf } from './picAlignData'
 import { DEFAULT_ALIGN, PEAK_X, PEAK_Y, analyseAlign, type AlignState } from './picAlignModel'
 import './pic.css'
@@ -26,6 +27,7 @@ const round = (value: number, digits: number) => {
 export function PicAlignPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [state, setState] = useState<AlignState>(DEFAULT_ALIGN)
+  const [geometryReset, setGeometryReset] = useState(0)
   const analysis = useMemo(() => analyseAlign(state), [state])
   const verdict = verdictOf(state, analysis)
   const run = analysis.runs[state.alg]
@@ -43,7 +45,10 @@ export function PicAlignPage({ moduleId, onModuleChange }: Props) {
       asideLater={t(S.asideLater)}
       nextId={'picCutback' as ModuleId}
       nextLabel={t(S.next)}
-      extra={<TaskList items={taskItems(state, analysis)} onReset={() => setState(DEFAULT_ALIGN)} />}
+      extra={<TaskList items={taskItems(state, analysis)} onReset={() => {
+        setState(DEFAULT_ALIGN)
+        setGeometryReset((count) => count + 1)
+      }} />}
     >
       <Section title={t(S.introTitle)}>
         <RefParas paras={INTRO} onOpen={onModuleChange} />
@@ -82,6 +87,7 @@ export function PicAlignPage({ moduleId, onModuleChange }: Props) {
           <Knob label={S.moveLabel} value={state.moveS} unit="s" min={0.05} max={1} step={0.05} onChange={(moveS) => update({ moveS: round(moveS, 2) })} />
         </div>
 
+        <PicAlignGeometry key={geometryReset} w={state.wUm} example={state.deltaW === 'on'} />
         <div className="hs-grid">
           <CouplingHeat
             xs={analysis.heatX}

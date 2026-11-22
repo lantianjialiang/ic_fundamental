@@ -4,6 +4,9 @@ import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
 import { Cards, Knob, Readout, Seg } from '../fund/parts'
 import { allPairsIsolation, fixtureBreakEven, flyingProbeTimeS } from './core'
+import { CostCrossover, DefectCircuit } from './ProcessDiagrams'
+import { Formula, ScaleBars } from './FlowVisuals'
+import { IsolationDiagram } from './IsolationDiagram'
 import { MFG_META } from './meta'
 import { After, COMMON, Drill, PackLesson, near, useSticky } from './shell'
 
@@ -66,6 +69,7 @@ export function MfgFlyingPage({ moduleId, onModuleChange }: { moduleId: ModuleId
   const { t } = useLocale()
   const [stratId, setStratId] = useState(STRATS[0].id)
   const [defId, setDefId] = useState(DEFECTS[0].id)
+  const [resetId, setResetId] = useState(0)
   const [nets, setNets] = useState(2000)
   const [points, setPoints] = useState(8000)
   const [move, setMove] = useState(0.2)
@@ -109,6 +113,7 @@ export function MfgFlyingPage({ moduleId, onModuleChange }: { moduleId: ModuleId
         { id: 't4', text: taskNear, done: nearHit.hit },
       ]}
       onReset={() => {
+        setResetId((id) => id + 1)
         setStratId(STRATS[0].id)
         setDefId(DEFECTS[0].id)
         setNets(2000)
@@ -125,7 +130,8 @@ export function MfgFlyingPage({ moduleId, onModuleChange }: { moduleId: ModuleId
         <div className="mfg-lab">
           <p>{t(loc('基板电气测试抓三类问题。点一类，读它在测通还是测不通。', 'Electrical test of a substrate catches three problems. Click one and read whether it checks continuity or isolation.'))}</p>
           <Cards items={DEFECTS} activeId={defId} cols={3} onPick={(item) => setDefId(item.id)} />
-          <p>{t(defect.text)}</p>
+          <DefectCircuit defect={defId} caption={defect.text} />
+          <IsolationDiagram key={resetId} strategy={stratId} onStrategyChange={setStratId} />
           <p>{t(strat.text)}</p>
           <p>{t(loc('飞针没有治具的一次性费用，针逐点走。时间 = 测试点数 × 每次移动 ÷ 针数。这一课把机时按 0.01 / 秒摊到每一块板，治具做完后单颗按 0.15 计，都是示意。', 'Flying probe has no fixture NRE; the needles walk point by point. Time = points × move time ÷ probes. This lesson charges machine time at 0.01 per second onto each board, and a finished fixture at 0.15 per unit. Both are illustrations.'))}</p>
           <p>{t(loc('治具盈亏平衡产量 = 治具 NRE ÷ (飞针单颗 − 治具单颗)。产量低于它，飞针更便宜；高于它，治具把一次性费用摊薄了。', 'Fixture break-even volume = fixture NRE ÷ (flying-probe unit − fixture unit). Below it, flying probe is cheaper; above it, the fixture has amortized its one-time cost.'))}</p>
@@ -136,7 +142,16 @@ export function MfgFlyingPage({ moduleId, onModuleChange }: { moduleId: ModuleId
           <Drill n={1} title={taskPairs}>
             <Seg options={STRATS.map((item) => ({ id: item.id, label: item.title }))} value={stratId} onChange={setStratId} />
             <Knob label={loc('网络数', 'Nets')} value={nets} unit="" min={1000} max={5000} step={1000} onChange={setNets} />
-            <Readout items={[{ label: loc('你算出的测试对数', 'Pairs you got'), value: pairs.toFixed(0) }]} />
+            <Formula
+              rule="N_all = N(N − 1) / 2"
+              value={stratId === "all" ? `${nets} × ${nets - 1} / 2 = ${pairs.toLocaleString()}` : `4 × ${nets} = ${pairs.toLocaleString()}`}
+              note={loc("全对先为每个网络配 N−1 个对手，然后除 2 避免 A–B 和 B–A 重复。相邻模式用每网约 4 个唯一候选对作教学近似。", "For all pairs, each net has N−1 partners. Divide by two because A–B and B–A are the same pair. Neighbor mode estimates four unique candidate pairs per net.")}
+            >
+              <ScaleBars max={allPairsIsolation(nets)} items={[
+                { title: loc('全对绝缘', 'All pairs'), value: allPairsIsolation(nets), display: allPairsIsolation(nets).toLocaleString() },
+                { title: loc('相邻候选', 'Nearby candidates'), value: nets * 4, display: (nets * 4).toLocaleString() },
+              ]} />
+            </Formula>
             <After show={pairHit.hit} text={loc('5000×4999/2 = 12,497,500 对。全对在工程上测不完，所以量产常改测相邻网络。', '5000×4999/2 = 12,497,500 pairs. All-pairs cannot be finished in production, so volume test usually switches to neighboring nets.')} />
           </Drill>
           <Drill n={2} title={taskTime}>
@@ -145,12 +160,23 @@ export function MfgFlyingPage({ moduleId, onModuleChange }: { moduleId: ModuleId
               <Knob label={loc('每次移动', 'Move time')} value={move} unit="s" min={0.1} max={0.3} step={0.1} onChange={setMove} />
               <Knob label={loc('飞针数', 'Probes')} value={probes} unit="" min={2} max={4} step={1} onChange={setProbes} />
             </div>
-            <Readout items={[{ label: loc('你算出的飞针时间', 'Flying-probe time you got'), value: `${time.toFixed(1)} s` }]} />
+            <Formula
+              rule="T ≈ N_point × t_move / M"
+              value={`${points.toLocaleString()} × ${move} s / ${probes} = ${time.toFixed(1)} s`}
+              note={loc("M 是可同时工作的针数。示意把点数平均分给各针；真实机器还受路线、读数停留和可同时接触的点限制。", "M counts concurrent probes. The model spreads work evenly. Real machines also depend on routing, measurement dwell and which points can be contacted together.")}
+            />
             <After show={timeHit.hit} text={loc('(20000 × 0.1) / 4 = 500 秒。针数翻倍，时间减半，因为几根针同时在走。', '(20,000 × 0.1) / 4 = 500 seconds. Twice the probes halves the time, because several needles move at once.')} />
           </Drill>
           <Drill n={3} title={taskBe}>
             <Knob label={loc('治具 NRE', 'Fixture NRE')} value={nre} unit="" min={10000} max={40000} step={5000} onChange={setNre} />
-            <Readout items={[{ label: loc('你算出的盈亏平衡产量', 'Break-even volume you got'), value: Number.isFinite(be) ? be.toFixed(0) : '—' }]} />
+            <Formula
+              rule="Q* = F_fixture / (v_flying − v_fixture)"
+              value={be > 0 && Number.isFinite(be) ? `${nre} / (${flyUnit.toFixed(2)} − 0.15) ≈ ${be.toFixed(0)}` : t(loc("无正产量交点", "No positive crossover"))}
+              note={loc("飞针可变成本用秒数乘 0.01，治具可变成本设为 0.15。两者的单颗可变成本差用于收回治具固定费用。", "Flying-probe variable cost is seconds × 0.01. Fixture variable cost is 0.15. Savings per unit pay back the fixture's fixed cost.")}
+            >
+              <CostCrossover first={{ title: loc('飞针', 'Flying probe'), fixed: 0, variable: flyUnit }}
+                second={{ title: loc('治具', 'Fixture'), fixed: nre, variable: 0.15 }} crossover={be} />
+            </Formula>
             <After show={beHit.hit} text={loc('500 秒 × 0.01 = 5，是飞针摊到每一块的钱。30000 / (5 − 0.15) ≈ 6186 块。不到这个量，花时间飞针更划算；超过它，先做治具更划算。', '500 seconds × 0.01 = 5, the flying-probe money on each board. 30000 / (5 − 0.15) ≈ 6186 boards. Below that, spending time on the flying probe costs less; above it, building the fixture costs less.')} />
           </Drill>
           <Drill n={4} title={taskNear}>

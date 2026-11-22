@@ -15,7 +15,7 @@ export function Cards<T extends Card>({
   onPick,
   cols = 3,
 }: {
-  items: T[]
+  items: readonly T[]
   activeId?: string
   onPick: (item: T) => void
   cols?: 2 | 3 | 4
@@ -28,6 +28,7 @@ export function Cards<T extends Card>({
           key={item.id}
           type="button"
           className={`pick__card${activeId === item.id ? ' is-active' : ''}`}
+          aria-pressed={activeId === undefined ? undefined : activeId === item.id}
           onClick={() => onPick(item)}
         >
           {t(item.title)}
@@ -55,7 +56,7 @@ export function Seg<T extends string>({
   value,
   onChange,
 }: {
-  options: Array<{ id: T; label: Text }>
+  options: readonly { id: T; label: Text }[]
   value: T
   onChange: (id: T) => void
 }) {
@@ -67,6 +68,7 @@ export function Seg<T extends string>({
           key={option.id}
           type="button"
           className={value === option.id ? 'is-active' : ''}
+          aria-pressed={value === option.id}
           onClick={() => onChange(option.id)}
         >
           {t(option.label)}

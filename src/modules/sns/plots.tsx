@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { type DefectKind } from './core/sensor.ts'
+import { type Rect } from './core/frames'
 
 const BG = '#0d1117'
 const BOX = '#161b22'
@@ -15,6 +16,8 @@ export function FrameView({
   w,
   mode,
   hot,
+  roi,
+  scale,
   aria,
   summary,
 }: {
@@ -22,6 +25,8 @@ export function FrameView({
   w: number
   mode: 'gray' | 'heat'
   hot?: number[]
+  roi?: Rect
+  scale?: readonly [number, number]
   aria: string
   summary: string
 }) {
@@ -40,10 +45,12 @@ export function FrameView({
       if (frame[i] < lo) lo = frame[i]
       if (frame[i] > hi) hi = frame[i]
     }
-    const span = Math.max(hi - lo, 1e-6)
+    const low = scale?.[0] ?? lo
+    const high = scale?.[1] ?? hi
+    const span = Math.max(high - low, 1e-6)
     const image = ctx.createImageData(w, h)
     for (let i = 0; i < frame.length; i += 1) {
-      const t = (frame[i] - lo) / span
+      const t = Math.max(0, Math.min(1, (frame[i] - low) / span))
       const o = i * 4
       if (mode === 'gray') {
         const g = Math.round(t * 255)
@@ -66,11 +73,19 @@ export function FrameView({
         ctx.strokeRect(i % w, (i / w) | 0, 1, 1)
       }
     }
-  }, [frame, w, h, mode, hot])
+  }, [frame, w, h, mode, hot, scale])
+
+  const image = <canvas ref={ref} className="sns-canvas" role="img" aria-label={aria} />
 
   return (
     <figure className="sns-fig">
-      <canvas ref={ref} className="sns-canvas" role="img" aria-label={aria} />
+      {roi ? <div className="sns-frame-overlay">
+        {image}
+        <span aria-hidden="true" className="sns-frame-roi" style={{
+          left: `${(100 * roi.x) / w}%`, top: `${(100 * roi.y) / h}%`,
+          width: `${(100 * roi.w) / w}%`, height: `${(100 * roi.h) / h}%`,
+        }} />
+      </div> : image}
       <p className="sns-summary">{summary}</p>
     </figure>
   )
@@ -84,6 +99,7 @@ export function PtcPlot({
   summary,
   xLabel,
   yLabel,
+  selected,
 }: {
   points: Array<{ mean: number; variance: number }>
   slope: number
@@ -92,6 +108,7 @@ export function PtcPlot({
   summary: string
   xLabel: string
   yLabel: string
+  selected?: number
 }) {
   const W = 560
   const H = 280
@@ -107,22 +124,26 @@ export function PtcPlot({
   const y1 = Math.max(...ys, 1)
   const xOf = (v: number) => L + ((v - x0) / (x1 - x0 || 1)) * (W - L - R)
   const yOf = (v: number) => T + (1 - (v - y0) / (y1 - y0 || 1)) * (H - T - B)
-  const fit = [x0, x1].map((x) => {
+  const fit = Array.from({ length: 41 }, (_, index) => {
+    const x = x0 + (x1 - x0) * index / 40
     const mean = 10 ** x
     const variance = Math.max(slope * mean + intercept, 1e-4)
-    return `${xOf(x).toFixed(1)},${yOf(Math.log10(variance)).toFixed(1)}`
-  })
-  const fitLine = fit.join(' ')
+    return [xOf(x), yOf(Math.log10(variance))]
+  }).filter(([, y]) => y >= T && y <= H - B)
+  const fitLine = fit.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ')
+  const active = selected === undefined || !points[selected] ? undefined : { x: xOf(xs[selected]), y: yOf(ys[selected]) }
 
   return (
     <figure className="sns-fig">
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={aria} className="sns-svg">
         <rect width={W} height={H} rx={10} fill={BG} />
         <rect x={L} y={T} width={W - L - R} height={H - T - B} fill={BOX} stroke={EDGE} />
+        {active && <path d={`M${L} ${active.y} H${active.x} V${H - B}`} stroke={MUTED} strokeDasharray="4 4" fill="none" />}
         <polyline fill="none" stroke={GOLD} strokeWidth={1.6} points={fitLine} />
         {points.map((p, index) => (
           <circle key={index} cx={xOf(Math.log10(Math.max(p.mean, 0.1)))} cy={yOf(Math.log10(Math.max(p.variance, 1e-4)))} r={3.2} fill={BLUE} />
         ))}
+        {active && <circle data-selected-point={selected} cx={active.x} cy={active.y} r="7" fill={BG} stroke="#64ebc2" strokeWidth="3" />}
         <text x={12} y={16} fill={TEXT} fontSize={11}>
           {yLabel}
         </text>

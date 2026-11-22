@@ -328,3 +328,25 @@ button.prep-matrix__row.is-active {
 .prep-table td b {
   color: var(--gold);
 }
+.prep-role-chain {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+  gap: .65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.prep-role-chain li {
+  display: grid;
+  justify-items: center;
+  gap: .3rem;
+  padding: .55rem .3rem;
+  text-align: center;
+  background: var(--well);
+  border: 1px solid var(--line-2);
+  border-radius: .65rem;
+}
+.prep-role-chain li[data-cover='2'] { border-color: var(--blue); background: var(--blue-bg); }
+.prep-role-chain li[data-cover='1'] { border-color: var(--gold-line); border-style: dashed; }
+.prep-role-chain svg { width: 3rem; height: auto; }
+.prep-role-chain span { color: var(--text-2); font-size: .8rem; }

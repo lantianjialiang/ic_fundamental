@@ -135,7 +135,9 @@ export const VOX_DIAG = {
   wrongVoh: loc('读到负电压：输出其实是低电平，PMU 往外抽电流，把引脚拉到地以下。这不是驱动弱，是输出状态错了——先查预处理向量。', 'Negative reading: the output is actually low, and the PMU pulling current out drags the pin below ground. This is not weak drive - the output state is wrong. Check the preconditioning vectors first.'),
 }
 
-export const IDD_KINDS: Card[] = [
+export type IddKind = 'gross' | 'static' | 'iddq' | 'dynamic'
+
+export const IDD_KINDS: (Card & { id: IddKind })[] = [
   {
     id: 'gross',
     title: loc('Gross IDD', 'Gross IDD'),
@@ -198,7 +200,7 @@ export const IN_METHODS: Array<{ id: InMethod; label: LText; text: LText }> = [
   {
     id: 'gang',
     label: loc('并联（Ganged）', 'Ganged'),
-    text: loc('所有输入脚并在一起接到一个 PMU，量一次总电流。极限仍用单脚的 10 µA：总和都没超，每只脚自然也没超，一次全判 PASS。超了就改用串行法逐脚复测，找出是哪只脚。良品最快；只适合高阻 CMOS 输入，带上拉 / 下拉的脚不能并联测。', 'All inputs are tied together to one PMU and the total current is measured once. The limit is still the single-pin 10 µA: if the sum is under it, so is every pin, and all pass at once. If it is exceeded, retest serially pin by pin to find which one. Fastest for good parts; only suitable for high-impedance CMOS inputs, and pins with pull-ups / pull-downs cannot be ganged.'),
+    text: loc('把高阻输入并到一台 PMU 上，先用单脚的 10 µA 限值筛查总电流。本例假设各脚电流同向，因此总和没超，单脚也没超。总和超限只触发逐脚复测。实测若电流可能相消，或有内部上下拉，应逐脚测。', 'Tie high-impedance inputs to one PMU and screen their total against the 10 µA per-pin limit. In this example all currents have the same direction, so if the sum stays within the limit, each pin does too. An excess triggers individual retest. Test pins separately if currents can cancel or internal pulls are present.'),
   },
 ]
 

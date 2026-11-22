@@ -118,8 +118,8 @@ export const S = {
   introTitle: loc('为什么把光引擎挪到交换芯片旁边', 'Why the optical engine moves next to the switch'),
   coreTitle: loc('点一块：它做什么，在哪一级测', 'Pick a block: what it does, and where it is tested'),
   coreNote: loc(
-    '从左到右是交换 ASIC、光引擎（PIC+EIC）、外置激光源 ELS、光纤阵列 FAU。点一块，右边写出它的职责和测试阶段。能耗用功率除以比特率。',
-    'Left to right: the switch ASIC, the optical engine (PIC+EIC), the external laser ELS, and the fiber array FAU. Pick a block to read its job and the test stage. Energy uses power divided by bit rate.',
+    '选一块查看职责和测试阶段。下方八个角色的路径图可跟踪信号从交换 ASIC 走到光纤。每比特能量用功率除以比特率。',
+    'Pick a block to review its job and test stage. In the eight-role diagram below, follow the signal from the switch ASIC to the fiber. Energy per bit is power divided by bit rate.',
   ),
   powerLabel: loc('光引擎电功率', 'Optical-engine electrical power'),
   rateLabel: loc('总速率', 'Aggregate rate'),
@@ -173,9 +173,6 @@ export const S = {
     '电通道变短能降低均衡功耗，是因为损耗随速率增大，短通道留下的损耗更小，均衡器要补的也更少。当前 {p} W、{r} Tbps 对应 {pj} pJ/bit，因为每比特能量 = 功率 / 比特率。',
     'A shorter electrical channel cuts equalizer power because loss grows with rate, so a short channel leaves less loss and the equalizer has less to undo. At {p} W and {r} Tbps the energy is {pj} pJ/bit, because energy per bit = power / bit rate.',
   ),
-  figAria: loc('共封装光学的四个方块，当前选中 {name}', 'Four co-packaged-optics blocks, selected: {name}'),
-  figSelected: loc('当前选中：{name}。方块的描边表示选中，名称写在方块里。', 'Selected: {name}. The outline marks the selection; the name is written in the block.'),
-  hitAria: loc('选择{name}', 'Select {name}'),
 }
 
 export const INTRO = [

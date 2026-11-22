@@ -21,3 +21,7 @@
   gap: 8px;
   margin-bottom: 12px;
 }
+.pic-route { margin-block: .75rem; display: grid; gap: .55rem; max-width: 46rem; }
+.pic-route-legend { display: flex; flex-wrap: wrap; gap: .4rem .8rem; margin: 0; padding: 0; list-style: none; color: var(--text-2); font-size: .85rem; }
+.pic-route-legend li { border-inline-start: .25rem solid; padding-inline-start: .35rem; }
+.pic-coupler-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: .6rem; }

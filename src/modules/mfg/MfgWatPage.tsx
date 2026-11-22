@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
-import { Cards, Knob, Readout, Seg } from '../fund/parts'
+import { Knob, Readout, Seg } from '../fund/parts'
 import { controlLimits, cpk, sheetResistance4pt, viaChainResistance } from './core'
-import { ControlPlot } from './figs'
+import { FourPointProbe, Plot, SeriesLinks } from './ProcessDiagrams'
+import { Formula, ScaleBars } from './FlowVisuals'
+import { WatStructureCompare } from './TestSetupVisuals'
 import { MFG_META } from './meta'
 import { After, COMMON, Drill, PackLesson, near, useSticky } from './shell'
 
@@ -75,6 +77,7 @@ export function MfgWatPage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
   const [rVia, setRVia] = useState(2)
   const [mean, setMean] = useState(0.52)
   const [sigma, setSigma] = useState(0.02)
+  const [sample, setSample] = useState(0)
   const [drift, setDrift] = useState(false)
   const param = PARAMS.find((item) => item.id === paramId) ?? PARAMS[0]
   const site = SITES.find((item) => item.id === siteId) ?? SITES[0]
@@ -128,6 +131,7 @@ export function MfgWatPage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
         setMean(0.52)
         setSigma(0.02)
         setDrift(false)
+        setSample(0)
         rsHit.reset()
         viaHit.reset()
         cpkHit.reset()
@@ -137,8 +141,7 @@ export function MfgWatPage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
       learn={
         <div className="mfg-lab">
           <p>{t(loc('WAT 看的是工艺，不是产品功能。点一项，读它在测什么。', 'WAT watches the process, not product function. Click one and read what it measures.'))}</p>
-          <Cards items={PARAMS} activeId={paramId} cols={3} onPick={(item) => setParamId(item.id)} />
-          <p>{t(param.text)}</p>
+          <WatStructureCompare items={PARAMS} value={paramId} onPick={setParamId} />
           <p>{t(loc('四探针把电流打进薄层，量另外两针的电压。薄层电阻 Rs = (π / ln 2) × V / I。π/ln2 约是 4.53，所以 Rs 不是 V/I 本身。', 'A four-point probe forces current into the film and measures voltage on the other two needles. Sheet resistance Rs = (π / ln 2) × V / I. π/ln2 is about 4.53, so Rs is not V/I itself.'))}</p>
           <p>{t(loc('通孔链把很多通孔串起来。链电阻 = 个数 × 单孔电阻。链太长是为了把很小的单孔电阻放大到好测的范围，也用来抓开路。', 'A via chain strings many vias together. Chain resistance = count × one-via resistance. The long chain amplifies a tiny via resistance into something easy to measure, and it catches opens.'))}</p>
           <p>{t(loc('规格是 0.45–0.55 V。Cpk = min(上限−均值, 均值−下限) / (3σ)。σ 越小、均值越靠近中间，Cpk 越大，工艺离规格边越远。', 'The spec is 0.45–0.55 V. Cpk = min(upper−mean, mean−lower) / (3σ). A smaller σ and a mean nearer the center make Cpk larger, so the process sits farther from the spec edge.'))}</p>
@@ -152,7 +155,12 @@ export function MfgWatPage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
               <Knob label={loc('V', 'V')} value={vMv} unit="mV" min={1} max={5} step={1} onChange={setVMv} />
               <Knob label={loc('I', 'I')} value={iMa} unit="mA" min={1} max={5} step={1} onChange={setIMa} />
             </div>
-            <Readout items={[{ label: loc('你算出的 Rs', 'Rs you got'), value: `${rs.toFixed(3)} Ω/sq` }]} />
+            <FourPointProbe voltage={vMv} current={iMa} />
+            <Formula
+              rule="Rₛ = (π / ln 2) × V / I"
+              value={`4.532 × ${vMv} mV / ${iMa} mA ≈ ${rs.toFixed(3)} Ω/□`}
+              note={loc("mV 和 mA 的千分因子相消。Ω/□ 描述薄膜正方形两对边之间的片电阻。", "The milli prefixes cancel. Ω/□ describes resistance between opposite edges of a square of film.")}
+            />
             <After show={rsHit.hit} text={loc('1 mV / 1 mA 再乘 π/ln2，得到约 4.532 Ω/sq。若只做 V/I，会得到 1 Ω/sq，那漏掉了薄层的几何系数。', '1 mV / 1 mA times π/ln2 is about 4.532 Ω/sq. V/I alone would give 1 Ω/sq and would miss the sheet geometry factor.')} />
           </Drill>
           <Drill n={2} title={taskVia}>
@@ -160,7 +168,7 @@ export function MfgWatPage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
               <Knob label={loc('通孔数', 'Via count')} value={nVia} unit="" min={1000} max={10000} step={1000} onChange={setNVia} />
               <Knob label={loc('单孔电阻', 'R via')} value={rVia} unit="Ω" min={1} max={5} step={1} onChange={setRVia} />
             </div>
-            <Readout items={[{ label: loc('你算出的链电阻', 'Chain resistance you got'), value: `${chain.toFixed(0)} Ω` }]} />
+            <Formula rule="R_chain = N × R_via" value={`${nVia.toLocaleString()} × ${rVia} Ω = ${chain.toLocaleString()} Ω`} note={loc("示例忽略连线电阻，并假设各孔等阻串联。多个孔串联可放大单孔阻值偏移。", "The model omits routing resistance and assumes identical vias in series. A long chain amplifies changes in individual via resistance.")}><SeriesLinks count={nVia} label={loc('A 到 B 串联通孔，省略号代表中间的大量通孔', 'Vias in series from A to B, with more vias omitted')} /></Formula>
             <After show={viaHit.hit} text={loc('10000 × 2 Ω = 20 kΩ。单孔只有 2 Ω，直接测很容易被引线电阻淹没，串成链之后开路或偏高才会明显。', '10,000 × 2 Ω = 20 kΩ. A single 2 Ω via is easy to hide under lead resistance; in a chain, an open or a high via stands out.')} />
           </Drill>
           <Drill n={3} title={taskCpk}>
@@ -168,11 +176,24 @@ export function MfgWatPage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
               <Knob label={loc('Vth 均值', 'Vth mean')} value={mean} unit="V" min={0.46} max={0.54} step={0.01} onChange={setMean} />
               <Knob label={loc('σ', 'σ')} value={sigma} unit="V" min={0.01} max={0.04} step={0.01} onChange={setSigma} />
             </div>
-            <Readout items={[{ label: loc('你算出的 Cpk', 'Cpk you got'), value: cpkNow.toFixed(3) }]} />
+            <Formula
+              rule="Cpk = min(USL − μ, μ − LSL) / (3σ)"
+              value={`min(${(0.55 - mean).toFixed(2)}, ${(mean - 0.45).toFixed(2)}) / ${(3 * sigma).toFixed(2)} = ${cpkNow.toFixed(3)}`}
+              note={loc("μ 是均值，σ 是标准差，上下规格分别为 0.55、0.45 V。较近的规格边限制 Cpk；规格来自要求，控制限来自过程。", "μ is the mean and σ is the standard deviation. Specs are 0.55 and 0.45 V. The nearer spec limits Cpk. Specs come from requirements, while control limits come from the process.")}
+            >
+              <ScaleBars max={0.12} items={[
+                { title: loc('距规格上限（V）', 'Distance to USL (V)'), value: 0.55 - mean },
+                { title: loc('距规格下限（V）', 'Distance to LSL (V)'), value: mean - 0.45 },
+                { title: loc('过程波动 3σ（V）', 'Process variation 3σ (V)'), value: 3 * sigma },
+              ]} />
+            </Formula>
             <After show={cpkHit.hit} text={loc('均值在 0.50，离两边各 0.05 V，除以 3×0.01，Cpk = 1.667。均值一偏，就改用更近的那一边，所以 Cpk 取两边里更小的。', 'The mean is 0.50, 0.05 V from each side. Divide by 3×0.01 and Cpk is 1.667. If the mean shifts, use the nearer side, so Cpk takes the smaller of the two.')} />
           </Drill>
           <Drill n={4} title={taskDrift}>
-            <ControlPlot points={points} mean={0.5} lcl={limits.lcl} ucl={limits.ucl} />
+            <Plot title={loc('批次均值控制图', 'Lot mean control chart')} points={points}
+              labels={points.map((_, i) => t(loc(`批次 ${i + 1}`, `Lot ${i + 1}`)))} selected={sample} onPick={setSample} min={0.465} max={0.535} unit="V"
+              guides={[{ label: 'LCL', value: limits.lcl, alert: true }, { label: 'CL', value: 0.5 }, { label: 'UCL', value: limits.ucl, alert: true }]}
+              caption={loc('拖动游标读单批均值。红点是越界信号，提示调查工艺变化。', 'Drag the cursor to read one lot. A red point is an out-of-control signal to investigate.')} />
             <label>
               <input type="checkbox" checked={drift} onChange={(event) => setDrift(event.target.checked)} />
               {t(loc('注入渐变漂移', 'Inject a drift'))}
@@ -182,8 +203,15 @@ export function MfgWatPage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
           </Drill>
           <Drill n={5} title={taskSites}>
             <Seg options={SITES.map((item) => ({ id: item.id, label: item.title }))} value={siteId} onChange={setSiteId} />
-            <ControlPlot points={points} mean={0.5} lcl={limits.lcl} ucl={limits.ucl} />
-            <Readout items={[{ label: loc('当前控制限半宽', 'Current limit half-width'), value: ((limits.ucl - limits.lcl) / 2).toFixed(4) }]} />
+            <Plot title={loc('批次均值控制图', 'Lot mean control chart')} points={points}
+              labels={points.map((_, i) => t(loc(`批次 ${i + 1}`, `Lot ${i + 1}`)))} selected={sample} onPick={setSample} min={0.465} max={0.535} unit="V"
+              guides={[{ label: 'LCL', value: limits.lcl, alert: true }, { label: 'CL', value: 0.5 }, { label: 'UCL', value: limits.ucl, alert: true }]}
+              caption={loc('拖动游标读单批均值。红点是越界信号，提示调查工艺变化。', 'Drag the cursor to read one lot. A red point is an out-of-control signal to investigate.')} />
+            <Formula
+              rule="UCL / LCL = μ₀ ± 3σ / √n"
+              value={`0.500 ± 3 × 0.010 / √${site.n} = ${limits.lcl.toFixed(4)}–${limits.ucl.toFixed(4)} V`}
+              note={loc("示例比较 n 个独立测点的均值。n 增大时均值的标准差按 √n 缩小。", "This model averages n independent sites. The standard deviation of the mean falls by √n.")}
+            />
             <After show={siteHit.hit} text={loc('限宽正比于 1/√n。从 5 点改到 9 点，√n 变大，同一套 σ 下控制限更窄，均值的小偏移更容易被看见。', 'Limit width scales as 1/√n. Going from 5 sites to 9 increases √n, so the same σ draws a narrower limit and a small shift in the mean is easier to see.')} />
           </Drill>
         </div>

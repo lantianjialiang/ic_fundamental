@@ -26,6 +26,7 @@ import { type Seg as WaveSeg } from './data/func'
 import { Callout, Cards, Explain, Readout, Seg, type Note } from './parts'
 import { SramTimingFig } from './SramTimingFig'
 import { WaveRows } from './WaveRows'
+import { AcTimingLab } from './AcTimingLab'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
@@ -178,6 +179,7 @@ export function FundAcPage({ moduleId, onModuleChange }: Props) {
             </p>
           </Callout>
         ) : null}
+        {paramItem && <AcTimingLab key={paramItem.id} param={paramItem.id} />}
       </Section>
 
       <Section title={t(S.searchTitle)} note={t(SEARCH_LEAD)}>

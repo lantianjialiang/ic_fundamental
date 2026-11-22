@@ -1,0 +1,85 @@
+.fab-figure {
+  --fab-teal: #54cbbb;
+  --fab-amber: #d99753;
+  --fab-stage: #111d2b;
+  display: grid;
+  gap: 0.85rem;
+  min-width: 0;
+  margin: 0;
+  padding: clamp(0.75rem, 2vw, 1.25rem);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+}
+
+.fab-figure h4 { margin: 0; color: var(--text); font-size: 1.05rem; }
+.fab-figure figcaption, .fab-figure p { margin: 0; color: var(--text-2); line-height: 1.65; }
+.fab-choices { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.fab-choices button {
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.fab-choices button[aria-pressed='true'] {
+  border-color: var(--blue);
+  background: var(--blue-bg);
+  color: var(--blue);
+  font-weight: 700;
+}
+.fab-choices button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+.fab-cut {
+  position: relative;
+  height: clamp(9.5rem, 28vw, 15rem);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #172a3f, var(--fab-stage));
+}
+.fab-cut--short { height: clamp(6.5rem, 23vw, 10rem); }
+.fab-block { position: absolute; border-radius: 2px; }
+.fab-ions { position: absolute; inset: 14% 36% auto; text-align: center; color: #92f1de; font-weight: 700; }
+.fab-relief { position: absolute; inset: 26% 23% 50%; border: 2px dashed #d1eaf7; border-bottom: 0; border-radius: 5px 5px 0 0; }
+.fab-muted .fab-block { opacity: 0.4; }
+.fab-silicon { background: #6488ae; }
+.fab-oxide { background: #2b4058; }
+.fab-device, .fab-full { background: var(--fab-teal); }
+.fab-contact { background: #e7c07b; }
+.fab-metal { background: #87a9ff; }
+.fab-film { background: #6dc7e7; }
+.fab-resist { background: #c499f5; }
+.fab-partial { background: var(--fab-amber); }
+.fab-rim { background: #52382f; }
+.fab-legend { display: flex; flex-wrap: wrap; gap: 0.35rem 0.9rem; margin: 0; padding: 0; list-style: none; color: var(--text-2); font-size: 0.85rem; }
+.fab-legend li { display: flex; gap: 0.35rem; align-items: center; }
+.fab-legend i { flex: 0 0 auto; width: 0.7rem; height: 0.7rem; border-radius: 2px; border: 1px solid var(--line); }
+.fab-split { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); align-items: start; gap: 1rem; }
+.fab-split > div { display: grid; gap: 0.55rem; }
+.fab-wafer { display: block; width: 100%; max-width: 24rem; height: auto; border-radius: 10px; background: var(--fab-stage); }
+.fab-pitch { display: grid; width: 5rem; overflow: hidden; border: 1px solid var(--fab-teal); border-radius: 5px; background: var(--fab-stage); }
+.fab-pitch > span { display: grid; place-items: center; background: #357c79; color: #fff; font: 0.8rem var(--mono); }
+.fab-pitch-gap { margin: 0 0.4rem 0.4rem 0; border-right: 1px dashed #ffd286; border-bottom: 1px dashed #ffd286; }
+.fab-equation { display: grid; gap: 0.65rem; min-width: 0; padding: 0.85rem; border: 1px solid var(--line); border-radius: 10px; }
+.fab-line { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.25rem 0.75rem; font-family: var(--mono); }
+.fab-line b { color: var(--text); }
+.fab-line span { color: var(--blue); font-weight: 700; }
+.fab-yield-track, .fab-ruler { height: 1.1rem; border-radius: 4px; overflow: hidden; background: var(--fab-amber); }
+.fab-yield-track span, .fab-ruler span { display: block; height: 100%; background: var(--fab-teal); }
+.fab-ruler { position: relative; background: var(--fab-stage); }
+.fab-ruler::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(#a9c5da, #a9c5da) 25% / 1px 100% no-repeat,
+    linear-gradient(#a9c5da, #a9c5da) 50% / 1px 100% no-repeat,
+    linear-gradient(#a9c5da, #a9c5da) 75% / 1px 100% no-repeat;
+  content: '';
+}
+.fab-ruler-labels { position: relative; display: flex; justify-content: space-between; color: var(--text-2); font: 0.8rem var(--mono); }
+.fab-ruler-labels span:nth-child(2), .fab-ruler-labels span:nth-child(3), .fab-ruler-labels span:nth-child(4) { position: absolute; transform: translateX(-50%); }
+.fab-ruler-labels span:nth-child(2) { left: 25%; }
+.fab-ruler-labels span:nth-child(3) { left: 50%; }
+.fab-ruler-labels span:nth-child(4) { left: 75%; }
+.fab-ruler--reference span { background: #87a9ff; }
+.mfg-lab.fab-practice .knobs { grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }

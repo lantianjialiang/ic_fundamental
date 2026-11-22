@@ -4,25 +4,27 @@ import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
 import { Cards, Knob, Readout } from '../fund/parts'
 import { poissonYield, siliconPerGoodMm2 } from './core'
-import { PackageCut, YieldBars } from '../mfg/figs'
+import { YieldBars } from '../mfg/figs'
+import { DiagramChoices } from '../mfg/FlowVisuals'
 import { After, COMMON, Drill, PackLesson, near, useSticky } from '../mfg/shell'
 import { APK_META } from './meta'
+import { ApkArchitecture, type Architecture } from './ApkArchitecture'
 
 const KINDS = [
   { id: 'd2', title: loc('2D', '2D'), text: loc('引线键合或倒装，die 躺在基板上。', 'Wire-bond or flip-chip; the die sits on the substrate.') },
   { id: 'd25', title: loc('2.5D', '2.5D'), text: loc('中介层把多个 die 并排放在一起，用细线互连。', 'An interposer places several dies side by side with fine wiring.') },
   { id: 'd3', title: loc('3D', '3D'), text: loc('die 竖向堆叠，靠 TSV 或混合键合。', 'Dies stack vertically through TSVs or hybrid bonding.') },
   { id: 'fo', title: loc('扇出 / SiP', 'Fan-out / SiP'), text: loc('RDL 重新布线，或多个功能封进同一壳体。', 'RDL redistributes I/O, or several functions share one shell.') },
-]
+] as const
 
 const PARTS = [
-  { id: 'lid', title: loc('盖板', 'Lid'), y: 18, h: 16, color: '#b0b8c0' },
-  { id: 'die', title: loc('Die / chiplet', 'Die / chiplet'), y: 38, h: 28, color: '#7eb8c9' },
-  { id: 'bump', title: loc('凸点', 'Bumps'), y: 68, h: 12, color: '#f4d27a' },
-  { id: 'intp', title: loc('中介层 / TSV', 'Interposer / TSV'), y: 82, h: 28, color: '#9ec27c' },
-  { id: 'c4', title: loc('C4', 'C4'), y: 112, h: 12, color: '#d8a45a' },
-  { id: 'sub', title: loc('基板', 'Substrate'), y: 126, h: 36, color: '#c4a15a' },
-  { id: 'ball', title: loc('焊球', 'Balls'), y: 164, h: 14, color: '#b0b8c0' },
+  { id: 'lid', title: loc('盖板', 'Lid') },
+  { id: 'die', title: loc('Die / chiplet', 'Die / chiplet') },
+  { id: 'bump', title: loc('凸点', 'Bumps') },
+  { id: 'intp', title: loc('中介层', 'Interposer') },
+  { id: 'c4', title: loc('C4', 'C4') },
+  { id: 'sub', title: loc('基板', 'Substrate') },
+  { id: 'ball', title: loc('焊球', 'Balls') },
 ]
 
 const QUIZ = [
@@ -71,14 +73,13 @@ const QUIZ = [
 
 export function ApkOverviewPage({ moduleId, onModuleChange }: { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }) {
   const { t } = useLocale()
-  const [kindId, setKindId] = useState(KINDS[0].id)
-  const [partId, setPartId] = useState(PARTS[0].id)
+  const [kindId, setKindId] = useState<Architecture>(KINDS[0].id)
+  const [route, setRoute] = useState(true)
   const [quizPart, setQuizPart] = useState('')
   const [d0, setD0] = useState(0.2)
   const [area, setArea] = useState(400)
   const [n, setN] = useState(1)
   const kind = KINDS.find((item) => item.id === kindId) ?? KINDS[0]
-  const part = PARTS.find((item) => item.id === partId) ?? PARTS[0]
   const piece = area / n
   const yMono = poissonYield(d0, area)
   const ySplit = poissonYield(d0, piece)
@@ -107,7 +108,7 @@ export function ApkOverviewPage({ moduleId, onModuleChange }: { moduleId: Module
       ]}
       related={['mfgOverview', 'apkFlow', 'picFlow']}
       kicker={COMMON.kicker}
-      asideTitle={part.title}
+      asideTitle={kind.title}
       asideText={kind.text}
       notice={COMMON.vendor}
       tasks={[
@@ -118,7 +119,7 @@ export function ApkOverviewPage({ moduleId, onModuleChange }: { moduleId: Module
       ]}
       onReset={() => {
         setKindId(KINDS[0].id)
-        setPartId(PARTS[0].id)
+        setRoute(true)
         setQuizPart('')
         setD0(0.2)
         setArea(400)
@@ -132,13 +133,13 @@ export function ApkOverviewPage({ moduleId, onModuleChange }: { moduleId: Module
         <div className="mfg-lab">
           <p>{t(loc('四种摆法。点一种，读 die 是躺在基板上、并排在中介层上，还是竖着叠。', 'Four arrangements. Click one and read whether the die lies on a substrate, sits side by side on an interposer, or stacks vertically.'))}</p>
           <Cards items={KINDS} activeId={kindId} cols={4} onPick={(item) => setKindId(item.id)} />
-          <p>{t(kind.text)}</p>
+          <button type="button" aria-pressed={route} onClick={() => setRoute(!route)}>
+            {t(loc('标出信号路径', 'Highlight signal paths'))}
+          </button>
+          <ApkArchitecture kind={kindId} route={route} />
           <p>{t(loc('光罩一次曝光大约盖住 26×33 mm，也就是 858 mm²。再大就要拼接，或者把一颗大 die 拆成几颗 chiplet。', 'One reticle exposure covers about 26×33 mm, which is 858 mm². Larger than that needs stitching, or the big die has to be split into chiplets.'))}</p>
           <p>{t(loc('良率按 Poisson：Y = exp(−D0 × 面积)。面积用 cm²。800 mm² 是 8 cm²。面积变成四分之一，指数里的乘积也变成四分之一，良率会高很多。前提是每颗都能单独测准。', 'Yield follows Poisson: Y = exp(−D0 × area), with area in cm². 800 mm² is 8 cm². At a quarter of the area the product inside the exponential is also a quarter, so yield is much higher. That only helps if each piece can be tested on its own.'))}</p>
           <p>{t(loc('得到一颗好 die 要消耗的硅 ≈ 面积 / 良率。单片良率低，就要投进更多硅才换来一颗好的。', 'Silicon spent per good die ≈ area / yield. A low monolithic yield means more silicon has to be started to finish one good die.'))}</p>
-          <p>{t(loc('点剖面里的一层，看信号从 die 出去要经过凸点、中介层、C4、基板，最后才是板上的焊球。', 'Click a layer in the cross-section. A signal leaves the die through bumps, the interposer, C4 and the substrate, and only then the board-level balls.'))}</p>
-          <PackageCut parts={PARTS} activeId={partId} onPick={setPartId} />
-          <p>{t(part.title)}</p>
         </div>
       }
       practice={
@@ -166,7 +167,8 @@ export function ApkOverviewPage({ moduleId, onModuleChange }: { moduleId: Module
             <After show={siHit.hit} text={loc('单片约 800/0.449 ≈ 1780 mm² 才换一颗好的。拆开后每颗约 200/0.819，四颗合计约 977 mm²。硅省下来了，封装和测试的账单会在后面几课加回去。', 'The monolithic die spends about 800/0.449 ≈ 1780 mm² per good die. Split, each piece is about 200/0.819, and four of them are about 977 mm². The silicon is saved; package and test bills come back in the later lessons.')} />
           </Drill>
           <Drill n={4} title={taskPart}>
-            <PackageCut parts={PARTS} activeId={quizPart} onPick={setQuizPart} />
+            <DiagramChoices label={loc('定位 2.5D 封装层', 'Locate 2.5D package layers')} items={PARTS} value={quizPart} onPick={setQuizPart} />
+            <ApkArchitecture kind="d25" part={quizPart} />
             <After show={quizPart !== ''} text={quizPart === 'ball'
               ? loc('焊球在最外面，因为它要焊到系统板上。在它里面，die 的信号已经走过凸点、中介层和基板。越往外才发现的缺陷，里面这些都已经做完了。', 'The balls are on the outside because they solder to the system board. Inside them, the die’s signals have already crossed bumps, the interposer and the substrate. A defect found this far out has already paid for all of that.')
               : loc('再看位置。焊球贴着系统板，在剖面的最外一层。凸点、中介层和基板都在它里面。', 'Look at the position again. The balls meet the system board, on the outer layer of the drawing. Bumps, the interposer and the substrate are inside them.')} />

@@ -11,6 +11,7 @@ import '../prep/prep.css'
 import '../hs/hs.css'
 import { PWR_META } from './meta'
 import { RdsErrFig } from './PwrStaticFig'
+import { PwrStaticWiring } from './PwrStaticWiring'
 import {
   COMPLIANCE_LABEL,
   COMPLIANCE_UNIT,
@@ -232,6 +233,7 @@ export function PwrStaticPage({ moduleId, onModuleChange }: Props) {
           ) : null}
         </div>
         {state.param === 'vth' ? <Callout tone="warn">{t(S.vthNote)}</Callout> : null}
+        <PwrStaticWiring state={state} clipped={m.clipped} />
 
         <div className="hs-grid">
           <div className="pwr-figs">{isRds ? <RdsErrFig state={state} /> : null}</div>

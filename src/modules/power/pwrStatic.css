@@ -26,6 +26,8 @@
   min-width: 0;
 }
 
+.pwr-wiring { max-width: 44rem; }
+
 .pwr-fig {
   margin: 0;
   display: grid;

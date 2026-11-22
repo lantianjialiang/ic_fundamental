@@ -34,6 +34,7 @@ import {
   type InMethod,
 } from './data/dc'
 import { EQ_ITEMS } from './data/dcEq'
+import { IddSamplingFigure, InputPmuFigure } from './DcCurrentFigures'
 import { DcEqFig } from './DcEqFig'
 import { DriverFig } from './DriverFig'
 import { Callout, Cards, Explain, Knob, Readout, Seg, Steps, fmtOhm, fmtV, type Note } from './parts'
@@ -91,11 +92,12 @@ const S = {
   inNote: loc('12 个输入脚，每脚极限 ±10 µA。每次 PMU 量测约 2 ms，IIL、IIH 各量一次。先看 A5 漏 35 µA 的坏片，再切到良品，比较三种测法的时间。', '12 input pins, each with a ±10 µA limit. Each PMU measurement takes about 2 ms; IIL and IIH are each measured once. Start with a bad part whose A5 leaks 35 µA, then switch to a good part, and compare the test time of the three methods.'),
   inGood: loc('良品', 'Good part'),
   inBad: loc('A5 漏电', 'A5 leaks'),
-  inTime: loc('测试时间', 'Test time'),
+  inTime: loc('完整流程用时', 'Full sequence time'),
   inResult: loc('结果', 'Result'),
   inGangLimit: loc('并联极限 = 单脚极限', 'Ganged limit = single-pin limit'),
   inAllPass: loc('全部 PASS', 'All PASS'),
   inFound: loc('找到 A5', 'A5 found'),
+  inGangFail: loc('总电流超限，待定位', 'Total above limit, pin unknown'),
   inRetest: loc('并联超限，逐脚串行复测：', 'Ganged limit exceeded; serial retest pin by pin:'),
   inGangPass: loc('总电流没超过单脚极限，所有脚一次判 PASS，不用复测。', 'The total stays under the single-pin limit, so every pin passes in one measurement and no retest is needed.'),
   colPin: loc('管脚', 'Pin'),
@@ -123,6 +125,8 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
   const [iddqBad, setIddqBad] = useState(false)
   const [inMethod, setInMethod] = useState<InMethod>(IN_METHODS[0].id)
   const [inLeaky, setInLeaky] = useState(true)
+  const [inPin, setInPin] = useState(0)
+  const [gangRetest, setGangRetest] = useState(false)
   const [other, setOther] = useState(OTHER[0].id)
   const [eqId, setEqId] = useState(EQ_ITEMS[0].id)
   const eq = EQ_ITEMS.find((item) => item.id === eqId) ?? EQ_ITEMS[0]
@@ -147,7 +151,9 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
   const serialMs = 2 * IN_PINS.length * IN_MEAS_MS
   const inMs =
     inMethod === 'serial' ? serialMs : inMethod === 'parallel' ? 2 * IN_MEAS_MS : 2 * IN_MEAS_MS + (gangFail ? serialMs : 0)
-  const showPins = inMethod !== 'gang' || gangFail
+  const retesting = inMethod === 'gang' && gangFail && gangRetest
+  const showPins = inMethod !== 'gang' || retesting
+  const inResult = inLeaky ? (showPins ? S.inFound : S.inGangFail) : S.inAllPass
 
   return (
     <LessonFrame
@@ -336,6 +342,7 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
             setNote({ kicker: S.kicker, title: item.title, text: item.text })
           }}
         />
+        <IddSamplingFigure kind={idd} readings={iddq} />
         <Explain paras={IDD_KINDS.find((item) => item.id === idd)?.explain} />
         <h3>{t(S.iddqLab)}</h3>
         <Seg
@@ -371,22 +378,35 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
       </Section>
 
       <Section title={t(S.inTitle)} note={t(S.inNote)}>
-        <Seg options={IN_METHODS.map((m) => ({ id: m.id, label: m.label }))} value={inMethod} onChange={setInMethod} />
+        <Seg options={IN_METHODS.map((m) => ({ id: m.id, label: m.label }))} value={inMethod} onChange={(method) => {
+          setInMethod(method)
+          setGangRetest(false)
+          setInPin(0)
+        }} />
         <Seg
           options={[
             { id: 'bad', label: S.inBad },
             { id: 'good', label: S.inGood },
           ]}
           value={inLeaky ? 'bad' : 'good'}
-          onChange={(id) => setInLeaky(id === 'bad')}
+          onChange={(id) => {
+            setInLeaky(id === 'bad')
+            setGangRetest(false)
+            setInPin(0)
+          }}
         />
         <p>{t(IN_METHODS.find((m) => m.id === inMethod)?.text ?? '')}</p>
+        {inMethod === 'gang' && gangFail && <Seg options={[
+          { id: 'screen', label: loc('查看并联筛查', 'Ganged screen') },
+          { id: 'retest', label: loc('切到逐脚复测', 'Retest each pin') },
+        ]} value={gangRetest ? 'retest' : 'screen'} onChange={(mode) => setGangRetest(mode === 'retest')} />}
+        <InputPmuFigure method={retesting ? 'serial' : inMethod} pin={inPin} reading={leaks[inPin]} onPin={setInPin} total={gangTotal} />
         <Readout
           items={[
             { label: S.inTime, value: `${inMs} ms` },
             {
               label: S.inResult,
-              value: t(inLeaky ? S.inFound : S.inAllPass),
+              value: t(inResult),
               state: inLeaky ? 'fail' : 'pass',
             },
           ]}
@@ -405,7 +425,7 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
             </tbody>
           </table>
         ) : null}
-        {inMethod === 'gang' ? <p>{t(gangFail ? S.inRetest : S.inGangPass)}</p> : null}
+        {inMethod === 'gang' && (!gangFail || retesting) ? <p>{t(gangFail ? S.inRetest : S.inGangPass)}</p> : null}
         {showPins ? (
           <table className="dtable">
             <thead>

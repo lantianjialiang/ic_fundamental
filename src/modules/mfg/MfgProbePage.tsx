@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
-import { Cards, Knob, Readout } from '../fund/parts'
-import { LayerBars } from './figs'
+import { Knob, Readout } from '../fund/parts'
+import { ProbeMotion, ProbeStack } from './ProbeVisuals'
+import { ProbeTypeCompare, type ProbeType } from './ProbeTypes'
 import { MFG_META } from './meta'
 import { After, COMMON, Drill, PackLesson, useSticky } from './shell'
 
@@ -19,14 +20,7 @@ const TYPES = [
   { id: 'cant', title: loc('悬臂针', 'Cantilever'), text: loc('针从一侧伸到焊盘上方，下压时针尖往前滑，留下一条 scrub。焊盘要留出这段滑程。节距一细，旁边的针会挤在一起，更密的芯片就改用垂直针或 MEMS。', 'The needle reaches in from the side. On the way down the tip slides forward and leaves a scrub mark. The pad has to leave room for that slide. At fine pitch the neighbors crowd each other, so a denser chip moves to vertical or MEMS needles.') },
   { id: 'vert', title: loc('垂直针', 'Vertical'), text: loc('针大致竖直，靠自身压缩产生压力，而不是靠悬臂弯曲。平面度更好控，节距可以更细。针仍然会磨，要清，也要看针尖直径。', 'The needles are roughly vertical. Force comes from the needle compressing, not from a cantilever bending. Planarity is easier to hold, so the pitch can be finer. The tips still wear: they get cleaned, and the tip diameter is watched.') },
   { id: 'mems', title: loc('MEMS', 'MEMS'), text: loc('针用光刻和电镀在晶圆上做出来，同一批的长度和针尖更齐，共面更好。常见叠法是 MEMS 针 + 有机空间转换基板（MLO）+ PCB。密度来自这套工艺。针还是耗材，尖磨了就要保养。', 'Needles are lithographed and plated on a wafer, so length and tip shape match across the batch and the tips sit in one plane. A common stack is MEMS needles, an organic space transformer (MLO) and a PCB. Density comes from that process. The needles are still a consumable: a worn tip gets serviced.') },
-]
-
-const LAYERS = [
-  { id: 'probe', title: loc('探针', 'Probes'), color: '#c4a15a' },
-  { id: 'st', title: loc('空间转换', 'Space transformer'), color: '#d8c48a' },
-  { id: 'pcb', title: loc('针卡 PCB', 'Probe PCB'), color: '#c4d4b0' },
-  { id: 'pogo', title: loc('Pogo 环', 'Pogo ring'), color: '#8aa4b5' },
-]
+] as const
 
 const LAYER_TEXT = {
   probe: loc('只有针碰到焊盘。过驱动让针尖刮开氧化层。针很细，能过的电流比 Socket 里的弹簧针小。', 'Only the needle touches the pad. Overdrive makes the tip scrub through oxide. The needle is thin, so it carries less current than a socket pogo.'),
@@ -86,11 +80,17 @@ const QUIZ = [
 
 export function MfgProbePage({ moduleId, onModuleChange }: { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }) {
   const { t } = useLocale()
-  const [typeId, setTypeId] = useState(TYPES[0].id)
-  const [layerId, setLayerId] = useState(LAYERS[0].id)
+  const [typeId, setTypeId] = useState<ProbeType>(TYPES[0].id)
+  const [compareLoad, setCompareLoad] = useState(false)
+  const [layerId, setLayerId] = useState('pogo')
+  const [approach, setApproach] = useState(false)
   const [overdrive, setOverdrive] = useState(0)
   const kind = TYPES.find((item) => item.id === typeId) ?? TYPES[0]
   const zone = zoneOf(overdrive)
+  const moveChuck = (next: number, beforeContact = false) => {
+    setOverdrive(next)
+    setApproach(beforeContact)
+  }
   const memsHit = useSticky(typeId === 'mems')
   const okHit = useSticky(overdrive === 30)
   const highHit = useSticky(overdrive === 70)
@@ -122,20 +122,18 @@ export function MfgProbePage({ moduleId, onModuleChange }: { moduleId: ModuleId;
       ]}
       onReset={() => {
         setTypeId(TYPES[0].id)
-        setLayerId(LAYERS[0].id)
-        setOverdrive(0)
+        setCompareLoad(false)
+        setLayerId('pogo')
+        moveChuck(0)
         memsHit.reset()
         okHit.reset()
         highHit.reset()
       }}
       learn={
         <div className="mfg-lab">
-          <p>{t(loc('三种针。点一种，读它怎样碰到焊盘，节距一细会卡在哪。', 'Three needles. Click one and read how it meets the pad, and where a finer pitch gets stuck.'))}</p>
-          <Cards items={TYPES} activeId={typeId} cols={3} onPick={(item) => setTypeId(item.id)} />
+          <ProbeTypeCompare items={TYPES} selected={typeId} onSelect={setTypeId} loaded={compareLoad} onLoad={setCompareLoad} />
           <p>{t(kind.text)}</p>
-          <p>{t(loc('信号从焊盘出去要经过四层。点一层。只有最上面的针碰到芯片。', 'A signal leaving the pad crosses four layers. Click one. Only the top needles touch the chip.'))}</p>
-          <LayerBars layers={LAYERS} activeId={layerId} onPick={setLayerId} />
-          <p>{t(LAYER_TEXT[layerId as keyof typeof LAYER_TEXT])}</p>
+          <ProbeStack layer={layerId} onLayer={setLayerId} note={LAYER_TEXT[layerId as keyof typeof LAYER_TEXT]} />
           <p>{t(loc('扎上之后再多走一段，针尖在焊盘上刮出一条痕，把氧化层刮开，接触电阻才下来。这段多走的距离叫过驱动。太短，氧化还在，读数像开路。太长，痕太深，后面打线或植球会接在受伤的表面上。', 'After touchdown the chuck travels a little more. The tip scrubs a mark into the pad, breaks the oxide, and only then does contact resistance fall. That extra travel is overdrive. Too short, and oxide remains, so the reading looks like an open. Too long, and the mark is deep enough that later wire-bond or bumping lands on a damaged surface.'))}</p>
           <p>{t(loc('针很细，载流比 Socket 的弹簧针小。晶圆上如果电源已经短路，先上电跑功能可能把针烧了。所以开短路放在上电之前。', 'The needle is thin and carries less current than a socket pogo. If a supply is already shorted on the wafer, powering up to run a functional test can burn the needle. Opens and shorts therefore run before power is applied.'))}</p>
         </div>
@@ -143,19 +141,20 @@ export function MfgProbePage({ moduleId, onModuleChange }: { moduleId: ModuleId;
       practice={
         <div className="mfg-lab">
           <Drill n={1} title={taskMems}>
-            <p>{t(loc('用上面的三张针型卡片。', 'Use the three needle cards above.'))}</p>
-            <After show={memsHit.hit} text={loc('MEMS 针在晶圆上一次光刻出来，所以长度和针尖更齐。信号仍然是针 → 空间转换基板 → 针卡 PCB → 测试头 Pogo。齐，来自工艺，不来自把悬臂针磨到一样长。', 'MEMS needles are lithographed on a wafer in one pass, so length and tip shape match. The signal is still needle, then space transformer, then probe-card PCB, then test-head pogo. The match comes from the process, not from grinding cantilever needles to one length.')} />
+            <p>{t(loc('点上方的 MEMS 图，再顺着针卡截面追踪信号。', 'Select the MEMS drawing above, then trace the signal through the probe-card cross-section.'))}</p>
+            <After show={memsHit.hit} text={loc('MEMS 微加工可重复形成小型针体，便于控制每根针的长度和针尖位置。沿信号通路依次是针、空间转换基板、针卡 PCB、测试头 Pogo。', 'MEMS fabrication can repeat compact probe elements with controlled length and tip position. The signal path runs from the probe through the space transformer and probe-card PCB to the test-head pogo.')} />
           </Drill>
           <Drill n={2} title={taskOk}>
             <div className="knobs">
-              <Knob label={loc('过驱动', 'Overdrive')} value={overdrive} unit="µm" min={0} max={80} step={5} onChange={setOverdrive} />
+              <Knob label={loc('过驱动', 'Overdrive')} value={overdrive} unit="µm" min={0} max={80} step={5} onChange={moveChuck} />
             </div>
-            <Readout items={[{ label: loc('教学窗口 20–40 µm', 'Teaching window 20–40 µm'), value: t(ZONE_LABEL[zone]) }]} />
+            <ProbeMotion type={typeId} overdrive={overdrive} approach={approach} onMotion={moveChuck} />
+            <Readout items={[{ label: loc('教学窗口 20–40 µm', 'Teaching window 20–40 µm'), value: approach ? t(loc('未接触', 'Gap open')) : t(ZONE_LABEL[zone]) }]} />
             <After show={okHit.hit} text={loc('30 µm 落在 20–40 µm 的教学窗口里。这段行程够把氧化刮开，又还没把示意的铝垫刨穿。真机的窗口看焊盘金属有多厚、针卡图纸写多少，不是这个固定数。', '30 µm sits inside the 20–40 µm teaching window. That travel is enough to scrub oxide and not yet enough to plow through the example aluminum pad. A real window follows how thick the pad metal is and what the probe-card drawing says, not this fixed number.')} />
           </Drill>
           <Drill n={3} title={taskHigh}>
-            <p>{t(loc('继续用上面的过驱动旋钮。', 'Keep using the overdrive knob above.'))}</p>
-            <Readout items={[{ label: loc('教学窗口 20–40 µm', 'Teaching window 20–40 µm'), value: t(ZONE_LABEL[zone]) }]} />
+            <p>{t(loc('拖动上面的过驱动滑杆，或点 70 µm，在俯视图里看擦痕。', 'Drag the overdrive slider or select 70 µm and inspect the scrub mark in the top view.'))}</p>
+            <Readout items={[{ label: loc('教学窗口 20–40 µm', 'Teaching window 20–40 µm'), value: approach ? t(loc('未接触', 'Gap open')) : t(ZONE_LABEL[zone]) }]} />
             <After show={highHit.hit} text={loc('70 µm 超出教学窗口。多出来的行程变成更深的针迹，焊盘被刨伤，后面的打线或植球会接在受伤的表面上。过驱动不是越大越稳。', '70 µm is outside the teaching window. The extra travel becomes a deeper scrub, the pad is gouged, and later wire-bond or bumping lands on a damaged surface. More overdrive is not automatically a more stable contact.')} />
           </Drill>
         </div>

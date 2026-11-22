@@ -10,7 +10,7 @@ import { type ModuleId } from '../catalog'
 import { Callout } from '../fund/parts'
 import { RefParas, RefP, Related, type PrepNote } from './common'
 import { INTRO, QUIZ, ROLES, S, STAGES, SUPPLY, TAKEAWAY, TESTER, type RoleId, type SupplyId } from './data/industry'
-import { ChainFig, RoleMatrix } from './IndustryFigs'
+import { ChainFig, RoleChain, RoleMatrix } from './IndustryFigs'
 import './prep.css'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
@@ -93,6 +93,7 @@ export function PrepIndustryPage({ moduleId, onModuleChange }: Props) {
             }
           }}
         />
+        <RoleChain active={role} />
         <Callout>
           <p>
             <b>{t(roleItem.title)}</b> · {t(roleItem.full)}

@@ -6,6 +6,8 @@ import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
 import { Callout, Cards, Readout } from '../fund/parts'
 import { After, COMMON, Drill, PackLesson, useSticky } from './shell'
+import { CalendarTimeline } from './ProcessDiagrams'
+import { Formula } from './FlowVisuals'
 import { MFG_META } from './meta'
 
 type StageId = 'design' | 'mask' | 'fab' | 'wat' | 'cp' | 'sub' | 'asm' | 'ft'
@@ -63,7 +65,7 @@ const QUIZ = [
     { id: 'c', text: loc('封装车间', 'The assembly floor') },
   ], answer: 'b', explain: loc('晶圆和封装外包给 Foundry 与 OSAT。', 'Wafers and assembly are outsourced to foundry and OSAT.') },
   { id: 'q3', prompt: loc('为什么封装不是“最后一步小事”？', 'Why is packaging not “a small last step”?'), options: [
-    { id: 'a', text: loc('基板和组装与晶圆并行，而且有自己的测试和良率', 'Substrate and assembly run in parallel with wafers and have their own test and yield') },
+    { id: 'a', text: loc('基板与晶圆段并行，组装等两边到齐，并有自己的测试与良率', 'Substrate manufacturing overlaps with wafer fabrication. Assembly waits for both and has its own tests and yield.') },
     { id: 'b', text: loc('封装不产生数据', 'Packaging produces no data') },
     { id: 'c', text: loc('所有公司都自己做封装', 'Every company packages in-house') },
   ], answer: 'a', explain: loc('基板制造周期往往和晶圆重叠；飞针、AOI、组装良率都在这里。', 'Substrate cycle time often overlaps the wafer; flying probe, AOI and assembly yield live here.') },
@@ -151,7 +153,7 @@ export function MfgOverviewPage({ moduleId, onModuleChange }: { moduleId: Module
               'Ship goes through these stages. Click one and read what it produces and how many weeks it takes on its own. Substrate and wafers run at the same time: the calendar keeps the longer one, and does not add both.',
             ))}
           </p>
-          <Cards items={STAGES} activeId={stageId} cols={4} onPick={(item) => setStageId(item.id)} />
+          <CalendarTimeline steps={STAGES} active={stageId} onPick={setStageId} />
           <Readout
             items={[
               { label: loc('这一段自己的周数', 'Weeks for this stage alone'), value: `${stage.weeks}` },
@@ -264,7 +266,11 @@ export function MfgOverviewPage({ moduleId, onModuleChange }: { moduleId: Module
                 </button>
               ))}
             </div>
-            <Readout items={[{ label: loc('你加出来的周数', 'Weeks you added'), value: `${calendarWeeks}` }]} />
+            <Formula
+              rule="T = T_before + max(T_wafer, T_substrate) + T_after"
+              value={t(loc(`当前勾选合计 ${calendarWeeks} 周`, `Selected stages: ${calendarWeeks} weeks`))}
+              note={loc("并行段用较长的分支。主路等 CP 产出的裸片和基板都到齐，才接上组装和成品测试。", "Use the longer parallel branch. Assembly and final test follow when sorted dies and substrates are both available.")}
+            />
             <After
               show={added.hit}
               text={loc(

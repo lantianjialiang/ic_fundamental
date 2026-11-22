@@ -10,9 +10,10 @@ import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import '../hs/hs.css'
 import { PIC_META } from './meta'
-import { PicOverviewFig } from './PicOverviewFig'
+import { PicOverviewFig, PicTestWiring } from './PicOverviewFig'
 import {
   BLOCK_ASIDE,
+  BLOCK_FIG,
   CHOICE_LABEL,
   INTRO,
   MISCONCEPTIONS,
@@ -29,6 +30,7 @@ import {
   verdictOf,
 } from './picOverviewData'
 import {
+  BLOCK_IDS,
   ROLE_IDS,
   TEST_IDS,
   analyseOverview,
@@ -117,7 +119,7 @@ export function PicOverviewPage({ moduleId, onModuleChange }: Props) {
           />
         </div>
         <div className="hs-grid">
-          <PicOverviewFig block={state.block} onPick={(block) => update({ block })} />
+          <Seg options={BLOCK_IDS.map((id) => ({ id, label: BLOCK_FIG[id].title }))} value={state.block} onChange={(block) => update({ block })} />
           <div className="hs-cell">
             <p>{t(BLOCK_ASIDE[state.block])}</p>
             <Readout
@@ -137,6 +139,7 @@ export function PicOverviewPage({ moduleId, onModuleChange }: Props) {
           cols={4}
           onPick={(item) => update({ roleFocus: item.id as RoleId })}
         />
+        <PicOverviewFig role={state.roleFocus} />
         <div className="hs-field">
           <span className="hs-field__label">{t(S.rolePick)}</span>
           <Seg
@@ -156,6 +159,7 @@ export function PicOverviewPage({ moduleId, onModuleChange }: Props) {
           cols={3}
           onPick={(item) => update({ testFocus: item.id as TestId })}
         />
+        <PicTestWiring test={state.testFocus} />
         <div className="hs-field">
           <span className="hs-field__label">{t(S.stagePick)}</span>
           <Seg

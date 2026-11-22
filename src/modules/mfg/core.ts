@@ -91,7 +91,7 @@ export function microstripZ0(w: number, h: number, t: number, epsR: number): num
 }
 
 export function escapeTraces(pitch: number, padDia: number, line: number, space: number): number {
-  return Math.floor((pitch - padDia - space) / (line + space))
+  return Math.max(0, Math.floor((pitch - padDia - space) / (line + space)))
 }
 
 export function layerYield(perLayerYield: number, layers: number): number {

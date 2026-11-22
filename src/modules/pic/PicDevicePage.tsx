@@ -11,6 +11,7 @@ import '../prep/prep.css'
 import '../hs/hs.css'
 import { PIC_META } from './meta'
 import { SpectrumPlot } from './plots'
+import { PicDevicePath } from './PicDevicePath'
 import {
   INTRO,
   MISCONCEPTIONS,
@@ -101,6 +102,8 @@ export function PicDevicePage({ moduleId, onModuleChange }: Props) {
           )}
         </div>
         <div className="hs-grid">
+          <div className="pic-route">
+          <PicDevicePath state={state} analysis={analysis} cursor={cursor} onCursor={(next) => update({ cursor: next })} />
           <SpectrumPlot
             lambdaNm={analysis.lambdaNm}
             curves={[
@@ -118,6 +121,7 @@ export function PicDevicePage({ moduleId, onModuleChange }: Props) {
             xLabel={t(S.xLabel)}
             yLabel={t(S.yLabel)}
           />
+          </div>
           <div className="hs-cell">
             {state.tab === 'mzi' ? (
               <>

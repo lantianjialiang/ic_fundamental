@@ -3,6 +3,16 @@
   margin: 0;
 }
 
+.sns-pixel-sequence { display: grid; gap: .6rem; min-width: 0; }
+.sns-ptc-point { display: grid; gap: .65rem; min-width: 0; }
+.sns-ptc-frames { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; }
+.sns-ptc-frames canvas { display: block; }
+.sns-frame-overlay { position: relative; }
+.sns-frame-roi { position: absolute; inset: 0 auto auto 0; border: 2px solid #ffc64f; pointer-events: none; }
+.sns-ptc-math { margin: 0; display: grid; gap: .45rem; padding: .65rem; background: var(--well); border-radius: 8px; }
+.sns-ptc-math dt { color: var(--text-2); }
+.sns-ptc-math dd { margin: .15rem 0 0; font: .875rem var(--mono); color: var(--text); }
+
 .sns-svg,
 .pic-svg {
   width: 100%;

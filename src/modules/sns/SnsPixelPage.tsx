@@ -95,6 +95,7 @@ export function SnsPixelPage({ moduleId, onModuleChange }: Props) {
         <div className="hs-grid">
           <SnsPixelFig
             photoE={state.photoE}
+            cgUv={analysis.cgUv}
             cds={state.cds === 'on'}
             aria={t(S.figAria)}
             summary={t(figSummary(state, analysis))}

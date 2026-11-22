@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
-import { Cards, Knob, Readout } from '../fund/parts'
+import { Cards, Knob } from '../fund/parts'
 import { maxSites, perInsertionCost, seriesLBandwidthGHz, unitCost } from './core'
+import { BandwidthResponse, HardwarePath } from './HardwarePathVisuals'
+import { Formula, ScaleBars } from './FlowVisuals'
 import { MFG_META } from './meta'
 import { After, COMMON, Drill, PackLesson, useSticky } from './shell'
 
@@ -59,6 +61,7 @@ const QUIZ = [
 export function MfgHwPage({ moduleId, onModuleChange }: { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }) {
   const { t } = useLocale()
   const [kindId, setKindId] = useState(KINDS[0].id)
+  const [pathStep, setPathStep] = useState(0)
   const [channels, setChannels] = useState(256)
   const [pins, setPins] = useState(80)
   const [lNh, setLNh] = useState(2)
@@ -106,6 +109,7 @@ export function MfgHwPage({ moduleId, onModuleChange }: { moduleId: ModuleId; on
       ]}
       onReset={() => {
         setKindId(KINDS[0].id)
+        setPathStep(0)
         setChannels(256)
         setPins(80)
         setLNh(2)
@@ -121,9 +125,11 @@ export function MfgHwPage({ moduleId, onModuleChange }: { moduleId: ModuleId; on
       }}
       learn={
         <div className="mfg-lab">
-          <p>{t(loc('三种硬件接触的对象不同。点一种，读它用在晶圆还是封装。', 'The three fixtures touch different things. Click one and read whether it meets the wafer or the package.'))}</p>
-          <Cards items={KINDS} activeId={kindId} cols={3} onPick={(item) => setKindId(item.id)} />
-          <p>{t(kind.text)}</p>
+          <Cards items={KINDS} activeId={kindId} cols={3} onPick={(item) => {
+            setKindId(item.id)
+            setPathStep(item.id === 'socket' ? 2 : 1)
+          }} />
+          <HardwarePath key={kindId === 'pcard' ? 'cp' : 'ft'} kind={kindId} step={pathStep} onStep={setPathStep} />
           <p>{t(loc('能并行的颗数上限 = floor(测试机通道 ÷ 每颗引脚)。这只是通道账。热、针的平面度和共享电源还会再把颗数往下砍。', 'The parallel-DUT cap = floor(tester channels ÷ pins per DUT). That is only the channel budget. Heat, pin planarity and shared supplies can cut it further.'))}</p>
           <p>{t(loc('弹簧针可以看成串联电感。带宽 ≈ 2×Z0 / (2πL)，L 用 nH、结果用 GHz。电感越大，带宽越低。', 'A pogo pin behaves as a series inductance. Bandwidth ≈ 2×Z0 / (2πL), with L in nH and the result in GHz. More inductance means less bandwidth.'))}</p>
           <p>{t(loc('每次插拔成本 = 耗材价格 ÷ 寿命次数。复用旧板没有新的一次性费用，单颗只剩可变部分；新做一块板要把 NRE 摊进产量。', 'Cost per insertion = consumable price ÷ life. Reusing an old board has no new one-time bill, so the unit is only the variable part; a new board amortizes its NRE over volume.'))}</p>
@@ -136,7 +142,16 @@ export function MfgHwPage({ moduleId, onModuleChange }: { moduleId: ModuleId; on
               <Knob label={loc('测试机通道', 'Tester channels')} value={channels} unit="" min={128} max={512} step={128} onChange={setChannels} />
               <Knob label={loc('每颗引脚', 'Pins / DUT')} value={pins} unit="" min={16} max={128} step={16} onChange={setPins} />
             </div>
-            <Readout items={[{ label: loc('你算出的并行颗数', 'Parallel DUTs you got'), value: `${sites}` }]} />
+            <Formula
+              rule="N_site = ⌊C / P⌋"
+              value={`⌊${channels} / ${pins}⌋ = ${sites}`}
+              note={loc("C 是可独占的测试机通道，P 是每颗 DUT 需要的通道。下图把余下但凑不齐一个站点的通道也算出来。", "C is the pool of exclusive tester channels and P is the requirement per DUT. The figure also shows channels left over.")}
+            >
+              <ScaleBars max={channels} items={[
+                { title: loc('分配的通道', 'Assigned channels'), value: sites * pins, display: String(sites * pins) },
+                { title: loc('剩余通道', 'Unused channels'), value: channels % pins, display: String(channels % pins) },
+              ]} />
+            </Formula>
             <After show={siteHit.hit} text={loc('512 ÷ 64 = 8，所以通道最多并行 8 颗。热和机械若吃不消，实际还要再少。', '512 ÷ 64 = 8, so the channels allow 8 DUTs in parallel. If heat or mechanics cannot keep up, the real count is lower.')} />
           </Drill>
           <Drill n={2} title={taskBw}>
@@ -144,7 +159,16 @@ export function MfgHwPage({ moduleId, onModuleChange }: { moduleId: ModuleId; on
               <Knob label={loc('串联电感', 'Series L')} value={lNh} unit="nH" min={1} max={5} step={1} onChange={setLNh} />
               <Knob label={loc('Z0', 'Z0')} value={z0} unit="Ω" min={40} max={60} step={5} onChange={setZ0} />
             </div>
-            <Readout items={[{ label: loc('你算出的带宽', 'Bandwidth you got'), value: `${bw.toFixed(1)} GHz` }]} />
+            <Formula
+              rule="f₋₃dB = 2Z₀ / (2πL)"
+              value={`2 × ${z0} / (2π × ${lNh}) = ${bw.toFixed(1)} GHz`}
+              note={loc("源和负载各为 Z₀，串联电感的感抗到达 2Z₀ 时，相对低频幅度降到 1/√2。nH 对应输出 GHz。", "Source and load each have impedance Z₀. When series reactance reaches 2Z₀, amplitude falls to 1/√2 of its low-frequency value. nH gives GHz here.")}
+            >
+              <ScaleBars max={20} items={[
+                { title: loc('当前 −3 dB 频率', 'Current −3 dB frequency'), value: bw, display: `${bw.toFixed(1)} GHz` },
+              ]} />
+            </Formula>
+            <BandwidthResponse bandwidth={bw} />
             <After show={bwHit.hit} text={loc('2×50 / (2π×1 nH) ≈ 15.9 GHz。电感加到 2 nH，带宽大约减半，所以 Socket 不是“只接触、不影响信号”。', '2×50 / (2π×1 nH) ≈ 15.9 GHz. At 2 nH the bandwidth is about half, so a socket is not “just contact, no effect on the signal”.')} />
           </Drill>
           <Drill n={3} title={taskPer}>
@@ -152,7 +176,11 @@ export function MfgHwPage({ moduleId, onModuleChange }: { moduleId: ModuleId; on
               <Knob label={loc('Socket 价格', 'Socket price')} value={price} unit="" min={200} max={1000} step={100} onChange={setPrice} />
               <Knob label={loc('寿命次数', 'Life insertions')} value={life} unit="" min={50000} max={200000} step={50000} onChange={setLife} />
             </div>
-            <Readout items={[{ label: loc('你算出的每次成本', 'Cost per insertion you got'), value: per.toFixed(4) }]} />
+            <Formula
+              rule="C_insert = C_socket / N_life"
+              value={`${price} / ${life.toLocaleString()} = ${per.toFixed(4)}`}
+              note={loc("耗材购置价除以预计可用插拔次数。停机、清洁等另有成本。", "Divide the purchase price by expected insertion life. Cleaning and downtime add separate costs.")}
+            />
             <After show={perHit.hit} text={loc('500 ÷ 200000 = 0.0025。这只是耗材本身，清针和换针还要另算。', '500 ÷ 200,000 = 0.0025. That is only the consumable; cleaning and replacing pins are extra.')} />
           </Drill>
           <Drill n={4} title={taskCost}>
@@ -160,10 +188,16 @@ export function MfgHwPage({ moduleId, onModuleChange }: { moduleId: ModuleId; on
               <Knob label={loc('新 DIB NRE（千）', 'New DIB NRE (k)')} value={nreNew} unit="k" min={20} max={120} step={20} onChange={setNreNew} />
               <Knob label={loc('产量（千）', 'Volume (k)')} value={volumeK} unit="k" min={10} max={160} step={10} onChange={setVolumeK} />
             </div>
-            <Readout items={[
-              { label: loc('复用旧板的单颗', 'Reuse, per unit'), value: reuse.toFixed(3) },
-              { label: loc('新做的单颗', 'New board, per unit'), value: fresh.toFixed(3) },
-            ]} />
+            <Formula
+              rule="C = F / Q + v"
+              value={`${reuse.toFixed(3)} / ${fresh.toFixed(3)}`}
+              note={loc("复用固定费为零、可变成本 0.40；新板需摊销 NRE，但示例可变成本降到 0.15。", "Reuse has zero new fixed cost and a variable cost of 0.40. A new board amortizes NRE and has a variable cost of 0.15 in this example.")}
+            >
+              <ScaleBars max={Math.max(reuse, fresh)} items={[
+                { title: loc('复用', 'Reuse'), value: reuse },
+                { title: loc('新制', 'New board'), value: fresh },
+              ]} />
+            </Formula>
             <After show={costHit.hit} text={loc('复用单颗固定在可变成本 0.4。新板单颗 = NRE ÷ 产量 + 0.15。NRE 调到 2 万、产量够大之后，摊销降下来，新板才比复用便宜。产量不够时，新板更贵。', 'Reuse stays at the variable cost, 0.4. A new board is NRE ÷ volume + 0.15. After NRE is 20,000 and volume is high enough, amortization falls and the new board becomes cheaper. At low volume the new board costs more.')} />
           </Drill>
         </div>

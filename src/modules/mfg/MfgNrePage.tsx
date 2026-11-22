@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
-import { Cards, Knob, Readout } from '../fund/parts'
+import { Cards, Knob } from '../fund/parts'
 import { breakEvenVolume, mpwShare, unitCost } from './core'
-import { YieldBars } from './figs'
+import { CostCrossover, ReticleLayout } from './ProcessDiagrams'
+import { Formula, ScaleBars } from './FlowVisuals'
 import { MFG_META } from './meta'
 import { After, COMMON, Drill, PackLesson, near, useSticky } from './shell'
 
@@ -137,18 +138,21 @@ export function MfgNrePage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
       practice={
         <div className="mfg-lab">
           <Drill n={1} title={taskUnit}>
-            <YieldBars
-              items={[
-                { title: loc('NRE 摊到每颗', 'NRE on each unit'), value: Math.min(1, nreAll / (volumeK * 1000) / 40) },
-                { title: loc('可变成本', 'Variable cost'), value: Math.min(1, variable / 40) },
-              ]}
-            />
             <div className="knobs">
               <Knob label={loc('NRE（百万）', 'NRE (millions)')} value={nre} unit="" min={0.5} max={5} step={0.5} onChange={setNre} />
               <Knob label={loc('产量（千）', 'Volume (k)')} value={volumeK} unit="k" min={10} max={200} step={10} onChange={setVolumeK} />
               <Knob label={loc('可变成本', 'Variable')} value={variable} unit="" min={2} max={12} step={1} onChange={setVariable} />
             </div>
-            <Readout items={[{ label: loc('你算出的单颗成本', 'Unit cost you got'), value: unit.toFixed(2) }]} />
+            <Formula
+              rule="C = F / Q + v"
+              value={`${nreAll.toLocaleString()} / ${(volumeK * 1000).toLocaleString()} + ${variable} = ${unit.toFixed(2)}`}
+              note={loc("F 是一次性费用含重流片，Q 是颗数，v 是每颗可变成本。下面两条用同一成本刻度。", "F includes one-time costs and respins. Q is volume in units and v is variable cost per unit. Both bars use the same cost scale.")}
+            >
+              <ScaleBars max={unit} items={[
+                { title: loc('固定费用摊销', 'Amortized fixed cost'), value: unit - variable },
+                { title: loc('可变成本', 'Variable cost'), value: variable },
+              ]} />
+            </Formula>
             <After show={unitHit.hit} text={loc('2 百万 ÷ 10 万颗 = 20，再加可变成本 5，单颗是 25。产量若只有一半，摊销变成 40，单颗就是 45。', '2 million ÷ 100,000 units = 20, plus variable cost 5, so the unit is 25. At half the volume the amortization becomes 40 and the unit is 45.')} />
           </Drill>
           <Drill n={2} title={taskBe}>
@@ -158,17 +162,27 @@ export function MfgNrePage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
               <Knob label={loc('方案 B NRE（百万）', 'Plan B NRE (M)')} value={nreB} unit="" min={1} max={5} step={0.5} onChange={setNreB} />
               <Knob label={loc('方案 B 可变', 'Plan B variable')} value={varB} unit="" min={2} max={10} step={1} onChange={setVarB} />
             </div>
-            <Readout items={[{ label: loc('你算出的盈亏平衡产量', 'Break-even volume you got'), value: Number.isFinite(be) ? be.toFixed(0) : '—' }]} />
+            <Formula rule="Q* = (Fᴮ − Fᴬ) / (vᴬ − vᴮ)" value={be > 0 && Number.isFinite(be) ? `${((nreB - nreA) * 1e6).toLocaleString()} / (${varA} − ${varB}) ≈ ${be.toFixed(0)}` : t(loc("无唯一正产量交点", "No unique positive crossover"))} note={loc("令两方案单颗成本相等，再把固定费用差除以每颗可变成本差；分母为零或交点为非正数时，当前参数没有唯一的正产量交点。", "Set the two unit costs equal. Divide the fixed-cost difference by the variable-cost difference. A zero divisor or nonpositive intersection gives no unique positive crossover.")}><CostCrossover first={{ title: loc('方案 A', 'Plan A'), fixed: nreA * 1e6, variable: varA }}
+                second={{ title: loc('方案 B', 'Plan B'), fixed: nreB * 1e6, variable: varB }} crossover={be} /></Formula>
             <After show={beHit.hit} text={loc('(3−1) 百万 ÷ (8−5) ≈ 666,667 颗。低于这个产量，选一次性费用更低的 A；高于它，选可变成本更低的 B。', '(3−1) million ÷ (8−5) ≈ 666,667 units. Below that volume pick A, the lower one-time bill; above it pick B, the lower variable cost.')} />
           </Drill>
           <Drill n={3} title={taskMpw}>
             <Knob label={loc('MPW 项目数', 'MPW projects')} value={projects} unit="" min={2} max={16} step={1} onChange={setProjects} />
-            <Readout items={[{ label: loc('你算出的每个项目份额', 'Share per project you got'), value: share.toFixed(0) }]} />
+            <ReticleLayout projects={projects} />
+            <Formula
+              rule="C_share = C_mask / N"
+              value={`1,000,000 / ${projects} = ${share.toFixed(0)}`}
+              note={loc("N 是共享项目数，例题假设各项目等额分担。", "N counts the projects. This example splits the mask cost equally.")}
+            />
             <After show={mpwHit.hit} text={loc('光罩按 1 百万计，10 个项目各摊 10 万。项目越少，每一家分到的光罩越贵，所以 MPW 适合样片，不适合自己包下整套光罩的量产。', 'A mask counted as 1 million, shared by 10 projects, is 100,000 each. Fewer projects make each share more expensive, so MPW fits samples, not a production run that buys the whole mask set.')} />
           </Drill>
           <Drill n={4} title={taskRespin}>
             <Knob label={loc('重新流片次数', 'Respin count')} value={respin} unit="" min={0} max={2} step={1} onChange={setRespin} />
-            <Readout items={[{ label: loc('加上重新流片后的单颗', 'Unit cost with the respin'), value: unit.toFixed(2) }]} />
+            <Formula
+              rule="ΔC = F_respin / Q"
+              value={`${respin * 1000000} / ${volumeK * 1000} = ${(respin * 1000 / volumeK).toFixed(2)}; C = ${unit.toFixed(2)}`}
+              note={loc("每次重流片在模型中增加 100 万固定费用，同一批产量再摊一次。", "Each respin adds one million to fixed costs in this model, spread across the same production volume.")}
+            />
             <After show={respinHit.hit} text={loc('一次重新流片按再付一块同样大小的 NRE 来示意。它加在分子上，产量不变时每一颗都变贵，而且日程也要重来。', 'One respin is shown as paying another NRE of the same size. It adds to the numerator, so every unit gets more expensive at the same volume, and the schedule restarts too.')} />
           </Drill>
         </div>

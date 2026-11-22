@@ -248,3 +248,32 @@ export function RoleMatrix({ active, onPick }: { active: RoleId; onPick: (id: Ro
     </div>
   )
 }
+
+const ROLE_STAGE_COLUMNS = { design: 0, fab: 1, cp: 3, assy: 2, ft: 3 } as const
+const ROLE_RESPONSIBILITY = [
+  loc('其他公司负责', 'Another company runs it'),
+  loc('可自做或委外', 'In-house or outsourced'),
+  loc('主要自行完成', 'Core in-house work'),
+]
+
+export function RoleChain({ active }: { active: RoleId }) {
+  const { t } = useLocale()
+  const role = ROLES.find(({ id }) => id === active) ?? ROLES[0]
+  return (
+    <figure className="term-fig">
+      <ol className="prep-role-chain" data-model={active} aria-label={t(loc('当前公司模式沿产业链的职责', 'Responsibilities in the selected business model'))}>
+        {STAGES.map(({ id, title }) => {
+          const cover = id === 'system' ? 0 : role.cover[ROLE_STAGE_COLUMNS[id]]
+          return (
+            <li key={id} data-stage={id} data-cover={cover}>
+              <svg viewBox="0 0 64 60" aria-hidden="true"><StageIcon id={id} cx={32} cy={28} /></svg>
+              <strong>{t(title)}</strong>
+              <span>{t(id === 'system' ? loc('下游客户装机', 'Downstream system maker') : ROLE_RESPONSIBILITY[cover])}</span>
+            </li>
+          )
+        })}
+      </ol>
+      <figcaption aria-live="polite">{t(loc('切换公司模式后，看哪些测试站和制造站会留在公司内，哪些会交给其他公司。CP 和 FT 分别画在晶圆制造后、封装后。', 'Switch the business model to see which manufacturing and test steps can stay in-house and which pass to another company. CP follows wafer fabrication and FT follows assembly.'))}</figcaption>
+    </figure>
+  )
+}

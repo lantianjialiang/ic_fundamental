@@ -38,7 +38,6 @@ export type PtcBuilt = {
   dark: Float32Array
   pairs: Array<{ f1: Float32Array; f2: Float32Array; electrons: number }>
   saturated: boolean
-  preview: Float32Array
 }
 
 export type PtcAnalysis = PtcResult & {
@@ -47,8 +46,6 @@ export type PtcAnalysis = PtcResult & {
   relK: number
   varRel: number
   saturated: boolean
-  preview: Float32Array
-  previewMean: number
   w: number
   roi: Rect
 }
@@ -119,14 +116,12 @@ export function buildPtcFrames(state: Pick<PtcState, 'kTrue' | 'readNoiseE' | 'f
     f1: genFrame(params, { exposureS: EXPOSURE_S, illumE: e / EXPOSURE_S, tempC: 25, seed: 100 + index * 2 }),
     f2: genFrame(params, { exposureS: EXPOSURE_S, illumE: e / EXPOSURE_S, tempC: 25, seed: 101 + index * 2 }),
   }))
-  const previewIndex = Math.min(2, pairs.length - 1)
   return {
     w,
     roiMax: w,
     dark,
     pairs,
     saturated: electrons.some((e) => e >= state.fwcE * 0.98),
-    preview: pairs[previewIndex].f1,
   }
 }
 
@@ -155,8 +150,6 @@ export function analysePtc(state: PtcState, built: PtcBuilt): PtcAnalysis {
     relK,
     varRel: varRelError(side * side),
     saturated: built.saturated,
-    preview: built.preview,
-    previewMean: frameMean(built.preview, built.w, roi),
     w: built.w,
     roi,
   }
