@@ -34,6 +34,7 @@ import {
   type Seg as WaveSeg,
 } from './data/func'
 import { Callout, Cards, Explain, Knob, Readout, Seg, Steps, type Note } from './parts'
+import { VectorDataPath } from './VectorDataPath'
 import { WaveRows } from './WaveRows'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
@@ -210,6 +211,7 @@ export function FundFuncPage({ moduleId, onModuleChange }: Props) {
           }}
         />
         <Explain paras={SOURCES.find((item) => item.id === src)?.explain} />
+        <VectorDataPath key={src} mode={src} />
         <h3>{t(S.covTitle)}</h3>
         <p>{t(COVERAGE_LEAD)}</p>
         <div className="knob-row">
@@ -238,6 +240,7 @@ export function FundFuncPage({ moduleId, onModuleChange }: Props) {
           }}
         />
         <Explain paras={DFT.find((item) => item.id === dft)?.explain} />
+        <VectorDataPath key={dft} mode={dft} />
         <h3>{t(S.ctrTitle)}</h3>
         <div className="knob-row">
           <div>

@@ -21,7 +21,7 @@ const ly = (ppm: number) => {
 }
 
 /** 锁定曲线、锁定窗（±10 ppm）、10 µs 规格线与锁定时间标注；不稳定时不画曲线 */
-export function PllFig({ bwKhz, result }: { bwKhz: number; result: PllResult }) {
+export function PllFig({ bwKhz, result, cursor }: { bwKhz: number; result: PllResult; cursor: number }) {
   const { t } = useLocale()
   const windowY = ly(LOCK_WINDOW_PPM)
   const specX = tx(LOCK_SPEC_US)
@@ -68,6 +68,8 @@ export function PllFig({ bwKhz, result }: { bwKhz: number; result: PllResult }) 
         </text>
 
         {stable ? <polyline points={curve} fill="none" stroke="var(--blue)" strokeWidth="2" /> : null}
+        <line data-lock-cursor={cursor} x1={tx(cursor)} x2={tx(cursor)} y1={PY_TOP} y2={PY_BOT}
+          stroke="var(--purple)" strokeWidth="2" strokeDasharray="3 4" />
 
         {locked ? (
           <g>

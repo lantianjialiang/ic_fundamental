@@ -7,7 +7,7 @@
  * 外推：应力条件下的 Weibull 尺度 η_stress 乘以 AF 得到使用条件的 η_use = η_stress × AF。
  * B10：F(t) = 0.1 的时间，t = η · (−ln 0.9)^(1/β)。
  */
-import { arrheniusAF, fitWeibull, weibullCdf } from './core/reliability'
+import { arrheniusAF, fitWeibull, weibullCdf, weibullRankRows, type WeibullRankRow } from './core/reliability'
 import { mulberry32 } from './core/wafer'
 
 /** 默认加速因子：Ea 0.7 eV、55 → 125 °C（与 REL-02、REL-03 一致），取一位小数 */
@@ -66,30 +66,6 @@ export function sampleLifetimes(beta: number, eta: number, n: number, seed: numb
   return out
 }
 
-/**
- * 失效点的中位秩 F_i，与 fitWeibull 使用同一套 Johnson 调整：
- * 删失点不画点，但占据顺序位置，所以它之后的失效秩会被抬高。
- */
-export function medianRankPoints(samples: Sample[]): Array<{ t: number; f: number }> {
-  const items = samples
-    .map((s) => ({ t: s.t, censored: s.censored }))
-    .sort((a, b) => a.t - b.t || Number(a.censored) - Number(b.censored))
-  const n = items.length
-  const out: Array<{ t: number; f: number }> = []
-  let prevRank = 0
-  for (let i = 0; i < n; i += 1) {
-    const item = items[i]
-    if (item.censored) {
-      continue
-    }
-    const reverse = n - i
-    const adjusted = prevRank + (n + 1 - prevRank) / (1 + reverse)
-    prevRank = adjusted
-    out.push({ t: item.t, f: (adjusted - 0.3) / (n + 0.4) })
-  }
-  return out
-}
-
 /** 形状参数判断失效模式：β < 1 早期，β ≈ 1 随机，β > 1 磨损（±0.1 内算 ≈ 1） */
 export function failureMode(beta: number): FailureMode {
   if (Math.abs(beta - 1) < 0.1) {
@@ -116,8 +92,7 @@ export type WeibullAnalysis = {
   rUse10: number
   /** 使用条件下 10 年的可靠度，用真值 */
   rTrue10: number
-  /** 用于画图的失效点 */
-  points: Array<{ t: number; f: number }>
+  rankRows: WeibullRankRow[]
 }
 
 export function analyseWeibull(state: WeibullState): WeibullAnalysis {
@@ -140,7 +115,7 @@ export function analyseWeibull(state: WeibullState): WeibullAnalysis {
     b10True: state.eta * state.af * Math.pow(-Math.log(1 - B10_F), 1 / state.beta),
     rUse10: finite ? 1 - weibullCdf(fit.beta, fit.eta * state.af, TEN_YEAR_H) : NaN,
     rTrue10: 1 - weibullCdf(state.beta, state.eta * state.af, TEN_YEAR_H),
-    points: medianRankPoints(samples),
+    rankRows: weibullRankRows(times, cens),
   }
 }
 

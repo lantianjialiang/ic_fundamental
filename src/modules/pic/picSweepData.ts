@@ -75,21 +75,12 @@ export const S = {
     '把步长调到大于线宽。侧栏会说明峰可能被漏掉。',
     'Set the step larger than the linewidth. The side panel explains that the peak can be missed.',
   ),
-  legRaw: loc('原始', 'Raw'),
-  legNorm: loc('归一', 'Norm'),
   xLabel: loc('波长 nm', 'Wavelength nm'),
-  yLabel: loc('dBm / dB', 'dBm / dB'),
-  plotAria: loc('波长扫描谱，蓝线为原始读数，金线为归一化', 'Wavelength sweep, blue raw and gold normalized'),
   vTitleRing: loc('环形谐振器的扫描', 'Ring sweep'),
   vTitleMzi: loc('MZI 的扫描', 'MZI sweep'),
   vTitleFloor: loc('噪声底限制了消光比', 'The noise floor limits the extinction ratio'),
   vTitleMiss: loc('峰可能被漏掉', 'The peak can be missed'),
 }
-
-export const FIG_SUMMARY = loc(
-  '游标在 {nm} nm：原始 {raw} dBm，归一化 {norm} dB。',
-  'Cursor at {nm} nm: raw {raw} dBm, normalized {norm} dB.',
-)
 
 const vBody = loc(
   '结论：{kind}。FSR 是 {fsr} nm，细栅格线宽 {fwhm} nm，这次扫描的谷值在 {lam} nm（细栅格 {fine} nm）。原因：读数来自步长 {step} nm 的采样，线宽的 1/5 是 {fifth} nm。归一化相对真实谱的平均误差是 {err} dB。这一扫描有 {n} 个点，按每点 {settle} ms 约 {sec} s；步长再减小，测试时间会变长。',
@@ -145,7 +136,7 @@ export function taskItems(state: SweepState, analysis: SweepAnalysis): TaskItem[
   const gap = erGapDb(analysis)
   return [
     { id: 't1', text: S.task1, done: state.stepNm < analysis.fineDip.fwhmNm / 5 },
-    { id: 't2', text: S.task2, done: state.norm === 'on' && state.wanderDb > 0 && analysis.meanErrDb < 0.05 },
+    { id: 't2', text: S.task2, done: state.norm === 'on' && state.wanderDb > 0 && !analysis.scan.referenceClipped && analysis.meanErrDb < 0.05 },
     { id: 't3', text: S.task3, done: gap >= 3 },
     { id: 't4', text: S.task4, done: state.stepNm > analysis.fineDip.fwhmNm },
   ]

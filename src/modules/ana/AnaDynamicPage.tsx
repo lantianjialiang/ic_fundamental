@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { SpectralRecordFig } from './SpectralRecordFig'
 import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
@@ -11,7 +13,7 @@ import '../prep/prep.css'
 import { ANA_META } from './meta'
 import { BIT_OPTIONS, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, WINDOW_OPTIONS, taskItems, verdictOf } from './dynamicData'
 import { SpectrumFig } from './DynamicFig'
-import { DEFAULT_DYNAMIC, HD_MAX_DB, HD_MIN_DB, NOISE_MAX_LSB, SINAD_SPEC, analyze, type DynamicState } from './dynamicModel'
+import { DEFAULT_DYNAMIC, HD_MAX_DB, HD_MIN_DB, INPUT_AMP, NOISE_MAX_LSB, SINAD_SPEC, analyze, type DynamicState } from './dynamicModel'
 import './ana.css'
 import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
@@ -85,13 +87,20 @@ export function AnaDynamicPage({ moduleId, onModuleChange }: Props) {
               { label: S.rSfdr, value: `${result.sfdr.toFixed(1)} dBc` },
               { label: S.rSpur, value: result.spurHarmonic !== null ? `HD${result.spurHarmonic}` : t(S.spurNoise) },
               { label: S.rEnob, value: result.enob.toFixed(2) },
+              { label: loc('如果读数来自满量程正弦', 'If the reading were from a full-scale sine'),
+                value: `(${result.sinad.toFixed(2)} − 1.76) / 6.02 ≈ ${((result.sinad - 1.76) / 6.02).toFixed(2)} bit` },
+              { label: loc('把本实验的 0.9 FS 正弦归算到满量程', 'Refer this lab’s 0.9 FS sine to full scale'),
+                value: `(${result.sinad.toFixed(2)} + ${(20 * Math.log10(1 / INPUT_AMP)).toFixed(2)} − 1.76) / 6.02 ≈ ${result.enob.toFixed(2)} bit` },
             ]}
           />
+          <p className="intro__note">{t(loc('补偿量是 20 log₁₀(1/0.9)。1.76 dB 和 6.02 dB/bit 来自理想 ADC 的满量程正弦量化噪声模型。',
+            'The correction is 20 log₁₀(1/0.9). The constants 1.76 dB and 6.02 dB/bit come from the ideal ADC quantization-noise model for a full-scale sine.'))}</p>
         </div>
       </Section>
 
       
 
+      <SpectralRecordFig initial="power" />
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">
           <p>{t(TAKEAWAY)}</p>

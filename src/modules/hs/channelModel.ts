@@ -64,6 +64,8 @@ export type ChannelAnalysis = {
   lossDb: number
   /** |Γ_L| */
   gammaMag: number
+  gammaL: number
+  gammaS: number
   /** 回波损耗 −20·log10|Γ_L|，dB；完全匹配时为 Infinity */
   returnLoss: number
   /** 远端稳态电平，ZL = Z0 时为 1 */
@@ -165,6 +167,8 @@ export function analyseChannel(state: ChannelState): ChannelAnalysis {
     nyquistGhz,
     lossDb,
     gammaMag,
+    gammaL,
+    gammaS,
     returnLoss: returnLossDb(gammaMag),
     levelRel,
     eyeHeight,

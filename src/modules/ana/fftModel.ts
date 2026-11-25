@@ -185,7 +185,7 @@ export function analyze(state: FftState): FftResult {
   }
 }
 
-/** 谱线幅度（V 峰值）换成 dBV：1 V 峰值为 0 dBV */
+/** 谱线幅度以 1 V 峰值为基准转换成 dB。 */
 export function spectrumDb(amp: number): number {
   return toDb(amp, TRUE_FUND_V)
 }

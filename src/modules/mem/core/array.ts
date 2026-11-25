@@ -20,6 +20,7 @@ export type Fault =
 
 /** 一次访问：write = false 时 value 为期望读出值 */
 export type Access = { addr: number; write: boolean; value: 0 | 1 }
+export type CouplingChange = { aggressor: number; victim: number; before: number; after: number }
 
 export type LogEntry = {
   step: number
@@ -30,6 +31,7 @@ export type LogEntry = {
   /** 读操作的实际值；地址映射为空时为 0；写操作为 null */
   actual: 0 | 1 | null
   pass: boolean
+  coupling?: CouplingChange[]
 }
 
 export type RunResult = {
@@ -81,6 +83,7 @@ export function runAccesses(accesses: Access[], size: number, faults: Fault[]): 
   accesses.forEach((acc, step) => {
     const cell = resolve(acc.addr, faults)
     if (acc.write) {
+      let coupling: CouplingChange[] | undefined
       if (cell >= 0) {
         const old = cells[cell]
         const sv = stuck(cell)
@@ -103,17 +106,17 @@ export function runAccesses(accesses: Access[], size: number, faults: Fault[]): 
         if (next !== old) {
           const rising = next === 1
           for (const f of faults) {
-            if (f.kind === 'CFIN' && f.aggressor === cell && f.rising === rising) {
-              cells[f.victim] = cells[f.victim] ^ 1
-            }
-            if (f.kind === 'CFID' && f.aggressor === cell && f.rising === rising) {
-              cells[f.victim] = f.value
+            if ((f.kind === 'CFIN' || f.kind === 'CFID') && f.aggressor === cell && f.rising === rising) {
+              const before = cells[f.victim]
+              const after = f.kind === 'CFIN' ? before ^ 1 : f.value
+              cells[f.victim] = after
+              if (before !== after) (coupling ??= []).push({ aggressor: cell, victim: f.victim, before, after })
             }
           }
         }
         enforceStuck()
       }
-      log.push({ step, addr: acc.addr, write: true, expected: null, actual: null, pass: true })
+      log.push({ step, addr: acc.addr, write: true, expected: null, actual: null, pass: true, ...(coupling && { coupling }) })
     } else {
       const actual: 0 | 1 = cell >= 0 ? (cells[cell] as 0 | 1) : 0
       const pass = actual === acc.value

@@ -15,6 +15,7 @@ type Props = {
   ariaLabel: string
   /** 每颗 die 的无障碍描述（如坐标与参数），由调用方翻译 */
   dieLabel: (die: Die) => string
+  markOf?: (die: Die) => 'near' | 'source' | undefined
 }
 
 /**
@@ -22,7 +23,7 @@ type Props = {
  * 用 CSS 网格排列按钮：每颗 die 都能用 Tab 聚焦、用 Enter 选中，并带文字描述；
  * 圆外的格子是空的占位，不参与键盘导航。
  */
-export function WaferMap({ wafer, colorOf, selected, onPick, summary, ariaLabel, dieLabel }: Props) {
+export function WaferMap({ wafer, colorOf, selected, onPick, summary, ariaLabel, dieLabel, markOf }: Props) {
   const grid = useMemo(() => {
     const d = wafer.diameterDie
     const cells: Array<Die | null> = new Array(d * d).fill(null)
@@ -44,6 +45,7 @@ export function WaferMap({ wafer, colorOf, selected, onPick, summary, ariaLabel,
               type="button"
               className={`wafer__die${selected === die.id ? ' is-sel' : ''}`}
               style={{ background: colorOf(die) }}
+              data-wafer-mark={markOf?.(die)}
               aria-label={dieLabel(die)}
               aria-pressed={selected === die.id}
               onClick={() => onPick(die.id)}

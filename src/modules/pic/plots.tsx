@@ -28,7 +28,7 @@ export function SpectrumPlot({
   lambdaNm: number[]
   curves: SweepCurve[]
   cursor: number
-  onCursor: (index: number) => void
+  onCursor?: (index: number) => void
   aria: string
   summary: string
   xLabel: string
@@ -67,9 +67,13 @@ export function SpectrumPlot({
           const d = curve.db
             .map((db, index) => `${index === 0 ? 'M' : 'L'} ${xOf(index).toFixed(1)} ${yOf(db).toFixed(1)}`)
             .join(' ')
-          return <path key={curve.id} d={d} fill="none" stroke={curve.color} strokeWidth={1.8} />
+          return <path key={curve.id} data-spectrum-curve={curve.id} d={d} fill="none" stroke={curve.color} strokeWidth={1.8} />
         })}
         <line x1={xOf(i)} x2={xOf(i)} y1={T} y2={H - B} stroke={GOLD} strokeDasharray="3 3" />
+        {curves.map((curve) => Number.isFinite(curve.db[i]) && (
+          <circle key={curve.id} data-spectrum-point={curve.id} cx={xOf(i)} cy={yOf(curve.db[i])}
+            r="4.5" fill={curve.color} stroke={BG} strokeWidth="1.5" />
+        ))}
         {curves.map((curve, index) => (
           <g key={curve.id} transform={`translate(${L + index * 150}, 16)`}>
             <line x1={0} y1={0} x2={14} y2={0} stroke={curve.color} strokeWidth={2.5} />
@@ -82,7 +86,7 @@ export function SpectrumPlot({
           {`${xLabel}  ${lambdaNm[0]?.toFixed(1)} – ${lambdaNm[n - 1]?.toFixed(1)}`}
         </text>
       </svg>
-      <input
+      {onCursor && <input
         type="range"
         min={0}
         max={Math.max(0, n - 1)}
@@ -90,7 +94,7 @@ export function SpectrumPlot({
         value={i}
         aria-label={aria}
         onChange={(event) => onCursor(Number(event.target.value))}
-      />
+      />}
       <p className="pic-summary">{summary}</p>
     </figure>
   )

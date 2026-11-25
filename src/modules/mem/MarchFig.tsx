@@ -68,16 +68,20 @@ export function MarchFig({
   current,
   order,
   marks,
+  visited,
+  firstFail,
 }: {
   size: number
   current: CurrentOp | null
   order: MarchElement['order'] | null
   marks: Mark[]
+  visited: Set<number>
+  firstFail?: number
 }) {
   const { t } = useLocale()
   const cellClass = (index: number): string => {
     if (current === null || current.addr !== index) {
-      return 'mem-cell'
+      return visited.has(index) ? 'mem-cell' : 'mem-cell is-unvisited'
     }
     if (current.write) {
       return 'mem-cell is-cur is-w'
@@ -116,13 +120,15 @@ export function MarchFig({
           const x = X0 + index * STEP_X
           const mark = marks.filter((item) => item.cell === index)
           return (
-            <g key={index}>
+            <g key={index} data-address={index} data-visited={visited.has(index)} data-first-fail={index === firstFail}>
               {mark.map((item, k) => (
                 <text key={k} x={x + CELL_W / 2} y={CELL_Y - 8} textAnchor="middle" className={`mem-mark is-${item.role}`}>
                   {item.text}
                 </text>
               ))}
               <rect x={x} y={CELL_Y} width={CELL_W} height={CELL_H} rx={6} className={cellClass(index)} />
+              {index === firstFail && <rect x={x - 3} y={CELL_Y - 3} width={CELL_W + 6} height={CELL_H + 6}
+                rx="7" fill="none" stroke="var(--red)" strokeDasharray="3 3" strokeWidth="2.5" />}
               <text x={x + CELL_W / 2} y={CELL_Y + CELL_H + 16} textAnchor="middle" className="mem-fig-text">
                 {String(index)}
               </text>
@@ -132,6 +138,7 @@ export function MarchFig({
         {current === null ? <text x={CW / 2} y={CH - 6} textAnchor="middle" className="mem-fig-muted">{t(FIG.idle)}</text> : null}
       </svg>
       <figcaption>{t(FIG.cap)}</figcaption>
+      <p className="mmar-note">{t(loc('灰虚线格尚未执行。红虚线框保留首次 Fail 的地址。', 'Gray dashed cells are unvisited. A red dashed outline keeps the first failing address visible.'))}</p>
     </figure>
   )
 }

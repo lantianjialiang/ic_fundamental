@@ -14,12 +14,14 @@ type Props = {
   running: boolean
   histItem: string
   waferIndex: number
+  selectedDie: number | null
   onRun: () => void
   onCancel: () => void
   onBatchChange: (patch: Partial<{ count: number; retest: number; seed: number }>) => void
   onStopModeChange: (value: boolean) => void
   onHistItemChange: (id: string) => void
   onWaferChange: (index: number) => void
+  onDiePick: (index: number | null) => void
   onExportCsv: () => void
   onExportJson: () => void
   onImportFile: (file: File) => void
@@ -39,12 +41,14 @@ export function LotPanel({
   running,
   histItem,
   waferIndex,
+  selectedDie,
   onRun,
   onCancel,
   onBatchChange,
   onStopModeChange,
   onHistItemChange,
   onWaferChange,
+  onDiePick,
   onExportCsv,
   onExportJson,
   onImportFile,
@@ -254,7 +258,8 @@ export function LotPanel({
                 ))}
               </select>
             </div>
-            {wafers[waferPos] ? <WaferMap wafer={wafers[waferPos]} items={lot.items} /> : null}
+            {wafers[waferPos] ? <WaferMap key={wafers[waferPos].wafer} wafer={wafers[waferPos]} items={lot.items}
+              selectedDie={selectedDie} onPick={onDiePick} /> : null}
           </section>
         </>
       ) : (

@@ -11,6 +11,7 @@ import '../prep/prep.css'
 import '../hs/hs.css'
 import { REL_META } from './meta'
 import { ArrFig, FactorFig } from './RelAccelFig'
+import { RelMechanismFig } from './RelMechanismFig'
 import { INTRO, MECHANISMS, MECH_SEG, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, taskItems, verdictOf } from './relAccelData'
 import { DEFAULT_ACCEL, MECH_FACTORS, analyseAccel, type AccelState } from './relAccelModel'
 import './relAccel.css'
@@ -97,6 +98,7 @@ export function RelAccelPage({ moduleId, onModuleChange }: Props) {
             <Seg options={MECH_SEG} value={state.mech} onChange={(mech) => update({ mech })} />
           </div>
         </div>
+        <RelMechanismFig mechanism={state.mech} />
         <div className="hs-controls">
           <Knob label={S.tUseLabel} value={state.tUse} unit="°C" min={25} max={85} step={5} onChange={(v) => update({ tUse: v })} />
           <Knob label={S.tStressLabel} value={state.tStress} unit="°C" min={70} max={150} step={5} onChange={(v) => update({ tStress: v })} />

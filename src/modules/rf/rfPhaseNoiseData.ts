@@ -15,8 +15,8 @@ export const S = {
   introTitle: loc('相位噪声：信号的相位在“抖”', 'Phase noise: the signal’s phase wanders'),
   coreTitle: loc('练一练：偏移频率、积分与抖动', 'Practice: offset, integration and jitter'),
   coreNote: loc(
-    '下图是模型算出的 L(f)（dBc/Hz，对数频率轴）。拖滑块，或在曲线上点一下，选偏移频率；右侧读出该点的 L(f)。金色阴影是积分区间，把它积分、开方得到 rad rms，再除以 2π·f0 就是时间抖动。',
-    'The plot shows the modelled L(f) in dBc/Hz on a log frequency axis. Drag the slider, or click the curve, to pick an offset; the readout gives L(f) there. The gold band is the integration range: integrate it, take the root to get rad rms, and divide by 2π·f0 to get the time jitter.',
+    '下图是模型算出的 L(f)（dBc/Hz，对数频率轴）。拖滑块，或在曲线上点一下，选偏移频率；右侧读出该点的 L(f)。金色阴影标出频率范围。将 L 转成线性密度，按 Hz 积分，计入两侧后开方得到 rad rms，再除以 2π·f0 就是时间抖动。',
+    'The plot shows the modelled L(f) in dBc/Hz on a log frequency axis. Drag the slider, or click the curve, to pick an offset; the readout gives L(f) there. The gold band marks the frequency range. Convert L to linear density, integrate in hertz, double for both sides and take the root to get rad rms, and divide by 2π·f0 to get the time jitter.',
   ),
   f0Label: loc('载波频率 f0', 'Carrier frequency f0'),
   l1kLabel: loc('1/f² 项在 1 kHz 处的 L(1 kHz)（dBc/Hz）', '1/f² term at 1 kHz, L(1 kHz) (dBc/Hz)'),
@@ -92,8 +92,8 @@ export const MISCONCEPTIONS: LText[] = [
 ]
 
 export const TAKEAWAY: LText = loc(
-  'L(f) 单位是 dBc/Hz，即每赫兹的噪声功率相对载波的 dB 数；积分相位噪声 θ = √(2∫L df)，在线性域积分后开方；时间抖动 t = θ / (2π·f0)。积分下限决定 1/f² 段的贡献大小，底噪决定高频段的贡献。',
-  'L(f) is in dBc/Hz, the noise power per hertz relative to the carrier in dB; the integrated phase noise is θ = √(2∫L df), integrated in linear terms and then square-rooted; the time jitter is t = θ / (2π·f0). The integration lower limit sets how much the 1/f² term contributes, and the floor sets the contribution from high offsets.',
+  'L(f) 单位是 dBc/Hz，即每赫兹的噪声功率相对载波的 dB 数；积分相位噪声 θ = √(2∫Llin df)，在线性域积分后开方；时间抖动 t = θ / (2π·f0)。积分下限决定 1/f² 段的贡献大小，底噪决定高频段的贡献。',
+  'L(f) is in dBc/Hz, the noise power per hertz relative to the carrier in dB; the integrated phase noise is θ = √(2∫Llin df), integrated in linear terms and then square-rooted; the time jitter is t = θ / (2π·f0). The integration lower limit sets how much the 1/f² term contributes, and the floor sets the contribution from high offsets.',
 )
 
 const Q1_PS = (0.01 / (2 * Math.PI * 1e9)) * 1e12
@@ -145,7 +145,7 @@ export const QUIZ: QuizQuestion[] = [
   },
   {
     id: 'q4',
-    prompt: loc('积分相位噪声的公式 θ = √(2∫L df) 里为什么有系数 2？', 'Why is there a factor of 2 in θ = √(2∫L df)?'),
+    prompt: loc('积分相位噪声的公式 θ = √(2∫Llin df) 里为什么有系数 2？', 'Why is there a factor of 2 in θ = √(2∫Llin df)?'),
     options: [
       { id: 'a', text: loc('把 rms 换成峰峰值', 'To convert rms to peak-to-peak') },
       { id: 'b', text: loc('L 只算单边带，两个边带合起来是 2L', 'L counts only one sideband; the two sidebands together make 2L') },

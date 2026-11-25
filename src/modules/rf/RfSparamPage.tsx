@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { ReflectionPacket } from './ReflectionPacket'
 import { useLocale } from '../../i18n/LocaleContext'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
@@ -105,7 +106,10 @@ export function RfSparamPage({ moduleId, onModuleChange }: Props) {
         </div>
 
         <div className="hs-grid">
-          <RfSparamFig state={state} analysis={analysis} />
+          <div>
+            <RfSparamFig state={state} analysis={analysis} />
+            <ReflectionPacket gamma={analysis.gamma} />
+          </div>
           <div className="hs-cell">
             <Readout
               items={[

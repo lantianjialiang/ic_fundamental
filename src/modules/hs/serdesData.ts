@@ -103,13 +103,13 @@ export const FIG = {
     'Bathtub curve: BER (log scale) at each sampling phase from 0 to 1 UI; the red line is BER 1e-12 and the gold line is the best sampling phase',
   ),
   bathCap: loc(
-    '横轴是采样相位（ps），纵轴是 log₁₀ BER。低于红线的区间就是 BER 1e-12 下的眼宽。噪声大时，浴盆底会被电压项抬平。',
-    'The horizontal axis is the sampling phase (ps) and the vertical axis is log₁₀ BER. The part below the red line is the eye width at BER 1e-12. With large noise the floor of the bathtub is lifted flat by the voltage term.',
+    '白色光标落在离散相位扫描点上。蓝线给出教学模型的总 BER，红线是目标。电压噪声可能令整条浴盆曲线都高于目标，即使眼框仍有时序开口。',
+    'The white cursor marks one discrete phase sweep point. The blue curve shows total modelled BER and the red line marks the target. Voltage noise can lift the whole bathtub above the target even when the timing budget still has an opening.',
   ),
-  eyeAria: loc('BER 1e-12 下的眼：实线矩形是眼，虚线矩形是规格的 mask', 'The eye at BER 1e-12: the solid rectangle is the eye and the dashed rectangle is the spec mask'),
+  eyeAria: loc('眼开口预算：实线矩形是模型开口，虚线矩形是规格 mask', 'Eye budget: the solid rectangle is the modelled opening and the dashed rectangle is the spec mask'),
   eyeCap: loc(
-    '实线是 BER 1e-12 下量到的眼；虚线是规格 mask。眼要完整盖住 mask，才算合格。',
-    'The solid rectangle is the eye measured at BER 1e-12; the dashed one is the spec mask. The eye must fully cover the mask to pass.',
+    '眼开口预算示意。蓝框按模型分别估算时序与电压方向的开口，金框是规格 mask。横轴以数据眼中心为零，白线对应浴盆曲线上所选的同一采样相位。',
+    'Eye-opening budget. The blue box combines independently estimated timing and voltage openings. The gold box is the spec mask. Phase is relative to the data eye centre. The white cursor marks the same sweep point as the bathtub.',
   ),
   legendEye: loc('BER 1e-12 下的眼', 'Eye at BER 1e-12'),
   legendMask: loc('规格 mask', 'Spec mask'),

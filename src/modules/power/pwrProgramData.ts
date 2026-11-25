@@ -117,8 +117,8 @@ export const S = {
     'Teaching-simplified: average time = sum of the items each DUT actually runs; UIS is timed only on sampled DUTs',
   ),
   formulaUph: loc(
-    '教学简化公式：UPH = 3600·N / (T_idx + T_par + N·T_ser)·(1 + r)，N = 4',
-    'Teaching-simplified formula: UPH = 3600·N / ((T_idx + T_par + N·T_ser)·(1 + r)), N = 4',
+    'UPH = 3600·N / [(T_idx + T_par + N·T_ser)·(1 + r)]。各时间项用秒，r 为重测率。4 个 Site、基础一轮 0.25 s、重测率 20%，得 3600×4/(0.25×1.20) = 48,000 颗/小时。',
+    'UPH = 3600·N / [(T_idx + T_par + N·T_ser)·(1 + r)]. Use seconds for the timing terms and a fraction for retest rate r. With four sites, a 0.25 s base cycle and 20% retest, 3600×4/(0.25×1.20) = 48,000 units/hour.',
   ),
   rYield: loc('良率', 'Yield'),
   rEsc: loc('漏检（有缺陷却通过）', 'Escapes (defective but passed)'),

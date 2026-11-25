@@ -19,6 +19,7 @@ import { SMT } from './data/pcbSupplySmt'
 import { INTRO, S, TAKEAWAY } from './data/pcbSupply'
 import { PCB_META } from './meta'
 import { ChannelFig, FlowFig } from './SupplyFigs'
+import { BoardFilesFig } from './BoardFilesFig'
 import { PanelFig } from './SupplyFigs2'
 import { SmtFig } from './SupplyFigs4'
 import { CostPanel, ReflowPanel } from './SupplySections'
@@ -143,6 +144,7 @@ export function PcbSupplyPage({ moduleId, onModuleChange }: Props) {
           <Line label={S.usedLabel} text={file.used} onOpen={onModuleChange} />
           <Line label={S.trapLabel} text={file.trap} onOpen={onModuleChange} />
         </Callout>
+        <BoardFilesFig file={fileId} />
         <Related ids={['pcbTools', 'pcbFlow', 'pcbDfm']} onOpen={onModuleChange} />
       </Section>
 

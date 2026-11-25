@@ -704,10 +704,24 @@
   margin: 0;
 }
 
-.atesim-wafer__vals {
-  color: var(--muted);
-  font-family: var(--mono);
-  font-size: 11px;
+.atesim-wafer__die {
+  cursor: pointer;
+}
+
+.atesim-wafer__info caption {
+  padding: 8px 0 4px;
+  color: var(--text);
+  font-weight: 650;
+  text-align: start;
+}
+
+.atesim-wafer__info tr[data-lot-first-final-fail] {
+  background: var(--red-bg);
+}
+
+.atesim-wafer__info th small {
+  display: block;
+  color: var(--red);
 }
 
 .atesim-wafer__table {

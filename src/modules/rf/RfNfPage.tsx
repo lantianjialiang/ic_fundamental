@@ -10,7 +10,7 @@ import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import '../hs/hs.css'
 import { RF_META } from './meta'
-import { ChainFig, ShareFig } from './RfNfFig'
+import { ChainFig, ShareFig, YFactorFig } from './RfNfFig'
 import { ENR_SEG, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, taskItems, verdictOf } from './rfNfData'
 import { analyseNf, DEFAULT_NF, type NfState } from './rfNfModel'
 import './rfNf.css'
@@ -92,13 +92,10 @@ export function RfNfPage({ moduleId, onModuleChange }: Props) {
             <Seg options={ENR_SEG} value={String(state.enr)} onChange={(id) => update({ enr: Number(id) })} />
           </div>
         </div>
+        <YFactorFig analysis={analysis} enr={state.enr} />
         <div className="hs-cell">
           <Readout
             items={[
-              { label: S.yCold, value: `${analysis.nColdDbm.toFixed(2)} dBm` },
-              { label: S.yHot, value: `${analysis.nHotDbm.toFixed(2)} dBm` },
-              { label: S.yValue, value: analysis.y.toFixed(2) },
-              { label: S.yNf, value: `${analysis.nfFromYDb.toFixed(2)} dB` },
               {
                 label: S.yCheck,
                 value: t(matched ? S.same : S.differ),

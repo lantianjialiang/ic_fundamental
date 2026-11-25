@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
@@ -114,10 +115,13 @@ export function PicModPage({ moduleId, onModuleChange }: Props) {
                     { label: S.rP0, value: `${analysis.pLow.toFixed(3)} mW` },
                     { label: S.rEr, value: fmtEr(analysis.erDb) },
                     { label: S.rOma, value: `${analysis.oma.toFixed(3)} mW` },
-                    { label: S.rIl, value: `${analysis.ilDb.toFixed(2)} dB` },
+                    { label: S.rIl, value: `−10 log₁₀[((${analysis.pHigh.toFixed(3)} + ${analysis.pLow.toFixed(3)}) / 2) / ${state.p0.toFixed(3)}] ≈ ${fmtEr(analysis.ilDb)}` },
                   ]}
                 />
                 {analysis.task2 ? <p>{t(S.extinct)}</p> : null}
+                {Number.isNaN(analysis.erDb) && <p>{t(loc('高低电平都处于理想零点时，消光比 0/0 无定义。', 'When both levels are at the ideal null, the extinction ratio 0/0 is undefined.'))}</p>}
+                <p>{t(loc('本课的平均损耗采用等概率高低电平，包含偏置与调制导致的平均功率下降。器件额外的波导、耦合等插入损耗可单独测量。',
+                  'The average loss uses equally likely high and low levels and includes the power reduction due to bias and modulation. Added waveguide and coupling insertion losses can be measured separately.'))}</p>
               </div>
             </div>
           </>

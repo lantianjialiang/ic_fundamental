@@ -206,53 +206,57 @@ export function FundDebugPage({ moduleId, onModuleChange }: Props) {
       {/* 2. 限值 vs 灾难性 */}
       <Section title={t(S.kindTitle)} note={t(S.kindNote)}>
         <Explain paras={[KIND_TEXT.limit, KIND_TEXT.cata]} />
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th>{t(S.colTest)}</th>
-              <th>{t(S.colPin)}</th>
-              <th>{t(S.colVal)}</th>
-              <th>{t(S.colLimit)}</th>
-              <th>{t(S.colYou)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {LOG_ROWS.map((row) => {
-              const picked = answers[row.id]
-              return (
-                <tr key={row.id}>
-                  <td className="mono-cell">{row.test}</td>
-                  <td className="mono-cell">{row.pin}</td>
-                  <td className="mono-cell">{row.value}</td>
-                  <td className="mono-cell">{row.limit}</td>
-                  <td>
-                    <div className="kind">
-                      {(['limit', 'cata'] as FailKind[]).map((k) => {
-                        let state = ''
-                        if (picked && k === row.answer) state = ' is-right'
-                        else if (picked === k) state = ' is-wrong'
-                        return (
-                          <button
-                            key={k}
-                            type="button"
-                            className={`kind__btn${state}`}
-                            onClick={() => {
-                              setAnswers((prev) => ({ ...prev, [row.id]: k }))
-                              setNote({ kicker: S.kicker, title: `${row.test} · ${row.pin}`, text: row.why })
-                            }}
-                          >
-                            {t(KIND_LABEL[k])}
-                          </button>
-                        )
-                      })}
-                    </div>
-                    {picked ? <p className="intro__note" style={{ margin: '6px 0 0' }}>{t(row.why)}</p> : null}
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <div className="dtable-wrap">
+          <table className="dtable debug-classify">
+            <thead>
+              <tr>
+                <th>{t(S.colTest)}</th>
+                <th>{t(S.colPin)}</th>
+                <th>{t(S.colVal)}</th>
+                <th>{t(S.colLimit)}</th>
+                <th>{t(S.colYou)}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {LOG_ROWS.map((row) => {
+                const picked = answers[row.id]
+                return (
+                  <tr key={row.id}>
+                    <td className="mono-cell">{row.test}</td>
+                    <td className="mono-cell">{row.pin}</td>
+                    <td className="mono-cell" data-label={t(S.colVal)}>{row.value}</td>
+                    <td className="mono-cell" data-label={t(S.colLimit)}>{row.limit}</td>
+                    <td>
+                      <div className="kind">
+                        {(['limit', 'cata'] as FailKind[]).map((k) => {
+                          let state = ''
+                          if (picked && k === row.answer) state = ' is-right'
+                          else if (picked === k) state = ' is-wrong'
+                          return (
+                            <button
+                              key={k}
+                              type="button"
+                              className={`kind__btn${state}`}
+                              onClick={() => {
+                                setAnswers((prev) => ({ ...prev, [row.id]: k }))
+                                setNote({ kicker: S.kicker, title: `${row.test} · ${row.pin}`, text: row.why })
+                              }}
+                            >
+                              {t(KIND_LABEL[k])}
+                            </button>
+                          )
+                        })}
+                      </div>
+                      {picked ? <p className="intro__note" style={{ margin: '6px 0 0' }}>{t(row.why)}</p> : null}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+        <p>{t(loc('单边下限用「读数 − 下限」，单边上限用「上限 − 读数」，双边取两者较小。读数 0.39 V 对上限 0.40 V，还有 0.01 V。读数 2.41 V 对下限 2.40 V，也还有 0.01 V。',
+          'For a lower limit use reading minus limit. For an upper limit use limit minus reading. With two limits use the smaller difference. A 0.39 V reading below a 0.40 V maximum has 0.01 V left, as does a 2.41 V reading above a 2.40 V minimum.'))}</p>
       </Section>
 
       {/* 3. 从哪里开始 */}
@@ -333,6 +337,7 @@ export function FundDebugPage({ moduleId, onModuleChange }: Props) {
         {log.length === 0 ? (
           <p className="intro__note">{t(S.noLog)}</p>
         ) : (
+          <>
           <table className="dtable debug-log">
             <thead>
               <tr>
@@ -359,6 +364,17 @@ export function FundDebugPage({ moduleId, onModuleChange }: Props) {
               })}
             </tbody>
           </table>
+          <ol className="debug-log-cards">
+            {log.map((entry) => (
+              <li key={entry.n}>
+                <strong>{ACTIONS.find((action) => action.id === entry.action) ? t(ACTIONS.find((action) => action.id === entry.action)!.label) : ''}</strong>
+                {entry.reading && <span>{t(S.colRead)} · <b>{fmtRead(entry.reading)}</b></span>}
+                {entry.pass !== undefined && <span>{t(S.colRes)} · <b>{entry.pass ? 'PASS' : 'FAIL'}</b></span>}
+                <p>{t(entry.text)}</p>
+              </li>
+            ))}
+          </ol>
+          </>
         )}
         <h4 className="debug-sub">{t(S.judgeTitle)}</h4>
         <div className="debug-verdict">

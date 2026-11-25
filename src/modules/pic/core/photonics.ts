@@ -143,8 +143,9 @@ export function mzmPower(p: { p0: number; v: number; vpi: number; phi0: number }
 /** 正交点偏置：V = 0 时输出为 P0/2 */
 export const QUADRATURE_PHI = -Math.PI / 2
 
-/** ER（dB）= 10·log10(P1/P0)。P0 ≤ 0 时视为完全消光 */
+/** ER（dB）= 10·log10(P_high/P_low)。两级皆为零时功率比未定义。 */
 export function er(p1: number, p0: number): number {
+  if (p0 === 0 && p1 === 0) return NaN
   if (p0 <= 0) return Number.POSITIVE_INFINITY
   return 10 * Math.log10(p1 / p0)
 }
@@ -156,7 +157,7 @@ export function oma(p1: number, p0: number): number {
 
 /**
  * 偏置 φ0、驱动峰峰值 vpp（关于 0 对称）下的高低电平。
- * 插入损耗按平均功率相对 P0：IL = −10·log10(Pavg/P0)。
+ * 平均损耗按等概率电平计算：L_avg = −10·log10(P_avg/P_in)。
  */
 export function mzmLevels(p0: number, vpi: number, phi0: number, vpp: number): {
   pHigh: number
@@ -175,7 +176,7 @@ export function mzmLevels(p0: number, vpi: number, phi0: number, vpp: number): {
     pLow,
     erDb: er(pHigh, pLow),
     oma: oma(pHigh, pLow),
-    ilDb: -10 * Math.log10(Math.max(avg, 1e-30) / Math.max(p0, 1e-30)),
+    ilDb: -10 * Math.log10(avg / p0),
   }
 }
 

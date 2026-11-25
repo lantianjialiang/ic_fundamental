@@ -10,6 +10,7 @@ import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import '../hs/hs.css'
 import { SNS_META } from './meta'
+import { SnsAccelStimulus } from './SnsAccelStimulus'
 import {
   INTRO,
   MISCONCEPTIONS,
@@ -94,6 +95,7 @@ export function SnsAccelPage({ moduleId, onModuleChange }: Props) {
             <Seg options={PLAN_OPTIONS} value={state.plan} onChange={(plan) => update({ plan })} />
           </div>
         </div>
+        <SnsAccelStimulus state={state} analysis={analysis} />
         {state.mode === 'example' ? (
           <Callout tone="ok">
             <p>{t(fill(S.exampleLine, exampleNumbers))}</p>

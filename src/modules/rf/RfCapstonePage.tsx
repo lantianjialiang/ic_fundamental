@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
-import { type LText } from '../../i18n/locale'
+import { loc, type LText } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
@@ -28,6 +28,14 @@ import {
 } from './rfCapstoneData'
 import {
   BER_BITS,
+  BIT_RATE_BPS,
+  EBN0_REQ_DB,
+  IMPL_LOSS_DB,
+  NOISE_BANDWIDTH_HZ,
+  RATE_BANDWIDTH_DB,
+  SNR_REQ_DB,
+  THERMAL_DENSITY_DBM_PER_HZ,
+  THERMAL_POWER_DBM,
   DEFAULT_CAP,
   DEVICE_NAME,
   N_DEVICES,
@@ -161,6 +169,16 @@ export function RfCapstonePage({ moduleId, onModuleChange }: Props) {
             />
           </div>
           <BerFig nfDb={device.nfDb} rxTest={state.rxTest} />
+          <Readout items={[
+            { label: loc('噪声带宽内的热噪声', 'Thermal noise in the receiver bandwidth'),
+              value: `${THERMAL_DENSITY_DBM_PER_HZ} dBm/Hz + 10 log₁₀(${NOISE_BANDWIDTH_HZ / 1e6} × 10⁶) = ${THERMAL_POWER_DBM} dBm` },
+            { label: loc('从 BER 所需 Eb/N₀ 换到 SNR', 'Convert BER target Eb/N₀ to required SNR'),
+              value: `${EBN0_REQ_DB.toFixed(2)} + 10 log₁₀(Rb/B) + ${IMPL_LOSS_DB.toFixed(1)} ≈ ${SNR_REQ_DB.toFixed(2)} dB` },
+            { label: loc('本模型的比特率和接收噪声带宽', 'Model bit rate and receiver noise bandwidth'),
+              value: `Rb = ${BIT_RATE_BPS / 1e6} Mbit/s · B = ${NOISE_BANDWIDTH_HZ / 1e6} MHz · 10 log₁₀(Rb/B) = ${RATE_BANDWIDTH_DB.toFixed(0)} dB` },
+            { label: loc('这颗 DUT 的解析灵敏度', 'Analytic sensitivity of this DUT'),
+              value: `${THERMAL_POWER_DBM} + ${device.nfDb.toFixed(2)} (NF) + ${SNR_REQ_DB.toFixed(2)} (SNR) ≈ ${device.sensDbm.toFixed(2)} dBm` },
+          ]} />
         </div>
       </Section>
 

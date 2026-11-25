@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
-import { type LText } from '../../i18n/locale'
+import { loc, type LText } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
 import { TaskList } from '../../lab/TaskList'
 import { type ModuleId } from '../catalog'
-import { Callout, Seg, Steps } from '../fund/parts'
+import { Callout, Knob, Seg, Steps } from '../fund/parts'
 import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import { PrereqSection } from './HsPrereq'
@@ -24,7 +24,7 @@ import {
   taskItems,
   verdictOf,
 } from './serdesData'
-import { BER_LIMIT, DEFAULT_SAMPLE, DEVICE_NAME, SPEC_EH_MV, SPEC_EW_UI, buildCsv, runAll, type SampleId } from './serdesModel'
+import { BER_LIMIT, DEFAULT_SAMPLE, DEVICE_NAME, SPEC_EH_MV, SPEC_EW_UI, SWEEP_STEP_PS, buildCsv, runAll, type SampleId } from './serdesModel'
 import { HS_META } from './meta'
 import './hs.css'
 import './hsCapstone.css'
@@ -35,16 +35,19 @@ type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 export function HsCapstonePage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [sample, setSample] = useState<SampleId>(DEFAULT_SAMPLE)
+  const [pointIndex, setPointIndex] = useState<number | null>(null)
   /** 最近一次「运行全部」时的样片；换了样片后需要重新运行，报告才会出现 */
   const [ranSample, setRanSample] = useState<SampleId | null>(null)
   const [csvDone, setCsvDone] = useState(false)
 
   const report = useMemo(() => runAll(sample), [sample])
+  const point = pointIndex === null ? { phasePs: report.bestPhasePs, ber: report.berAtBest } : report.points[pointIndex]
   const shown = ranSample === sample ? report : null
   const verdict = verdictOf(sample, shown)
 
   const reset = () => {
     setSample(DEFAULT_SAMPLE)
+    setPointIndex(null)
     setRanSample(null)
     setCsvDone(false)
   }
@@ -139,16 +142,19 @@ export function HsCapstonePage({ moduleId, onModuleChange }: Props) {
         <div className="hs-controls">
           <div className="hs-field">
             <span className="hs-field__label">{t(S.sampleLabel)}</span>
-            <Seg options={SAMPLE_OPTIONS} value={sample} onChange={setSample} />
+            <Seg options={SAMPLE_OPTIONS} value={sample} onChange={(id) => { setSample(id); setPointIndex(null) }} />
           </div>
           <button type="button" className="lab__btn lab__btn--primary" aria-label={t(S.runAria)} onClick={runAllSteps}>
             {t(S.runAll)}
           </button>
         </div>
 
+        <Knob label={loc('选择时序扫描点', 'Select phase sweep point')} value={point.phasePs} unit="ps"
+          min={0} max={(report.points.length - 1) * SWEEP_STEP_PS} step={SWEEP_STEP_PS}
+          onChange={(phase) => setPointIndex(Math.round(phase / SWEEP_STEP_PS))} />
         <div className="serdes-figs">
-          <BathtubFig points={report.points} bestPhasePs={report.bestPhasePs} />
-          <EyeBoxFig sample={sample} />
+          <BathtubFig points={report.points} bestPhasePs={report.bestPhasePs} cursor={point} />
+          <EyeBoxFig sample={sample} phasePs={point.phasePs} />
         </div>
 
         <div className="serdes-report">

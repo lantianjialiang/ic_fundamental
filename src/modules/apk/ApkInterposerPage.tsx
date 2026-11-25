@@ -187,9 +187,23 @@ export function ApkInterposerPage({ moduleId, onModuleChange }: { moduleId: Modu
           </Drill>
           <Drill n={3} title={taskRc}>
             <Knob label={loc('走线长度', 'Trace length')} value={lenMm} unit="mm" min={2} max={8} step={1} onChange={setLenMm} />
+            <figure className="term-fig">
+              <svg viewBox="0 0 418 128" className="term-fig__svg" role="img" aria-label={t(loc('用四段电阻与对地电容近似分布式走线', 'Four resistor and shunt capacitor sections approximate the distributed trace'))}>
+                <rect width="418" height="128" rx="8" fill="var(--well)" />
+                <path d="M27 50 H39 M371 50 H394" stroke="var(--muted)" strokeWidth="2" />
+                {[39, 122, 205, 288].map((x) => <g key={x}>
+                  <path d={`M${x} 50 h15 l5 -8 l8 16 l8 -16 l8 16 l5 -8 h34`} stroke="var(--gold)" strokeWidth="2" fill="none" />
+                  <path d={`M${x + 72} 50 v17 m-9 0 h18 m-18 5 h18 m-9 0 v14 m-9 0 h18 m-14 4 h10`} stroke="var(--blue)" strokeWidth="2" fill="none" />
+                  <text x={x + 32} y="29" textAnchor="middle" fill="var(--text)" fontSize="13">R/4</text>
+                  <text x={x + 72} y="109" textAnchor="middle" fill="var(--text)" fontSize="13">C/4</text>
+                </g>)}
+              </svg>
+              <figcaption>{t(loc('每段都有电阻，电容沿线分布。均匀 RC 线由理想阶跃驱动、末端近似开路时，远端到最终值 50% 的延时约为 0.38RC。',
+                'Resistance and shunt capacitance are distributed along the trace. For a uniform RC line with ideal step drive and an approximately open far end, the far-end 50% delay is about 0.38RC.'))}</figcaption>
+            </figure>
             <Readout items={[
               { label: loc('你算出的电阻', 'Resistance you got'), value: `${rOhm.toFixed(1)} Ω` },
-              { label: loc('你算出的延时', 'Delay you got'), value: `${delay.toFixed(1)} ps` },
+              { label: loc('你算出的延时', 'Delay you got'), value: `0.38 × ${rOhm.toFixed(1)} Ω × ${(cF * 1e12).toFixed(2)} pF ≈ ${delay.toFixed(1)} ps` },
             ]} />
             <After show={rcHit.hit} text={loc('5 mm、截面积 2 µm×1 µm 时，R = 1.68×10⁻⁸ × 0.005 / 2×10⁻¹² = 42 Ω。电容约 1 pF，0.38×42×1 pF ≈ 16 ps。线很短，但已经是分布式 RC，不是理想导线。', 'At 5 mm and 2 µm×1 µm, R = 1.68×10⁻⁸ × 0.005 / 2×10⁻¹² = 42 Ω. Capacitance is about 1 pF, and 0.38×42×1 pF ≈ 16 ps. The trace is short, and it is already a distributed RC, not an ideal wire.')} />
           </Drill>

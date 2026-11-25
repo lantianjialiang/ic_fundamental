@@ -11,6 +11,7 @@ import '../prep/prep.css'
 import { ARRAY_SIZE } from './faultSet'
 import { MEM_META } from './meta'
 import { PatternFig } from './PatternFig'
+import { PatternTrace } from './PatternTrace'
 import { COVERAGE, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, taskItems, verdictOf } from './patternData'
 import { DEFAULT_PATTERN, PATTERN_IDS, PATTERN_OPTIONS, type PatternState, opsPerCell } from './patternModel'
 import './memPattern.css'
@@ -69,6 +70,7 @@ export function MemPatternPage({ moduleId, onModuleChange }: Props) {
 
         <div className="mem-grid">
           <PatternFig selected={pattern} rows={COVERAGE} />
+          <PatternTrace key={pattern} pattern={pattern} />
           <div className="mem-cell">
             <Readout
               items={[

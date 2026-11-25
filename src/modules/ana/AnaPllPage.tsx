@@ -12,6 +12,7 @@ import '../prep/prep.css'
 import { ANA_META } from './meta'
 import { INTRO, MISCONCEPTIONS, OUT_OPTIONS, QUIZ, REF_OPTIONS, S, TAKEAWAY, taskItems, verdictOf } from './pllData'
 import { PllFig } from './PllFig'
+import { PllLoopFig } from './PllLoopFig'
 import { BW_MAX_KHZ, BW_MIN_KHZ, DEFAULT_PLL, REF_JITTER_MAX_PS, REF_PPM_MAX, analyzePll, type LockStatus, type PllState } from './pllModel'
 import './ana.css'
 import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
@@ -28,10 +29,14 @@ const STATUS_TEXT: Record<LockStatus, LText> = {
 export function AnaPllPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [state, setState] = useState<PllState>(DEFAULT_PLL)
+  const [cursor, setCursor] = useState(0)
   const result = analyzePll(state)
   const verdict = verdictOf(state, result)
   const update = (patch: Partial<PllState>) => setState((prev) => ({ ...prev, ...patch }))
-  const reset = () => setState(DEFAULT_PLL)
+  const reset = () => {
+    setState(DEFAULT_PLL)
+    setCursor(0)
+  }
   const lockText = result.stable ? `${result.lockUs.toFixed(1)} µs` : '—'
   const hzSign = result.outErrHz >= 0 ? '+' : ''
 
@@ -81,7 +86,8 @@ export function AnaPllPage({ moduleId, onModuleChange }: Props) {
           <Knob label={S.seedLabel} value={state.seed} unit="" min={1} max={99} step={1} onChange={(seed) => update({ seed })} />
         </div>
 
-        <PllFig bwKhz={state.bwKhz} result={result} />
+        <PllLoopFig state={state} result={result} time={cursor} onTime={setCursor} />
+        <PllFig bwKhz={state.bwKhz} result={result} cursor={cursor} />
 
         <div className="ana-cell">
           <Readout

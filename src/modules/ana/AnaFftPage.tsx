@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { SpectralRecordFig } from './SpectralRecordFig'
 import { useLocale } from '../../i18n/LocaleContext'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
@@ -123,6 +124,7 @@ export function AnaFftPage({ moduleId, onModuleChange }: Props) {
 
       
 
+      <SpectralRecordFig initial="window" />
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">
           <p>{t(TAKEAWAY)}</p>

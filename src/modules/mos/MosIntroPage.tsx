@@ -15,7 +15,7 @@ import { INTRO_RD, SYM_FIG } from './data/mosIntroFig'
 import { CMP, CMP_HEAD, CMP_LINE, QUIZ, TAKEAWAY, type CmpId } from './data/mosIntroQuiz'
 import { TermFig } from './IntroFigs'
 import { SymPkgFig } from './IntroFigs2'
-import { fmtMa, SwitchFig, solveSwitch } from './IntroFigs3'
+import { fmtMa, LoadLineFig, SwitchFig, solveSwitch } from './IntroFigs3'
 import { CmpFig } from './IntroFigs4'
 import { MOS_META } from './meta'
 import '../prep/prep.css'
@@ -96,6 +96,7 @@ export function MosIntroPage({ moduleId, onModuleChange }: Props) {
           />
         </div>
         <SwitchFig vgs={vgs} />
+        <LoadLineFig vgs={vgs} />
         <Readout
           items={[
             { label: S.state, value: t(sw.on ? S.on : S.off), state: sw.on ? 'pass' : 'fail' },

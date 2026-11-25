@@ -97,3 +97,8 @@
 .mem-row-sel {
   fill: var(--gold-bg);
 }
+.mem-coupling-trace { display: grid; gap: .55rem; padding: 0; list-style: none; }
+.mem-coupling-trace li { display: grid; gap: .3rem; padding: .55rem; border: 1px solid var(--line-2); border-radius: .45rem; }
+.mem-coupling-trace li[data-state='current'] { background: var(--blue-bg); border-color: var(--blue); }
+.mem-coupling-trace li[data-state='fail'] { background: var(--red-bg); border-color: var(--red); }
+.mem-coupling-trace li[data-state='pending'] span { color: var(--muted); }

@@ -49,7 +49,7 @@ export type ModAnalysis = {
 }
 
 export function fmtEr(db: number): string {
-  return Number.isFinite(db) ? `${db.toFixed(2)} dB` : '∞'
+  return Number.isNaN(db) ? '—' : Number.isFinite(db) ? `${db.toFixed(2)} dB` : '∞'
 }
 
 export function analyseMod(state: ModState): ModAnalysis {

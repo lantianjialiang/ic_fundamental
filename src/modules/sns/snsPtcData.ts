@@ -72,7 +72,7 @@ export const S = {
   diffTitle: loc('差帧：K 来自散粒噪声斜率', 'Difference frames: K comes from the shot-noise slope'),
   singleTitle: loc('单帧：方差里还有 PRNU', 'Single frame: PRNU is still in the variance'),
   diffWhy: loc(
-    '原因：两帧相减再除以 2，不随时间变化的 FPN 和 PRNU 被消掉，剩下的方差对均值的斜率是 1/K。当前 K 估计 {k}，真值 {kt}，相对误差 {rel}%。满阱估计 {fwc}，旋钮 {fk}。ROI {side} 像素的方差相对误差约 {ve}%。',
+    '原因：先相减消掉稳定的 FPN 和 PRNU，再将差值的方差除以 2，剩下的方差对均值的斜率是 1/K。当前 K 估计 {k}，真值 {kt}，相对误差 {rel}%。满阱估计 {fwc}，旋钮 {fk}。ROI {side} 像素的方差相对误差约 {ve}%。',
     'Reason: subtracting the two frames and dividing by 2 cancels FPN and PRNU, which do not change with time, and the slope of variance versus mean is 1/K. K estimate is {k} now, the true value is {kt}, and the relative error is {rel}%. Full-well estimate is {fwc}, the knob is {fk}. The variance relative error on {side} ROI pixels is about {ve}%. ',
   ),
   singleWhy: loc(
@@ -84,7 +84,7 @@ export const S = {
 export function plotSummary(a: PtcAnalysis): LText {
   return fill(
     loc(
-      '蓝点是各曝光的均值和方差（对数坐标），金线斜率的倒数是 K。当前斜率 {slope}，K 估计 {k}。方差掉下去的亮端是饱和，用来读满阱。',
+      '蓝点是各曝光的均值和方差（对数坐标）。金线在原始线性单位的散粒噪声区拟合，拟合斜率的倒数是 K。当前斜率 {slope}，K 估计 {k}。方差掉下去的亮端是饱和，用来读满阱。',
       'Blue points are mean and variance at each exposure (log axes). K is the reciprocal of the gold slope. The slope is {slope} now and the K estimate is {k}. The bright end where variance falls is saturation, which is where full well is read.',
     ),
     { slope: a.slope.toFixed(4), k: fmtK(a.k) },
@@ -93,8 +93,8 @@ export function plotSummary(a: PtcAnalysis): LText {
 
 export const INTRO = [
   loc(
-    '光子传递曲线在每个曝光采两帧。均值是两帧 ROI 平均再减去暗场，方差是两帧之差的方差除以 2。散粒噪声区里，DN 的方差 = 均值 / K + 读出噪声方差，所以 K = 1 / 斜率。K（e-/DN）和转换增益 CG（V/e-）的关系是 K = Vref / (2^N · CG)。暗端的截距给出读出噪声，方差掉下去的位置是饱和，满阱 = 饱和均值 × K。',
-    'A photon transfer curve takes two frames at each exposure. The mean is the average of the two ROI means minus the dark mean, and the variance is the variance of the frame difference divided by 2. In the shot-noise region the DN variance equals mean / K plus the read-noise variance, so K = 1 / slope. K (e-/DN) and conversion gain CG (V/e-) are related by K = Vref / (2^N · CG). The intercept at the dark end gives read noise. Where the variance falls off is saturation, and full well = saturated mean times K.',
+    '光子传递曲线在每个曝光采两帧。均值是两帧 ROI 平均再减去暗场，同曝光的两帧中，若时间噪声相互独立且同方差，Var(f₁−f₂)=Var(f₁)+Var(f₂)=2σ²。差帧方差除以 2 才得到单帧方差。散粒噪声区里，DN 的方差 = 均值 / K + 读出噪声方差，所以 K = 1 / 斜率。K（e-/DN）和转换增益 CG（V/e-）的关系是 K = Vref / (2^N · CG)。暗端的截距给出读出噪声，方差掉下去的位置是饱和，满阱 = 饱和均值 × K。',
+    'A photon transfer curve takes two frames at each exposure. The mean is the average of the two ROI means minus the dark mean. With equal exposure and independent temporal noise of equal variance, Var(f₁−f₂) = Var(f₁) + Var(f₂) = 2σ². Divide the difference variance by 2 to recover the single-frame variance. Fit variance versus mean in linear units within the shot-noise region. Its slope is 1/K. K (e-/DN) and conversion gain CG (V/e-) are related by K = Vref / (2^N · CG). The intercept gives the read-noise variance, and the saturated mean times K gives full well.',
   ),
   loc(
     '动态范围是满阱电子数除以读出噪声，SNR 的最大值约是 √满阱。方差估计自己也有误差，大约 √(2/(n−1))，n 是 ROI 像素数，所以 ROI 不能太小。单帧方差把 PRNU 和 FPN 算了进去，斜率偏大，K 偏小。量产往往只抽几个曝光点，整条曲线留在特性化里做。',

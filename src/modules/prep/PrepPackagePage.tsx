@@ -9,6 +9,7 @@ import { Callout, Readout, Seg } from '../fund/parts'
 import { RefParas, RefP, Related, type PrepNote } from './common'
 import { CPFT, FLOW, INSIDE, INTRO, PARTS, PKGS, QUIZ, S, TAKEAWAY, type InsideMode, type PartId, type PkgId, type StageId } from './data/package'
 import { CpFtFig, FlowFig, InsideFig, PackageFig } from './PackageFigs'
+import { DieTrace, getDieTrace } from './DieTrace'
 import './prep.css'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
@@ -21,6 +22,7 @@ const MODES: Array<{ id: InsideMode; label: typeof S.wire }> = [
 export function PrepPackagePage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const flow = useStepPlayer(FLOW.length, 2000)
+  const [trace] = useState(getDieTrace)
   const [pkg, setPkg] = useState<PkgId>(PKGS[0].id)
   const [mode, setMode] = useState<InsideMode>(MODES[0].id)
   const [part, setPart] = useState<PartId>(INSIDE[MODES[0].id][0])
@@ -123,6 +125,7 @@ export function PrepPackagePage({ moduleId, onModuleChange }: Props) {
       <Section title={t(S.flowTitle)} note={t(S.flowNote)}>
         <FlowFig step={flow.step} />
         <StepControls player={flowPlayer} stepLabels={FLOW.map((f) => f.title)} />
+        <DieTrace {...trace} step={flow.step} />
         <Callout>
           <p>
             <b>{`${flow.step + 1}. ${t(flowItem.title)}`}</b>

@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
 import { TaskList } from '../../lab/TaskList'
 import { type ModuleId } from '../catalog'
-import { Callout, Readout, Seg } from '../fund/parts'
+import { Callout, Knob, Readout, Seg } from '../fund/parts'
 import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import { DnlInlFig, HistFig } from './StaticFig'
@@ -24,7 +25,7 @@ import {
   taskItems,
   verdictOf,
 } from './staticData'
-import { DEFAULT_STATIC, staticResult, type DeviceId, type StaticState } from './staticModel'
+import { CODE_MAX, DEFAULT_STATIC, buildTransitions, deviceOf, staticResult, type DeviceId, type StaticState } from './staticModel'
 import './ana.css'
 import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
@@ -34,13 +35,17 @@ export function AnaStaticPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [state, setState] = useState<StaticState>(DEFAULT_STATIC)
   const [predict, setPredict] = useState('')
-  const result = staticResult(state)
+  const [code, setCode] = useState(37)
+  const result = useMemo(() => staticResult(state), [state])
+  const transitions = useMemo(() => buildTransitions(deviceOf(state.device)), [state.device])
+  const mean = result.counts.slice(1, CODE_MAX).reduce((sum, value) => sum + value, 0) / (CODE_MAX - 1)
   const predicted = isPredictionRight(predict, result.expected)
   const verdict = verdictOf(state, result)
   const update = (patch: Partial<StaticState>) => setState((prev) => ({ ...prev, ...patch }))
   const reset = () => {
     setState(DEFAULT_STATIC)
     setPredict('')
+    setCode(37)
   }
 
   const predictText = t(predictFeedback(predict, predicted, result.expected))
@@ -91,18 +96,25 @@ export function AnaStaticPage({ moduleId, onModuleChange }: Props) {
           </div>
         </div>
 
+        <div className="knob-row">
+          <Knob label={loc('两张图中的当前码', 'Code in both plots')} value={code} min={1} max={CODE_MAX - 1} step={1} unit="" onChange={setCode} />
+        </div>
         <div className="ana-grid">
           <div className="ana-cell">
             <h3>{t(S.histTitle)}</h3>
             <p className="intro__note">{t(S.histNote)}</p>
-            <HistFig result={result} />
+            <HistFig result={result} selected={code} onSelect={setCode} />
           </div>
           <div className="ana-cell">
             <h3>{t(S.dnlTitle)}</h3>
             <p className="intro__note">{t(S.dnlNote)}</p>
-            <DnlInlFig result={result} />
+            <DnlInlFig result={result} selected={code} />
           </div>
         </div>
+        <p className="intro__note" aria-live="polite">
+          {t(loc(`码 ${code} 的原始区间为 [${transitions[code - 1].toFixed(3)}, ${transitions[code].toFixed(3)}) LSB。DNL = ${result.counts[code]} ÷ ${mean.toFixed(2)} − 1 = ${result.dnl[code - 1].toFixed(3)} LSB，这里以中间码平均命中数归一。INL = 从码 1 累加到码 ${code} 的 DNL = ${result.inl[code - 1].toFixed(3)} LSB。`,
+            `Code ${code} covers [${transitions[code - 1].toFixed(3)}, ${transitions[code].toFixed(3)}) LSB. DNL = ${result.counts[code]} ÷ ${mean.toFixed(2)} − 1 = ${result.dnl[code - 1].toFixed(3)} LSB, normalized by mean interior code hits. INL = sum of DNL from code 1 through ${code} = ${result.inl[code - 1].toFixed(3)} LSB.`))}
+        </p>
 
         <div className="ana-cell">
           <Readout

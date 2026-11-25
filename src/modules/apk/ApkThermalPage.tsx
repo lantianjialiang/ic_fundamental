@@ -4,15 +4,15 @@ import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
 import { Cards, Knob, Readout } from '../fund/parts'
 import { currentDensityAPerM2, layerStackRth } from './core'
-import { YieldBars } from '../mfg/figs'
 import { After, COMMON, Drill, PackLesson, useSticky } from '../mfg/shell'
 import { APK_META } from './meta'
 
 const LAYERS = [
-  { id: 'si', title: loc('硅', 'Silicon'), t: 50e-6, k: 150, text: loc('硅导热很好，这一层往往不是瓶颈。', 'Silicon conducts well; this layer is rarely the bottleneck.') },
-  { id: 'uf', title: loc('底部填充 / 键合', 'Underfill / bond'), t: 20e-6, k: 1, text: loc('低热导率，常常主导 Rth。', 'Low k; often dominates Rth.') },
-  { id: 'tim', title: loc('TIM / 盖板', 'TIM / lid'), t: 100e-6, k: 5, text: loc('盖板路径的另一段。', 'The other piece of the lid path.') },
-]
+  { id: 'si', title: loc('硅', 'Silicon'), k: 150, color: '#65accb', text: loc('硅的导热系数高，温降通常较小。', 'Silicon has high thermal conductivity and typically a small temperature drop.') },
+  { id: 'uf', title: loc('填充 / 键合', 'Underfill / bond'), k: 1, color: '#cf9f65', text: loc('填充或键合改变材料和厚度。比较这一层和 TIM 的温降。', 'The underfill or bond changes both material and thickness. Compare its drop with the drop across the TIM.') },
+  { id: 'tim', title: loc('TIM', 'TIM'), k: 5, color: '#75bba3', text: loc('导热界面材料把热送到盖板一侧。', 'The thermal interface material carries heat to the lid side.') },
+] as const
+const AREA_M2 = 1e-4
 
 const QUIZ = [
   { id: 'q1', prompt: loc('50 µm 硅、150 W/(m·K)、100 mm² 的 Rth？', 'Rth of 50 µm Si, 150 W/(m·K), 100 mm²?'), options: [
@@ -60,7 +60,7 @@ const QUIZ = [
 
 export function ApkThermalPage({ moduleId, onModuleChange }: { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }) {
   const { t } = useLocale()
-  const [layerId, setLayerId] = useState(LAYERS[0].id)
+  const [layerId, setLayerId] = useState<(typeof LAYERS)[number]['id']>(LAYERS[0].id)
   const [siUm, setSiUm] = useState(80)
   const [tUf, setTUf] = useState(40)
   const [hybrid, setHybrid] = useState(false)
@@ -68,15 +68,18 @@ export function ApkThermalPage({ moduleId, onModuleChange }: { moduleId: ModuleI
   const [tamb, setTamb] = useState(25)
   const [cur, setCur] = useState(5)
   const layer = LAYERS.find((item) => item.id === layerId) ?? LAYERS[0]
-  const ufT = hybrid ? 2e-6 : tUf * 1e-6
-  const stack = layerStackRth([
-    { thicknessM: siUm * 1e-6, kWmK: 150, areaM2: 1e-4 },
-    { thicknessM: ufT, kWmK: hybrid ? 2 : 1, areaM2: 1e-4 },
-    { thicknessM: 100e-6, kWmK: 5, areaM2: 1e-4 },
-  ])
+  const materials = LAYERS.map((item, index) => ({
+    ...item,
+    thicknessUm: [siUm, hybrid ? 2 : tUf, 100][index],
+    kWmK: item.id === 'uf' && hybrid ? 2 : item.k,
+  }))
+  const stack = layerStackRth(materials.map(({ thicknessUm, kWmK }) => ({ thicknessM: thicknessUm * 1e-6, kWmK, areaM2: AREA_M2 })))
   const tj = tamb + power * stack.total
   const j = currentDensityAPerM2(cur * 1e-3, 12.5e-6)
-  const rSi = (siUm * 1e-6) / (150 * 1e-4)
+  const [rSi, rUf] = stack.perLayer
+  const selectedIndex = materials.findIndex((item) => item.id === layerId)
+  const selected = materials[selectedIndex]
+  const selectedRth = stack.perLayer[selectedIndex]
   const siHit = useSticky(siUm === 50)
   const ufHit = useSticky(!hybrid && tUf === 20)
   const pHit = useSticky(power !== 80)
@@ -87,7 +90,6 @@ export function ApkThermalPage({ moduleId, onModuleChange }: { moduleId: ModuleI
   const taskP = loc('改一下功率，读结温怎样跟着变。', 'Change the power and read how the junction temperature follows.')
   const taskHy = loc('打开混合键合，读键合层热阻怎样变。', 'Turn on hybrid bonding and read how the bond-layer thermal resistance changes.')
   const taskJ = loc('把微凸点电流调到 10 mA，读电流密度。', 'Set the micro-bump current to 10 mA and read the current density.')
-  const rUf = ufT / ((hybrid ? 2 : 1) * 1e-4)
 
   return (
     <PackLesson
@@ -130,7 +132,43 @@ export function ApkThermalPage({ moduleId, onModuleChange }: { moduleId: ModuleI
         <div className="mfg-lab">
           <p>{t(loc('热从结到环境要穿过好几层。点一层，读它厚不厚、导不导热。', 'Heat from the junction to the air crosses several layers. Click one and read whether it is thick and whether it conducts.'))}</p>
           <Cards items={LAYERS} activeId={layerId} cols={3} onPick={(item) => setLayerId(item.id)} />
-          <p>{t(layer.text)}</p>
+          <figure className="term-fig">
+            <svg className="term-fig__svg" viewBox="0 0 428 249" role="img" aria-label={t(loc('从结到盖板的逐层热流和温降', 'Heat flow and temperature drops from junction to lid'))}>
+              <rect width="428" height="249" rx="10" fill="var(--well)" />
+              <rect x="43" y="35" width="151" height="17" rx="3" fill="var(--fig-box)" stroke="var(--line-2)" />
+              <rect x="43" y="200" width="151" height="14" rx="3" fill="#d96c61" fillOpacity=".65" />
+              <g fill="var(--text)" fontSize="14">
+                <text x="45" y="25">{t(loc('盖板侧边界', 'Lid-side boundary'))} · {tamb} °C</text>
+                <text x="45" y="234">{t(loc('结温', 'Junction'))} · {tj.toFixed(1)} °C</text>
+                <text x="246" y="34">{t(loc('各层温降', 'Drop across each layer'))}</text>
+              </g>
+              {materials.map((item, index) => {
+                const y = 151 - index * 48
+                const fraction = stack.perLayer[index] / stack.total
+                const title = item.id === 'uf' && hybrid ? loc('混合键合', 'Hybrid bond') : item.title
+                return <g key={item.id} data-thermal-layer={item.id} data-thermal-selected={layerId === item.id} data-thermal-drop={power * stack.perLayer[index]}>
+                  <rect x="43" y={y} width="151" height="45" rx="4" fill={item.color} fillOpacity={layerId === item.id ? '.86' : '.38'}
+                    stroke={layerId === item.id ? 'var(--text)' : item.color} strokeWidth={layerId === item.id ? 2 : 1} />
+                  <text x="57" y={y + 20} fill={layerId === item.id ? '#112432' : 'var(--text)'} fontSize="14">{t(title)}</text>
+                  <text x="57" y={y + 36} fill={layerId === item.id ? '#112432' : 'var(--text)'} fontSize="12">{item.thicknessUm} µm</text>
+                  <rect x="246" y={y + 18} width="157" height="9" rx="4" fill="var(--fig-box)" stroke="var(--line-2)" />
+                  <rect x="246" y={y + 18} width={fraction * 157} height="9" rx="4" fill={item.color} />
+                  <text x="246" y={y + 13} fill="var(--text)" fontSize="14">{(power * stack.perLayer[index]).toFixed(2)} K</text>
+                </g>
+              })}
+              <path d="M213 204 V54 M206 65 L213 54 L220 65" stroke="var(--gold)" strokeWidth="4" fill="none" />
+              <text x="221" y="218" fill="var(--gold)" fontSize="13">P = {power} W</text>
+            </svg>
+            <figcaption>{t(loc('箭头为热流方向。条长表示该层占总温降的比例。材料厚度按示意绘制，模型取一维稳态导热和等面积，并把盖板侧设为环境温度。',
+              'The arrow shows heat flow. Bar length is the layer’s share of the total drop. Layer thicknesses are schematic. The model assumes one-dimensional steady conduction, equal areas and a lid-side boundary at ambient temperature.'))}</figcaption>
+            <Readout items={[
+              { label: selected.title, value: t(selected.text) },
+              { label: loc('按 SI 单位代入单层热阻', 'Substitute SI units into layer resistance'),
+                value: `Rθ = t/(kA) = (${selected.thicknessUm} × 10⁻⁶ m) / (${selected.kWmK} W/(m·K) × 10⁻⁴ m²) ≈ ${selectedRth.toFixed(4)} K/W` },
+              { label: loc('该层承受的温降', 'Temperature drop across this layer'),
+                value: `ΔT = P × Rθ ≈ ${power} W × ${selectedRth.toFixed(4)} K/W ≈ ${(power * selectedRth).toFixed(2)} K` },
+            ]} />
+          </figure>
           <p>{t(loc('一层的热阻 Rth = 厚度 / (导热系数 × 面积)。这一课面积用 1 cm²。各层热阻相加，温升 ≈ 功率 × 总热阻。硅的导热系数按 150 W/(m·K)，底部填充按 1，混合键合那一层按 2，而且更薄。', 'One layer’s thermal resistance Rth = thickness / (conductivity × area). This lesson uses 1 cm². The layers add, and the temperature rise ≈ power × total Rth. Silicon is taken as 150 W/(m·K), underfill as 1, and the hybrid-bond film as 2, and thinner.'))}</p>
           <p>{t(loc('电流密度 J = I / (π r²)。微凸点半径这一课用 12.5 µm。电流挤在这么小的截面里，电迁移和芯片内部是同一类问题。', 'Current density J = I / (π r²). This lesson uses a 12.5 µm bump radius. Current crowded into that small section is the same kind of electromigration problem as inside the chip.'))}</p>
         </div>
@@ -148,11 +186,6 @@ export function ApkThermalPage({ moduleId, onModuleChange }: { moduleId: ModuleI
             <After show={ufHit.hit} text={loc('20 µm、导热系数 1、面积 1 cm²，热阻是 0.2 K/W。硅只有 3.33 mK/W，填充大约是它的 60 倍。热卡在填充，不卡在硅。', '20 µm, conductivity 1, area 1 cm²: the thermal resistance is 0.2 K/W. Silicon is only 3.33 mK/W, so the underfill is about 60× larger. Heat is stuck in the underfill, not in the silicon.')} />
           </Drill>
           <Drill n={3} title={taskP}>
-            <YieldBars items={[
-              { title: loc('硅', 'Silicon'), value: Math.min(1, stack.perLayer[0] / 0.25) },
-              { title: loc('键合 / 填充', 'Bond / UF'), value: Math.min(1, stack.perLayer[1] / 0.25) },
-              { title: loc('TIM', 'TIM'), value: Math.min(1, stack.perLayer[2] / 0.25) },
-            ]} />
             <div className="knobs">
               <Knob label={loc('功率', 'Power')} value={power} unit="W" min={40} max={160} step={20} onChange={setPower} />
               <Knob label={loc('环境温度', 'Ambient')} value={tamb} unit="°C" min={25} max={85} step={10} onChange={setTamb} />

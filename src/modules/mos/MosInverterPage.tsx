@@ -11,6 +11,7 @@ import { CALC_TEXT, FRAMES, INTRO, NOISE_TEXT, PARTS, PHASE_TEXT, POWERS, QUIZ, 
 import { FL, PHASE_SHORT } from './data/mosInverterFig'
 import { gainAt, KEY, opState, phaseOf, SweepFig } from './InverterFigs'
 import { dynPower, fmtE, fmtP, NoiseFig, PowerFig, StructFig } from './InverterFigs2'
+import { InverterCurrentFig } from './InverterCurrentFig'
 import { MOS_META } from './meta'
 import { VDD } from './model'
 import '../prep/prep.css'
@@ -306,6 +307,7 @@ export function MosInverterPage({ moduleId, onModuleChange }: Props) {
             }}
           />
         </div>
+        <InverterCurrentFig />
         <PowerFig c={cPf} v={vSup} f={fMhz} />
         <Readout
           items={[

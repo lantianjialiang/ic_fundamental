@@ -399,28 +399,30 @@ export function FundCharPage({ moduleId, onModuleChange }: Props) {
           </button>
         </div>
         {demo > 0 ? (
-          <table className="dtable char-demo">
-            <thead>
-              <tr>
-                <th>{t(S.colStep)}</th>
-                <th>{t(S.colRange)}</th>
-                <th>{t(S.colMid)}</th>
-                <th>{t(S.colCmp)}</th>
-                <th>{t(S.colNext)}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {DEMO_STEPS.slice(0, demo).map((row, i) => (
-                <tr key={row.range}>
-                  <td className={`mono-cell${i === demo - 1 ? ' is-now' : ''}`}>{i + 1}</td>
-                  <td className="mono-cell">{row.range}</td>
-                  <td className="mono-cell">{row.mid}</td>
-                  <td>{t(row.cmp)}</td>
-                  <td className="mono-cell">{row.next}</td>
+          <div className="dtable-wrap">
+            <table className="dtable char-demo">
+              <thead>
+                <tr>
+                  <th>{t(S.colStep)}</th>
+                  <th>{t(S.colRange)}</th>
+                  <th>{t(S.colMid)}</th>
+                  <th>{t(S.colCmp)}</th>
+                  <th>{t(S.colNext)}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {DEMO_STEPS.slice(0, demo).map((row, i) => (
+                  <tr key={row.range}>
+                    <td className={`mono-cell${i === demo - 1 ? ' is-now' : ''}`}>{i + 1}</td>
+                    <td className="mono-cell">{row.range}</td>
+                    <td className="mono-cell">{row.mid}</td>
+                    <td>{t(row.cmp)}</td>
+                    <td className="mono-cell">{row.next}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : null}
       </Section>
 
@@ -461,29 +463,31 @@ export function FundCharPage({ moduleId, onModuleChange }: Props) {
 
       {/* 4. 常见参数 */}
       <Section title={t(S.paramTitle)} note={t(S.paramNote)}>
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th>{t(S.colParam)}</th>
-              <th>{t(S.colWhat)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {PARAMS.map((p) => (
-              <tr
-                key={p.id}
-                className={`is-click${p.id === param ? ' is-active' : ''}`}
-                onClick={() => {
-                  setParam(p.id)
-                  setNote({ kicker: S.kicker, title: p.name, text: p.how })
-                }}
-              >
-                <td className="mono-cell">{t(p.name)}</td>
-                <td>{t(p.what)}</td>
+        <div className="dtable-wrap">
+          <table className="dtable">
+            <thead>
+              <tr>
+                <th>{t(S.colParam)}</th>
+                <th>{t(S.colWhat)}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {PARAMS.map((p) => (
+                <tr
+                  key={p.id}
+                  className={`is-click${p.id === param ? ' is-active' : ''}`}
+                  onClick={() => {
+                    setParam(p.id)
+                    setNote({ kicker: S.kicker, title: p.name, text: p.how })
+                  }}
+                >
+                  <td className="mono-cell">{t(p.name)}</td>
+                  <td>{t(p.what)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <Explain paras={[paramItem.how]} />
         <h4 className="char-sub">{t(S.planTitle)}</h4>
         <Steps items={PLAN} />
@@ -602,93 +606,97 @@ export function FundCharPage({ moduleId, onModuleChange }: Props) {
           <p key={para.zh}>{t(para)}</p>
         ))}
         <h4 className="char-sub">{t(S.fig95)}</h4>
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th>{t(S.colTest)}</th>
-              <th>{t(S.colPin)}</th>
-              <th>VDDMIN 4.5 V</th>
-              <th>VDDNOM 5.0 V</th>
-              <th>VDDMAX 5.5 V</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colSpan={5}>
-                <b>{t(S.inTh)}</b>
-              </td>
-            </tr>
-            {FIG95_IN.map((row) => (
-              <tr key={`${row.name}${row.pin}`}>
-                <td className="mono-cell">{`${row.name} THRESHOLD`}</td>
-                <td className="mono-cell">{row.pin}</td>
-                {row.v.map((v, i) => (
-                  <td key={i} className="mono-cell">
-                    {v}
-                  </td>
-                ))}
+        <div className="dtable-wrap">
+          <table className="dtable">
+            <thead>
+              <tr>
+                <th>{t(S.colTest)}</th>
+                <th>{t(S.colPin)}</th>
+                <th>VDDMIN 4.5 V</th>
+                <th>VDDNOM 5.0 V</th>
+                <th>VDDMAX 5.5 V</th>
               </tr>
-            ))}
-            <tr>
-              <td colSpan={5}>
-                <b>{t(S.outTh)}</b>
-              </td>
-            </tr>
-            {FIG95_OUT.map((row) => (
-              <tr key={`${row.name}${row.pin}`}>
-                <td className="mono-cell">{`${row.name} THRESHOLD`}</td>
-                <td className="mono-cell">{row.pin}</td>
-                {row.v.map((v, i) => (
-                  <td key={i} className="mono-cell">
-                    {v}
-                  </td>
-                ))}
+            </thead>
+            <tbody>
+              <tr>
+                <td colSpan={5}>
+                  <b>{t(S.inTh)}</b>
+                </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
+              {FIG95_IN.map((row) => (
+                <tr key={`${row.name}${row.pin}`}>
+                  <td className="mono-cell">{`${row.name} THRESHOLD`}</td>
+                  <td className="mono-cell">{row.pin}</td>
+                  {row.v.map((v, i) => (
+                    <td key={i} className="mono-cell">
+                      {v}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+              <tr>
+                <td colSpan={5}>
+                  <b>{t(S.outTh)}</b>
+                </td>
+              </tr>
+              {FIG95_OUT.map((row) => (
+                <tr key={`${row.name}${row.pin}`}>
+                  <td className="mono-cell">{`${row.name} THRESHOLD`}</td>
+                  <td className="mono-cell">{row.pin}</td>
+                  {row.v.map((v, i) => (
+                    <td key={i} className="mono-cell">
+                      {v}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <p className="intro__note">{t(FIG95_NOTE)}</p>
 
         <h4 className="char-sub">{t(S.fig96)}</h4>
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th>{t(S.colPinName)}</th>
-              <th>{t(S.colTp)}</th>
-              <th>{t(S.colMode)}</th>
-              <th>{t(S.colOrig)}</th>
-              <th>{t(S.colBegin)}</th>
-              <th>{t(S.colMeas)}</th>
-              <th>{t(S.colEnd)}</th>
-              <th>{t(S.colFail)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {FIG96.map((row) => (
-              <tr
-                key={row.pin}
-                className={`is-click${row96 === row.pin ? ' is-active' : ''}`}
-                onClick={() => {
-                  setRow96(row.pin)
-                  setNote({
-                    kicker: S.kicker,
-                    title: row.pin,
-                    text: fill96(S.row96, row),
-                  })
-                }}
-              >
-                <td className="mono-cell">{row.pin}</td>
-                <td className="mono-cell">{row.tp}</td>
-                <td className="mono-cell">EDGE</td>
-                <td className="mono-cell">45.0ns</td>
-                <td className="mono-cell">1.0ns</td>
-                <td className="mono-cell">{`${row.measured.toFixed(1)}ns`}</td>
-                <td className="mono-cell">80.0ns</td>
-                <td className="mono-cell">{row.fail}</td>
+        <div className="dtable-wrap">
+          <table className="dtable">
+            <thead>
+              <tr>
+                <th>{t(S.colPinName)}</th>
+                <th>{t(S.colTp)}</th>
+                <th>{t(S.colMode)}</th>
+                <th>{t(S.colOrig)}</th>
+                <th>{t(S.colBegin)}</th>
+                <th>{t(S.colMeas)}</th>
+                <th>{t(S.colEnd)}</th>
+                <th>{t(S.colFail)}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {FIG96.map((row) => (
+                <tr
+                  key={row.pin}
+                  className={`is-click${row96 === row.pin ? ' is-active' : ''}`}
+                  onClick={() => {
+                    setRow96(row.pin)
+                    setNote({
+                      kicker: S.kicker,
+                      title: row.pin,
+                      text: fill96(S.row96, row),
+                    })
+                  }}
+                >
+                  <td className="mono-cell">{row.pin}</td>
+                  <td className="mono-cell">{row.tp}</td>
+                  <td className="mono-cell">EDGE</td>
+                  <td className="mono-cell">45.0ns</td>
+                  <td className="mono-cell">1.0ns</td>
+                  <td className="mono-cell">{`${row.measured.toFixed(1)}ns`}</td>
+                  <td className="mono-cell">80.0ns</td>
+                  <td className="mono-cell">{row.fail}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <p className="intro__note">{t(FIG96_NOTE)}</p>
 
         <h4 className="char-sub">{t(S.readQuiz)}</h4>

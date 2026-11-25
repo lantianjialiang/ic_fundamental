@@ -1,4 +1,5 @@
 import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
 import { S } from './data/mosIntro'
 import { SW_FIG } from './data/mosIntroFig'
 import { MosSymbol, T } from './IntroFigs'
@@ -26,6 +27,34 @@ export function solveSwitch(vgs: number) {
 }
 
 export const fmtMa = (i: number) => `${(i * 1e3).toFixed(2)} mA`
+
+export function LoadLineFig({ vgs }: { vgs: number }) {
+  const { t } = useLocale()
+  const { id, vds } = solveSwitch(vgs)
+  const samples = Array.from({ length: 65 }, (_, i) => i * VDD / 64)
+  const max = Math.max(IMAX, nId(vgs, VDD))
+  const x = (v: number) => 56 + 314 * v / VDD
+  const y = (i: number) => 157 - 126 * i / max
+  return (
+    <figure className="term-fig">
+      <svg viewBox="0 0 410 194" className="term-fig__svg" role="img" aria-label={t(loc('MOS 电流曲线与电阻负载线的交点', 'MOS current curve intersects the resistor load line'))}>
+        <rect width="410" height="194" rx="8" fill="var(--well)" />
+        <path d="M56 26 V157 H378" stroke="var(--muted)" fill="none" />
+        <path d={`M56 ${y(IMAX)} L370 157`} stroke="var(--gold)" strokeWidth="2" />
+        <polyline points={samples.map((v) => `${x(v)},${y(nId(vgs, v))}`).join(' ')} fill="none" stroke="var(--blue)" strokeWidth="2" />
+        <path d={`M56 ${y(id)} H${x(vds)} V157`} stroke="var(--muted)" strokeDasharray="3 3" fill="none" />
+        <circle data-mos-operating={vds} cx={x(vds)} cy={y(id)} r="5" fill="var(--text)" />
+        <text x="14" y="20" fill="var(--text)" fontSize="14">Iᴅ (mA)</text>
+        <text x="367" y="181" fill="var(--text)" fontSize="14" textAnchor="end">Vᴅₛ (V)</text>
+        <text x="51" y="35" fill="var(--text)" fontSize="12" textAnchor="end">{(max * 1000).toFixed(2)}</text>
+      </svg>
+      <figcaption>{t(loc(
+        `蓝线为 VGS = ${vgs.toFixed(1)} V 时的器件模型，金线是负载所允许的电流。交点满足 ID = (${VDD} − ${vds.toFixed(2)}) V ÷ ${RL / 1000} kΩ ≈ ${fmtMa(id)}。器件曲线采用教学用平方律。`,
+        `Blue is the device model at VGS = ${vgs.toFixed(1)} V. Gold is the current allowed by the load. At their intersection, ID = (${VDD} − ${vds.toFixed(2)}) V ÷ ${RL / 1000} kΩ ≈ ${fmtMa(id)}. The device curve uses the teaching square-law model.`,
+      ))}</figcaption>
+    </figure>
+  )
+}
 
 const WIRE = 'var(--text-2)'
 

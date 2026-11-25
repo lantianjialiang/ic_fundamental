@@ -98,7 +98,7 @@ export function PhaseNoiseFig({
         {X_TICKS.map((tick) => (
           <g key={`x${tick}`}>
             <line x1={xOfExp(tick)} x2={xOfExp(tick)} y1={PAD_T} y2={PAD_T + PLOT_H} stroke={GRID} strokeDasharray="4 3" />
-            <text x={xOfExp(tick)} y={PAD_T + PLOT_H + 14} textAnchor="middle" fill={LABEL_COLOR} fontSize={11}>
+            <text x={xOfExp(tick)} y={PAD_T + PLOT_H + 14} textAnchor={tick === X_TICKS[X_TICKS.length - 1] ? 'end' : 'middle'} fill={LABEL_COLOR} fontSize={11}>
               {X_TICK_TEXT[tick]}
             </text>
           </g>

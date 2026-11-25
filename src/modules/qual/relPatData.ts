@@ -159,8 +159,8 @@ export const INTRO: LText[] = [
     'The neighbourhood rule (good die in bad neighborhood) uses spatial correlation: latent defects tend to cluster, so a good die near failures is suspect too. If at least m failures fall within radius r, the die is removed. PAT depends on wafer coordinates and parameter records (STDF PTR and coordinate fields); see {@genStdf}.',
   ),
   loc(
-    '标题里的 SBA 是统计 Bin 分析：用历史 Bin 分布给当前批次设警戒。静态 PAT 用事先写好的限值，动态 PAT 用本批分布现场计算。统计 Bin 限值（SBL）看某个失败 Bin 是否突然变多，统计良率限值（SYL）看整批良率是否掉出历史带。本课实验只练动态 PAT 与邻近规则，SBL/SYL 不单独做旋钮。',
-    'SBA in the title is statistical bin analysis: the historical bin distribution watches the current lot. Static PAT uses limits written in advance; dynamic PAT computes them from the lot. A statistical bin limit (SBL) asks whether one fail bin suddenly grew; a statistical yield limit (SYL) asks whether lot yield left the historical band. This lesson’s lab only practises dynamic PAT and the neighbourhood rule; SBL/SYL are not separate knobs.',
+    'SBA 是统计 Bin 分析，用历史分布给当前批次设警戒。静态 PAT 用事先写好的限值，动态 PAT 用本批分布现场计算。统计 Bin 限值（SBL）看某个失败 Bin 是否突然变多，本课可用规格失败 Bin 和教学警戒线练习。统计良率限值（SYL）则看整批良率是否掉出历史带。',
+    'SBA uses historical bin distributions to set alerts for the current lot. Static PAT uses preset limits and dynamic PAT computes them from current data. A statistical bin limit (SBL) flags an unusually large fail bin. The lab provides a spec-fail bin and an example limit. A statistical yield limit (SYL) checks whether lot yield leaves its historical band.',
   ),
 ]
 

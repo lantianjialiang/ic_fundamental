@@ -93,8 +93,8 @@ export const FIG = {
   ),
   freqAria: loc('频谱图：0 到 50 kHz 的幅度谱，标出基波、HD2、HD3 的读数谱线', 'Spectrum: amplitude spectrum from 0 to 50 kHz, marking the fundamental, HD2 and HD3 reading lines'),
   freqCap: loc(
-    '横轴是频率，谱线间隔 Δf = fs / N；纵轴是 dBV（1 V 峰值为 0 dBV）。读数取谱线附近的最大值；非相干时能量分散到邻近谱线，峰值会偏低。',
-    'The horizontal axis is frequency, with bin spacing Δf = fs / N; the vertical axis is dBV (1 V peak = 0 dBV). A reading takes the maximum near each line; in non-coherent sampling the energy spreads to neighbouring lines and the peak reads low.',
+    '频率间隔 Δf = fs/N。纵轴以 1 V 峰值为基准。与仪器的 RMS dBV 对照时，1 V 峰值正弦先除以 √2，再算 20 log₁₀(0.707/1) ≈ −3.01 dBV。非相干采样会把能量分散到邻近谱线，单档峰值偏低。',
+    'Frequency bins are spaced by Δf = fs/N. The vertical reference is 1 V peak. For an instrument using RMS dBV, divide a 1 V peak sine by √2 first, then calculate 20 log₁₀(0.707/1) ≈ −3.01 dBV. Non-coherent sampling spreads energy across bins and lowers the single-bin peak.',
   ),
   fund: loc('基波', 'Fund'),
   hd2: loc('HD2', 'HD2'),

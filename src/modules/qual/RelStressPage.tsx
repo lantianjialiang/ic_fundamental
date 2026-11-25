@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
@@ -99,6 +100,14 @@ export function RelStressPage({ moduleId, onModuleChange }: Props) {
                 { label: S.rAf, value: analysis.af.toFixed(1) },
                 { label: S.rDh, value: analysis.deviceHours.toExponential(2) },
                 { label: S.rEquiv, value: analysis.equivHours.toExponential(2) },
+                { label: loc('等效器件小时', 'Equivalent device-hours'),
+                  value: `(${state.batches} × ${state.perBatch}) × ${state.hours} h × ${analysis.af.toPrecision(4)} ≈ ${analysis.equivHours.toExponential(3)} device·h` },
+                ...(state.r === 0 ? [
+                  { label: loc('零失效的单侧上限', 'One-sided upper bound with zero failures'),
+                    value: `P(0) = exp(−λ·H) = 1−CL = ${(1 - state.cl).toFixed(2)} · μupper = −ln(1−CL) ≈ ${(-Math.log1p(-state.cl)).toFixed(4)}` },
+                  { label: loc('每十亿器件小时的失效数', 'Failures per billion device-hours'),
+                    value: `${(-Math.log1p(-state.cl)).toFixed(4)} ÷ ${analysis.equivHours.toExponential(3)} × 10⁹ ≈ ${analysis.fitUpper.toFixed(1)} FIT` },
+                ] : []),
                 { label: S.rFit, value: `${analysis.fitUpper.toFixed(1)} FIT` },
                 { label: S.rMin, value: String(analysis.minSample) },
                 {
@@ -110,6 +119,8 @@ export function RelStressPage({ moduleId, onModuleChange }: Props) {
             />
           </div>
         </div>
+        {state.type === 'tc' && <p className="rel-std-note">{t(loc('温度循环的 Coffin–Manson 因子本身换算循环数。这里按试验与使用条件的单次循环时长相同，将它换算为等效小时；实际热循环寿命需另外输入循环频率。',
+          'The Coffin–Manson factor converts cycle counts. To express equivalent hours this example assumes equal cycle durations in test and use. For field life, use the actual cycle frequency.'))}</p>}
       </Section>
 
       <Section title={t(S.tableTitle)} note={t(S.tableNote)}>

@@ -1,5 +1,5 @@
 import { useLocale } from '../../i18n/LocaleContext'
-import { type LText } from '../../i18n/locale'
+import { loc, type LText } from '../../i18n/locale'
 import { fillText, FIG } from './pwrWbgData'
 import {
   GAN_TAU_US,
@@ -11,6 +11,7 @@ import {
   relSpecificRon,
   type Material,
   type VthResult,
+  type WbgState,
 } from './pwrWbgModel'
 import './pwrWbg.css'
 
@@ -77,7 +78,7 @@ const V_PH = 176
 const V_YMAX = 30
 
 /** 正扫与反扫的 Id–Vgs 曲线：横向差即 Δ，读数点在 1 mA 恒流线上 */
-export function VthFig({ res }: { res: VthResult }) {
+export function VthFig({ res, phase }: { res: VthResult; phase: WbgPhase }) {
   const { t } = useLocale()
   const X = (vgs: number) => V_PL + (vgs / SWEEP_SPAN_V) * V_PW
   const Y = (ma: number) => V_PT + (1 - Math.min(ma, V_YMAX) / V_YMAX) * V_PH
@@ -114,6 +115,8 @@ export function VthFig({ res }: { res: VthResult }) {
         <path d={pathOf(res.shiftRev)} fill="none" stroke="var(--gold)" strokeWidth={2} strokeDasharray="6 4" />
         <circle cx={X(res.readFwd)} cy={yRead} r={3.5} fill="var(--blue)" />
         <circle cx={X(res.readRev)} cy={yRead} r={3.5} fill="var(--gold)" />
+        {phase !== 'condition' && <circle data-sic-read={phase} cx={X(phase === 'next' ? res.readFwd : res.readRev)}
+          cy={yRead} r="7" fill="none" stroke="var(--text)" strokeWidth="1.5" />}
         <text x={X(res.readFwd) + 6} y={yRead - 8} fill="var(--blue)" fontSize={11}>
           {t(FIG.vthTagF)}
         </text>
@@ -137,7 +140,7 @@ const PH = 112
 const P_BASE = 84
 
 /** 预置脉冲与两段扫描的栅压时序示意（时间轴不按比例） */
-export function PrecondFig({ vpre, tpre }: { vpre: number; tpre: number }) {
+export function PrecondFig({ vpre, tpre, phase }: { vpre: number; tpre: number; phase: WbgPhase }) {
   const { t } = useLocale()
   const h = (vpre / VPRE_MAX) * 56
   const wp = 60 + Math.min(tpre, 10) * 14
@@ -147,6 +150,7 @@ export function PrecondFig({ vpre, tpre }: { vpre: number; tpre: number }) {
   const f1 = f0 + 100
   const r0 = f1 + 24
   const r1 = r0 + 100
+  const [from, to] = { condition: [x0, x0 + wp], next: [f0, f1], read: [r0, r1] }[phase]
   const points = [
     `${x0},${P_BASE}`,
     `${x0},${P_BASE - h}`,
@@ -161,6 +165,8 @@ export function PrecondFig({ vpre, tpre }: { vpre: number; tpre: number }) {
     <figure className="term-fig pwrw-fig">
       <svg viewBox={`0 0 ${PW} ${PH}`} role="img" aria-label={t(FIG.preAria)} className="pwrw-svg">
         <rect x={0} y={0} width={PW} height={PH} rx={10} fill="var(--well)" />
+        <rect data-wbg-sic={phase} x={from - 4} y="10" width={to - from + 8} height="84" rx="4"
+          fill="var(--gold)" fillOpacity=".13" />
         <line x1={x0} x2={PW - 12} y1={P_BASE} y2={P_BASE} stroke="var(--line-2)" />
         <polyline points={points} fill="none" stroke="var(--text)" strokeWidth={2} />
         <text x={x0 + wp / 2} y={P_BASE - h - 6} textAnchor="middle" fill="var(--gold)" fontSize={11}>
@@ -178,6 +184,36 @@ export function PrecondFig({ vpre, tpre }: { vpre: number; tpre: number }) {
   )
 }
 
+export type WbgPhase = 'condition' | 'next' | 'read'
+
+export function GanSequenceFig({ state, phase }: { state: WbgState; phase: WbgPhase }) {
+  const { t } = useLocale()
+  const [from, to] = { condition: [30, 184], next: [184, 361], read: [361, 488] }[phase]
+  return (
+    <figure className="term-fig pwrw-fig">
+      <svg viewBox="0 0 520 112" className="pwrw-svg" role="img" aria-label={t(loc('GaN 漏极应力与导通测量时序', 'GaN drain stress and on-state measurement sequence'))}>
+        <rect width="520" height="112" rx="10" fill="var(--well)" />
+        <rect data-wbg-gan={phase} x={from} width={to - from} y="10" height="83" rx="4" fill="var(--blue)" fillOpacity=".16" />
+        <path d="M30 75 H488" stroke="var(--line-2)" />
+        <path d={state.vs > 0 ? 'M30 75 V34 H184 V75 H361' : 'M30 75 H361'}
+          fill="none" stroke="var(--blue)" strokeWidth="2.5" />
+        <path d="M361 75 H488" stroke="var(--green)" strokeWidth="3" />
+        <circle cx="375" cy="75" r={phase === 'read' ? 7 : 4} fill="var(--green)" />
+        <g textAnchor="middle" fontSize="14" fill="var(--text)">
+          <text x="107" y="26">{state.vs} V · {state.ts.toFixed(1)} ms</text>
+          <text x="272" y="62">{state.delay.toFixed(1)} µs</text>
+          <text x="424" y="62">VDS / ID</text>
+          <text x="107" y="103">{t(loc('关断应力', 'Off-state stress'))}</text>
+          <text x="272" y="103">{t(loc('撤去应力后等待', 'Wait after stress'))}</text>
+          <text x="424" y="103">{t(loc('导通时取样', 'Read while on'))}</text>
+        </g>
+      </svg>
+      <figcaption>{t(loc('漏极先承受关断应力。撤去应力后延时，再取导通电压与电流。时窗按顺序示意，横轴未按实际时长缩放。',
+        'Apply off-state drain stress first, then remove the stress, wait and sample the on-state voltage and current. Horizontal spacing shows the sequence without a time scale.'))}</figcaption>
+    </figure>
+  )
+}
+
 const GW = 520
 const GH = 236
 const G_PL = 52
@@ -186,7 +222,7 @@ const G_PT = 28
 const G_PH = 170
 
 /** GaN：R(t) 随测量延时衰减，横轴对数（0.1 µs – 1000 µs） */
-export function GanFig({ k, delayUs }: { k: number; delayUs: number }) {
+export function GanFig({ k, delayUs, phase }: { k: number; delayUs: number; phase: WbgPhase }) {
   const { t } = useLocale()
   const r0 = ganRds(0, 0)
   const rMax = r0 * (1 + Math.max(k, 0.2)) * 1.05
@@ -212,6 +248,8 @@ export function GanFig({ k, delayUs }: { k: number; delayUs: number }) {
         <line x1={X(100)} x2={X(100)} y1={G_PT} y2={G_PT + G_PH} stroke="var(--blue)" strokeDasharray="5 3" opacity={0.6} />
         <path d={pts.join(' ')} fill="none" stroke="var(--text)" strokeWidth={2} />
         <line x1={X(delayUs)} x2={X(delayUs)} y1={G_PT} y2={G_PT + G_PH} stroke="var(--gold)" strokeWidth={2} />
+        {phase !== 'condition' && <circle data-gan-read={phase} cx={X(delayUs)} cy={Y(ganRds(k, delayUs))}
+          r={phase === 'read' ? 6 : 4} fill="var(--gold)" stroke="var(--well)" strokeWidth="1.5" />}
         <text x={X(delayUs) + 4} y={G_PT + G_PH - 6} fill="var(--gold)" fontSize={11}>
           {t(FIG.ganTagDelay)}
         </text>

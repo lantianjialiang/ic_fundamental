@@ -1,5 +1,6 @@
 import { useLocale } from '../../i18n/LocaleContext'
 import { loc } from '../../i18n/locale'
+import { type WeibullRankRow } from './core/reliability'
 import { fill } from './relStressData'
 import { S } from './relWeibullData'
 import { type WeibullAnalysis, type WeibullState } from './relWeibullModel'
@@ -22,9 +23,9 @@ const LABEL = {
   betaHat: loc('β̂ = {b}', 'β̂ = {b}'),
 }
 
-/** Weibull 概率坐标：纵轴 y = ln(−ln(1−F))，固定在 0.5%–99.5% 之间 */
-const Y_LO = Math.log(-Math.log(1 - 0.005))
-const Y_HI = Math.log(-Math.log(1 - 0.995))
+/** Weibull 概率坐标：覆盖本课最多 200 颗时的首、末绘图概率。 */
+const Y_LO = Math.log(-Math.log(1 - 0.003))
+const Y_HI = Math.log(-Math.log(1 - 0.997))
 const TICK_F = [0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.99]
 const X0 = 56
 const X1 = 460
@@ -35,12 +36,12 @@ const Y1 = 262
  * Weibull 概率图（REL-04 本地组件）：横轴 log10 t，纵轴 ln(−ln(1−F))。
  * 拟合线 y = β̂(ln t − ln η̂)，真值线 y = β(ln t − ln η) 用金色虚线；截尾时间用竖线标出。
  */
-export function WeibullPlotFig({ state, analysis }: { state: WeibullState; analysis: WeibullAnalysis }) {
+export function WeibullPlotFig({ state, analysis, selected }: { state: WeibullState; analysis: WeibullAnalysis; selected?: WeibullRankRow }) {
   const { t } = useLocale()
   const allTimes = analysis.samples.map((s) => s.t)
   const tMin = Math.min(...allTimes)
   const tMax = Math.max(...allTimes, state.censorAt)
-  const lo = Math.max(Math.floor(Math.log10(tMin)), 0)
+  const lo = Math.floor(Math.log10(tMin))
   let hi = Math.ceil(Math.log10(tMax))
   if (hi <= lo) {
     hi = lo + 1
@@ -67,10 +68,7 @@ export function WeibullPlotFig({ state, analysis }: { state: WeibullState; analy
 
   const fitPath = analysis.finite ? linePath(analysis.fit.beta, analysis.fit.eta) : ''
   const truePath = linePath(state.beta, state.eta)
-  const inside = analysis.points.filter((p) => {
-    const y = Math.log(-Math.log(1 - p.f))
-    return y >= Y_LO && y <= Y_HI && p.t >= tDomainLo && p.t <= tDomainHi
-  })
+  const inside = analysis.rankRows.filter((row) => row.point !== null && row.t >= tDomainLo && row.t <= tDomainHi)
   const censorInside = state.censorAt >= tDomainLo && state.censorAt <= tDomainHi
 
   const xTicks: number[] = []
@@ -100,7 +98,7 @@ export function WeibullPlotFig({ state, analysis }: { state: WeibullState; analy
           <g key={k}>
             <line x1={X(Math.pow(10, k))} y1={Y1} x2={X(Math.pow(10, k))} y2={Y1 + 4} stroke={EDGE} />
             <text x={X(Math.pow(10, k))} y={Y1 + 16} textAnchor="middle" fill={MUTED} fontSize={11}>
-              {String(Math.pow(10, k))}
+              {String(Number(Math.pow(10, k).toPrecision(1)))}
             </text>
           </g>
         ))}
@@ -120,9 +118,15 @@ export function WeibullPlotFig({ state, analysis }: { state: WeibullState; analy
         ) : null}
         {truePath ? <path d={truePath} fill="none" stroke={GOLD} strokeWidth={1.5} strokeDasharray="6 4" /> : null}
         {fitPath ? <path d={fitPath} fill="none" stroke={BLUE} strokeWidth={2} /> : null}
-        {inside.map((p, index) => (
-          <circle key={index} cx={X(p.t)} cy={Y(Math.log(-Math.log(1 - p.f)))} r={3} fill={TEXT} />
-        ))}
+        {inside.map(({ index, t: time, point }) => {
+          if (!point || point.y < Y_LO || point.y > Y_HI) return null
+          const active = selected?.index === index
+          return <circle key={index} data-weibull-selected={active ? index + 1 : undefined}
+            cx={X(time)} cy={Y(point.y)} r={active ? 6 : 3} fill={active ? GOLD : TEXT} />
+        })}
+        {selected && !selected.point && censorInside &&
+          <path data-weibull-censored={selected.index + 1} d={`M ${X(selected.t) - 6} ${Y1 - 3} L ${X(selected.t)} ${Y1 - 11} L ${X(selected.t) + 6} ${Y1 - 3}`}
+            fill="none" stroke={GOLD} strokeWidth="2.5" />}
         <g>
           <line x1={X0 + 8} y1={Y0 + 18} x2={X0 + 24} y2={Y0 + 18} stroke={BLUE} strokeWidth={2} />
           <text x={X0 + 30} y={Y0 + 22} fill={TEXT} fontSize={11}>

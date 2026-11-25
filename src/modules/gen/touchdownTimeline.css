@@ -1,0 +1,20 @@
+.touchdown-time { display: grid; gap: .65rem; }
+.touchdown-time__bar {
+  display: flex;
+  height: 2.35rem;
+  overflow: hidden;
+  border-radius: .5rem;
+  background: var(--well);
+}
+.touchdown-time__bar > div { display: flex; flex-basis: 0; min-width: 0; overflow: hidden; }
+.touchdown-time__bar > div[hidden] { display: none; }
+.touchdown-time__bar span { flex: 1 1 0; border-inline-end: 1px solid var(--well); }
+.touchdown-time [data-stage='index'] { --phase-color: #a581d5; }
+.touchdown-time [data-stage='parallel'] { --phase-color: #4589bc; }
+.touchdown-time [data-stage='serial'] { --phase-color: #4f9d8d; }
+.touchdown-time [data-stage='retest'] { --phase-color: #b87743; }
+.touchdown-time__bar > div { background: var(--phase-color); }
+.touchdown-time__bar [data-stage='retest'] { background: repeating-linear-gradient(45deg, var(--phase-color) 0 4px, var(--well) 4px 7px); }
+.touchdown-time__legend { display: flex; flex-wrap: wrap; gap: .45rem 1rem; margin: 0; }
+.touchdown-time__legend > div { border-inline-start: .25rem solid var(--phase-color); padding-inline: .45rem; }
+.touchdown-time__legend dd { margin: .1rem 0 0; font-family: var(--mono); }

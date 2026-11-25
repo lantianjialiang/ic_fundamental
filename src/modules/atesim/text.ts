@@ -204,7 +204,7 @@ export const S = {
     histCpkNoLimit: loc('单边规格', 'one-sided spec'),
     waferTitle: loc('Wafer Map', 'Wafer map'),
     waferOption: loc('Wafer {n}', 'Wafer {n}'),
-    waferHint: loc('把鼠标移到 die 上查看该颗的详细结果。', 'Hover a die to read its result.'),
+    waferHint: loc('点选一颗 die，固定它的测试明细。也可以用下拉框选择。', 'Select a die to keep its test results on screen. The dropdown also works.'),
     waferNotch: loc('缺口', 'Notch'),
     waferGood: loc('良品 {n} / {total}', 'Good {n} / {total}'),
     waferBad: loc('不良 {n} / {total}', 'Fail {n} / {total}'),

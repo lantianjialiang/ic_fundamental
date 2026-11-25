@@ -14,6 +14,7 @@ import { MOS_META } from './meta'
 import { PassFig, RdsFig } from './SwitchFigs'
 import { LedFig, NeedFig } from './SwitchFigs2'
 import { BootFig } from './SwitchFigs3'
+import { HighSideDriveFig } from './HighSideDriveFig'
 import '../prep/prep.css'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
@@ -272,6 +273,7 @@ export function MosSwitchPage({ moduleId, onModuleChange }: Props) {
           </p>
           <RefP text={approachItem.text} onOpen={onModuleChange} />
         </Callout>
+        <HighSideDriveFig approach={approach} />
         <Related ids={['mosApps', 'mosDynamic', 'mosSelect', 'mosGates']} onOpen={onModuleChange} />
       </Section>
 

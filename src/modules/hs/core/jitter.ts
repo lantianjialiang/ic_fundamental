@@ -1,6 +1,6 @@
 /**
  * 抖动与误码率的数学工具。
- * 双狄拉克模型：TJ(BER) = DJ_pp + 2·Q(BER)·σ_RJ，其中 Q(BER) 是 Q(x) = BER 的解，Q(1e-12) ≈ 7.03。
+ * 双狄拉克模型：TJ(BER) = DJ_pp + 2·Q⁻¹(BER)·σ_RJ，其中 Q⁻¹(BER) 是 Q(x) = BER 的解，Q⁻¹(1e-12) ≈ 7.03。
  */
 
 /** 互补误差函数，Numerical Recipes 的 erfcc 近似，相对误差约 1.2e-7，尾部精度足够 Q 函数使用 */

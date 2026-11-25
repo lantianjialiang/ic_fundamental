@@ -181,11 +181,13 @@ export function MfgAssemblyPage({ moduleId, onModuleChange }: { moduleId: Module
               {t(loc('加入老化', 'Add burn-in'))}
             </label>
             <Formula rule="C_with = C_assembly + C_burn-in" value={`${flow.costPerGood.toFixed(3)} + ${extra.toFixed(2)} = ${(flow.costPerGood + extra).toFixed(3)}`}
-              note={loc('示例对每颗组装好品附加固定老化成本。组装报废成本单独记账，老化筛出的失效比例没有进入本例。', 'The example adds a fixed burn-in cost per assembled good unit. Assembly scrap is tracked separately. This example leaves out the fraction screened out by burn-in.')}>
+              note={loc(`组装总投入先按累计良率摊到好品：${flow.inputCost.toFixed(3)} ÷ ${flow.yield.toFixed(4)}。组装报废已包含在这笔成本里。老化在每颗组装好品上另加固定成本，此处只演示老化的收费。`,
+                `Allocate assembly spending across good units by dividing by cumulative yield: ${flow.inputCost.toFixed(3)} ÷ ${flow.yield.toFixed(4)}. This already includes assembly scrap. The example adds a fixed burn-in charge per assembled good unit.`)}>
               <ScaleBars max={Math.max(flow.costPerGood + extra, 0.01)} items={[
                 { title: loc('每颗组装好品成本', 'Assembly cost per good unit'), value: flow.costPerGood, display: flow.costPerGood.toFixed(3) },
                 { title: loc('老化附加成本', 'Burn-in overhead per unit'), value: extra, display: extra.toFixed(2) },
-                { title: loc('组装报废成本（每颗投入）', 'Assembly scrap per input unit'), value: flow.scrapCost, display: flow.scrapCost.toFixed(3) },
+                { title: loc('其中，分摊到每颗组装好品的报废', 'Included scrap per assembled good unit'),
+                  value: flow.scrapCost / flow.yield, display: (flow.scrapCost / flow.yield).toFixed(3) },
               ]} />
             </Formula>
             <After show={biHit.hit} text={loc('老化在每颗上加 0.4。它抓的是早期失效，不是把 CP 或 FT 再做一遍，所以不能用它替代前面的测试。', 'Burn-in adds 0.4 on every unit. It catches infant fails. It is not another copy of CP or FT, so it does not replace the tests in front of it.')} />

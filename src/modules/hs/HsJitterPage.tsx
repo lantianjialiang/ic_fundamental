@@ -38,6 +38,8 @@ export function HsJitterPage({ moduleId, onModuleChange }: Props) {
   const analysis = useMemo(() => analyseJitter(state), [state])
   const samplePs = analysis.ui * samplePercent / 100
   const sampleBer = berAt(samplePs, analysis.ui, state.dj, state.rj)
+  const tail = analysis.q * state.rj
+  const x = (ps: number) => 30 + 350 * ps / Math.max(analysis.ui, analysis.tjTarget)
   const verdict = verdictOf(state, analysis)
   const update = (patch: Partial<JitterState>) => setState((prev) => ({ ...prev, ...patch }))
 
@@ -91,6 +93,26 @@ export function HsJitterPage({ moduleId, onModuleChange }: Props) {
           <div className="hs-stack">
             <JitterHistFig analysis={analysis} />
             <JitterBathFig analysis={analysis} ber={state.ber} samplePs={samplePs} sampleBer={sampleBer} />
+            <figure className="term-fig">
+              <svg viewBox="0 0 410 108" className="term-fig__svg" role="img" aria-label={t(loc('用同一时间尺对照 UI、DJ 与两侧 RJ 尾', 'Compare UI, DJ and both RJ tails on one time scale'))}>
+                <rect width="410" height="108" rx="8" fill="var(--well)" />
+                <text x="30" y="19" fill="var(--text)" fontSize="14">UI = {analysis.ui.toFixed(1)} ps</text>
+                <path d={`M30 33 H${x(analysis.ui)}`} stroke="var(--text)" strokeWidth="2" />
+                <rect x="30" y="43" width={x(state.dj) - x(0)} height="17" fill="var(--gold)" />
+                <rect x={x(state.dj)} y="43" width={x(tail) - x(0)} height="17" fill="var(--blue)" />
+                <rect x={x(state.dj + tail)} y="43" width={x(tail) - x(0)} height="17" fill="var(--purple)" />
+                <path d={`M${x(analysis.ui)} 30 V65`} stroke="var(--muted)" strokeDasharray="3 3" />
+                <g fontSize="13">
+                  <text x="30" y="85" fill="var(--gold)">DJ = {state.dj} ps</text>
+                  <text x="124" y="85" fill="var(--blue)">RJₗ = {tail.toFixed(1)} ps</text>
+                  <text x="253" y="85" fill="var(--purple)">RJᵣ = {tail.toFixed(1)} ps</text>
+                </g>
+              </svg>
+              <figcaption>{t(loc(
+                `每侧 RJ = Q⁻¹(${state.ber.toExponential(0)}) × σ ≈ ${analysis.q.toFixed(2)} × ${state.rj} ps。眼开口 = UI − DJ − 2×RJ ≈ ${analysis.ui.toFixed(1)} − ${state.dj} − 2×${tail.toFixed(1)} ps。`,
+                `Each RJ tail = Q⁻¹(${state.ber.toExponential(0)}) × σ ≈ ${analysis.q.toFixed(2)} × ${state.rj} ps. Eye opening = UI − DJ − 2×RJ ≈ ${analysis.ui.toFixed(1)} − ${state.dj} − 2×${tail.toFixed(1)} ps.`,
+              ))}</figcaption>
+            </figure>
             <Knob label={loc('采样相位', 'Sampling phase')} value={samplePercent} unit="% UI" min={0} max={100} step={1} onChange={setSamplePercent} />
             <p className="intro__note" role="status">{samplePs.toFixed(1)} ps · BER {sampleBer.toExponential(2)}</p>
           </div>

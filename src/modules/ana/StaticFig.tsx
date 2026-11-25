@@ -11,7 +11,7 @@ const HY_BOT = 164
 const HBW = (HX1 - HX0) / NCODES - 1.5
 
 /** 码密度直方图：每个码一根柱子；理想中间码计数为虚线；命中数为 0 的码在基线上标红 */
-export function HistFig({ result }: { result: StaticResult }) {
+export function HistFig({ result, selected, onSelect }: { result: StaticResult; selected: number; onSelect: (code: number) => void }) {
   const { t } = useLocale()
   const counts = result.counts
   const peak = Math.max(...counts, result.expected, 1)
@@ -34,14 +34,16 @@ export function HistFig({ result }: { result: StaticResult }) {
 
         {counts.map((value, code) => {
           const interior = code >= 1 && code <= CODE_MAX - 1
-          const fill = interior ? 'var(--blue)' : 'var(--muted)'
+          const fill = code === selected ? 'var(--gold)' : interior ? 'var(--blue)' : 'var(--muted)'
           const top = cy(value)
           return (
-            <g key={code}>
+            <g key={code} data-code={code} data-code-selected={code === selected}>
               <rect x={cx(code) - HBW / 2} y={top} width={HBW} height={HY_BOT - top} fill={fill} fillOpacity="0.8" />
               {interior && value === 0 ? (
                 <rect x={cx(code) - HBW / 2} y={HY_BOT - 3} width={HBW} height="3" fill="var(--red)" />
               ) : null}
+              {interior && <rect x={cx(code) - (HBW + 1.5) / 2} y={HY_TOP} width={HBW + 1.5} height={HY_BOT - HY_TOP}
+                fill="transparent" onClick={() => onSelect(code)} style={{ cursor: 'pointer' }} />}
             </g>
           )
         })}
@@ -85,7 +87,7 @@ const dyTop = (value: number) => TOP_C - (value / DRANGE) * DHALF
 const dyBot = (value: number) => BOT_C - (value / DRANGE) * DHALF
 
 /** 上半部分：每个中间码的 DNL 柱；下半部分：INL 折线。虚线为限值，超限的柱子标红 */
-export function DnlInlFig({ result }: { result: StaticResult }) {
+export function DnlInlFig({ result, selected }: { result: StaticResult; selected: number }) {
   const { t } = useLocale()
   const bw = (DX1 - DX0) / (CODE_MAX - 2) - 1.4
   const inlPoints = result.inl.map((v, index) => `${dx(index + 1).toFixed(1)},${dyBot(v).toFixed(1)}`).join(' ')
@@ -126,6 +128,9 @@ export function DnlInlFig({ result }: { result: StaticResult }) {
         })}
 
         <polyline points={inlPoints} fill="none" stroke="var(--purple)" strokeWidth="1.8" />
+        <line data-selected-code={selected} x1={dx(selected)} x2={dx(selected)} y1="28" y2="219"
+          stroke="var(--gold)" strokeWidth="1.5" strokeDasharray="3 3" />
+        <circle cx={dx(selected)} cy={dyBot(result.inl[selected - 1])} r="4" fill="var(--gold)" />
 
         {[1, 16, 32, 48, CODE_MAX - 1].map((code) => (
           <text key={code} x={dx(code)} y="238" textAnchor="middle" fill="var(--muted)" fontSize="10" fontFamily="var(--mono)">

@@ -9,6 +9,8 @@ import { Callout, Readout, Seg } from '../fund/parts'
 import { RefParas, Related, type PrepNote } from './common'
 import { CP_BODY, DIE_SIZES, INTRO, LITHO, MAKE, MAP_TEXT, QUIZ, S, STACK, TAKEAWAY, type DieSizeId, type StackId } from './data/silicon'
 import { DIES, LithoFig, StackFig, WaferMakeFig, WaferMapFig, firstDie, type Die } from './SiliconFigs'
+import { dieTraceId, rememberDie } from './DieTrace'
+import { loc } from '../../i18n/locale'
 import './prep.css'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
@@ -102,6 +104,13 @@ export function PrepSiliconPage({ moduleId, onModuleChange }: Props) {
             <b>{`Die (${die.col}, ${die.row})`}</b>
           </p>
           <p>{t(dieText)}</p>
+          <p><strong>{dieTraceId(size, die)}</strong></p>
+          <div className="seg">
+            <button type="button" onClick={() => {
+              rememberDie(size, die)
+              onModuleChange('pPackage')
+            }}>{t(loc('去下一课追踪这颗裸片', 'Trace this die in the next lesson'))}</button>
+          </div>
         </Callout>
         <Callout tone="warn">
           <p>{t(MAP_TEXT.why)}</p>

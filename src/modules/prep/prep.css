@@ -350,3 +350,18 @@ button.prep-matrix__row.is-active {
 .prep-role-chain li[data-cover='1'] { border-color: var(--gold-line); border-style: dashed; }
 .prep-role-chain svg { width: 3rem; height: auto; }
 .prep-role-chain span { color: var(--text-2); font-size: .8rem; }
+.prep-die-trace { margin-block: .75rem; }
+.prep-die-trace__icon {
+  display: grid;
+  place-items: center;
+  width: 2.8rem;
+  height: 2.4rem;
+  background: var(--panel-2);
+  border: 1px solid var(--line-2);
+  border-radius: .25rem;
+}
+.prep-die-trace__icon i { width: .8rem; height: .8rem; background: var(--blue); border-radius: 2px; }
+.prep-die-trace__icon[data-object='wafer'] { width: 2.4rem; border-radius: 50%; }
+.prep-die-trace__icon[data-object='tape'] i { box-shadow: -.85rem 0 var(--line-2), .85rem 0 var(--line-2); }
+.prep-die-trace__icon[data-object='package'] i { border: 3px solid var(--muted); box-sizing: content-box; }
+.prep-die-trace__icon[data-object='ft'] { border-bottom: 5px solid var(--green-line); }

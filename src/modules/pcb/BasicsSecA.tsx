@@ -10,6 +10,7 @@ import { ClearanceFig } from './BasicsFigs2'
 import { TERMS, TERMS_S, type TermId } from './data/pcbBasics'
 import {
   OZ_MIL,
+  K_LAYER,
   clearanceCreepage,
   currentForWidthMil,
   ipcSpacingMm,
@@ -139,7 +140,9 @@ export function WidthSection({ onOpen, setNote }: SecProps) {
       <Readout
         items={[
           { label: fromCur ? WIDTH_S.outW : WIDTH_S.outI, value: fromCur ? `${widthMm.toFixed(2)} mm · ${widthMil.toFixed(1)} mil` : `${current.toFixed(2)} A` },
-          { label: WIDTH_S.area, value: `${areaMil2.toFixed(1)} mil²` },
+          { label: WIDTH_S.area, value: `${widthMil.toFixed(2)} mil × ${(oz * OZ_MIL).toFixed(3)} mil ≈ ${areaMil2.toFixed(2)} mil² ≈ ${(areaMil2 * milToMm(1) ** 2).toPrecision(3)} mm²` },
+          { label: loc('按曲线圆点复算电流', 'Recompute the current at the plotted point'),
+            value: `I = ${K_LAYER[layer]} × ${dT}^0.44 × ${areaMil2.toFixed(2)}^0.725 ≈ ${current.toFixed(2)} A` },
           { label: WIDTH_S.thick, value: `${(oz * OZ_MIL).toFixed(2)} mil · ${(oz * OZ_MIL * 25.4).toFixed(0)} µm` },
           { label: WIDTH_S.r10, value: `${(r10 * 1000).toFixed(1)} mΩ` },
           { label: WIDTH_S.drop10, value: `${(r10 * current * 1000).toFixed(1)} mV` },

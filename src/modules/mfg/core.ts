@@ -130,18 +130,20 @@ export type FlowNode = {
 
 export function flowYieldCost(nodes: FlowNode[]) {
   let yieldAll = 1
-  let spent = 0
+  let costOnUnit = 0
+  let inputCost = 0
   let scrap = 0
   let test = 0
   for (const node of nodes) {
-    spent += node.stepCost ?? 0
-    test += node.testCost ?? 0
-    spent += node.testCost ?? 0
-    scrap += (1 - node.yield) * spent
-    spent *= node.yield
+    const testCost = node.testCost ?? 0
+    const stepCost = (node.stepCost ?? 0) + testCost
+    test += yieldAll * testCost
+    inputCost += yieldAll * stepCost
+    costOnUnit += stepCost
+    scrap += yieldAll * (1 - node.yield) * costOnUnit
     yieldAll *= node.yield
   }
-  return { yield: yieldAll, costPerGood: yieldAll > 0 ? spent / yieldAll : Infinity, scrapCost: scrap, testCost: test }
+  return { yield: yieldAll, inputCost, costPerGood: yieldAll > 0 ? inputCost / yieldAll : Infinity, scrapCost: scrap, testCost: test }
 }
 
 export function planTouchdowns(dies: number, cols: number, rows: number) {

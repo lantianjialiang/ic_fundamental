@@ -38,8 +38,8 @@ export const S = {
   knobErr: loc('去嵌入模型的带宽误差', 'Bandwidth error of the de-embed model'),
   realAria: loc('真实眼图：器件本身的眼，PRBS7 叠加与 mask', 'Real eye diagram: the device’s own eye, PRBS7 overlay and mask'),
   measAria: loc('测得眼图：经过 ATE 与夹具后的眼，PRBS7 叠加与 mask', 'Measured eye diagram: the eye after the ATE and fixture, PRBS7 overlay and mask'),
-  realCap: loc('真实眼：器件本身。金色是 mask，红点是落进 mask 的采样点。', 'Real eye: the device itself. Gold is the mask; red dots are samples inside it.'),
-  measCap: loc('测得眼：器件 → ATE 通道 → 夹具。同一个 mask，红点数就是 mask 的违例数。', 'Measured eye: device → ATE channel → fixture. Same mask; the red dots are the mask violations.'),
+  realCap: loc('参考眼（DUT 输出）：两图共用 UI、mV 刻度及金色 mask。红点是落进 mask 的采样点。', 'Reference eye (DUT output): both plots share the UI and mV scales and the gold mask. Red dots are samples inside the mask.'),
+  measCap: loc('测得眼（经过 ATE 通道与夹具）：对照参考眼，观察相同采样位置的眼高、眼宽和 mask 违例。', 'Measured eye (after the ATE channel and fixture): compare eye height, eye width and mask violations with the reference at the same sampling positions.'),
   respAria: loc('频响图：ATE 通道、夹具和整条测得路径的损耗随频率变化', 'Frequency response: loss of the ATE channel, the fixture and the whole measured path versus frequency'),
   respCap: loc(
     '纵轴是损耗（dB，越往下越差）。虚线是 5 GHz：10 Gb/s 码型的奈奎斯特频率，夹具损耗就按这个点标定。',

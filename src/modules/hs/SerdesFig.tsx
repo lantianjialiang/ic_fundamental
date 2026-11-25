@@ -1,5 +1,8 @@
 ﻿import { useLocale } from '../../i18n/LocaleContext'
-import { FIG } from './serdesData'
+import { loc } from '../../i18n/locale'
+import { Readout } from '../fund/parts'
+import { qOfBer } from './core/jitter'
+import { FIG, fmtBer } from './serdesData'
 import {
   BER_LIMIT,
   SAMPLES,
@@ -25,7 +28,7 @@ const bx = (ps: number) => BPL + (ps / UI_PS) * (BW - BPL - BPR)
 const by = (lg: number) => BPT + ((0 - lg) / -LG_MIN) * (BH - BPT - BPB)
 
 /** 浴盆曲线：横轴采样相位（0–1 UI），纵轴 log10(BER)；红线是 1e-12，金线是最佳采样相位 */
-export function BathtubFig({ points, bestPhasePs }: { points: SweepPoint[]; bestPhasePs: number }) {
+export function BathtubFig({ points, bestPhasePs, cursor }: { points: SweepPoint[]; bestPhasePs: number; cursor: SweepPoint }) {
   const { t } = useLocale()
   const curve = points
     .map((point) => {
@@ -56,6 +59,9 @@ export function BathtubFig({ points, bestPhasePs }: { points: SweepPoint[]; best
         <line x1={BPL} x2={BW - BPR} y1={by(-12)} y2={by(-12)} stroke="#f85149" strokeWidth={1.5} strokeDasharray="5 3" />
         <line x1={bx(bestPhasePs)} x2={bx(bestPhasePs)} y1={BPT} y2={BH - BPB} stroke="#e8c45a" strokeWidth={1.5} />
         <polyline points={curve} fill="none" stroke="#58a6ff" strokeWidth={2.2} />
+        <line x1={bx(cursor.phasePs)} x2={bx(cursor.phasePs)} y1={BPT} y2={BH - BPB} stroke="#e2e8f0" strokeDasharray="3 4" />
+        <circle data-serdes-scan={cursor.phasePs} cx={bx(cursor.phasePs)}
+          cy={by(Math.max(Math.log10(cursor.ber), LG_MIN))} r="4" fill="#0d1117" stroke="#e2e8f0" strokeWidth="2" />
         <text x={(BPL + BW - BPR) / 2} y={BH - 6} fill="#8b949e" fontSize={11} textAnchor="middle">
           {t(FIG.axisPhase)}
         </text>
@@ -71,6 +77,9 @@ export function BathtubFig({ points, bestPhasePs }: { points: SweepPoint[]; best
         </li>
       </ul>
       <figcaption>{t(FIG.bathCap)}</figcaption>
+      <Readout items={[
+        { label: loc('所选模型扫描点', 'Selected model sweep point'), value: `${cursor.phasePs.toFixed(1)} ps · BER ${fmtBer(cursor.ber)}`, state: cursor.ber <= BER_LIMIT ? 'pass' : 'fail' },
+      ]} />
     </figure>
   )
 }
@@ -82,11 +91,15 @@ const ex = (ui: number) => 30 + ui * 300
 const ey = (mv: number) => 120 - mv * 0.3
 
 /** BER 1e-12 下的眼（实线矩形）与规格 mask（虚线矩形）；虚线横线是没有噪声时的中心眼高 */
-export function EyeBoxFig({ sample }: { sample: SampleId }) {
+export function EyeBoxFig({ sample, phasePs }: { sample: SampleId; phasePs: number }) {
   const { t } = useLocale()
   const p = SAMPLES[sample]
   const ew = eyeWidthUi(BER_LIMIT, p)
   const eh = Math.max(0, eyeHeightMv(BER_LIMIT, p))
+  const centrePs = (p.skewPs + UI_PS / 2) % UI_PS
+  const offsetPs = ((phasePs - centrePs + 1.5 * UI_PS) % UI_PS) - UI_PS / 2
+  const cursorX = ex(0.5 + offsetPs / UI_PS)
+  const q = qOfBer(BER_LIMIT)
   const eyeLeft = ex(0.5 - ew / 2)
   const eyeRight = ex(0.5 + ew / 2)
   const maskLeft = ex(0.5 - SPEC_EW_UI / 2)
@@ -118,6 +131,13 @@ export function EyeBoxFig({ sample }: { sample: SampleId }) {
           stroke="#58a6ff"
           strokeWidth={2}
         />
+        <line data-serdes-eye-cursor={phasePs} x1={cursorX} x2={cursorX} y1="20" y2={EH - 28}
+          stroke="#e2e8f0" strokeWidth="2" strokeDasharray="3 4" />
+        <g fill="#aab7c6" fontSize="13" textAnchor="middle">
+          <text x={ex(0)} y={EH - 9}>−½ UI</text>
+          <text x={ex(0.5)} y={EH - 9}>0</text>
+          <text x={ex(1)} y={EH - 9}>+½ UI</text>
+        </g>
       </svg>
       <ul className="serdes-legend">
         <li>
@@ -134,6 +154,13 @@ export function EyeBoxFig({ sample }: { sample: SampleId }) {
         </li>
       </ul>
       <figcaption>{t(FIG.eyeCap)}</figcaption>
+      <Readout items={[
+        { label: loc('所选点相对眼中心', 'Selected point relative to eye centre'), value: `${offsetPs >= 0 ? '+' : ''}${offsetPs.toFixed(1)} ps` },
+        { label: loc('时间预算（UI 扣除 DJ 和双侧 RJ）', 'Time budget (UI minus DJ and both RJ tails)'),
+          value: `${UI_PS} − ${p.djPp} − 2 × ${q.toFixed(2)} × ${p.rjRms} ≈ ${(ew * UI_PS).toFixed(1)} ps` },
+        { label: loc('眼宽减 mask 宽', 'Eye width minus mask width'), value: `${ew.toFixed(3)} − ${SPEC_EW_UI.toFixed(2)} ≈ ${(ew - SPEC_EW_UI).toFixed(3)} UI` },
+        { label: loc('眼高减 mask 高', 'Eye height minus mask height'), value: `${eh.toFixed(1)} − ${SPEC_EH_MV} ≈ ${(eh - SPEC_EH_MV).toFixed(1)} mV` },
+      ]} />
     </figure>
   )
 }

@@ -182,26 +182,28 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
       </Section>
 
       <Section title={t(S.binTitle)} note={t(S.binNote)}>
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th>{t(S.colSoft)}</th>
-              <th>{t(S.colItem)}</th>
-              <th>{t(S.colHard)}</th>
-              <th>{t(S.colMeaning)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {BINS.map((row) => (
-              <tr key={row.soft}>
-                <td className="mono-cell">{row.soft}</td>
-                <td>{t(row.item)}</td>
-                <td className="mono-cell">{row.hard}</td>
-                <td>{t(row.note)}</td>
+        <div className="dtable-wrap">
+          <table className="dtable">
+            <thead>
+              <tr>
+                <th>{t(S.colSoft)}</th>
+                <th>{t(S.colItem)}</th>
+                <th>{t(S.colHard)}</th>
+                <th>{t(S.colMeaning)}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {BINS.map((row) => (
+                <tr key={row.soft}>
+                  <td className="mono-cell">{row.soft}</td>
+                  <td>{t(row.item)}</td>
+                  <td className="mono-cell">{row.hard}</td>
+                  <td>{t(row.note)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <h3>{t(S.summaryTitle)}</h3>
         {SUMMARY.map((para) => (
           <p key={para.zh}>{t(para)}</p>
@@ -237,36 +239,38 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
       </Section>
 
       <Section title={t(S.ohmTitle)} note={t(OHM_LEAD)}>
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th>{t(S.colName)}</th>
-              <th>{t(S.colV)}</th>
-              <th>{t(S.colI)}</th>
-              <th>{t(S.colR)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {OHMS.map((row) => {
-              const r = row.id === 'ios' ? `${fmtOhm(5.25 / 85e-3)} – ${fmtOhm(5.25 / 30e-3)}` : fmtOhm(row.v / row.i)
-              return (
-                <tr
-                  key={row.id}
-                  className={`is-click${row.id === ohmId ? ' is-active' : ''}`}
-                  onClick={() => {
-                    setOhmId(row.id)
-                    setNote({ kicker: S.kicker, title: `${row.name} → ${r}`, text: row.text })
-                  }}
-                >
-                  <td className="mono-cell">{row.name}</td>
-                  <td className="mono-cell">{row.vText}</td>
-                  <td className="mono-cell">{row.iText}</td>
-                  <td className="mono-cell">{r}</td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <div className="dtable-wrap">
+          <table className="dtable">
+            <thead>
+              <tr>
+                <th>{t(S.colName)}</th>
+                <th>{t(S.colV)}</th>
+                <th>{t(S.colI)}</th>
+                <th>{t(S.colR)}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {OHMS.map((row) => {
+                const r = row.id === 'ios' ? `${fmtOhm(5.25 / 85e-3)} – ${fmtOhm(5.25 / 30e-3)}` : fmtOhm(row.v / row.i)
+                return (
+                  <tr
+                    key={row.id}
+                    className={`is-click${row.id === ohmId ? ' is-active' : ''}`}
+                    onClick={() => {
+                      setOhmId(row.id)
+                      setNote({ kicker: S.kicker, title: `${row.name} → ${r}`, text: row.text })
+                    }}
+                  >
+                    <td className="mono-cell">{row.name}</td>
+                    <td className="mono-cell">{row.vText}</td>
+                    <td className="mono-cell">{row.iText}</td>
+                    <td className="mono-cell">{r}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
         <Explain paras={[OHMS.find((row) => row.id === ohmId)?.text ?? '']} />
         <div className="calc">
           <span>{t(S.ohmCalc)}</span>
@@ -412,42 +416,46 @@ export function FundDcPage({ moduleId, onModuleChange }: Props) {
           ]}
         />
         {inMethod === 'gang' ? (
-          <table className="dtable">
-            <tbody>
-              <tr className={gangFail ? 'is-fail' : 'is-pass'}>
-                <td>{t(S.total)} IIH</td>
-                <td className="mono-cell">{gangTotal.toFixed(1)} µA</td>
-                <td className="mono-cell">
-                  {t(S.inGangLimit)} = {IN_LIMIT} µA
-                </td>
-                <td className="verdict">{gangFail ? 'FAIL' : 'PASS'}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="dtable-wrap">
+            <table className="dtable">
+              <tbody>
+                <tr className={gangFail ? 'is-fail' : 'is-pass'}>
+                  <td>{t(S.total)} IIH</td>
+                  <td className="mono-cell">{gangTotal.toFixed(1)} µA</td>
+                  <td className="mono-cell">
+                    {t(S.inGangLimit)} = {IN_LIMIT} µA
+                  </td>
+                  <td className="verdict">{gangFail ? 'FAIL' : 'PASS'}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         ) : null}
         {inMethod === 'gang' && (!gangFail || retesting) ? <p>{t(gangFail ? S.inRetest : S.inGangPass)}</p> : null}
         {showPins ? (
-          <table className="dtable">
-            <thead>
-              <tr>
-                <th>{t(S.colPin)}</th>
-                <th>{t(S.colIih)}</th>
-                <th>{t(S.colVerdict)}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {IN_PINS.map((pin, index) => {
-                const bad = leaks[index] > IN_LIMIT
-                return (
-                  <tr key={pin} className={bad ? 'is-fail' : 'is-pass'}>
-                    <td className="mono-cell">{pin}</td>
-                    <td className="mono-cell">{leaks[index].toFixed(2)} µA</td>
-                    <td className="verdict">{bad ? 'FAIL' : 'PASS'}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+          <div className="dtable-wrap">
+            <table className="dtable">
+              <thead>
+                <tr>
+                  <th>{t(S.colPin)}</th>
+                  <th>{t(S.colIih)}</th>
+                  <th>{t(S.colVerdict)}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {IN_PINS.map((pin, index) => {
+                  const bad = leaks[index] > IN_LIMIT
+                  return (
+                    <tr key={pin} className={bad ? 'is-fail' : 'is-pass'}>
+                      <td className="mono-cell">{pin}</td>
+                      <td className="mono-cell">{leaks[index].toFixed(2)} µA</td>
+                      <td className="verdict">{bad ? 'FAIL' : 'PASS'}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         ) : null}
       </Section>
 

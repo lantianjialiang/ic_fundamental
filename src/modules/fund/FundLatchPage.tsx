@@ -45,6 +45,7 @@ import {
   type TestMode,
 } from './data/latch'
 import { LatchSeqFig, ScrCircuitFig, ScrIvFig } from './LatchFig'
+import { LatchTriggerFig } from './LatchTriggerFig'
 import { Callout, Cards, Explain, Knob, Readout, Seg, Steps, type Note } from './parts'
 import './latch.css'
 
@@ -275,6 +276,7 @@ export function FundLatchPage({ moduleId, onModuleChange }: Props) {
           }}
         />
         {trigItem ? <Explain paras={[trigItem.text, ...(trigItem.explain ?? [])]} /> : null}
+        <LatchTriggerFig mode={trig} />
         <Callout>{t(PREVENT)}</Callout>
       </Section>
 

@@ -11,7 +11,44 @@ const LINKS = [
   { id: 'on', title: loc('片内线', 'On-die wire'), text: loc('最短、最密，但过不了光罩、跨不了工艺。', 'Shortest and densest, but cannot leave the reticle or the process.') },
   { id: 'd2d', title: loc('D2D', 'D2D'), text: loc('毫米级、宽并行、低能耗。UCIe 等开放规范以现行文本为准。', 'Millimetre-scale, wide, low energy. Open specs such as UCIe follow the current text.') },
   { id: 'ser', title: loc('长距 SerDes', 'Long-reach SerDes'), text: loc('过板、过连接器。均衡重、能耗高。见高速课。', 'Across a board and a connector. Heavy EQ, higher energy. See the high-speed lessons.') },
-]
+] as const
+
+type LinkId = (typeof LINKS)[number]['id']
+
+const LINK_PATH = {
+  on: 'M90 85 H138 M130 79 L138 85 L130 91',
+  d2d: 'M90 85 H152 V133 H235 V85 H280 M272 79 L280 85 L272 91',
+  ser: 'M90 85 H169 V167 H212 V192 H393 V177 H431 V155 H455 M447 149 L455 155 L447 161',
+}
+
+function D2dBoundaryFig({ link }: { link: LinkId }) {
+  const { t } = useLocale()
+  return (
+    <svg className="term-fig__svg" viewBox="0 0 500 232" role="img" aria-label={t(loc('片内、封装内与板级信号路径', 'On-die, in-package and board-level signal paths'))}>
+      <rect width="500" height="232" rx="10" fill="var(--well)" />
+      <rect x="24" y="35" width="309" height="138" rx="10" fill="var(--fig-box)" stroke="var(--gold)" strokeDasharray="5 4" />
+      <rect x="46" y="57" width="134" height="54" rx="5" fill="#338aa1" fillOpacity=".25" stroke="#54afc3" />
+      <rect x="215" y="57" width="101" height="54" rx="5" fill="#338aa1" fillOpacity=".25" stroke="#54afc3" />
+      <rect x="44" y="122" width="274" height="24" rx="5" fill="#cb9b59" fillOpacity=".23" stroke="#cb9b59" />
+      {[79, 152, 235, 280].map((x) => <path key={x} d={`M${x} 111 V121`} stroke="#cb9b59" strokeWidth="3" />)}
+      <rect x="24" y="181" width="374" height="25" rx="4" fill="#3e997f" fillOpacity=".28" stroke="#53b098" />
+      <rect x="385" y="169" width="24" height="39" rx="3" fill="var(--fig-box)" stroke="var(--muted)" />
+      <rect x="416" y="173" width="63" height="17" rx="3" fill="#3e997f" fillOpacity=".28" stroke="#53b098" />
+      <rect x="419" y="135" width="58" height="32" rx="4" fill="var(--fig-box)" stroke="var(--muted)" />
+      <g fill="var(--text)" fontSize="14">
+        <text x="26" y="25">{t(loc('共用封装边界', 'Package boundary'))}</text>
+        <text x="53" y="74">Die A</text>
+        <text x="224" y="74">Die B</text>
+        <text x="52" y="139">{t(loc('中介层／桥接', 'Interposer / bridge'))}</text>
+        <text x="31" y="199">{t(loc('主板 PCB', 'Main PCB'))}</text>
+        <text x="398" y="223" textAnchor="middle">{t(loc('连接器', 'Connector'))}</text>
+        <text x="449" y="127" textAnchor="middle">{t(loc('远端接收', 'Remote Rx'))}</text>
+      </g>
+      <path data-d2d-path={link} d={LINK_PATH[link]} fill="none" stroke={link === 'ser' ? '#ff867d' : '#63b4fd'} strokeWidth="3.5" strokeLinejoin="round" strokeLinecap="round" />
+      <circle cx="90" cy="85" r="4" fill="#e7c46c" />
+    </svg>
+  )
+}
 
 const QUIZ = [
   { id: 'q1', prompt: loc('4 行、45 µm、16 Gbps 的岸线密度？', 'Shoreline density at 4 rows, 45 µm, 16 Gbps?'), options: [
@@ -59,7 +96,7 @@ const QUIZ = [
 
 export function ApkD2dPage({ moduleId, onModuleChange }: { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }) {
   const { t } = useLocale()
-  const [linkId, setLinkId] = useState(LINKS[0].id)
+  const [linkId, setLinkId] = useState<LinkId>(LINKS[0].id)
   const [tryId, setTryId] = useState('')
   const [rows, setRows] = useState(2)
   const [pitch, setPitch] = useState(55)
@@ -116,7 +153,14 @@ export function ApkD2dPage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
         <div className="mfg-lab">
           <p>{t(loc('三种距离。点一种，读它过不过得了芯片边界。', 'Three reaches. Click one and read whether it can leave the chip edge.'))}</p>
           <Cards items={LINKS} activeId={linkId} cols={3} onPick={(item) => setLinkId(item.id)} />
-          <p>{t(link.text)}</p>
+          <figure className="term-fig">
+            <D2dBoundaryFig link={linkId} />
+            <figcaption>{t({
+              on: loc('起点与终点都在 Die A，信号沿片内金属线传输。', 'Both endpoints are on Die A, joined by on-die wiring.'),
+              d2d: loc('从 Die A 经微凸点、中介层或桥接走线，再经微凸点进入 Die B。整个路径都在封装内。', 'Leave Die A through micro-bumps, cross the interposer or bridge, and enter Die B through its micro-bumps. The full route stays inside the package.'),
+              ser: loc('离开芯片与封装后，沿 PCB 走线经过连接器，接到远端接收器。', 'Leave both die and package, follow PCB routing through a connector, and reach the remote receiver.'),
+            }[linkId])} {t(link.text)}</figcaption>
+          </figure>
           <p>{t(loc('岸线密度 = 行数 × (1000 / 节距) × 每通道速率。节距用 µm，结果是沿芯片边每毫米能送多少 Gbps。除以 8 得到大约的 GB/s/mm。', 'Shoreline density = rows × (1000 / pitch) × lane rate. Pitch is in µm. The result is how many Gbps fit along one millimetre of chip edge. Divide by 8 for about GB/s/mm.'))}</p>
           <p>{t(loc('每位能量仍是 αCV²，这一课 α 取 0.5。距离短，C 小，所以 pJ/bit 低。过板的 SerDes 要过连接器和长走线，均衡重，能耗高。', 'Energy per bit is still αCV², and this lesson uses α = 0.5. A short reach keeps C small, so pJ/bit is low. A SerDes that crosses a board also crosses a connector and a long trace, so equalization is heavy and energy is high.'))}</p>
           <p>{t(loc('训练是把采样点挪到眼的中间。余量 = 50 − |采样点 − 50|，采样点用百分数。正中间余量最大。组装之后微凸点扎不到，训练、误码和诊断走边带和环回。', 'Training moves the sample point to the middle of the eye. Margin = 50 − |sample − 50|, with the sample in percent. The middle has the largest margin. After assembly the micro-bumps cannot be probed, so training, errors and diagnosis use a sideband and loopback.'))}</p>

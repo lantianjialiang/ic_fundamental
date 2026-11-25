@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
+import { ScanStorageFig } from './ScanStorageFig'
 import { loc } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
@@ -485,6 +486,7 @@ export function FundScanPage({ moduleId, onModuleChange }: Props) {
           }}
         />
         {memItem ? <Explain paras={[memItem.text]} /> : null}
+        <ScanStorageFig />
         <h4 className="scan-sub">{t(S.calcTitle)}</h4>
         <div className="knob-row">
           <Knob label={S.ffs} value={ffs} unit="" min={1000} max={100000} step={1000} onChange={setFfs} />

@@ -7,6 +7,7 @@ import { type ModuleId } from '../catalog'
 import { Callout, Cards, Readout } from '../fund/parts'
 import { After, COMMON, Drill, PackLesson, useSticky } from './shell'
 import { CalendarTimeline } from './ProcessDiagrams'
+import { TestObject } from './TestObject'
 import { Formula } from './FlowVisuals'
 import { MFG_META } from './meta'
 
@@ -107,6 +108,11 @@ export function MfgOverviewPage({ moduleId, onModuleChange }: { moduleId: Module
   const role = ROLES.find((r) => r.id === roleId) ?? ROLES[0]
   const checkOk = CHECKS.every((c) => checkStage[c.id] === c.stage)
   const calendarWeeks = STAGES.filter((s) => calendar.includes(s.id)).reduce((sum, s) => sum + s.weeks, 0)
+  const weeksFor = (...ids: StageId[]) => STAGES.filter((s) => ids.includes(s.id)).reduce((sum, s) => sum + s.weeks, 0)
+  const beforeWeeks = weeksFor('design', 'mask')
+  const waferWeeks = weeksFor('fab', 'wat', 'cp')
+  const substrateWeeks = weeksFor('sub')
+  const afterWeeks = weeksFor('asm', 'ft')
   const calendarOk = CALENDAR.every((id) => calendar.includes(id)) && calendar.length === CALENDAR.length
   const cheapOk = cheapId === 'wat' || cheapId === 'cp'
   const matched = useSticky(checkOk)
@@ -154,6 +160,7 @@ export function MfgOverviewPage({ moduleId, onModuleChange }: { moduleId: Module
             ))}
           </p>
           <CalendarTimeline steps={STAGES} active={stageId} onPick={setStageId} />
+          <TestObject stage={stageId} />
           <Readout
             items={[
               { label: loc('这一段自己的周数', 'Weeks for this stage alone'), value: `${stage.weeks}` },
@@ -268,9 +275,28 @@ export function MfgOverviewPage({ moduleId, onModuleChange }: { moduleId: Module
             </div>
             <Formula
               rule="T = T_before + max(T_wafer, T_substrate) + T_after"
-              value={t(loc(`当前勾选合计 ${calendarWeeks} 周`, `Selected stages: ${calendarWeeks} weeks`))}
+              value={`${beforeWeeks} + max(${waferWeeks}, ${substrateWeeks}) + ${afterWeeks} = ${beforeWeeks + Math.max(waferWeeks, substrateWeeks) + afterWeeks}`}
               note={loc("并行段用较长的分支。主路等 CP 产出的裸片和基板都到齐，才接上组装和成品测试。", "Use the longer parallel branch. Assembly and final test follow when sorted dies and substrates are both available.")}
-            />
+            >
+              <svg viewBox="0 0 420 112" className="term-fig__svg" role="img" aria-label={t(loc('较长的晶圆分支决定汇合时间', 'The longer wafer branch determines the join time'))}>
+                <rect width="420" height="112" rx="8" fill="var(--well)" />
+                <path d="M121 31 H349" stroke="var(--gold)" strokeWidth="13" />
+                <path d={`M121 74 h${228 * substrateWeeks / waferWeeks}`} stroke="var(--blue)" strokeWidth="13" />
+                <path d="M349 20 V88 H368" fill="none" stroke="var(--muted)" strokeDasharray="4 3" />
+                <g fill="var(--text)" fontSize="14">
+                  <text x="15" y="36">{t(loc('晶圆与 CP', 'Wafer and CP'))}</text>
+                  <text x="15" y="79">{t(loc('基板', 'Substrate'))}</text>
+                  <text x="355" y="35">{waferWeeks} wk</text>
+                  <text x={128 + 228 * substrateWeeks / waferWeeks} y="79">{substrateWeeks} wk</text>
+                  <text x="348" y="105" textAnchor="middle">{t(loc('汇合后组装', 'Assembly after join'))}</text>
+                </g>
+              </svg>
+            </Formula>
+            <Readout items={[
+              { label: loc('当前勾选项目的时长合计（周）', 'Sum of selected stages (weeks)'), value: String(calendarWeeks) },
+              { label: loc('完整流程的并行分支（周）', 'Parallel branches in the complete flow (weeks)'),
+                value: t(loc(`晶圆制造 → WAT → CP：${waferWeeks}（关键路径）。基板：${substrateWeeks}。`, `Wafer fab → WAT → CP: ${waferWeeks} (critical path). Substrate: ${substrateWeeks}.`)) },
+            ]} />
             <After
               show={added.hit}
               text={loc(

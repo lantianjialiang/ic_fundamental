@@ -4,6 +4,7 @@ import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
 import { Cards, Knob, Readout } from '../fund/parts'
 import { knownGoodProb, stackYieldD2W, stackYieldW2W } from './core'
+import { ApkStackPairing } from './ApkStackPairing'
 import { YieldBars } from '../mfg/figs'
 import { After, COMMON, Drill, PackLesson, near, useSticky } from '../mfg/shell'
 import { APK_META } from './meta'
@@ -120,6 +121,7 @@ export function ApkStackPage({ moduleId, onModuleChange }: { moduleId: ModuleId;
           <p>{t(loc('两种贴法。点一种，读它能不能把坏 die 挑出去。', 'Two ways to place dies. Click one and read whether it can reject a bad die.'))}</p>
           <Cards items={MODES} activeId={modeId} cols={2} onPick={(item) => setModeId(item.id)} />
           <p>{t(mode.text)}</p>
+          <ApkStackPairing pick={modeId === 'd2w'} coverage={cov} goodGivenPass={kgd} />
           <p>{t(loc('晶圆对晶圆：堆叠良率 = 各层良率连乘 × 键合良率的 (层数−1) 次方。好 die 可能正对着坏 die，没法挑。', 'Wafer to wafer: stack yield = the product of the die yields × bond yield to the power (layers−1). A good die can land on a bad one. There is no picking.'))}</p>
           <p>{t(loc('先测再贴时，用 P(好|通过) = Y / (Y + (1−Y)×(1−覆盖率)) 代替裸片良率。覆盖率不是 1，通过的片子里仍可能有漏网的坏片。裸片良率这一式用 0.9。', 'Test-then-place replaces the bare yield with P(good|pass) = Y / (Y + (1−Y)×(1−coverage)). Coverage is not 1, so a passing die can still be bad. This formula uses a bare yield of 0.9.'))}</p>
         </div>
@@ -157,9 +159,11 @@ export function ApkStackPage({ moduleId, onModuleChange }: { moduleId: ModuleId;
         </div>
       }
       misconceptions={[
-        loc('KGD 就是 100% 好。它只在覆盖率里“已知”。', 'KGD is not 100% good. It is “known” only inside coverage.'),
+        loc('如果测试覆盖率低于 100%，通过筛选的片中仍可能有漏检坏片。实际比例同时取决于筛选覆盖率和裸片良率。',
+          'When test coverage is below 100%, passing dies can include escaped defects. Their share depends on both coverage and the incoming die yield.'),
         loc('当单层良率较低时，W2W 的叠层良率会随层数增加而下降。良品出货减少，可能抵消晶圆级键合的成本优势。', 'When individual wafer yields are low, W2W stack yield falls as layers are added. Fewer good stacks can offset the cost advantage of wafer-level bonding.'),
-        loc('键合良率可忽略。它要乘 n−1 次。', 'Bond yield is not optional. It is raised to n−1.'),
+        loc('每增加一层就多一次键合。即使单次键合良率很高，n 层也要乘入 n−1 次键合良率。',
+          'Each added layer introduces one more bond. Even at high bond yield, an n-layer stack incurs the bond yield n−1 times.'),
       ]}
       takeaway={[
         loc('W2W = ΠYi × bond^(n−1)；D2W 先把 Yi 换成 P(good|pass)。', 'W2W = ΠYi × bond^(n−1); D2W first replaces Yi with P(good|pass).'),

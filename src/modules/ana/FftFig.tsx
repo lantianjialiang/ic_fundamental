@@ -73,7 +73,7 @@ const FREQ_TICKS = [0, 10, 20, 30, 40, 50]
 const DB_TICKS = [0, -40, -80, -120]
 
 const fx = (khz: number) => FX0 + (khz / FMAX) * (FX1 - FX0)
-/** dB 映射到纵坐标：0 dBV 在顶部，−120 dBV（噪声底）在底部，超出范围的截到边界 */
+/** 峰值参考的 dB 映射到纵坐标，显示范围为 0 到 −120。 */
 const dy = (db: number) => {
   const clamped = Math.min(0, Math.max(db, DB_FLOOR))
   return FY_TOP + (clamped / DB_FLOOR) * (FY_BOT - FY_TOP)
@@ -101,6 +101,7 @@ export function FreqFig({ result }: { result: FftResult }) {
       <svg viewBox={`0 0 ${FW} ${FH}`} className="term-fig__svg" role="img" aria-label={t(FIG.freqAria)}>
         <rect width={FW} height={FH} rx="10" fill="var(--well)" />
         <rect x={FX0} y={FY_TOP} width={FX1 - FX0} height={FY_BOT - FY_TOP} fill="var(--fig-box)" stroke="var(--line-2)" />
+        <text x={FX0 + 5} y={FY_TOP + 13} fill="var(--text)" fontSize="11">dB re 1 Vpeak</text>
 
         {DB_TICKS.map((db) => (
           <g key={db}>

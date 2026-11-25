@@ -9,6 +9,7 @@ import { Callout, Knob, Readout, Seg } from '../fund/parts'
 import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import { ChannelFig } from './ChannelFig'
+import { ChannelBounceFig } from './ChannelBounceFig'
 import { PrereqSection } from './HsPrereq'
 import {
   INTRO,
@@ -98,9 +99,8 @@ export function HsChannelPage({ moduleId, onModuleChange }: Props) {
             />
           </div>
         </div>
+        <ChannelBounceFig analysis={analysis} load={state.zl} />
       </Section>
-
-      
 
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">

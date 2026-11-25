@@ -11,6 +11,7 @@ import { QUIZ as BENCH_QUIZ } from '../module17/data/content'
 import { QUIZ, S, TAKEAWAY } from './data/content'
 import { IddqLab } from './IddqLab'
 import { OsLab } from './OsLab'
+import { DutTraceLab } from './DutTraceLab'
 import { type Note } from './parts'
 import './vate.css'
 
@@ -19,7 +20,7 @@ type VatePageProps = {
   onModuleChange: (id: ModuleId) => void
 }
 
-type Tab = 'bench' | 'iddq' | 'os'
+type Tab = 'bench' | 'iddq' | 'os' | 'trace'
 
 /** 合并后测验：先是原 D15 实验台的题，再是 VATE 的题 */
 const ALL_QUIZ = [...BENCH_QUIZ, ...QUIZ]
@@ -28,6 +29,7 @@ const TABS: Array<{ id: Tab; label: LText; code: string }> = [
   { id: 'bench', label: loc('基础台：时序 / 漏电 / 图案', 'Basic bench: timing / leakage / pattern'), code: 'T000' },
   { id: 'iddq', label: S.tabIddq, code: 'T100' },
   { id: 'os', label: S.tabOs, code: 'T200' },
+  { id: 'trace', label: loc('单颗 DUT 测试流程', 'One-DUT test flow'), code: 'FLOW' },
 ]
 
 const START_NOTE: Record<Tab, Note> = {
@@ -38,6 +40,8 @@ const START_NOTE: Record<Tab, Note> = {
   },
   iddq: { kicker: S.kickerIddq, title: S.asideIntroTitle, text: S.asideIntroText },
   os: { kicker: S.kickerOs, title: S.asideOsTitle, text: S.asideOsText },
+  trace: { kicker: loc('测试流程', 'Test flow'), title: loc('从接触检查到 Bin', 'From contact check to bin'),
+    text: loc('选定一颗 DUT，逐步记录测试条件、读数、限值和首个失败项。', 'Select one DUT and step through conditions, readings, limits and its first failing test.') },
 }
 
 export function VatePage({ moduleId, onModuleChange }: VatePageProps) {
@@ -108,6 +112,9 @@ export function VatePage({ moduleId, onModuleChange }: VatePageProps) {
               </div>
               <div role="tabpanel" id="vate-panel-os" aria-labelledby="vate-tab-os" hidden={tab !== 'os'}>
                 <OsLab onNote={setNote('os')} />
+              </div>
+              <div role="tabpanel" id="vate-panel-trace" aria-labelledby="vate-tab-trace" hidden={tab !== 'trace'}>
+                <DutTraceLab />
               </div>
             </div>
           </div>

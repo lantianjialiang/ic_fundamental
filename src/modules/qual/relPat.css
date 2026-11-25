@@ -11,6 +11,16 @@
   margin: 0;
 }
 
+.rel-pat-lot {
+  padding: 8px;
+  border: 2px solid var(--green);
+  border-radius: 10px;
+}
+
+.rel-pat-lot.is-held {
+  border-color: var(--red);
+}
+
 .rel-pat-svg {
   display: block;
   width: 100%;

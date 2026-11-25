@@ -147,3 +147,4 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+.mem-array .mem-cell.is-unvisited { stroke: var(--muted); stroke-dasharray: 3 3; }

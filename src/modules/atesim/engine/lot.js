@@ -46,6 +46,8 @@
       inst.beginTouch(i, count);
       var res = Flow.run(die, program, { instruments: inst, stopOnFirstFail: req.stopOnFirstFail });
       var firstBin = res.bin;
+      var firstFailItem = res.failItem;
+      var firstFailReading = res.results.find(function (r) { return r.id === firstFailItem; });
       var attempts = 1;
       var retestTime = 0;
       if (firstBin === 1) yieldBeforeRetestCount++;
@@ -72,6 +74,8 @@
         y: die.y,
         bin: res.bin,
         firstBin: firstBin,
+        firstFailItem: firstFailItem,
+        firstFailValue: firstFailReading ? firstFailReading.value : null,
         trueGood: die.trueGood,
         process: die.process,
         attempts: attempts,

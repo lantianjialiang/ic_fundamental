@@ -173,7 +173,24 @@ export function ApkTsvPage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
           </Drill>
           <Drill n={2} title={taskC}>
             <Knob label={loc('绝缘层 tox', 'Liner tox')} value={tox} unit="µm" min={0.2} max={0.6} step={0.2} onChange={setTox} />
-            <Readout items={[{ label: loc('你算出的电容', 'Capacitance you got'), value: `${(c * 1e15).toFixed(1)} fF` }]} />
+            <figure className="term-fig">
+              <svg viewBox="0 0 410 163" className="term-fig__svg" role="img" aria-label={t(loc('同轴近似中的铜半径、绝缘层和长度', 'Copper radius, liner and length in the coaxial approximation'))}>
+                <rect width="410" height="163" rx="8" fill="var(--well)" />
+                <circle cx="90" cy="78" r={48 + 32 * tox / (dia / 2)} fill="var(--blue)" />
+                <circle cx="90" cy="78" r="48" fill="#a76d25" />
+                <path d={`M90 78 H138 M90 78 L${90 + (48 + 32 * tox / (dia / 2)) * 0.707} ${78 - (48 + 32 * tox / (dia / 2)) * 0.707} H173`} stroke="#ffffff" strokeWidth="2" fill="none" />
+                <text x="102" y="98" fontSize="14" fill="#ffffff">r</text>
+                <text x="156" y="67" fontSize="14" fill="var(--text)">r + tox</text>
+                <rect x="241" y="39" width="40" height="84" fill="var(--blue)" />
+                <rect x="249" y="39" width="24" height="84" fill="#a76d25" />
+                <path d="M290 39 H302 V123 H290" stroke="var(--text)" fill="none" />
+                <text x="306" y="85" fontSize="14" fill="var(--text)">{len} µm</text>
+                <text x="26" y="150" fontSize="13" fill="var(--text)">r = {dia / 2} µm · tox = {tox} µm</text>
+              </svg>
+              <figcaption>{t(loc('铜芯外面是绝缘层，蓝环厚度放大显示。左为横截面，右为沿孔的长度。', 'The blue dielectric ring surrounds the copper and is enlarged for visibility. The left view is transverse and the right view shows the length.'))}</figcaption>
+            </figure>
+            <Readout items={[{ label: loc('你算出的电容', 'Capacitance you got'),
+              value: `2π × 3.9ε₀ × (${len} × 10⁻⁶ m) / ln[(${dia / 2} + ${tox}) / ${dia / 2}] ≈ ${(c * 1e15).toFixed(1)} fF` }]} />
             <After show={cHit.hit} text={loc('绝缘 0.2 µm 时，孔壁电容约 141 fF。它和电阻一起决定这个孔对旁边信号的拖累。', 'At a 0.2 µm liner the wall capacitance is about 141 fF. Together with the resistance, it sets how much this via loads a nearby signal.')} />
           </Drill>
           <Drill n={3} title={taskChain}>

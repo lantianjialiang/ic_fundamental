@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
@@ -30,7 +31,7 @@ import {
   verdictOf,
   waferSummary,
 } from './relPatData'
-import { DEFAULT_PAT, type Limits, type PatState, TARGET_CAPTURE, TARGET_YIELD_LOSS, runPat, samplePat } from './relPatModel'
+import { DEFAULT_PAT, type Limits, type PatRun, type PatState, TARGET_CAPTURE, TARGET_YIELD_LOSS, runPat, samplePat, siteOf } from './relPatModel'
 import { WaferMap } from './WaferMap'
 import './relPat.css'
 import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
@@ -38,11 +39,20 @@ import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
 
 const fmtLim = (l: Limits) => `[${l.lo.toFixed(1)}, ${l.hi.toFixed(1)}]`
+const MAP_VIEWS = [
+  { id: 'outcome', label: loc('综合结果', 'Combined outcome') },
+  { id: 'pat', label: loc('PAT 看单颗', 'PAT: one die') },
+  { id: 'sba', label: loc('SBA 看整批', 'SBA: whole lot') },
+  { id: 'nbr', label: loc('邻近筛选看周围', 'Neighbour screening: nearby dies') },
+] as const
+const isPriorFail = (outcome: PatRun['outcome'][number]) => outcome === 'spec' || outcome.startsWith('pat-')
 
 export function RelPatPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [state, setState] = useState<PatState>(DEFAULT_PAT)
   const [picked, setPicked] = useState<number | null>(null)
+  const [mapView, setMapView] = useState<(typeof MAP_VIEWS)[number]['id']>('outcome')
+  const [binLimit, setBinLimit] = useState(1.2)
   const run = useMemo(() => runPat(state), [state])
   const { stats } = run
   const hand = useMemo(() => samplePat(state.k), [state.k])
@@ -50,6 +60,14 @@ export function RelPatPage({ moduleId, onModuleChange }: Props) {
   const captureOk = stats.capture >= TARGET_CAPTURE
   const yieldOk = stats.yieldLoss <= TARGET_YIELD_LOSS
   const shiftSigma = (run.waferMedian - run.lotMedian) / run.sigmaRob
+  const active = picked === null ? run.map.dies[Math.floor(run.map.dies.length / 2)] : run.map.dies[picked]
+  const activeOutcome = run.outcome[active.id]
+  const activeLimit = run.applied.find((line) => line.site === null || line.site === siteOf(active)) ?? run.lotLimits
+  const binRate = 100 * stats.specFail / stats.dies
+  const lotHeld = binRate > binLimit
+  const neighbours = new Set(run.map.dies.filter((die) => die.id !== active.id
+    && Math.hypot(die.row - active.row, die.col - active.col) <= state.radius).map((die) => die.id))
+  const sourceCount = [...neighbours].filter((id) => isPriorFail(run.outcome[id])).length
 
   const update = (patch: Partial<PatState>) => {
     setState((prev) => ({ ...prev, ...patch }))
@@ -60,16 +78,26 @@ export function RelPatPage({ moduleId, onModuleChange }: Props) {
   const reset = () => {
     setState(DEFAULT_PAT)
     setPicked(null)
+    setMapView('outcome')
+    setBinLimit(1.2)
   }
 
   const colorOf = (die: Die) => {
+    const outcome = run.outcome[die.id]
+    if (mapView === 'pat' || mapView === 'nbr') {
+      return isPriorFail(outcome) || (mapView === 'nbr' && outcome.startsWith('nbr-'))
+        ? OUTCOME_COLOR[outcome] : '#536173'
+    }
+    if (mapView === 'sba') {
+      return outcome === 'spec' ? OUTCOME_COLOR.spec : '#536173'
+    }
     if (state.colorBy === 'param') {
       if (die.hardFail) {
         return '#484f58'
       }
       return paramColor((die.param - run.lotMedian) / run.sigmaRob)
     }
-    return OUTCOME_COLOR[run.outcome[die.id]]
+    return OUTCOME_COLOR[outcome]
   }
 
   const dieLabel = (die: Die) => {
@@ -153,24 +181,56 @@ export function RelPatPage({ moduleId, onModuleChange }: Props) {
           </div>
           <Knob label={S.radiusLabel} value={state.radius} unit="die" min={0.5} max={3} step={0.5} onChange={(radius) => update({ radius })} />
           <Knob label={S.minLabel} value={state.minFails} unit="die" min={1} max={8} step={1} onChange={(minFails) => update({ minFails })} />
-          <div className="hs-field">
+          {mapView === 'outcome' && <div className="hs-field">
             <span className="hs-field__label">{t(S.colorLabel)}</span>
             <Seg options={COLOR_SEG} value={state.colorBy} onChange={(colorBy) => update({ colorBy })} />
-          </div>
+          </div>}
         </div>
 
         <div className="hs-grid">
           <div className="rel-pat-figs">
-            <WaferMap
-              wafer={run.map}
-              colorOf={colorOf}
-              selected={picked}
-              onPick={setPicked}
-              summary={t(waferSummary(run))}
-              ariaLabel={t(S.mapAria)}
-              dieLabel={dieLabel}
-            />
-            {state.colorBy === 'outcome' ? <OutcomeLegend /> : <p className="rel-pat-legend">{t(S.paramLegend)}</p>}
+            <Seg options={MAP_VIEWS} value={mapView} onChange={setMapView} />
+            {mapView === 'sba' && <Knob label={loc('历史失败 Bin 警戒线（示例）', 'Historical fail-bin limit (example)')}
+              value={binLimit} unit="%" min={0.5} max={3} step={0.1} onChange={setBinLimit} />}
+            <div className={mapView === 'sba' ? `rel-pat-lot ${lotHeld ? 'is-held' : ''}` : undefined}
+              data-pat-scope={mapView} data-lot-held={mapView === 'sba' ? lotHeld : undefined}>
+              <WaferMap
+                wafer={run.map}
+                colorOf={colorOf}
+                selected={mapView === 'outcome' ? picked : mapView === 'sba' ? null : active.id}
+                onPick={setPicked}
+                summary={t(waferSummary(run))}
+                ariaLabel={t(S.mapAria)}
+                dieLabel={dieLabel}
+                markOf={mapView === 'nbr' ? (die) => neighbours.has(die.id)
+                  ? isPriorFail(run.outcome[die.id]) ? 'source' : 'near' : undefined : undefined}
+              />
+            </div>
+            {mapView === 'outcome' && (state.colorBy === 'outcome' ? <OutcomeLegend /> : <p className="rel-pat-legend">{t(S.paramLegend)}</p>)}
+            {mapView === 'pat' && <Readout items={[
+              { label: loc('选中的 die 及其 PAT 窗口', 'Selected die and its PAT window'),
+                value: `(${active.row + 1}, ${active.col + 1}) · ${active.param.toFixed(2)} µA · ${fmtLim(activeLimit)} µA` },
+              { label: loc('对单颗的判定', 'Decision for one die'),
+                value: t(activeOutcome === 'spec' ? loc('规格已失败，先剔除', 'Failed spec, removed before PAT')
+                  : activeOutcome.startsWith('pat-') ? loc('超出统计窗口，PAT 剔除', 'Outside the statistical window; removed by PAT')
+                    : loc('落在窗口内，通过 PAT', 'Inside the window; passes PAT')) },
+            ]} />}
+            {mapView === 'sba' && <Readout items={[
+              { label: loc('整批规格失败 Bin 占比', 'Spec-fail bin share across the whole lot'),
+                value: `${stats.specFail} / ${stats.dies} × 100% ≈ ${binRate.toFixed(2)}%` },
+              { label: loc('整批判定（当前晶圆是批次的一部分）', 'Lot decision (this wafer belongs to the lot)'),
+                value: t(lotHeld ? loc('超过警戒线，整批待查', 'Above the limit; hold the lot for review')
+                  : loc('达到或低于警戒线，继续流转', 'At or below the limit; release for the next step')),
+                state: lotHeld ? 'fail' : 'pass' },
+            ]} />}
+            {mapView === 'nbr' && <Readout items={[
+              { label: loc('所选 die 周围的失败邻居（黄框）', 'Failing neighbours around the selected die (gold outlines)'),
+                value: `${sourceCount} / ${neighbours.size} · r = ${state.radius} die · m = ${state.minFails}` },
+              { label: loc('对中心 die 的邻近判定', 'Neighbour decision for the centre die'),
+                value: t(isPriorFail(activeOutcome) ? loc('规格或 PAT 已剔除', 'Already removed by spec or PAT')
+                  : sourceCount >= state.minFails ? loc('达到门槛，开启邻近规则后剔除', 'Threshold met; reject when neighbourhood screening is enabled')
+                    : loc('低于门槛，保留中心 die', 'Below the threshold; keep the centre die')) },
+            ]} />}
             <PatHistFig values={run.values} lines={run.applied} windowId={state.window} ariaLabel={t(S.histAria)} />
           </div>
           <div className="hs-cell">

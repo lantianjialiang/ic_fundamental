@@ -34,8 +34,8 @@ export function MarginFig({ params, x, active, onPick }: { params: MarginParam[]
       <rect width="680" height={height} rx="10" fill="var(--well)" />
       {ticks.map((v) => (
         <g key={v}>
-          <line x1={px(v)} y1={28} x2={px(v)} y2={height - 8} stroke="var(--line)" strokeDasharray={v === RISK_PCT ? '4 3' : undefined} />
-          <text x={px(v)} y={20} textAnchor="middle" fill={v === RISK_PCT ? 'var(--gold)' : 'var(--dim)'} fontSize="10">
+          <line x1={px(v)} y1={28} x2={px(v)} y2={height - 8} stroke="var(--line)" />
+          <text x={px(v)} y={20} textAnchor="middle" fill="var(--dim)" fontSize="10">
             {`${v}%`}
           </text>
         </g>
@@ -44,7 +44,7 @@ export function MarginFig({ params, x, active, onPick }: { params: MarginParam[]
         const m = marginPct(p)
         const y = 36 + i * MROW
         const fail = m <= x
-        const risk = !fail && m < RISK_PCT
+        const risk = !fail && m - x < RISK_PCT
         const color = fail ? 'var(--red)' : risk ? 'var(--gold)' : 'var(--green)'
         return (
           <g key={p.id} style={{ cursor: 'pointer' }} onClick={() => onPick(p.id)}>
@@ -59,6 +59,8 @@ export function MarginFig({ params, x, active, onPick }: { params: MarginParam[]
           </g>
         )
       })}
+      <line x1={px(x + RISK_PCT)} y1={26} x2={px(x + RISK_PCT)} y2={height - 6}
+        stroke="var(--gold)" strokeWidth="1.5" strokeDasharray="4 3" />
       <line x1={px(x)} y1={26} x2={px(x)} y2={height - 6} stroke="var(--sky)" strokeWidth="2" />
       <text x={px(x) + 4} y={height - 10} fill="var(--sky)" fontSize="11">
         {`${t(L.pull)} ±${x}%`}

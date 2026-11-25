@@ -2,24 +2,74 @@ import { useState } from 'react'
 import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
-import { Cards, Knob, Readout } from '../fund/parts'
+import { Cards, Knob, Readout, Seg } from '../fund/parts'
 import { hbmBandwidthGBps } from './core'
-import { PackageCut } from '../mfg/figs'
 import { After, COMMON, Drill, PackLesson, near, useSticky } from '../mfg/shell'
 import { APK_META } from './meta'
 
 const PARTS = [
-  { id: 'dram', title: loc('DRAM 层', 'DRAM layers'), y: 24, h: 70, color: '#7eb8c9' },
-  { id: 'base', title: loc('基底 die', 'Base die'), y: 96, h: 24, color: '#9ec27c' },
-  { id: 'ubump', title: loc('微凸点', 'Micro-bumps'), y: 122, h: 12, color: '#f4d27a' },
-  { id: 'intp', title: loc('中介层', 'Interposer'), y: 136, h: 28, color: '#c4a15a' },
-]
+  { id: 'dram', label: loc('DRAM 层', 'DRAM layers') },
+  { id: 'base', label: loc('基底 die', 'Base die') },
+  { id: 'ubump', label: loc('微凸点', 'Micro-bumps') },
+  { id: 'intp', label: loc('中介层', 'Interposer') },
+] as const
 
 const FIX = [
-  { id: 'bist', title: loc('BIST / 修复', 'BIST / repair'), text: loc('基底 die 上的自检和行列/TSV 冗余。以现行规范为准。', 'BIST and row/column/TSV redundancy on the base die. Follow the current spec.') },
-  { id: 'ecc', title: loc('ECC', 'ECC'), text: loc('运行中纠错，不能替代出厂测试。', 'In-field correction; it does not replace factory test.') },
-  { id: 'access', title: loc('测试访问', 'Test access'), text: loc('堆好之后底层 DRAM 不能直接扎针。', 'After stacking, lower DRAM cannot be probed directly.') },
-]
+  { id: 'bist', title: loc('BIST 自检', 'BIST'), text: loc('自检逻辑向选中的 DRAM 层写入图样，再读回比较。图中蓝色去程和虚线回程共用垂直互连。', 'Self-test writes a pattern into the selected DRAM layer and compares the readback. The solid blue command path and dashed return share vertical interconnects.') },
+  { id: 'repair', title: loc('冗余修复', 'Redundancy repair'), text: loc('定位到坏行后，把地址重映射到同层备用行。这里画的是行冗余示例。', 'Once a bad row is located, remap its address to a spare row on the same die. The diagram shows row redundancy.') },
+  { id: 'ecc', title: loc('ECC', 'ECC'), text: loc('运行中读出数据与校验位，解码后修正可纠正的错误。图中以主机侧 ECC 为例；具体实现会有差异。', 'During operation, read data with its check bits and decode to correct recoverable errors. This example shows host-side ECC. Implementations vary.') },
+  { id: 'access', title: loc('测试访问', 'Test access'), text: loc('堆叠完成后，从外部可接触端子，经中介层、基底 die 和垂直互连访问被覆盖的 DRAM 层。', 'After stacking, start at accessible external contacts and reach buried DRAM through the interposer, base die and vertical interconnects.') },
+] as const
+
+type HbmPart = (typeof PARTS)[number]['id']
+type HbmRole = (typeof FIX)[number]['id']
+
+function HbmCut({ part, role }: { part: HbmPart; role: HbmRole }) {
+  const { t } = useLocale()
+  return (
+    <svg className="term-fig__svg" viewBox="0 0 440 231" role="img" aria-label={t(loc('HBM 堆叠与测试路径示意', 'HBM cross-section and test paths'))}>
+      <rect width="440" height="231" rx="10" fill="var(--well)" />
+      <g fontSize="14" fill="var(--text)">
+        <text x="15" y="64">{t(PARTS[0].label)}</text>
+        <text x="15" y="142">{t(PARTS[1].label)}</text>
+        <text x="15" y="166">{t(PARTS[2].label)}</text>
+        <text x="15" y="186">{t(PARTS[3].label)}</text>
+      </g>
+      {[31, 54, 77, 100].map((y) => (
+        <rect key={y} x="119" y={y} width="161" height="18" rx="3" fill="#67aebc" fillOpacity={part === 'dram' ? .64 : .27} stroke="#67aebc" />
+      ))}
+      <rect x="113" y="124" width="173" height="24" rx="4" fill="#81b067" fillOpacity={part === 'base' ? .65 : .32} stroke="#81b067" />
+      {[131, 162, 193, 224, 255, 271].map((x) => <circle key={x} cx={x} cy="160" r="4" fill="#e1b253" opacity={part === 'ubump' ? 1 : .5} />)}
+      <rect x="101" y="171" width="316" height="21" rx="4" fill="#cb9b59" fillOpacity={part === 'intp' ? .65 : .27} stroke="#cb9b59" />
+      <rect x="310" y="120" width="100" height="32" rx="5" fill="var(--fig-box)" stroke="var(--line-2)" />
+      <text x="360" y="141" textAnchor="middle" fontSize="14" fill="var(--text)">{t(loc('主机逻辑', 'Host logic'))}</text>
+      <path d="M173 35 V136 M198 35 V136 M222 35 V136" stroke="var(--muted)" opacity=".65" strokeWidth="2" />
+      <path d="M218 42 H250" stroke="var(--text)" />
+      <text x="254" y="45" fontSize="12" fill="var(--text)">TSV</text>
+      <g data-hbm-path={role} fill="none" strokeLinejoin="round" strokeLinecap="round" strokeWidth="3">
+        {role === 'bist' && <>
+          <path d="M148 137 H173 V62 H254 M246 57 L254 62 L246 67" stroke="var(--blue)" />
+          <path d="M254 67 H198 V143 H148" stroke="var(--blue)" strokeDasharray="4 4" />
+          <text x="290" y="65" fill="var(--text)" fontSize="14">BIST</text>
+        </>}
+        {role === 'repair' && <>
+          <path d="M157 81 L166 92 M166 81 L157 92" stroke="var(--red)" />
+          <path d="M173 87 H244 M236 82 L244 87 L236 92" stroke="var(--gold)" />
+          <rect x="248" y="79" width="20" height="15" rx="3" stroke="var(--gold)" />
+          <text x="287" y="91" fill="var(--text)" fontSize="14">{t(loc('备用行', 'Spare row'))}</text>
+        </>}
+        {role === 'ecc' && <>
+          <path d="M249 63 H222 V181 H360 V150 M355 158 L360 150 L365 158" stroke="var(--green)" />
+          <text x="360" y="100" textAnchor="middle" fill="var(--green)" fontSize="14">{t(loc('数据 + 校验位', 'Data + check bits'))}</text>
+        </>}
+        {role === 'access' && <>
+          <path d="M117 218 L143 192 H178 V181 H198 V106 H257 M250 101 L257 106 L250 111" stroke="var(--gold)" />
+          <text x="152" y="219" fill="var(--text)" fontSize="14">{t(loc('外部测试端子', 'External test contact'))}</text>
+        </>}
+      </g>
+    </svg>
+  )
+}
 
 const QUIZ = [
   { id: 'q1', prompt: loc('8 层 × 16 Gb 的容量？', 'Capacity of 8 × 16 Gb?'), options: [
@@ -67,13 +117,12 @@ const QUIZ = [
 
 export function ApkHbmPage({ moduleId, onModuleChange }: { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }) {
   const { t } = useLocale()
-  const [partId, setPartId] = useState(PARTS[0].id)
-  const [fixId, setFixId] = useState(FIX[0].id)
+  const [partId, setPartId] = useState<HbmPart>(PARTS[0].id)
+  const [fixId, setFixId] = useState<HbmRole>(FIX[0].id)
   const [layers, setLayers] = useState(4)
   const [dieGb, setDieGb] = useState(8)
   const [width, setWidth] = useState(512)
   const [rate, setRate] = useState(3.2)
-  const part = PARTS.find((item) => item.id === partId) ?? PARTS[0]
   const fix = FIX.find((item) => item.id === fixId) ?? FIX[0]
   const capGb = layers * dieGb
   const capGB = capGb / 8
@@ -133,12 +182,12 @@ export function ApkHbmPage({ moduleId, onModuleChange }: { moduleId: ModuleId; o
       learn={
         <div className="mfg-lab">
           <p>{t(loc('HBM 是多层 DRAM 叠在一颗基底 die 上，再经微凸点贴到中介层。点一层，看信号从哪进出。', 'HBM is DRAM dies stacked on a base die, then micro-bumped onto an interposer. Click a layer and see where the signals enter.'))}</p>
-          <PackageCut parts={PARTS} activeId={partId} onPick={setPartId} />
-          <p>{t(part.title)}</p>
           <p>{t(loc('容量先按比特加：层数 × 单 die 的 Gb，再除以 8 得到 GB。带宽 (GB/s) = 位宽 × 每引脚 Gbps / 8。HBM 的位宽到 1024，所以同样的每引脚速率，带宽远高于 64 位 DDR。', 'Capacity adds in bits: layers × Gb per die, then divide by 8 for GB. Bandwidth (GB/s) = width × Gbps per pin / 8. HBM’s width reaches 1024, so at the same per-pin rate the bandwidth is far above a 64-bit DDR channel.'))}</p>
           <p>{t(loc('3.2 TB/s = 3200 GB/s。需要的叠数 = 向上取整(3200 / 单叠带宽)。叠数变多，热和良率都会变差。', '3.2 TB/s = 3200 GB/s. Stacks needed = ceil(3200 / one stack’s bandwidth). More stacks make heat and yield worse.'))}</p>
           <p>{t(loc('点一种测试机制。堆好之后，下面的 DRAM 焊盘被盖住，不能再直接扎针。', 'Click a test mechanism. After stacking, the lower DRAM pads are covered and cannot be probed directly.'))}</p>
-          <Cards items={FIX} activeId={fixId} cols={3} onPick={(item) => setFixId(item.id)} />
+          <Cards items={FIX} activeId={fixId} cols={4} onPick={(item) => setFixId(item.id)} />
+          <Seg options={PARTS} value={partId} onChange={setPartId} />
+          <HbmCut part={partId} role={fixId} />
           <p>{t(fix.text)}</p>
         </div>
       }

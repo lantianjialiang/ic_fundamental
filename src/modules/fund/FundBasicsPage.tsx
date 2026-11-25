@@ -277,35 +277,37 @@ export function FundBasicsPage({ moduleId, onModuleChange }: Props) {
         {NOTATION_LEAD.map((para) => (
           <p key={para.zh}>{t(para)}</p>
         ))}
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th>{t(S.colPrefix)}</th>
-              <th>{t(S.colName)}</th>
-              <th>{t(S.colPow)}</th>
-              <th>{t(S.colComp)}</th>
-              <th>{t(S.colNum)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {PREFIXES.map((p) => (
-              <tr
-                key={p.id}
-                className={`is-click${p.id === prefix ? ' is-active' : ''}`}
-                onClick={() => {
-                  setPrefix(p.id)
-                  setNote({ kicker: S.kicker, title: p.name, text: `${p.sym || '—'} = 1 × 10${supNum(p.exp)} = 1E${p.exp >= 0 ? '+' : ''}${p.exp}` })
-                }}
-              >
-                <td className="mono-cell">{p.sym || '—'}</td>
-                <td>{t(p.name)}</td>
-                <td className="mono-cell">{`1 × 10${supNum(p.exp)}`}</td>
-                <td className="mono-cell">{`1E${p.exp >= 0 ? '+' : ''}${p.exp}`}</td>
-                <td className="mono-cell">{p.exp >= 0 ? (10 ** p.exp).toLocaleString('en-US') : `0.${'0'.repeat(-p.exp - 1)}1`}</td>
+        <div className="dtable-wrap">
+          <table className="dtable">
+            <thead>
+              <tr>
+                <th>{t(S.colPrefix)}</th>
+                <th>{t(S.colName)}</th>
+                <th>{t(S.colPow)}</th>
+                <th>{t(S.colComp)}</th>
+                <th>{t(S.colNum)}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {PREFIXES.map((p) => (
+                <tr
+                  key={p.id}
+                  className={`is-click${p.id === prefix ? ' is-active' : ''}`}
+                  onClick={() => {
+                    setPrefix(p.id)
+                    setNote({ kicker: S.kicker, title: p.name, text: `${p.sym || '—'} = 1 × 10${supNum(p.exp)} = 1E${p.exp >= 0 ? '+' : ''}${p.exp}` })
+                  }}
+                >
+                  <td className="mono-cell">{p.sym || '—'}</td>
+                  <td>{t(p.name)}</td>
+                  <td className="mono-cell">{`1 × 10${supNum(p.exp)}`}</td>
+                  <td className="mono-cell">{`1E${p.exp >= 0 ? '+' : ''}${p.exp}`}</td>
+                  <td className="mono-cell">{p.exp >= 0 ? (10 ** p.exp).toLocaleString('en-US') : `0.${'0'.repeat(-p.exp - 1)}1`}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <h4 className="basics-sub">{t(S.convTitle)}</h4>
         <div className="calc">
           <span>{t(S.convValue)}</span>
@@ -561,34 +563,36 @@ export function FundBasicsPage({ moduleId, onModuleChange }: Props) {
           <b>{t(S.rule)}</b>
           {t(gateItem.rule)}
         </p>
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th>A</th>
-              {gate === 'not' ? null : <th>B</th>}
-              <th>{t(S.out)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {truthRows.map(([ra, rb]) => {
-              const active = gate === 'not' ? ra === a : ra === a && rb === b
-              return (
-                <tr
-                  key={`${ra}${rb}`}
-                  className={`is-click${active ? ' is-active' : ''}`}
-                  onClick={() => {
-                    setA(ra)
-                    setB(rb)
-                  }}
-                >
-                  <td className="mono-cell">{ra}</td>
-                  {gate === 'not' ? null : <td className="mono-cell">{rb}</td>}
-                  <td className="mono-cell">{gateOut(gate, ra, rb)}</td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <div className="dtable-wrap">
+          <table className="dtable">
+            <thead>
+              <tr>
+                <th>A</th>
+                {gate === 'not' ? null : <th>B</th>}
+                <th>{t(S.out)}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {truthRows.map(([ra, rb]) => {
+                const active = gate === 'not' ? ra === a : ra === a && rb === b
+                return (
+                  <tr
+                    key={`${ra}${rb}`}
+                    className={`is-click${active ? ' is-active' : ''}`}
+                    onClick={() => {
+                      setA(ra)
+                      setB(rb)
+                    }}
+                  >
+                    <td className="mono-cell">{ra}</td>
+                    {gate === 'not' ? null : <td className="mono-cell">{rb}</td>}
+                    <td className="mono-cell">{gateOut(gate, ra, rb)}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
         <Explain paras={[gateItem.text]} />
       </Section>
 

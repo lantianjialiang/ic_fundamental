@@ -12,6 +12,7 @@ import '../prep/prep.css'
 import { DEFAULT_MS, DIAG_SITES, FORMULAS, INJECT_OFFSET_V, INTRO, M, MISCONCEPTIONS, PREREQ, QUIZ, TAKEAWAY } from './genMultisiteData'
 import { GEN_META } from './meta'
 import { MultisiteFig } from './MultisiteFig'
+import { TouchdownTimeline } from './TouchdownTimeline'
 import { SiteGroups } from './SiteGroups'
 import { LOT_TESTS, buildLot, encodeFile, parseStdf, summarizeStdf } from './model/stdf'
 import { bestSites, cotCents, efficiency, hourlyCost, maxSites, MAX_SITES_SHOWN, sweep, touchdownS, uph, type MsParams } from './model/multisite'
@@ -155,6 +156,7 @@ export function GenMultisitePage({ moduleId, onModuleChange }: Props) {
         ) : null}
 
         <MultisiteFig points={points} current={n} best={best} limit={limit} />
+        <TouchdownTimeline params={p} current={n} best={best} />
 
         
       </Section>

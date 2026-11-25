@@ -456,34 +456,36 @@ export function FundVectorPage({ moduleId, onModuleChange }: Props) {
         <div className="knob-row">
           <Knob label={S.cbStart} value={cbStart} unit={`(${cbStart.toString(16).toUpperCase().padStart(2, '0')}h)`} min={0} max={248} step={8} onChange={setCbStart} />
         </div>
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th>ADDR</th>
-              <th>DIN</th>
-              <th>DOUT</th>
-              <th>CS1</th>
-              <th>CS2</th>
-              <th>WE</th>
-              <th>OE</th>
-              <th>Time Set</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cb.map((row) => (
-              <tr key={row.addr}>
-                <td className="mono-cell">{row.hex}</td>
-                <td className="mono-cell">{row.din}</td>
-                <td className="mono-cell">{row.dout}</td>
-                <td className="mono-cell">{row.cs1}</td>
-                <td className="mono-cell">{row.cs2}</td>
-                <td className="mono-cell">{row.we}</td>
-                <td className="mono-cell">{row.oe}</td>
-                <td className="mono-cell">{row.ts}</td>
+        <div className="dtable-wrap">
+          <table className="dtable">
+            <thead>
+              <tr>
+                <th>ADDR</th>
+                <th>DIN</th>
+                <th>DOUT</th>
+                <th>CS1</th>
+                <th>CS2</th>
+                <th>WE</th>
+                <th>OE</th>
+                <th>Time Set</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {cb.map((row) => (
+                <tr key={row.addr}>
+                  <td className="mono-cell">{row.hex}</td>
+                  <td className="mono-cell">{row.din}</td>
+                  <td className="mono-cell">{row.dout}</td>
+                  <td className="mono-cell">{row.cs1}</td>
+                  <td className="mono-cell">{row.cs2}</td>
+                  <td className="mono-cell">{row.we}</td>
+                  <td className="mono-cell">{row.oe}</td>
+                  <td className="mono-cell">{row.ts}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <CheckerFig rows={cb} />
         <Callout>{t(CB_WHY)}</Callout>
         <p className="intro__note">{t(S.cbTotal)}</p>

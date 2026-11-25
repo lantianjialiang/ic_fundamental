@@ -1715,6 +1715,12 @@ body {
 }
 
 /* ---- 数据表（规格书、Datalog） ---- */
+.dtable-wrap {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .dtable {
   width: 100%;
   border-collapse: separate;

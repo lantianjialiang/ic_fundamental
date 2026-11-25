@@ -85,13 +85,10 @@
 .flow-cross { height: clamp(6.5rem, 22vw, 11rem); }
 .flow-part { position: absolute; border-radius: 2px; }
 .flow-part[data-muted='true'] { opacity: .42; }
-.flow-series, .flow-sites { display: flex; width: fit-content; align-items: center; padding: .5rem; border-radius: 6px; background: var(--flow-stage); color: #dce8f4; }
+.flow-series { display: flex; width: fit-content; align-items: center; padding: .5rem; border-radius: 6px; background: var(--flow-stage); color: #dce8f4; }
 .flow-series i { width: .65rem; height: 2px; background: var(--flow-teal); }
 .flow-series b { display: grid; place-items: center; width: 1rem; height: .85rem; margin-right: 2px; border: 1px solid var(--flow-teal); border-radius: 2px; }
 .flow-series b.flow-series-more { border: 0; }
-.flow-sites { display: grid; gap: .25rem; }
-.flow-sites span { display: grid; place-items: center; aspect-ratio: 1; background: var(--flow-teal); color: var(--flow-stage); border-radius: 4px; }
-.flow-sites span[data-empty='true'] { background: #20364b; color: #c4d6e6; }
 .flow-defect-net { position: absolute; inset: 37% 12% 56%; background: var(--flow-teal); }
 .flow-defect-net--lower { inset: 74% 12% 19%; }
 .flow-defect-break { position: absolute; inset: 37% 45% 56%; background: var(--flow-stage); }

@@ -6,6 +6,7 @@ import { Cards, Knob } from '../fund/parts'
 import { d0Learning, murphyYield, negBinomialYield, poissonYield, product, unitCost } from './core'
 import { Plot } from './ProcessDiagrams'
 import { Formula, ScaleBars, YieldStages } from './FlowVisuals'
+import { YieldPatternFig } from './YieldPatternFig'
 import { MFG_META } from './meta'
 import { After, COMMON, Drill, PackLesson, near, useSticky } from './shell'
 
@@ -137,6 +138,7 @@ export function MfgRampPage({ moduleId, onModuleChange }: { moduleId: ModuleId; 
         <div className="mfg-lab">
           <p>{t(loc('三种模型都用 AD：A 是面积（这里按 1 cm²），D 是每平方厘米的缺陷数。点一种，读它假设缺陷怎样分布。', 'All three models use AD: A is area (1 cm² here) and D is defects per square centimetre. Click one and read how it assumes defects are spread.'))}</p>
           <Cards items={MODELS} activeId={modelId} cols={3} onPick={(item) => setModelId(item.id)} />
+          <YieldPatternFig model={modelId} ad={ad} yieldRate={modelId === 'mur' ? yMur : modelId === 'nb' ? yNb : yPoiAd} />
           <p>{t(model.text)}</p>
           <p>{t(loc('Poisson 假设缺陷完全随机，Y=exp(−AD)。Murphy 对中等成团更宽松。负二项 Y=(1+AD/α)^(−α)，α 越小越成团，一部分 die 更干净，所以同样的 AD 良率更高。', 'Poisson assumes fully random defects, Y=exp(−AD). Murphy is kinder to moderate clustering. The negative binomial is Y=(1+AD/α)^(−α); a smaller α means tighter clusters, some dies stay cleaner, and yield at the same AD is higher.'))}</p>
           <p>{t(loc('总良率 = 线良率 × CP × 组装 × FT。任何一段变差，总良率跟着乘下去，不能把四段拿来平均。', 'Total yield = line × CP × assembly × FT. If one stage gets worse, the total multiplies it in. The four stages are not averaged.'))}</p>

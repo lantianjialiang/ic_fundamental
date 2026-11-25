@@ -6,6 +6,8 @@ import { QuizList } from '../../lab/QuizList'
 import { type ModuleId } from '../catalog'
 import { Callout, Cards, type Note } from '../fund/parts'
 import { CHAIN, CHIP_TYPES, QUIZ, STDF_PARAS, STDF_RECORDS, STDF_TITLE, SYS, SYS_ORDER, TAKEAWAY, TERMS, WHAT, type ChainId, type SysId, type TermId } from './data/content'
+import { ChipTestChain } from './ChipTestChain'
+import './chipTestChain.css'
 import { GlossaryArt } from './GlossaryArt'
 import { ChainFig, SysFig } from './IntroFigs'
 import './module00.css'
@@ -74,6 +76,7 @@ export function Module00Page({ moduleId, onModuleChange, onOpenConnection }: Mod
           <b>{t(ui.m01.chipParams)}</b>
           {chipItem.params.map((p) => t(p)).join(' · ')}
         </p>
+        <ChipTestChain id={chip} />
       </Section>
 
       <Section title={t(ui.m01.termsTitle)} note={t(ui.m01.termsNote)}>

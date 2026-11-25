@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
@@ -12,21 +13,26 @@ import '../hs/hs.css'
 import { ScopeView, type ScopeTrace } from './ScopeView'
 import { PWR_META } from './meta'
 import { DptCircuitFig } from './PwrDptFig'
-import { DPT_DEFAULT, VDRIVE, simulateDpt, type DptState, type WinKey } from './pwrDptModel'
+import { DPT_DEFAULT, VDRIVE, energy, simulateDpt, type DptState, type WinKey } from './pwrDptModel'
 import { fill, INTRO, MISCONCEPTIONS, QUIZ, S, TAKEAWAY, WIN_SEG, taskItems, verdictOf } from './pwrDptData'
 import './pwrDpt.css'
 import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
+type DptStage = WinKey | 'recovery'
+const RECOVERY = loc('反向恢复区间', 'Reverse recovery window')
+const STAGES = [...WIN_SEG, { id: 'recovery' as const, label: RECOVERY }]
 
 export function PwrDptPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [state, setState] = useState<DptState>(DPT_DEFAULT)
-  const [win, setWin] = useState<WinKey>(WIN_SEG[0].id)
+  const [selectedStage, setStage] = useState<DptStage>(WIN_SEG[0].id)
   const result = useMemo(() => simulateDpt(state), [state])
   const verdict = verdictOf(state, result)
   const update = (patch: Partial<DptState>) => setState((prev) => ({ ...prev, ...patch }))
   const k = result.timing
+  const stage = selectedStage === 'recovery' && k.tRr === 0 ? 'on' : selectedStage
+  const win: WinKey = stage === 'off' ? 'off' : 'on'
 
   /* 三路归一化到各自满量程，才能放在同一坐标上 */
   const tNs = useMemo(() => result.wave.t.map((x) => x * 1e9), [result])
@@ -37,6 +43,16 @@ export function PwrDptPage({ moduleId, onModuleChange }: Props) {
   ]
   const [winFrom, winTo] = result.windows[win]
   const winEnergy = win === 'off' ? result.eoff : result.eon
+  const recoveryFrom = result.windows.on[0] + k.tRi
+  const recoveryTo = recoveryFrom + k.tRr
+  const recoveryBand = win === 'on' ? { from: recoveryFrom * 1e9, to: recoveryTo * 1e9, label: RECOVERY } : undefined
+  const shade = { from: winFrom * 1e9, to: winTo * 1e9, label: win === 'off' ? S.winOffLabel : S.winOnLabel }
+  const power = result.wave.vds.map((voltage, index) => voltage * result.wave.id[index] / 1e3)
+  const area = stage === 'recovery' && recoveryBand ? recoveryBand : shade
+  const areaEnergy = stage === 'recovery' ? energy(result.wave, [recoveryFrom, recoveryTo]) : winEnergy
+  const areaHint = stage === 'recovery'
+    ? loc('这段面积已包含在 Eon 内，其中还包含负载电流的功耗。', 'Eon already includes this area, which also contains power due to load current.')
+    : loc('时窗外的功率不计入这一读数。', 'Power outside the window is excluded.')
   const scopeSummary = t(
     fill(
       S.scopeSummary,
@@ -94,17 +110,34 @@ export function PwrDptPage({ moduleId, onModuleChange }: Props) {
 
         <div className="hs-grid">
           <div className="pwr-dpt-figs">
-            <DptCircuitFig />
-            <Seg options={WIN_SEG} value={win} onChange={setWin} />
+            <Seg options={k.tRr > 0 ? STAGES : WIN_SEG} value={stage} onChange={setStage} />
+            <DptCircuitFig stage={stage} />
             <ScopeView
               t={tNs}
               tUnit="ns"
               traces={traces}
-              shade={{ from: winFrom * 1e9, to: winTo * 1e9, label: win === 'off' ? S.winOffLabel : S.winOnLabel }}
+              shade={shade}
+              band={recoveryBand}
               summary={scopeSummary}
               ariaLabel={t(S.scopeAria)}
             />
+            <ScopeView
+              t={tNs}
+              tUnit="ns"
+              yUnit="kW"
+              traces={[{ id: 'power', label: loc('瞬时功率 VDS × ID', 'Instantaneous power VDS × ID'), color: '#ed766e', values: power }]}
+              shade={shade}
+              band={recoveryBand}
+              area={{ traceId: 'power', from: area.from, to: area.to }}
+              ariaLabel={t(loc('双脉冲开关功率与积分面积', 'Double-pulse switching power and integration area'))}
+              summary={`${t(loc('填色部分的能量', 'Energy in the filled area'))} ∫ VDS × ID dt ≈ ${(areaEnergy * 1e6).toFixed(1)} µJ. ${t(areaHint)}`}
+            />
             <p className="pwr-dpt-note">{t(S.scopeNote)}</p>
+            <p className="pwr-dpt-note">{t(win === 'on'
+              ? loc(`理想模型中，恢复期间母线功率包含负载项 Vdc × I × trr ≈ ${(state.vdc * k.current * k.tRr * 1e6).toFixed(1)} µJ 和超额恢复项 Vdc × Qrr ≈ ${(state.vdc * k.qrr * 1e6).toFixed(1)} µJ。右侧开通简式包含超额恢复项。`,
+                `In the ideal model, the recovery interval includes the load term Vdc × I × trr ≈ ${(state.vdc * k.current * k.tRr * 1e6).toFixed(1)} µJ and the excess recovery term Vdc × Qrr ≈ ${(state.vdc * k.qrr * 1e6).toFixed(1)} µJ. The simplified turn-on formula includes the excess term.`)
+              : loc(`关断简式只算额定母线电压下的重叠面积。理想过冲另外贡献 ΔV × I × tfi / 3 ≈ ${((result.eoffAnalytic - result.eoffFormula) * 1e6).toFixed(1)} µJ。`,
+                `The simplified turn-off formula uses the nominal bus voltage. Ideal overshoot adds ΔV × I × tfi / 3 ≈ ${((result.eoffAnalytic - result.eoffFormula) * 1e6).toFixed(1)} µJ.`))}</p>
           </div>
           <div className="hs-cell">
             <Readout

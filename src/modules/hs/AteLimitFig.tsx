@@ -63,6 +63,7 @@ function drawEye(ctx: CanvasRenderingContext2D, wave: Float64Array) {
   ctx.font = '11px Consolas, ui-monospace, monospace'
   ctx.textAlign = 'right'
   ctx.textBaseline = 'middle'
+  ctx.fillText('mV', PAD_L - 6, PAD_T + 3)
   for (const mv of [LEVEL_MV, 0, -LEVEL_MV]) {
     ctx.fillText(mv > 0 ? `+${mv}` : `${mv}`, PAD_L - 6, yOf(mv))
   }

@@ -7,6 +7,7 @@ import { knownGoodProb } from './core'
 import { flowYieldCost } from '../mfg/core'
 import { After, COMMON, Drill, PackLesson, near, useSticky } from '../mfg/shell'
 import { APK_META } from './meta'
+import { ApkInsertFig, type InsertId } from './ApkInsertFig'
 
 const INSERTS = [
   { id: 'kgd', title: loc('Die 级 KGD', 'Die-level KGD'), text: loc('GPU/ASIC 和 DRAM 先分选。覆盖率决定漏进堆栈的坏片。', 'Sort GPU/ASIC and DRAM first. Coverage sets how many bad dice enter the stack.') },
@@ -14,7 +15,7 @@ const INSERTS = [
   { id: 'kgs', title: loc('KGS 堆栈测试', 'KGS stack test'), text: loc('经基底 die 测已堆好的 HBM。', 'Test the stacked HBM through the base die.') },
   { id: 'post', title: loc('贴装后互连', 'Post-attach link'), text: loc('D2D / HBM 通道靠环回，不再扎微凸点。', 'D2D / HBM channels use loopback; micro-bumps are not probed again.') },
   { id: 'pkg', title: loc('封装 / SLT', 'Package / SLT'), text: loc('成品和系统级。晚发现会报废 GPU+中介层。', 'Final and system-level. A late find scraps the GPU plus interposer.') },
-]
+] as const
 
 const QUIZ = [
   { id: 'q1', prompt: loc('无 KGD 时 8 层 0.9 × 基底 0.95 × 键合 0.97？', 'No KGD: 8×0.9 × base 0.95 × bond 0.97?'), options: [
@@ -62,7 +63,7 @@ const QUIZ = [
 
 export function ApkFlowPage({ moduleId, onModuleChange }: { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }) {
   const { t } = useLocale()
-  const [insId, setInsId] = useState(INSERTS[0].id)
+  const [insId, setInsId] = useState<InsertId>(INSERTS[0].id)
   const [kgdOn, setKgdOn] = useState(true)
   const [lateId, setLateId] = useState('')
   const [kgsOn, setKgsOn] = useState(false)
@@ -132,7 +133,10 @@ export function ApkFlowPage({ moduleId, onModuleChange }: { moduleId: ModuleId; 
         <div className="mfg-lab">
           <p>{t(loc('测试可以插在不同的地方。点一次，读它抓的是裸片、堆栈、互连还是成品。', 'Test can be inserted in different places. Click one and read whether it catches a bare die, a stack, a link or the finished part.'))}</p>
           <Cards items={INSERTS} activeId={insId} cols={3} onPick={(item) => setInsId(item.id)} />
-          <p>{t(ins.text)}</p>
+          <figure className="term-fig">
+            <ApkInsertFig stage={insId} />
+            <figcaption>{t(ins.text)}</figcaption>
+          </figure>
           <p>{t(loc('不做裸片分选时，8 层 DRAM 按 0.9 连乘，再乘基底 0.95 和键合 0.97。层数在指数上，所以掉得很快。', 'Without die sort, eight DRAM layers multiply 0.9, then the base 0.95 and the bond 0.97. The layer count is an exponent, so the yield falls fast.'))}</p>
           <p>{t(loc('裸片分选之后，每一层用 P(好|通过) 代替 0.9。覆盖率越高，漏进堆栈的坏片越少。堆栈测试（KGS）是贴上贵的 GPU 之前，经基底 die 再确认一次。', 'After die sort, each layer uses P(good|pass) instead of 0.9. Higher coverage lets fewer bad dies into the stack. The stack test (KGS) checks once more through the base die, before the expensive GPU is attached.'))}</p>
           <p>{t(loc('每多插一次测试，测试成本就叠上去；每少插一次，坏片就带着后面已经做过的 GPU 和中介层报废。两边要一起看。', 'Every extra test adds test cost. Every test you skip lets a bad die scrap the GPU and interposer already built behind it. Both sides have to be read together.'))}</p>
@@ -162,15 +166,19 @@ export function ApkFlowPage({ moduleId, onModuleChange }: { moduleId: ModuleId; 
               <input type="checkbox" checked={kgsOn} onChange={(event) => setKgsOn(event.target.checked)} />
               {t(loc('贴 GPU 前先做堆栈测试', 'Test the stack before attaching the GPU'))}
             </label>
-            <Readout items={[{ label: loc('报废成本', 'Scrap cost'), value: flow.scrapCost.toFixed(1) }]} />
+            <Readout items={[{ label: loc('每颗投入的报废成本', 'Scrap cost per original input'), value: flow.scrapCost.toFixed(1) }]} />
             <After show={kgsHit.hit} text={loc('堆栈测试把键合后的坏堆挡在 GPU 之前。报废的是相对便宜的堆栈，不是已经贴上的 GPU 和中介层。', 'The stack test stops a bad bonded stack before the GPU. The scrap is the cheaper stack, not a GPU and interposer already attached.')} />
           </Drill>
           <Drill n={4} title={taskCost}>
             <Knob label={loc('每次插入的测试成本', 'Test cost per insertion')} value={testCost} unit="" min={2} max={16} step={2} onChange={setTestCost} />
             <Readout items={[
-              { label: loc('每颗好封装', 'Cost per good package'), value: flow.costPerGood.toFixed(1) },
-              { label: loc('测试成本', 'Test cost'), value: flow.testCost.toFixed(1) },
+              { label: loc('每颗原始投入的期望总成本', 'Expected total cost per original input'), value: flow.inputCost.toFixed(2) },
+              { label: loc('每颗原始投入的期望测试成本', 'Expected test cost per original input'), value: flow.testCost.toFixed(2) },
+              { label: loc('总投入摊到每颗好封装', 'Total cost allocated per good package'),
+                value: `${flow.inputCost.toFixed(2)} / ${flow.yield.toFixed(4)} ≈ ${flow.costPerGood.toFixed(1)}` },
             ]} />
+            <p>{t(loc('每道工序的成本按实际走到该站的比例计入，再用累计良率分摊到出货的好封装。例如每颗投入花 10、单站良率 50%，平均两颗投入才出一颗好品，成本为 20。',
+              'Weight each step’s cost by the fraction reaching that step. Divide the total by cumulative yield to allocate it to good packages. At one step costing 10 per input and yielding 50%, two inputs give one good unit on average, costing 20.'))}</p>
             <After show={costHit.hit} text={loc('测试成本加在每一颗上，好封装的成本跟着升。它要和少测一次所多出来的报废比，不是测得越多越划算。', 'Test cost is added on every unit, so the cost per good package rises with it. Compare that with the extra scrap from skipping a test. More test is not automatically the better deal.')} />
           </Drill>
           <Drill n={5} title={taskLate}>

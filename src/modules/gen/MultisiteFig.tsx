@@ -80,7 +80,7 @@ export function MultisiteFig({ points, current, best, limit }: Props) {
         <text x={(PX0 + PX1) / 2} y={H - 4} textAnchor="middle" fill="var(--text)" fontSize="11">
           {t(M.curveX)}
         </text>
-        <text x="8" y={(PY0 + PY1) / 2} fill="var(--text)" fontSize="11" transform={`rotate(-90 8 ${(PY0 + PY1) / 2})`} textAnchor="middle">
+        <text x="13" y={(PY0 + PY1) / 2} fill="var(--text)" fontSize="11" transform={`rotate(-90 13 ${(PY0 + PY1) / 2})`} textAnchor="middle">
           {t(M.curveY)}
         </text>
         <text x={PX0 - 6} y={PY0 + 10} textAnchor="end" fill="var(--muted)" fontSize="10" fontFamily="var(--mono)">

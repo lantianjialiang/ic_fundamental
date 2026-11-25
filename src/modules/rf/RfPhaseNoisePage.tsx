@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
@@ -105,10 +106,16 @@ export function RfPhaseNoisePage({ moduleId, onModuleChange }: Props) {
                 { label: S.rFlicker, value: `${analysis.lFlicker.toFixed(1)} dBc/Hz` },
                 { label: S.rFloor, value: `${analysis.lFloor.toFixed(1)} dBc/Hz` },
                 { label: S.rBand, value: `${fmtFreq(state.fLow)} – 10 MHz` },
+                { label: loc('光标处的线性谱密度', 'Linear spectral density at the cursor'),
+                  value: `Llin = 10^(${analysis.l.toFixed(2)} / 10) ≈ ${(10 ** (analysis.l / 10)).toExponential(2)} /Hz` },
+                { label: loc('积分区间的单侧线性面积', 'Single-sideband area within the integration limits'),
+                  value: `∫ Llin df ≈ ${(analysis.varFlicker / 2).toExponential(2)} + ${(analysis.varFloor / 2).toExponential(2)}` },
+                { label: loc('乘 2 计入载波两侧，再开方', 'Double to include both sidebands, then take the square root'),
+                  value: `θrms = √[2 × ${((analysis.varFlicker + analysis.varFloor) / 2).toExponential(3)}] ≈ ${analysis.thetaRad.toPrecision(3)} rad` },
                 { label: S.rTheta, value: `${analysis.thetaRad.toFixed(4)} rad rms` },
                 {
                   label: S.rJitter,
-                  value: `${analysis.jitterPs.toFixed(2)} ps`,
+                  value: `${analysis.thetaRad.toPrecision(3)} / (2π × ${state.f0Ghz} × 10⁹) × 10¹² ≈ ${analysis.jitterPs.toFixed(2)} ps`,
                   state: analysis.pass ? 'pass' : 'fail',
                 },
               ]}

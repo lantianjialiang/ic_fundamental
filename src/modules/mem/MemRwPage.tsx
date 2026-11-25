@@ -10,6 +10,7 @@ import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import { MEM_META } from './meta'
 import { RwFig } from './RwFig'
+import { MemoryCellPath } from './MemoryCellPath'
 import './memRw.css'
 import {
   INTRO,
@@ -99,7 +100,10 @@ export function MemRwPage({ moduleId, onModuleChange }: Props) {
         <p className="mrw-note">{t(S.simpNote)}</p>
 
         <div className="mrw-grid">
-          <RwFig slots={slots} seq={seq} executed={state.step} />
+          <div>
+            <RwFig slots={slots} seq={seq} executed={state.step} />
+            <MemoryCellPath slot={current} address={state.addr} writeValue={state.value} committed={state.step >= 3} />
+          </div>
           <div className="mrw-cell">
             <Readout
               items={[

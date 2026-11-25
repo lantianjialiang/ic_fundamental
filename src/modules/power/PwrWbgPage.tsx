@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
@@ -10,7 +11,7 @@ import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import '../hs/hs.css'
 import { PWR_META } from './meta'
-import { GanFig, MaterialFig, PrecondFig, VthFig } from './PwrWbgFig'
+import { GanFig, GanSequenceFig, MaterialFig, PrecondFig, VthFig, type WbgPhase } from './PwrWbgFig'
 import {
   APP_SEG,
   APP_TEXT,
@@ -30,6 +31,11 @@ import './pwrWbg.css'
 import { PRACTICE_NOTE, PracticeSteps } from '../../lab/PracticeSteps'
 
 type Props = { moduleId: ModuleId; onModuleChange: (id: ModuleId) => void }
+const PHASES = [
+  { id: 'condition', label: loc('预置 / 加应力', 'Precondition / stress') },
+  { id: 'next', label: loc('正扫 / 等待', 'Sweep forward / wait') },
+  { id: 'read', label: loc('反扫 / 取样', 'Sweep back / sample') },
+] as const
 
 /** 导通电阻读数：大于 1 保留一位小数，小于 1 用两位有效数字 */
 const fmtRon = (x: number) => (x >= 1 ? x.toFixed(1) : x.toPrecision(2))
@@ -38,6 +44,7 @@ const fmtPct = (x: number) => `${(x * 100).toFixed(1)} %`
 export function PwrWbgPage({ moduleId, onModuleChange }: Props) {
   const { t } = useLocale()
   const [state, setState] = useState<WbgState>(DEFAULT_WBG)
+  const [phase, setPhase] = useState<WbgPhase>('condition')
   const analysis = useMemo(() => analyseWbg(state), [state])
   const verdict = verdictOf(state, analysis)
   const update = (patch: Partial<WbgState>) => setState((prev) => ({ ...prev, ...patch }))
@@ -56,7 +63,7 @@ export function PwrWbgPage({ moduleId, onModuleChange }: Props) {
       asideLater={t(S.asideLater)}
       nextId="pwrProgram"
       nextLabel={t(S.next)}
-      extra={<TaskList items={taskItems(state, analysis)} onReset={() => setState(DEFAULT_WBG)} />}
+      extra={<TaskList items={taskItems(state, analysis)} onReset={() => { setState(DEFAULT_WBG); setPhase('condition') }} />}
     >
       <Section title={t(S.introTitle)}>
         <RefParas paras={INTRO} onOpen={onModuleChange} />
@@ -76,6 +83,38 @@ export function PwrWbgPage({ moduleId, onModuleChange }: Props) {
         <PracticeSteps items={taskItems(state, analysis)} />
 
         <Seg options={TAB_SEG} value={state.tab} onChange={(tab) => update({ tab })} />
+
+        {state.tab === 'vth' && (
+          <div className="hs-controls">
+            <Knob label={S.rateLabel} value={state.rate} unit="V/s" min={0.1} max={10} step={0.1} onChange={(rate) => update({ rate })} />
+            <Knob label={S.vpreLabel} value={state.vpre} unit="V" min={0} max={20} step={1} onChange={(vpre) => update({ vpre })} />
+            <Knob label={S.tpreLabel} value={state.tpre} unit="ms" min={0} max={10} step={0.1} onChange={(tpre) => update({ tpre })} />
+          </div>
+        )}
+        {state.tab === 'gan' && (
+          <div className="hs-controls">
+            <Knob label={S.vsLabel} value={state.vs} unit="V" min={0} max={650} step={10} onChange={(vs) => update({ vs })} />
+            <Knob label={S.tsLabel} value={state.ts} unit="ms" min={0.1} max={10} step={0.1} onChange={(ts) => update({ ts })} />
+            <Knob label={S.delayLabel} value={state.delay} unit="µs" min={0.1} max={200} step={0.1} onChange={(delay) => update({ delay })} />
+          </div>
+        )}
+        {state.tab !== 'material' && (
+          <div className="pwrw-protocol">
+            <Seg options={PHASES} value={phase} onChange={setPhase} />
+            <div className="pwrw-protocol__grid">
+              <article>
+                <h3>{t(loc('SiC 栅压与阈值读数', 'SiC gate bias and threshold readings'))}</h3>
+                <PrecondFig vpre={state.vpre} tpre={state.tpre} phase={phase} />
+                <VthFig res={vth} phase={phase} />
+              </article>
+              <article>
+                <h3>{t(loc('GaN 漏极应力与动态导通电阻', 'GaN drain stress and dynamic on-resistance'))}</h3>
+                <GanSequenceFig state={state} phase={phase} />
+                <GanFig k={analysis.k} delayUs={state.delay} phase={phase} />
+              </article>
+            </div>
+          </div>
+        )}
 
         {state.tab === 'material' ? (
           <div className="pwrw-grid">
@@ -112,14 +151,7 @@ export function PwrWbgPage({ moduleId, onModuleChange }: Props) {
         {state.tab === 'vth' ? (
           <div className="pwrw-grid">
             <div className="pwrw-stack">
-              <div className="hs-controls">
-                <Knob label={S.rateLabel} value={state.rate} unit="V/s" min={0.1} max={10} step={0.1} onChange={(rate) => update({ rate })} />
-                <Knob label={S.vpreLabel} value={state.vpre} unit="V" min={0} max={20} step={1} onChange={(vpre) => update({ vpre })} />
-                <Knob label={S.tpreLabel} value={state.tpre} unit="ms" min={0} max={10} step={0.1} onChange={(tpre) => update({ tpre })} />
-              </div>
               <p className="pwrw-note">{t(S.stdNote)}</p>
-              <VthFig res={vth} />
-              <PrecondFig vpre={state.vpre} tpre={state.tpre} />
               <p className="pwrw-note">{t(S.formulaVth)}</p>
             </div>
             <div className="pwrw-cell">
@@ -139,13 +171,7 @@ export function PwrWbgPage({ moduleId, onModuleChange }: Props) {
         {state.tab === 'gan' ? (
           <div className="pwrw-grid">
             <div className="pwrw-stack">
-              <div className="hs-controls">
-                <Knob label={S.vsLabel} value={state.vs} unit="V" min={0} max={650} step={10} onChange={(vs) => update({ vs })} />
-                <Knob label={S.tsLabel} value={state.ts} unit="ms" min={0.1} max={10} step={0.1} onChange={(ts) => update({ ts })} />
-                <Knob label={S.delayLabel} value={state.delay} unit="µs" min={0.1} max={200} step={0.1} onChange={(delay) => update({ delay })} />
-              </div>
               <p className="pwrw-note">{t(S.stdNote)}</p>
-              <GanFig k={analysis.k} delayUs={state.delay} />
               <p className="pwrw-note">{t(S.formulaGan)}</p>
             </div>
             <div className="pwrw-cell">

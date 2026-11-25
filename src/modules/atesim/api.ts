@@ -99,6 +99,8 @@ export type DieRecord = {
   y: number
   bin: Bin
   firstBin: Bin
+  firstFailItem?: string | null
+  firstFailValue?: number | null
   trueGood: boolean
   process: number
   attempts: number

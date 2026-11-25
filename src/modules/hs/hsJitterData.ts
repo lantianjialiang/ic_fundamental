@@ -83,15 +83,15 @@ export const INTRO = [
     'The {@hsTiming} lesson showed that jitter shrinks the sampling window. This lesson takes the jitter apart: deterministic jitter (DJ) is bounded and repeatable, while random jitter (RJ) is Gaussian and its tail has no hard limit. The total jitter (TJ) that combines them must always be quoted at a stated BER.',
   ),
   loc(
-    '这一课的三件事：分清 DJ 与 RJ 的形状；用双狄拉克模型算出 TJ@BER（TJ = DJ_pp + 2·Q(BER)·σ_RJ）；从浴盆曲线读出目标 BER 下的眼开口。正态分布与统计的基本量见 {@anaStats}。',
-    'This lesson practises three things: tell the shapes of DJ and RJ apart; compute TJ@BER with the dual-Dirac model (TJ = DJ_pp + 2·Q(BER)·σ_RJ); and read the eye opening at the target BER from the bathtub curve. For the basic statistics of the normal distribution see {@anaStats}.',
+    '这一课的三件事：分清 DJ 与 RJ 的形状；用双狄拉克模型算出 TJ@BER（TJ = DJ_pp + 2·Q⁻¹(BER)·σ_RJ）；从浴盆曲线读出目标 BER 下的眼开口。正态分布与统计的基本量见 {@anaStats}。',
+    'This lesson practises three things: tell the shapes of DJ and RJ apart; compute TJ@BER with the dual-Dirac model (TJ = DJ_pp + 2·Q⁻¹(BER)·σ_RJ); and read the eye opening at the target BER from the bathtub curve. For the basic statistics of the normal distribution see {@anaStats}.',
   ),
 ]
 
 export const MISCONCEPTIONS: LText[] = [
   loc(
-    `用 6σ 作为 RJ 的峰峰值就够了。高斯尾没有硬边界，BER 为 1e-12 时要用 2·Q(1e-12)·σ ≈ ${f0(2 * Q_12)}σ，6σ 会严重低估。`,
-    `Taking 6σ as the peak-to-peak RJ is enough. A Gaussian tail has no hard edge; at BER 1e-12 you need 2·Q(1e-12)·σ ≈ ${f0(2 * Q_12)}σ, and 6σ badly underestimates it.`,
+    `用 6σ 作为 RJ 的峰峰值就够了。高斯尾没有硬边界，BER 为 1e-12 时要用 2·Q⁻¹(1e-12)·σ ≈ ${f0(2 * Q_12)}σ，6σ 会严重低估。`,
+    `Taking 6σ as the peak-to-peak RJ is enough. A Gaussian tail has no hard edge; at BER 1e-12 you need 2·Q⁻¹(1e-12)·σ ≈ ${f0(2 * Q_12)}σ, and 6σ badly underestimates it.`,
   ),
   loc(
     'DJ 也像 RJ 一样，BER 越低越大。DJ 有界：双峰固定在 ±DJ/2，测得再多、BER 再低也不会超出；随 BER 变大的只有 RJ 的 Q 倍数。',
@@ -106,8 +106,8 @@ export const MISCONCEPTIONS: LText[] = [
 /** 课末补充：Q 与 Q⁻¹ 的记号、高斯尾为什么乘 Q⁻¹、双狄拉克模型推导、DJ 为什么不乘 Q、直方图的极限 */
 export const PREREQ: LText[] = [
   loc(
-    'Q 函数的记号：Q(x) 是标准正态分布的尾部概率，P(X > x)，Q(x) = ½·erfc(x ÷ √2)。页面和代码里写的 Q(BER) 实际指它的反函数 Q⁻¹(BER)：使尾部概率恰好等于 BER 的 σ 倍数。Q⁻¹(1e-9) ≈ 6，Q⁻¹(1e-12) ≈ 7.03，Q⁻¹(1e-15) ≈ 8。',
-    'Notation for Q: Q(x) is the tail probability of a standard normal, P(X > x) = ½·erfc(x ÷ √2). The page and code write Q(BER) for its inverse Q⁻¹(BER): the number of σ at which the tail probability equals BER. Q⁻¹(1e-9) ≈ 6, Q⁻¹(1e-12) ≈ 7.03, Q⁻¹(1e-15) ≈ 8.',
+    'Q 函数的记号：Q(x) 是标准正态分布的尾部概率，P(X > x)，Q(x) = ½·erfc(x ÷ √2)。本课把尾概率换成偏移倍数时使用反函数 Q⁻¹(BER)：使尾部概率恰好等于 BER 的 σ 倍数。Q⁻¹(1e-9) ≈ 6，Q⁻¹(1e-12) ≈ 7.03，Q⁻¹(1e-15) ≈ 8。',
+    'Notation for Q: Q(x) is the tail probability of a standard normal, P(X > x) = ½·erfc(x ÷ √2). The inverse Q⁻¹(BER) converts a tail probability to an offset: the number of σ at which the tail probability equals BER. Q⁻¹(1e-9) ≈ 6, Q⁻¹(1e-12) ≈ 7.03, Q⁻¹(1e-15) ≈ 8.',
   ),
   loc(
     '高斯项为什么乘 Q⁻¹：RJ 没有硬边界，要让误码率达到 BER，边沿必须偏离均值 Q⁻¹(BER)·σ，而左右两侧各有一个边沿，所以 RJ 贡献的峰峰值是 2·Q⁻¹(BER)·σ。例：σ = 2 ps、BER 1e-12 时是 2 × 7.03 × 2 ≈ 28 ps，远大于 6σ = 12 ps。',
@@ -128,8 +128,8 @@ export const PREREQ: LText[] = [
 ]
 
 export const TAKEAWAY: LText = loc(
-  `TJ@BER = DJ_pp + 2·Q⁻¹(BER)·σ_RJ（Q(1e-12) ≈ ${f2(Q_12)}）。DJ 有界，按峰峰值整块扣；RJ 是高斯，尾部随 BER 变远。眼开口 = UI − TJ@BER，必须针对一个指定的 BER 说，否则数字没有意义。`,
-  `TJ@BER = DJ_pp + 2·Q⁻¹(BER)·σ_RJ (Q(1e-12) ≈ ${f2(Q_12)}). DJ is bounded and is subtracted whole as a peak-to-peak value; RJ is Gaussian and its tail reaches further as BER falls. The eye opening = UI − TJ@BER, and it must always be stated for a given BER, otherwise the number means nothing.`,
+  `TJ@BER = DJ_pp + 2·Q⁻¹(BER)·σ_RJ（Q⁻¹(1e-12) ≈ ${f2(Q_12)}）。DJ 有界，按峰峰值整块扣；RJ 是高斯，尾部随 BER 变远。眼开口 = UI − TJ@BER，必须针对一个指定的 BER 说，否则数字没有意义。`,
+  `TJ@BER = DJ_pp + 2·Q⁻¹(BER)·σ_RJ (Q⁻¹(1e-12) ≈ ${f2(Q_12)}). DJ is bounded and is subtracted whole as a peak-to-peak value; RJ is Gaussian and its tail reaches further as BER falls. The eye opening = UI − TJ@BER, and it must always be stated for a given BER, otherwise the number means nothing.`,
 )
 
 const NOTE_RJ = loc(
@@ -145,8 +145,8 @@ export function verdictOf(state: JitterState, a: JitterAnalysis): { title: LText
     return {
       title: S.pass,
       text: loc(
-        `在 ${berText} 下 TJ = ${f1(a.tjTarget)} ps，比 UI = ${f1(a.ui)} ps 小，眼还开着 ${f1(a.opening)} ps。DJ 有界，按峰峰值 ${f1(state.dj)} ps 整块扣；RJ 的高斯尾按 Q(${berText}) = ${f2(a.q)} 倍的 σ 扣。`,
-        `At ${berText} the TJ is ${f1(a.tjTarget)} ps, less than the UI of ${f1(a.ui)} ps, so the eye is still open by ${f1(a.opening)} ps. DJ is bounded and subtracted whole as its ${f1(state.dj)} ps peak-to-peak; the RJ tail is subtracted as Q(${berText}) = ${f2(a.q)} times σ.`,
+        `在 ${berText} 下 TJ = ${f1(a.tjTarget)} ps，比 UI = ${f1(a.ui)} ps 小，眼还开着 ${f1(a.opening)} ps。DJ 有界，按峰峰值 ${f1(state.dj)} ps 整块扣；RJ 的高斯尾按 Q⁻¹(${berText}) = ${f2(a.q)} 倍的 σ 扣。`,
+        `At ${berText} the TJ is ${f1(a.tjTarget)} ps, less than the UI of ${f1(a.ui)} ps, so the eye is still open by ${f1(a.opening)} ps. DJ is bounded and subtracted whole as its ${f1(state.dj)} ps peak-to-peak; the RJ tail is subtracted as Q⁻¹(${berText}) = ${f2(a.q)} times σ.`,
       ),
       note,
     }
@@ -182,8 +182,8 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'b',
     explain: loc(
-      `TJ = DJ_pp + 2·Q(1e-12)·σ = 20 + 2 × ${f2(Q_12)} × 2 ≈ ${f1(TJ_Q1)} ps。只看 DJ 会少算约 ${f0(TJ_Q1 - 20)} ps 的随机部分。`,
-      `TJ = DJ_pp + 2·Q(1e-12)·σ = 20 + 2 × ${f2(Q_12)} × 2 ≈ ${f1(TJ_Q1)} ps. Counting DJ alone misses about ${f0(TJ_Q1 - 20)} ps of random contribution.`,
+      `TJ = DJ_pp + 2·Q⁻¹(1e-12)·σ = 20 + 2 × ${f2(Q_12)} × 2 ≈ ${f1(TJ_Q1)} ps。只看 DJ 会少算约 ${f0(TJ_Q1 - 20)} ps 的随机部分。`,
+      `TJ = DJ_pp + 2·Q⁻¹(1e-12)·σ = 20 + 2 × ${f2(Q_12)} × 2 ≈ ${f1(TJ_Q1)} ps. Counting DJ alone misses about ${f0(TJ_Q1 - 20)} ps of random contribution.`,
     ),
   },
   {
@@ -196,8 +196,8 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'b',
     explain: loc(
-      `ΔTJ = 2·Q(1e-12)·Δσ = 2 × ${f2(Q_12)} × 1 ≈ ${f1(TJ_Q2 - TJ_Q1)} ps。RJ 每增加 1 ps rms，TJ@1e-12 就增加约 ${f0(2 * Q_12)} ps，而不是 1 ps。`,
-      `ΔTJ = 2·Q(1e-12)·Δσ = 2 × ${f2(Q_12)} × 1 ≈ ${f1(TJ_Q2 - TJ_Q1)} ps. Each 1 ps rms of RJ adds about ${f0(2 * Q_12)} ps to TJ@1e-12, not 1 ps.`,
+      `ΔTJ = 2·Q⁻¹(1e-12)·Δσ = 2 × ${f2(Q_12)} × 1 ≈ ${f1(TJ_Q2 - TJ_Q1)} ps。RJ 每增加 1 ps rms，TJ@1e-12 就增加约 ${f0(2 * Q_12)} ps，而不是 1 ps。`,
+      `ΔTJ = 2·Q⁻¹(1e-12)·Δσ = 2 × ${f2(Q_12)} × 1 ≈ ${f1(TJ_Q2 - TJ_Q1)} ps. Each 1 ps rms of RJ adds about ${f0(2 * Q_12)} ps to TJ@1e-12, not 1 ps.`,
     ),
   },
   {
@@ -210,8 +210,8 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'a',
     explain: loc(
-      '双狄拉克模型把 DJ 当成两个有界的尖峰（±DJ/2），测多少个沿都不会超出它们。随 BER 变远的只有 RJ 的高斯尾，所以只有 RJ 项要乘 Q(BER)。',
-      'The dual-Dirac model treats DJ as two bounded spikes at ±DJ/2 that no number of edges will exceed. Only the Gaussian tail of RJ moves further out as BER falls, so only the RJ term is multiplied by Q(BER).',
+      '双狄拉克模型把 DJ 当成两个有界的尖峰（±DJ/2），测多少个沿都不会超出它们。随 BER 变远的只有 RJ 的高斯尾，所以只有 RJ 项要乘 Q⁻¹(BER)。',
+      'The dual-Dirac model treats DJ as two bounded spikes at ±DJ/2 that no number of edges will exceed. Only the Gaussian tail of RJ moves further out as BER falls, so only the RJ term is multiplied by Q⁻¹(BER).',
     ),
   },
   {

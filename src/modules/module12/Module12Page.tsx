@@ -21,6 +21,7 @@ import {
   type FlowFrame,
 } from './data/content'
 import { ProgramFlowFig } from './ProgramFlowFig'
+import { DebugProbeFig } from './DebugProbeFig'
 import './program.css'
 
 type Module12PageProps = {
@@ -127,6 +128,7 @@ export function Module12Page({ moduleId, onModuleChange }: Module12PageProps) {
         />
         <div className="case">
           <p>{t(active.scene)}</p>
+          <DebugProbeFig key={active.id} scenario={active.id} />
           <div className="quiz__options">
             {active.options.map((option) => {
               const judged = picked !== undefined

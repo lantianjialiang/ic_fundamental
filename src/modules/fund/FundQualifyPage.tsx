@@ -44,7 +44,7 @@ const S = {
   can: loc('能答', 'Can answer'),
   cannot: loc('答不了', "Can't answer"),
   marginTitle: loc('动手：查 Margin', 'Hands-on: check margins'),
-  marginNote: loc('拖动“整体拉偏”，每个参数都朝着它更容易 Fail 的方向走 x%。条形长度是这个参数离失效还有多少余量。点一行看说明。', 'Drag "Push all": every parameter moves x% in the direction that makes it more likely to fail. Bar length is how much margin the parameter has before failing. Click a row for details.'),
+  marginNote: loc('拖动“整体拉偏”。图中条长是原规格到失效点的距离，滑块位置是已用的余量。表格显示两者相减后的剩余余量。', 'Drag “Push all”. The bars show the distance from the original specification to failure. The slider shows the margin used. The table shows the remaining difference.'),
   pull: loc('整体拉偏', 'Push all'),
   colParam: loc('参数', 'Parameter'),
   colKind: loc('类型', 'Type'),
@@ -108,7 +108,7 @@ export function FundQualifyPage({ moduleId, onModuleChange }: Props) {
   const header = ['==== DATALOG ====', ...FIELDS.filter((f) => fields[f.id]).map((f) => f.line)]
 
   /* ---- Margin ---- */
-  const status = (m: number) => (m <= pull ? 'fail' : m < RISK_PCT ? 'risk' : 'ok')
+  const status = (m: number) => (m <= pull ? 'fail' : m - pull < RISK_PCT ? 'risk' : 'ok')
   const failed = MARGIN_PARAMS.filter((p) => status(marginPct(p)) === 'fail')
   const risky = MARGIN_PARAMS.filter((p) => status(marginPct(p)) === 'risk')
   const paramItem = MARGIN_PARAMS.find((p) => p.id === param) ?? MARGIN_PARAMS[0]
@@ -203,59 +203,69 @@ export function FundQualifyPage({ moduleId, onModuleChange }: Props) {
           items={[
             { label: S.pull, value: `±${pull}%` },
             { label: S.nFail, value: String(failed.length), state: failed.length ? 'fail' : 'pass' },
-            { label: S.nRisk, value: String(MARGIN_PARAMS.filter((p) => marginPct(p) < RISK_PCT).length) },
+            { label: S.nRisk, value: String(risky.length) },
             { label: S.stRisk, value: risky.length ? risky.map((p) => p.name).join(' / ') : '—' },
           ]}
         />
         <figure className="term-fig">
           <MarginFig params={MARGIN_PARAMS} x={pull} active={param} onPick={pickParam} />
         </figure>
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th>{t(S.colParam)}</th>
-              <th>{t(S.colKind)}</th>
-              <th>{t(S.colSpec)}</th>
-              <th>{t(S.colFail)}</th>
-              <th>{t(S.colNow)}</th>
-              <th>{t(S.colMargin)}</th>
-              <th>{t(S.colState)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {MARGIN_PARAMS.map((p) => {
-              const m = marginPct(p)
-              const st = status(m)
-              return (
-                <tr
-                  key={p.id}
-                  className={`is-click${p.id === param ? ' is-active' : ''}${st === 'fail' ? ' is-fail' : st === 'ok' ? ' is-pass' : ''}`}
-                  onClick={() => pickParam(p.id)}
-                >
-                  <td className="mono-cell">{p.name}</td>
-                  <td>{t(p.kind)}</td>
-                  <td className="mono-cell">{`${fmtNum(p.spec)} ${p.unit}`}</td>
-                  <td className="mono-cell">{`${fmtNum(p.fail)} ${p.unit}`}</td>
-                  <td className="mono-cell">{`${fmtNum(pushed(p, pull))} ${p.unit}`}</td>
-                  <td className="mono-cell">{`${m.toFixed(1)}%`}</td>
-                  <td className="verdict">{t(st === 'fail' ? S.stFail : st === 'risk' ? S.stRisk : S.stOk)}</td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <div className="dtable-wrap">
+          <table className="dtable">
+            <thead>
+              <tr>
+                <th>{t(S.colParam)}</th>
+                <th>{t(S.colKind)}</th>
+                <th>{t(S.colSpec)}</th>
+                <th>{t(S.colFail)}</th>
+                <th>{t(S.colNow)}</th>
+                <th>{t(S.colMargin)}</th>
+                <th>{t(S.colState)}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MARGIN_PARAMS.map((p) => {
+                const m = marginPct(p)
+                const st = status(m)
+                return (
+                  <tr
+                    key={p.id}
+                    className={`is-click${p.id === param ? ' is-active' : ''}${st === 'fail' ? ' is-fail' : st === 'ok' ? ' is-pass' : ''}`}
+                    onClick={() => pickParam(p.id)}
+                  >
+                    <td className="mono-cell">{p.name}</td>
+                    <td>{t(p.kind)}</td>
+                    <td className="mono-cell">{`${fmtNum(p.spec)} ${p.unit}`}</td>
+                    <td className="mono-cell">{`${fmtNum(p.fail)} ${p.unit}`}</td>
+                    <td className="mono-cell">{`${fmtNum(pushed(p, pull))} ${p.unit}`}</td>
+                    <td className="mono-cell">{`${(m - pull).toFixed(1)}%`}</td>
+                    <td className="verdict">{t(st === 'fail' ? S.stFail : st === 'risk' ? S.stRisk : S.stOk)}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
         <Explain paras={[paramItem.text]} />
+        <Readout items={[
+          { label: loc('当前条件到失效点的有符号距离', 'Signed distance from the current condition to failure'),
+            value: paramItem.fail >= paramItem.spec
+              ? `${paramItem.fail} − ${pushed(paramItem, pull).toFixed(3)} ≈ ${(paramItem.fail - pushed(paramItem, pull)).toFixed(3)} ${paramItem.unit}`
+              : `${pushed(paramItem, pull).toFixed(3)} − ${paramItem.fail} ≈ ${(pushed(paramItem, pull) - paramItem.fail).toFixed(3)} ${paramItem.unit}` },
+          { label: loc('以原规格归一化的剩余余量', 'Remaining margin normalized to the original specification'),
+            value: `${marginPct(paramItem).toFixed(1)}% − ${pull}% ≈ ${(marginPct(paramItem) - pull).toFixed(1)}%` },
+        ]} />
         <Callout tone={failed.length ? 'bad' : 'ok'}>
           {failed.length ? t(MARGIN_MSG.fail).replace('{x}', failed.map((p) => p.name).join(t(S.sep))) : t(MARGIN_MSG.none)}
         </Callout>
-        <Callout tone="warn">
+        {risky.length > 0 && <Callout tone="warn">
           {t(MARGIN_MSG.risk).replace(
             '{x}',
-            MARGIN_PARAMS.filter((p) => marginPct(p) < RISK_PCT)
+            risky
               .map((p) => p.name)
               .join(t(S.sep)),
           )}
-        </Callout>
+        </Callout>}
       </Section>
 
       {/* 3. Shmoo */}
@@ -293,74 +303,78 @@ export function FundQualifyPage({ moduleId, onModuleChange }: Props) {
         {BIN_LEAD.map((para) => (
           <p key={para.zh}>{t(para)}</p>
         ))}
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th>{t(S.colKindF)}</th>
-              <th />
-              <th>{t(S.colExpect)}</th>
-              <th>{t(S.colProg)}</th>
-              <th>{t(S.colCheck)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {FAIL_KINDS.map((k) => {
-              const done = (made[k.id] ?? 0) > 0
-              const ok = k.prog === k.expect
-              return (
-                <tr key={k.id} className={done ? (ok ? 'is-pass' : 'is-fail') : ''}>
-                  <td>{t(k.label)}</td>
-                  <td>
-                    <button
-                      type="button"
-                      className="lab__btn"
-                      onClick={() => {
-                        setMade((prev) => ({ ...prev, [k.id]: (prev[k.id] ?? 0) + 1 }))
-                        setNote({ kicker: S.kicker, title: k.label, text: k.text })
-                      }}
-                    >
-                      {t(S.make)}
-                    </button>
-                  </td>
-                  <td className="mono-cell">{`Bin ${k.expect}`}</td>
-                  <td className="mono-cell">{done ? `Bin ${k.prog}` : t(S.notYet)}</td>
-                  <td className="verdict">{done ? t(ok ? S.match : S.mismatch) : t(S.notYet)}</td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <div className="dtable-wrap">
+          <table className="dtable">
+            <thead>
+              <tr>
+                <th>{t(S.colKindF)}</th>
+                <th />
+                <th>{t(S.colExpect)}</th>
+                <th>{t(S.colProg)}</th>
+                <th>{t(S.colCheck)}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {FAIL_KINDS.map((k) => {
+                const done = (made[k.id] ?? 0) > 0
+                const ok = k.prog === k.expect
+                return (
+                  <tr key={k.id} className={done ? (ok ? 'is-pass' : 'is-fail') : ''}>
+                    <td>{t(k.label)}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="lab__btn"
+                        onClick={() => {
+                          setMade((prev) => ({ ...prev, [k.id]: (prev[k.id] ?? 0) + 1 }))
+                          setNote({ kicker: S.kicker, title: k.label, text: k.text })
+                        }}
+                      >
+                        {t(S.make)}
+                      </button>
+                    </td>
+                    <td className="mono-cell">{`Bin ${k.expect}`}</td>
+                    <td className="mono-cell">{done ? `Bin ${k.prog}` : t(S.notYet)}</td>
+                    <td className="verdict">{done ? t(ok ? S.match : S.mismatch) : t(S.notYet)}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
         <h4 className="qual-sub">{t(S.sumTitle)}</h4>
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th>Bin</th>
-              {binList.map((b) => (
-                <th key={b} className="mono-cell">
-                  {b}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{t(S.sumMade)}</td>
-              {binList.map((b) => (
-                <td key={b} className="mono-cell">
-                  {madeSum[b] ?? 0}
-                </td>
-              ))}
-            </tr>
-            <tr className={sumWrong ? 'is-fail' : ''}>
-              <td>{t(S.sumProg)}</td>
-              {binList.map((b) => (
-                <td key={b} className={`mono-cell${(progSum[b] ?? 0) !== (madeSum[b] ?? 0) ? ' verdict' : ''}`}>
-                  {progSum[b] ?? 0}
-                </td>
-              ))}
-            </tr>
-          </tbody>
-        </table>
+        <div className="dtable-wrap">
+          <table className="dtable">
+            <thead>
+              <tr>
+                <th>Bin</th>
+                {binList.map((b) => (
+                  <th key={b} className="mono-cell">
+                    {b}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{t(S.sumMade)}</td>
+                {binList.map((b) => (
+                  <td key={b} className="mono-cell">
+                    {madeSum[b] ?? 0}
+                  </td>
+                ))}
+              </tr>
+              <tr className={sumWrong ? 'is-fail' : ''}>
+                <td>{t(S.sumProg)}</td>
+                {binList.map((b) => (
+                  <td key={b} className={`mono-cell${(progSum[b] ?? 0) !== (madeSum[b] ?? 0) ? ' verdict' : ''}`}>
+                    {progSum[b] ?? 0}
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <div className="row-actions">
           <button type="button" className="lab__btn" onClick={() => setMade({})}>
             {t(S.clearBin)}

@@ -19,8 +19,8 @@ export const HS_JITTER_KNOWLEDGE: AnaKnowledge = {
       term: 'Total jitter (TJ)',
       name: loc('总抖动（TJ）', 'Total jitter (TJ)'),
       def: loc(
-        '在指定误码率下，边沿位移的总范围：TJ@BER = DJ_pp + 2·Q(BER)·σ_RJ。它必须说明是在哪个 BER 下测得的，BER 越低 TJ 越大。见 {@hsJitter}。',
-        'The total span of edge displacement at a stated bit error rate: TJ@BER = DJ_pp + 2·Q(BER)·σ_RJ. It must always be quoted with its BER, and it grows as the BER falls. See {@hsJitter}.',
+        '在指定误码率下，边沿位移的总范围：TJ@BER = DJ_pp + 2·Q⁻¹(BER)·σ_RJ。它必须说明是在哪个 BER 下测得的，BER 越低 TJ 越大。见 {@hsJitter}。',
+        'The total span of edge displacement at a stated bit error rate: TJ@BER = DJ_pp + 2·Q⁻¹(BER)·σ_RJ. It must always be quoted with its BER, and it grows as the BER falls. See {@hsJitter}.',
       ),
       lessons: ['hsJitter'],
     },
@@ -44,8 +44,8 @@ export const HS_JITTER_KNOWLEDGE: AnaKnowledge = {
       id: 'hs-jitter-tj-formula',
       q: loc('总抖动为什么不是把 DJ 和 RJ 的峰值简单相加？', 'Why is total jitter not just the sum of the DJ and RJ peaks?'),
       a: loc(
-        'DJ 有硬边界，按峰峰值整块扣；RJ 是高斯，要按目标 BER 乘以 Q 倍的 σ。TJ@BER = DJ_pp + 2·Q(BER)·σ_RJ，所以 BER 不同，TJ 也不同。把 RJ 当作有界的 ±3σ 会严重低估。见 {@hsJitter}。',
-        'DJ has a hard limit and is subtracted whole as a peak-to-peak value; RJ is Gaussian and must be multiplied by the Q factor for the target BER. TJ@BER = DJ_pp + 2·Q(BER)·σ_RJ, so TJ changes with the BER. Treating RJ as a bounded ±3σ badly underestimates it. See {@hsJitter}.',
+        'DJ 有硬边界，按峰峰值整块扣；RJ 是高斯，要按目标 BER 乘以 Q 倍的 σ。TJ@BER = DJ_pp + 2·Q⁻¹(BER)·σ_RJ，所以 BER 不同，TJ 也不同。把 RJ 当作有界的 ±3σ 会严重低估。见 {@hsJitter}。',
+        'DJ has a hard limit and is subtracted whole as a peak-to-peak value; RJ is Gaussian and must be multiplied by the Q factor for the target BER. TJ@BER = DJ_pp + 2·Q⁻¹(BER)·σ_RJ, so TJ changes with the BER. Treating RJ as a bounded ±3σ badly underestimates it. See {@hsJitter}.',
       ),
       lessons: ['hsJitter'],
     },

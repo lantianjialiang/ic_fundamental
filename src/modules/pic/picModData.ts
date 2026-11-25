@@ -21,16 +21,16 @@ export const TAB_LABEL: Record<ModTab, LText> = {
 export const TABS = TAB_IDS.map((id) => ({ id, label: TAB_LABEL[id] }))
 
 export const DRIFT_LABEL: Record<DriftId, LText> = {
-  raises: loc('偏离正交点会提高消光比', 'Drifting off quadrature raises the extinction ratio'),
-  lowers: loc('偏离正交点会降低消光比', 'Drifting off quadrature lowers the extinction ratio'),
-  same: loc('偏置漂移不改变消光比', 'Bias drift does not change the extinction ratio'),
+  raises: loc('ER 必定增加', 'ER always increases'),
+  lowers: loc('OMA 减小，ER 随高低电平之比变化', 'OMA shrinks and ER depends on the level ratio'),
+  same: loc('OMA 和 ER 都保持不变', 'OMA and ER both stay unchanged'),
 }
 
 export const DRIFT_OPTIONS = DRIFT_IDS.map((id) => ({ id, label: DRIFT_LABEL[id] }))
 
 export const FIG = {
-  pHigh: loc('P1', 'P1'),
-  pLow: loc('P0', 'P0'),
+  pHigh: loc('P_high', 'P_high'),
+  pLow: loc('P_low', 'P_low'),
   x: loc('V', 'V'),
   y: loc('P', 'P'),
   aria: loc('调制器传输曲线，横轴电压，纵轴光功率，并标出驱动的高低两点', 'Modulator transfer curve, voltage on the horizontal axis and optical power on the vertical axis, with the high and low drive points marked'),
@@ -46,11 +46,11 @@ export const S = {
   introTitle: loc('余弦形的调制器，和一只光电二极管', 'A cosine-shaped modulator, and a photodiode'),
   coreTitle: loc('两个标签：先看调制器，再看探测器', 'Two tabs: the modulator first, then the photodetector'),
   coreNote: loc(
-    'P = (P0/2)·(1 + cos(πV/Vπ + φ0))。正交点是 φ0 = -π/2，V = 0 时输出为 P0/2。环调制器更小，但也更怕温度，不能和 MZM 互换。',
-    'P = (P0/2) * (1 + cos(pi V/Vpi + phi0)). Quadrature is phi0 = -pi/2, so the output at V = 0 is P0/2. A ring modulator is smaller, and also more sensitive to temperature. It is not interchangeable with an MZM.',
+    'P = (P_in/2)·(1 + cos(πV/Vπ + φ0))。正交点是 φ0 = -π/2，V = 0 时输出为 P_in/2。环调制器更小，但也更怕温度，不能和 MZM 互换。',
+    'P = (P_in/2) * (1 + cos(pi V/Vpi + phi0)). Quadrature is phi0 = -pi/2, so the output at V = 0 is P_in/2. A ring modulator is smaller, and also more sensitive to temperature. It is not interchangeable with an MZM.',
   ),
   tabAria: loc('调制器与探测器标签', 'Modulator and photodetector tabs'),
-  p0Label: loc('输入光功率 P0', 'Input optical power P0'),
+  p0Label: loc('输入光功率 P_in', 'Input optical power P_in'),
   vpiLabel: loc('Vπ', 'Vpi'),
   phiLabel: loc('偏置 φ0', 'Bias phi0'),
   vppLabel: loc('驱动 Vpp', 'Drive Vpp'),
@@ -59,17 +59,17 @@ export const S = {
   darkLabel: loc('暗电流', 'Dark current'),
   driftLabel: loc('偏置漂离开正交点时', 'When the bias drifts off quadrature'),
   rAt0: loc('V = 0 的输出', 'Output at V = 0'),
-  rP1: loc('高电平 P1', 'High level P1'),
-  rP0: loc('低电平 P0', 'Low level P0'),
+  rP1: loc('高电平 P_high', 'High level P_high'),
+  rP0: loc('低电平 P_low', 'Low level P_low'),
   rEr: loc('消光比 ER', 'Extinction ratio ER'),
   rOma: loc('OMA', 'OMA'),
-  rIl: loc('插入损耗 IL', 'Insertion loss IL'),
+  rIl: loc('相对入射功率的平均损耗', 'Average power loss relative to input'),
   rPhoto: loc('光电流 R·P', 'Photocurrent R*P'),
   rTotal: loc('总电流', 'Total current'),
   rDark: loc('暗电流', 'Dark current'),
   extinct: loc(
-    'P 从 0 摆到 P0，消光比是无穷大。原因：正交点上 ±Vπ/2 的满摆幅正好走到传输曲线的峰值和零点。',
-    'P swings from 0 to P0, so the extinction ratio is infinite. Reason: at quadrature a full swing of plus or minus Vpi/2 lands on the peak and the null of the transfer curve.',
+    'P 从 0 摆到 P_in，消光比是无穷大。原因：正交点上 ±Vπ/2 的满摆幅正好走到传输曲线的峰值和零点。',
+    'P swings from 0 to P_in, so the extinction ratio is infinite. Reason: at quadrature a full swing of plus or minus Vpi/2 lands on the peak and the null of the transfer curve.',
   ),
   misTitle: loc('常见误区', 'Common misconceptions'),
   takeawayTitle: loc('带走这几句', 'Key takeaways'),
@@ -80,30 +80,30 @@ export const S = {
     'ER and OMA on an eye diagram are measured again in the optical-link lesson. Here the modulator curve and the photocurrent come first.',
   ),
   next: loc('下一课：光源、功率计与波长扫描', 'Next: source, power meter and wavelength sweep'),
-  task1: loc('把偏置调到正交点（-90 度，即 -π/2）。V = 0 的读数应为输入 P0 的一半。', 'Set the bias to quadrature (-90 degrees, which is -pi/2). The V = 0 readout should be half of the input P0.'),
+  task1: loc('把偏置调到正交点（-90 度，即 -π/2）。V = 0 的读数应为输入 P_in 的一半。', 'Set the bias to quadrature (-90 degrees, which is -pi/2). The V = 0 readout should be half of the input P_in.'),
   task2: loc(
-    '在正交点把 Vπ 设为 4 V、Vpp 设为 4 V。高低电平应落到 0 和 P0，消光比为无穷大。',
-    'At quadrature set Vpi to 4 V and Vpp to 4 V. The levels should land on 0 and P0, and the extinction ratio is infinite.',
+    '在正交点把 Vπ 设为 4 V、Vpp 设为 4 V。高低电平应落到 0 和 P_in，消光比为无穷大。',
+    'At quadrature set Vpi to 4 V and Vpp to 4 V. The levels should land on 0 and P_in, and the extinction ratio is infinite.',
   ),
   task3: loc('在探测器上把入射功率设为 -10 dBm、响应度设为 0.8 A/W，读出光电流 80 µA。', 'On the photodetector, set the incident power to -10 dBm and the responsivity to 0.8 A/W, and read a photocurrent of 80 µA.'),
-  task4: loc('选择偏置漂移的后果：偏离正交点会降低消光比。', 'Choose the result of bias drift: drifting off quadrature lowers the extinction ratio.'),
+  task4: loc('选择固定驱动摆幅下偏离正交点的后果，对照 OMA 与 ER。', 'For fixed drive swing, choose what happens to OMA and ER as bias moves off quadrature.'),
   mzmTitle: loc('正交点把偏置放在半功率', 'Quadrature puts the bias at half power'),
   mzmOff: loc('当前不在正交点', 'Not at quadrature'),
   mzmText: loc(
-    'V = 0 的输出是 {at0} mW，输入 P0 是 {p0} mW。高电平 P1 = {p1} mW，低电平 P0 = {p0l} mW，ER = {er}，OMA = {oma} mW，IL = {il} dB。',
-    'The output at V = 0 is {at0} mW, and the input P0 is {p0} mW. High level P1 = {p1} mW, low level P0 = {p0l} mW, ER = {er}, OMA = {oma} mW, IL = {il} dB.',
+    'V = 0 的输出是 {at0} mW，输入 P_in 是 {p0} mW。高电平 P_high = {p1} mW，低电平 P_low = {p0l} mW，ER = {er}，OMA = {oma} mW，L_avg = {il} dB。',
+    'The output at V = 0 is {at0} mW, and the input P_in is {p0} mW. High level P_high = {p1} mW, low level P_low = {p0l} mW, ER = {er}, OMA = {oma} mW, L_avg = {il} dB.',
   ),
   quadText: loc(
-    '原因：φ0 = -π/2 是正交点，余弦项为 0，所以 V = 0 时 P = P0/2 = {half} mW。',
-    'Reason: phi0 = -pi/2 is quadrature, the cosine term is 0, and at V = 0 the power is P0/2 = {half} mW.',
+    '原因：φ0 = -π/2 是正交点，余弦项为 0，所以 V = 0 时 P = P_in/2 = {half} mW。',
+    'Reason: phi0 = -pi/2 is quadrature, the cosine term is 0, and at V = 0 the power is P_in/2 = {half} mW.',
   ),
   fullText: loc(
-    '原因：Vpp = Vπ = 4 V，在正交点上 ±Vπ/2 走到 P = P0 和 P = 0，所以 ER 为无穷大，OMA = P0 = {oma} mW。',
-    'Reason: Vpp = Vpi = 4 V. At quadrature, plus or minus Vpi/2 reaches P = P0 and P = 0, so ER is infinite and OMA = P0 = {oma} mW.',
+    '原因：Vpp = Vπ = 4 V，在正交点上 ±Vπ/2 走到 P = P_in 和 P = 0，所以 ER 为无穷大，OMA = P_in = {oma} mW。',
+    'Reason: Vpp = Vpi = 4 V. At quadrature, plus or minus Vpi/2 reaches P = P_in and P = 0, so ER is infinite and OMA = P_in = {oma} mW.',
   ),
   driftText: loc(
-    '偏离正交点会降低消光比。原因：两个驱动点离开余弦最陡的地方，同样的 Vpp 换来的 P1/P0 更小。当前 ER 是 {er}。',
-    'Drifting off quadrature lowers the extinction ratio. Reason: the two drive points leave the steepest part of the cosine, so the same Vpp buys a smaller P1/P0. The ER at this bias is {er}.',
+    '固定驱动摆幅下，正交点给出最大 OMA。ER 由功率比决定，低电平接近零时可增大。当前 ER 是 {er}。',
+    'At fixed drive swing, quadrature maximizes OMA. ER depends on the power ratio and can rise as the low level approaches zero. Current ER is {er}.',
   ),
   pdTitle: loc('光电流是响应度乘功率', 'Photocurrent is responsivity times power'),
   pdText: loc(
@@ -118,8 +118,8 @@ export const S = {
 
 export const INTRO = [
   loc(
-    '马赫-曾德尔调制器的功率是 P = (P0/2)·(1 + cos(πV/Vπ + φ0))。正交点取 φ0 = -π/2，曲线最陡，V = 0 时输出正好是 P0/2。消光比 ER = 10·log10(P1/P0)，光调制幅度 OMA = P1 - P0。插入损耗按平均功率相对 P0 来算。',
-    'A Mach-Zehnder modulator has P = (P0/2) * (1 + cos(pi V/Vpi + phi0)). Quadrature uses phi0 = -pi/2, where the curve is steepest, and the output at V = 0 is exactly P0/2. Extinction ratio ER = 10 log10(P1/P0), and optical modulation amplitude OMA = P1 - P0. Insertion loss compares the average power with P0.',
+    '马赫-曾德尔调制器的功率是 P = (P_in/2)·(1 + cos(πV/Vπ + φ0))。正交点取 φ0 = -π/2，曲线最陡，V = 0 时输出正好是 P_in/2。消光比 ER = 10·log10(P_high/P_low)，光调制幅度 OMA = P_high - P_low。平均损耗按等概率的 P_avg 相对 P_in 来算。',
+    'A Mach-Zehnder modulator has P = (P_in/2) * (1 + cos(pi V/Vpi + phi0)). Quadrature uses phi0 = -pi/2, where the curve is steepest, and the output at V = 0 is exactly P_in/2. Extinction ratio ER = 10 log10(P_high/P_low), and optical modulation amplitude OMA = P_high - P_low. Average loss compares the equiprobable P_avg with P_in.',
   ),
   loc(
     '环调制器面积小、电容小，但谐振跟着温度走，偏置和波长都要锁。MZM 更长、驱动电压往往更高，工作点却宽得多。两者不能互换：一个靠谐振，一个靠两臂干涉。',
@@ -147,8 +147,8 @@ export const MISCONCEPTIONS: LText[] = [
 ]
 
 export const TAKEAWAY: LText = loc(
-  'MZM 在正交点（φ0 = -π/2）的 V = 0 输出是 P0/2。ER = 10·log10(P1/P0)，OMA = P1 - P0。满摆幅 ±Vπ/2 走到消光，ER 为无穷大。偏离正交点会降低 ER。环调制器更小也更怕温度，不能替换 MZM。探测器 I = R·P + I_dark。',
-  'At MZM quadrature (phi0 = -pi/2) the output at V = 0 is P0/2. ER = 10 log10(P1/P0) and OMA = P1 - P0. A full swing of plus or minus Vpi/2 reaches extinction, so ER is infinite. Drifting off quadrature lowers ER. A ring modulator is smaller and more thermally sensitive, and it does not replace an MZM. A photodetector has I = R*P + I_dark.',
+  'MZM 在正交点的零驱动输出是 P_in/2。OMA 取两电平的差，ER 取两电平之比。满摆幅 ±Vπ/2 在正交点达到理想消光。探测器电流为 I = R·P + I_dark。',
+  'At quadrature the MZM outputs P_in/2 at zero drive. OMA is the level difference and ER is the level ratio. A full ±Vπ/2 swing at quadrature reaches ideal extinction. Photodetector current is I = R·P + I_dark.',
 )
 
 const P_HALF = mzmPower({ p0: 1, v: 0, vpi: 4, phi0: QUADRATURE_PHI })
@@ -158,7 +158,7 @@ const UA = pdCurrent(dbmToW(-10), 0.8, 0) * 1e6
 export const QUIZ: QuizQuestion[] = [
   {
     id: 'q1',
-    prompt: loc('输入 P0 = 1 mW，正交点、V = 0 时输出是多少？', 'Input P0 = 1 mW. What is the output at quadrature and V = 0?'),
+    prompt: loc('输入 P_in = 1 mW，正交点、V = 0 时输出是多少？', 'Input P_in = 1 mW. What is the output at quadrature and V = 0?'),
     options: [
       { id: 'a', text: loc(`${P_HALF.toFixed(2)} mW`, `${P_HALF.toFixed(2)} mW`) },
       { id: 'b', text: loc('1.00 mW', '1.00 mW') },
@@ -166,8 +166,8 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'a',
     explain: loc(
-      'φ0 = -π/2 时余弦项为 0，P = P0/2。1 mW 的一半是 0.50 mW。峰值偏置才会在 V = 0 给出全部 P0。',
-      'With phi0 = -pi/2 the cosine term is 0, so P = P0/2. Half of 1 mW is 0.50 mW. A peak bias is what gives the full P0 at V = 0.',
+      'φ0 = -π/2 时余弦项为 0，P = P_in/2。1 mW 的一半是 0.50 mW。峰值偏置才会在 V = 0 给出全部 P_in。',
+      'With phi0 = -pi/2 the cosine term is 0, so P = P_in/2. Half of 1 mW is 0.50 mW. A peak bias is what gives the full P_in at V = 0.',
     ),
   },
   {
@@ -186,7 +186,7 @@ export const QUIZ: QuizQuestion[] = [
   },
   {
     id: 'q3',
-    prompt: loc('正交点、Vπ = 4 V、驱动 4 Vpp、P0 = 1 mW 时，OMA 是多少？', 'At quadrature, Vpi = 4 V, a 4 Vpp drive and P0 = 1 mW, what is the OMA?'),
+    prompt: loc('正交点、Vπ = 4 V、驱动 4 Vpp、P_in = 1 mW 时，OMA 是多少？', 'At quadrature, Vpi = 4 V, a 4 Vpp drive and P_in = 1 mW, what is the OMA?'),
     options: [
       { id: 'a', text: loc(`${LEVELS.oma.toFixed(2)} mW`, `${LEVELS.oma.toFixed(2)} mW`) },
       { id: 'b', text: loc('0.50 mW', '0.50 mW') },
@@ -194,15 +194,15 @@ export const QUIZ: QuizQuestion[] = [
     ],
     answer: 'a',
     explain: loc(
-      '±Vπ/2 走到 P = P0 和 P = 0，所以 OMA = P0 - 0 = 1 mW，ER 为无穷大。0.50 mW 是正交点上 V = 0 的功率，不是两个电平之差。',
-      'Plus or minus Vpi/2 reaches P = P0 and P = 0, so OMA = P0 - 0 = 1 mW and ER is infinite. 0.50 mW is the power at V = 0 on quadrature, not the difference of the two levels.',
+      '±Vπ/2 走到 P = P_in 和 P = 0，所以 OMA = P_in - 0 = 1 mW，ER 为无穷大。0.50 mW 是正交点上 V = 0 的功率，不是两个电平之差。',
+      'Plus or minus Vpi/2 reaches P = P_in and P = 0, so OMA = P_in - 0 = 1 mW and ER is infinite. 0.50 mW is the power at V = 0 on quadrature, not the difference of the two levels.',
     ),
   },
   {
     id: 'q4',
     prompt: loc(
-      '关于 ER 和 OMA，下列哪些说法正确？(1) ER = 10·log10(P1/P0)；(2) OMA = P1 - P0；(3) 驱动一旦超过第一个零点，ER 一定继续变大；(4) ER 和 OMA 是同一个量。',
-      'Which of these statements about ER and OMA are correct? (1) ER = 10 log10(P1/P0); (2) OMA = P1 - P0; (3) once the drive passes the first null, ER keeps increasing; (4) ER and OMA are the same quantity.',
+      '关于 ER 和 OMA，下列哪些说法正确？(1) ER = 10·log10(P_high/P_low)；(2) OMA = P_high - P_low；(3) 驱动一旦超过第一个零点，ER 一定继续变大；(4) ER 和 OMA 是同一个量。',
+      'Which of these statements about ER and OMA are correct? (1) ER = 10 log10(P_high/P_low); (2) OMA = P_high - P_low; (3) once the drive passes the first null, ER keeps increasing; (4) ER and OMA are the same quantity.',
     ),
     options: [
       { id: 'a', text: loc('(1)、(2)', '(1), (2)') },
@@ -234,16 +234,16 @@ export const QUIZ: QuizQuestion[] = [
   },
   {
     id: 'q6',
-    prompt: loc('偏置从正交点漂开，消光比怎样变？', 'What happens to the extinction ratio when the bias drifts off quadrature?'),
+    prompt: loc('固定 Vpp，偏离正交点后如何判断 OMA 与 ER？', 'At fixed Vpp, how do OMA and ER respond to a move off quadrature?'),
     options: [
-      { id: 'a', text: loc('降低，因为驱动点离开了最陡的区域', 'It falls, because the drive points leave the steepest region') },
-      { id: 'b', text: loc('提高，因为平均功率变了', 'It rises, because the average power changed') },
-      { id: 'c', text: loc('不变，ER 只由 Vπ 决定', 'It stays the same; ER depends only on Vpi') },
+      { id: 'a', text: loc('OMA 减小，若低电平接近零，ER 可能上升', 'OMA shrinks, while ER can rise as the low level nears zero') },
+      { id: 'b', text: loc('OMA 和 ER 总是一起增加', 'OMA and ER always increase together') },
+      { id: 'c', text: loc('只要 Vπ 不变，两项都不变', 'Both stay unchanged if Vπ is fixed') },
     ],
     answer: 'a',
     explain: loc(
-      '同样的 Vpp，在正交点能拉开最大的 P1 和 P0。漂向峰值或零点后，两点的功率差变小，ER 下降。',
-      'The same Vpp opens the largest gap between P1 and P0 at quadrature. Drift toward the peak or the null shrinks that gap, so ER falls.',
+      'P_in = 1 mW、Vπ = 4 V、Vpp = 2 V 时，φ 从 −90° 到 −135°，OMA 从 0.707 mW 降到 0.500 mW，ER 则由约 7.66 dB 变为理想消光。',
+      'At P_in = 1 mW, Vπ = 4 V and Vpp = 2 V, moving from −90° to −135° reduces OMA from 0.707 to 0.500 mW and takes ER from about 7.66 dB to ideal extinction.',
     ),
   },
   {
@@ -262,7 +262,7 @@ export const QUIZ: QuizQuestion[] = [
   },
   {
     id: 'q8',
-    prompt: loc('正交点、满摆幅 ±Vπ/2、P0 = 1 mW 时，插入损耗大约是多少？', 'At quadrature with a full swing of plus or minus Vpi/2 and P0 = 1 mW, about what is the insertion loss?'),
+    prompt: loc('正交点、满摆幅 ±Vπ/2、P_in = 1 mW 时，平均功率损耗大约是多少？', 'At quadrature with a full swing of plus or minus Vpi/2 and P_in = 1 mW, about what is the average power loss?'),
     options: [
       { id: 'a', text: loc(`${LEVELS.ilDb.toFixed(2)} dB`, `${LEVELS.ilDb.toFixed(2)} dB`) },
       { id: 'b', text: loc('0.00 dB', '0.00 dB') },
@@ -271,8 +271,8 @@ export const QUIZ: QuizQuestion[] = [
     answer: 'a',
     explain: fill(
       loc(
-        '两个电平是 P0 和 0，平均是 P0/2。IL = -10·log10((P0/2)/P0) = {il} dB，也就是 3 dB 那一档：平均功率是输入的一半。',
-        'The two levels are P0 and 0, so the average is P0/2. IL = -10 log10((P0/2)/P0) = {il} dB, the 3 dB case: the average power is half the input.',
+        '两个电平是 P_in 和 0，平均是 P_in/2。L_avg = -10·log10((P_in/2)/P_in) = {il} dB，也就是 3 dB 那一档：平均功率是输入的一半。',
+        'The two levels are P_in and 0, so the average is P_in/2. L_avg = -10 log10((P_in/2)/P_in) = {il} dB, the 3 dB case: the average power is half the input.',
       ),
       { il: LEVELS.ilDb.toFixed(2) },
     ),

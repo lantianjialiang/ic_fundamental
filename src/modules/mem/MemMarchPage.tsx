@@ -2,6 +2,7 @@ import { LessonComparison } from '../LessonComparison'
 import { memoryAlgorithms } from '../lessonComparisons'
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
@@ -45,6 +46,11 @@ export function MemMarchPage({ moduleId, onModuleChange }: Props) {
   const order = cur === null ? null : alg.elements[cur.element].order
   const verdict = verdictOf(state.alg, choice, result, steps)
   const marks = marksOf(choice.fault)
+  const visible = result.log.slice(0, shown)
+  const visited = new Set(visible.map(({ addr }) => addr))
+  const firstFail = result.log.find((item) => !item.pass)
+  const changed = result.log.find(({ coupling }) => coupling?.length)
+  const event = changed?.coupling?.[0]
 
   return (
     <LessonFrame
@@ -110,11 +116,24 @@ export function MemMarchPage({ moduleId, onModuleChange }: Props) {
             {t(S.stepReset)}
           </button>
           <span className="mmar-progress">{`${t(S.progress)}: ${shown} / ${count}`}</span>
+          {changed && <button type="button" className="lab__btn" onClick={() => setState({ ...state, step: changed.step + 1 })}>
+            {t(loc('定位首次耦合改变', 'Find first coupling change'))}
+          </button>}
+          {firstFail && <button type="button" className="lab__btn" onClick={() => setState({ ...state, step: firstFail.step + 1 })}>
+            {t(loc('定位首次读错', 'Find first wrong read'))}
+          </button>}
         </div>
         <p className="mmar-note">{t(S.opHelp)}</p>
 
         <div className="mmar-grid">
-          <MarchFig size={ARRAY_SIZE} current={current} order={order} marks={marks} />
+          <div>
+            <MarchFig size={ARRAY_SIZE} current={current} order={order} marks={marks} visited={visited}
+              firstFail={firstFail && firstFail.step < shown ? firstFail.addr : undefined} />
+            {changed && event && changed.step < shown && <p className="mmar-note" aria-live="polite">
+              {t(loc(`第 ${changed.step + 1} 步写入 ${event.aggressor}，受害位 ${event.victim} 从 ${event.before} 变成 ${event.after}。`,
+                `At step ${changed.step + 1}, writing to ${event.aggressor} changed victim ${event.victim} from ${event.before} to ${event.after}.`))}
+            </p>}
+          </div>
           <div className="mmar-cell">
             <Readout
               items={[

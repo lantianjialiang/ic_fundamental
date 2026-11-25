@@ -89,7 +89,7 @@ export function RfIp3Page({ moduleId, onModuleChange }: Props) {
         </div>
 
         <div className="rfip3-grid">
-          <Ip3Fig analysis={analysis} />
+          <Ip3Fig analysis={analysis} pin={state.pin} />
           <div className="rfip3-cell">
             <Readout items={readout} />
           </div>

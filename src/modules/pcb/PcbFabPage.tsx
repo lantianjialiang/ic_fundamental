@@ -10,6 +10,7 @@ import { RefP, RefParas, Related, type PrepNote } from '../prep/common'
 import { EtchFig, etchVerdicts } from './FabEtchFig'
 import { FabControls, FabLegend, FabTimeline } from './FabControls'
 import { FabBoardFig } from './FabFigs2'
+import { ViaWallFig } from './ViaWallFig'
 import { INTRO, QUIZ, RULE_ROWS, S, STEPS, TAKEAWAY, defectsOf } from './data/pcbFab'
 import { FRAMES, firstFrameOfStep, stepOfFrame } from './data/pcbFabModel'
 import { etchCheck, umToMil, type EtchLayer } from './data/pcbFabRules'
@@ -74,6 +75,7 @@ export function PcbFabPage({ moduleId, onModuleChange }: Props) {
           }}
         />
         <FabBoardFig frame={frame.id} hot={defect ? defect.hot : null} />
+        <ViaWallFig frame={frame.id} />
         <FabLegend />
         <FabControls player={player} onUse={() => setNote(null)} />
         <Callout>

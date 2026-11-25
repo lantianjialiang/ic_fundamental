@@ -8,7 +8,8 @@ import { gaussian, seededRandom } from '../ana/core/rng'
  *
  * Tx：输出功率 = 设置值 + 器件偏差 + 仪表噪声；EVM 用 QPSK 符号加高斯噪声，按 EVM = √(平均误差功率 / 参考功率) 计算。
  * Rx：增益 = 器件增益 + 仪表噪声；灵敏度用 BER 判定。
- *   每比特 Eb/N0 = SNR − 实现损耗，SNR = P_in − (底噪 kTB + NF)，带宽取 1 MHz；
+ *   dB 单位下，有效 Eb/N0 = SNR − 10log₁₀(Rb/B) − 实现损耗。SNR = P_in − (kTB + NF)。
+ *   教学模型固定 Rb = 1 Mbit/s、B = 1 MHz。
  *   QPSK 的 BER = Q(√(2·Eb/N0))。BER 限值 1e-3 所需的 Eb/N0 由 Q 函数解析求出（见 EBN0_REQ_DB）。
  *   测试时发送 BER_BITS 个比特、数误码数，误码数 / 比特数即 BER 估计；误码数不超过 BER_LIMIT × BER_BITS 判 Pass。
  *   解析灵敏度（BER = 1e-3 的输入功率）= 底噪 + NF + SNR_REQ_DB，只用于说明，测试本身只在一个功率点测。
@@ -29,8 +30,11 @@ export const SENS_SPEC_DBM = -95
 export const BER_LIMIT = 1e-3
 export const BER_BITS = 20000
 
-/** 1 MHz 带宽的热噪声底：−174 dBm/Hz + 60 dB */
-const NOISE_1MHZ_DBM = -114
+export const NOISE_BANDWIDTH_HZ = 1e6
+export const BIT_RATE_BPS = 1e6
+export const RATE_BANDWIDTH_DB = 10 * Math.log10(BIT_RATE_BPS / NOISE_BANDWIDTH_HZ)
+export const THERMAL_DENSITY_DBM_PER_HZ = -174
+export const THERMAL_POWER_DBM = THERMAL_DENSITY_DBM_PER_HZ + 10 * Math.log10(NOISE_BANDWIDTH_HZ)
 /** 实现损耗（dB）：理想 QPSK 之外的各种损失 */
 export const IMPL_LOSS_DB = 2.2
 
@@ -76,18 +80,18 @@ export function qInverse(p: number): number {
 
 /** BER = 1e-3 时 QPSK 所需的 Eb/N0（dB）：Q(√(2x)) = 1e-3 ⇒ x = Q⁻¹(1e-3)² / 2 */
 export const EBN0_REQ_DB = 10 * Math.log10((qInverse(BER_LIMIT) ** 2) / 2)
-/** 接收端 SNR 需要达到的值（dB）= Eb/N0 + 实现损耗 */
-export const SNR_REQ_DB = EBN0_REQ_DB + IMPL_LOSS_DB
+/** 接收端 SNR 需要达到的值（dB）。 */
+export const SNR_REQ_DB = EBN0_REQ_DB + RATE_BANDWIDTH_DB + IMPL_LOSS_DB
 
 /** 某个 NF 下的解析灵敏度（dBm）：BER = 1e-3 时的输入功率 */
 export function analyticSensDbm(nfDb: number): number {
-  return NOISE_1MHZ_DBM + nfDb + SNR_REQ_DB
+  return THERMAL_POWER_DBM + nfDb + SNR_REQ_DB
 }
 
 /** 理论 BER（解析）：输入功率 pDbm、噪声系数 nfDb 时的 QPSK 误码率 */
 export function berTheory(pDbm: number, nfDb: number): number {
-  const snr = pDbm - (NOISE_1MHZ_DBM + nfDb)
-  const ebn0 = snr - IMPL_LOSS_DB
+  const snr = pDbm - (THERMAL_POWER_DBM + nfDb)
+  const ebn0 = snr - RATE_BANDWIDTH_DB - IMPL_LOSS_DB
   return qFunction(Math.sqrt(2 * 10 ** (ebn0 / 10)))
 }
 
@@ -187,8 +191,8 @@ export function testDevice(index: number, spread: number, rxTestDbm: number): De
   }
 
   // 4. Rx BER：在测试功率下发送 BER_BITS 个比特，数误码
-  const snr = rxTestDbm - (NOISE_1MHZ_DBM + nfDb)
-  const ebn0 = snr - IMPL_LOSS_DB
+  const snr = rxTestDbm - (THERMAL_POWER_DBM + nfDb)
+  const ebn0 = snr - RATE_BANDWIDTH_DB - IMPL_LOSS_DB
   const amp = Math.sqrt(2 * 10 ** (ebn0 / 10))
   let errors = 0
   for (let b = 0; b < BER_BITS; b += 1) {

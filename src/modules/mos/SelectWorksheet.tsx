@@ -4,6 +4,7 @@ import { loc, type LText } from '../../i18n/locale'
 import { type ModuleId } from '../catalog'
 import { Callout, Knob, Readout, Seg } from '../fund/parts'
 import { RefP, type PrepNote } from '../prep/common'
+import { WorksheetCircuit } from './WorksheetCircuit'
 import { S } from './data/mosSelect'
 import { evaluate } from './data/mosSelectCalc'
 import { cat, f1, fP, type Input } from './data/mosSelectMath'
@@ -139,6 +140,8 @@ export function SelectWorksheet({ onOpen, onNote }: { onOpen: (id: ModuleId) => 
           <Knob label={S.ambient} value={st.ambient} unit="°C" min={0} max={85} step={5} onChange={(v) => update({ ambient: v })} />
         </div>
       </div>
+
+      <WorksheetCircuit topology={st.topology} load={st.load} diode={st.diode} />
 
       {lowSide ? (
         <Readout

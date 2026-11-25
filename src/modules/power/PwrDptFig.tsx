@@ -1,4 +1,5 @@
 import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
 import { S } from './pwrDptData'
 
 /** 示波器风格的深色底，颜色写死在 SVG 里 */
@@ -13,7 +14,7 @@ const GOLD = '#e8c45a'
  * 续流二极管 D 接在 SW 与母线之间；下管 DUT 的漏极在 SW，源极接地；Rg 串在栅极回路；Lstray 在母线上。
  * 探头：Vds 跨在 DUT 两端，Id 在 SW 的电流路径上。
  */
-export function DptCircuitFig() {
+export function DptCircuitFig({ stage }: { stage: 'off' | 'on' | 'recovery' }) {
   const { t } = useLocale()
   return (
     <figure className="pwr-dpt-fig">
@@ -64,8 +65,18 @@ export function DptCircuitFig() {
         {/* Vds 探头：跨在 DUT 两端 */}
         <path d="M222 100 H236 V130 H222" stroke={BLUE} strokeWidth={1.4} strokeDasharray="4 3" fill="none" />
         <text x={240} y={116} fill={BLUE} fontSize={11}>Vds</text>
+        <g data-dpt-stage={stage} fill="none" strokeLinejoin="round" strokeLinecap="round" strokeWidth="3">
+          {stage === 'off' && <path d="M110 31 V91 H160 V26 H118 M153 43 L160 36 L167 43" stroke={GOLD} />}
+          {stage === 'on' && <path d="M110 31 V92 H210 V100 H216 V130 H210 V152 M203 141 L210 148 L217 141" stroke={GOLD} />}
+          {stage === 'recovery' && <path d="M121 26 H160 V92 H210 V100 H216 V130 H210 V152 M153 71 L160 78 L167 71" stroke={BLUE} />}
+        </g>
       </svg>
       <figcaption className="pwr-dpt-note">{t(S.circuitCap)}</figcaption>
+      <p className="pwr-dpt-note">{t({
+        off: loc('关断时，负载电感的电流从下管转向续流二极管，高亮为换流后的续流路径。', 'At turn-off, load current commutates from the DUT to the freewheel diode. The highlight shows the resulting freewheel loop.'),
+        on: loc('第二次开通时，负载电流从续流二极管转回下管，高亮为换流后的负载路径。', 'At the second turn-on, the load current commutates from the freewheel diode back to the DUT. The highlight shows the resulting load path.'),
+        recovery: loc('反向恢复时，母线经二极管向下管注入额外电流。这股电流叠加在负载电流上。', 'During reverse recovery, extra current flows from the bus through the diode into the DUT and adds to the load current.'),
+      }[stage])}</p>
       <div className="pwr-dpt-legend">
         <span>{t(S.legendL)}</span>
         <span>{t(S.legendD)}</span>

@@ -1,0 +1,22 @@
+.intro-chip-chain {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: .7rem;
+  margin: .7rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.intro-chip-chain li {
+  display: grid;
+  grid-template-rows: auto 3.7rem auto;
+  align-items: center;
+  gap: .35rem;
+  padding: .7rem;
+  background: var(--well);
+  border: 1px solid var(--line);
+  border-radius: .7rem;
+}
+.intro-chip-chain svg { display: block; width: min(100%, 12rem); height: auto; }
+.intro-chip-chain__dut { padding: .5rem; width: fit-content; border: 2px solid var(--blue); border-radius: .4rem; }
+.intro-chip-chain output { color: var(--green); font: 700 .95rem var(--mono); }
+.intro-chip-chain output[data-result='fail'] { color: var(--red); }

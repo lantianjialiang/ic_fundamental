@@ -198,7 +198,12 @@ export function MfgSubstratePage({ moduleId, onModuleChange }: { moduleId: Modul
           </Drill>
           <Drill n={2} title={taskTune}>
             <p>{t(loc('继续用上面的四个旋钮。线加宽或介质变薄，阻抗会往下走。', 'Keep using the four knobs above. A wider line or a thinner dielectric brings impedance down.'))}</p>
-            <Readout items={[{ label: loc('你算出的 Z0', 'Z0 you got'), value: `${z0.toFixed(1)} Ω` }]} />
+            <Readout items={[
+              { label: loc('对数的无量纲输入（长度均用 µm）', 'Dimensionless logarithm argument (all lengths in µm)'),
+                value: `5.98 × ${h} / (0.8 × ${w} + ${th}) ≈ ${(5.98 * h / (0.8 * w + th)).toFixed(3)}` },
+              { label: loc('你算出的 Z0', 'Z0 you got'),
+                value: `87 / √(${eps} + 1.41) × ln(${(5.98 * h / (0.8 * w + th)).toFixed(3)}) ≈ ${z0.toFixed(1)} Ω` },
+            ]} />
             <After show={tuneHit.hit} text={loc('落到 50±3 Ω，说明线宽、介质厚和 εr 配到了目标。只改线宽、不动 h 和 εr，往往调不到。', 'Landing inside 50±3 Ω means width, dielectric thickness and εr now match the target. Changing width alone, and leaving h and εr, often cannot get there.')} />
           </Drill>
           <Drill n={3} title={taskEsc}>

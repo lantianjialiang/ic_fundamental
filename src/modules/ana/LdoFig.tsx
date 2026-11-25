@@ -1,7 +1,14 @@
 import { useLocale } from '../../i18n/LocaleContext'
+import { useState } from 'react'
+import { loc } from '../../i18n/locale'
+import { Seg } from '../fund/parts'
 import { FIG } from './ldoData'
 import {
   LOAD_LIMIT,
+  I_REF,
+  VIN_LO,
+  RIPPLE_VPK,
+  voutRippleV,
   LOAD_PRESETS_MA,
   PSRR_POINTS,
   loadRegMvPerMa,
@@ -13,11 +20,28 @@ const HW = 480
 const HH = 170
 
 /** 接线示意：DPS 供 VIN，AWG 的纹波叠加到 VIN 上，EN 接 VIN；VOUT 接电子负载，DMM 在 VOUT 端感测 */
-export function HookFig() {
+const MEASUREMENTS = [
+  { id: 'line', label: loc('线性调整率', 'Line regulation') },
+  { id: 'load', label: loc('负载调整率', 'Load regulation') },
+  { id: 'psrr', label: loc('PSRR', 'PSRR') },
+] as const
+
+export function HookFig({ state }: { state: LdoState }) {
   const { t } = useLocale()
+  const [mode, setMode] = useState<(typeof MEASUREMENTS)[number]['id']>('line')
+  const line = mode === 'line'
+  const load = mode === 'load'
+  const ripple = mode === 'psrr'
+  const active = 'var(--gold)'
+  const fixed = 'var(--muted)'
+  const caption = line
+    ? loc(`DPS 把 VIN 从 ${VIN_LO.toFixed(1)} V 改为 ${state.vin.toFixed(1)} V，电子负载固定在 ${I_REF * 1000} mA。DMM 比较两次直流 VOUT。`, `The DPS changes VIN from ${VIN_LO.toFixed(1)} V to ${state.vin.toFixed(1)} V. Hold the load at ${I_REF * 1000} mA and compare DC VOUT readings.`)
+    : load ? loc(`VIN 固定在 ${state.vin.toFixed(1)} V。电子负载从 ${I_REF * 1000} mA 切换到 ${state.iloadMa} mA，DMM 量 VOUT 的变化。`, `Hold VIN at ${state.vin.toFixed(1)} V. Change the load from ${I_REF * 1000} mA to ${state.iloadMa} mA and measure the change in VOUT.`)
+      : loc(`直流 VIN 和负载设定保持固定。在 VIN 注入 ${state.freqHz / 1000} kHz、${RIPPLE_VPK * 1000} mV 峰值，输出测得约 ${(voutRippleV(state.freqHz) * 1000).toFixed(3)} mV 峰值。`, `Hold DC VIN and the load setpoint fixed. Inject a ${state.freqHz / 1000} kHz, ${RIPPLE_VPK * 1000} mV peak ripple at VIN and read about ${(voutRippleV(state.freqHz) * 1000).toFixed(3)} mV peak at VOUT.`)
   return (
     <figure className="term-fig">
-      <svg viewBox={`0 0 ${HW} ${HH}`} className="term-fig__svg" role="img" aria-label={t(FIG.hookAria)}>
+      <Seg options={MEASUREMENTS} value={mode} onChange={setMode} />
+      <svg viewBox={`0 0 ${HW} ${HH}`} className="term-fig__svg" role="img" aria-label={t(FIG.hookAria)} data-ldo-measure={mode}>
         <rect width={HW} height={HH} rx="10" fill="var(--well)" />
 
         <rect x="16" y="22" width="104" height="44" rx="6" fill="var(--fig-box)" stroke="var(--line-2)" />
@@ -53,11 +77,11 @@ export function HookFig() {
           VOUT
         </text>
 
-        <path d="M120 44 H190" fill="none" stroke="var(--blue)" strokeWidth="2" />
-        <path d="M120 126 H150 V44" fill="none" stroke="var(--gold)" strokeWidth="2" strokeDasharray="5 3" />
+        <path data-adjusts="vin" d="M120 44 H190" fill="none" stroke={line ? active : fixed} strokeWidth={line ? 3 : 2} />
+        <path data-adjusts="awg" d="M120 126 H150 V44" fill="none" stroke={ripple ? active : fixed} strokeWidth={ripple ? 3 : 1} strokeDasharray="5 3" />
         <path d="M170 44 V 72 H 190" fill="none" stroke="var(--blue)" strokeWidth="2" />
 
-        <path d="M310 44 H366" fill="none" stroke="var(--blue)" strokeWidth="2" />
+        <path data-adjusts="load" d="M310 44 H366" fill="none" stroke={load ? active : fixed} strokeWidth={load ? 3 : 2} />
         <rect x="366" y="22" width="100" height="44" rx="6" fill="var(--fig-box)" stroke="var(--line-2)" />
         <text x="416" y="48" textAnchor="middle" fill="var(--text)" fontSize="12" fontWeight="600">
           {t(FIG.loadBox)}
@@ -66,10 +90,10 @@ export function HookFig() {
         <path d="M340 44 V 126 H366" fill="none" stroke="var(--green)" strokeWidth="1.5" strokeDasharray="3 2" />
         <rect x="366" y="104" width="100" height="44" rx="6" fill="var(--fig-box)" stroke="var(--line-2)" />
         <text x="416" y="131" textAnchor="middle" fill="var(--text)" fontSize="12" fontWeight="600">
-          DMM
+          {ripple ? t(loc('交流读出', 'AC readout')) : 'DMM'}
         </text>
       </svg>
-      <figcaption>{t(FIG.hookCap)}</figcaption>
+      <figcaption aria-live="polite">{t(caption)}</figcaption>
     </figure>
   )
 }

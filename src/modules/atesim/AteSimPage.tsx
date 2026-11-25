@@ -201,6 +201,7 @@ export function AteSimPage({ moduleId, onModuleChange }: AteSimPageProps) {
       ...prev,
       running: true,
       lot: null,
+      lotDieIndex: null,
       progress: { done: 0, total: request.count, yieldPct: 100 },
       progressNote: '',
     }))
@@ -628,6 +629,7 @@ export function AteSimPage({ moduleId, onModuleChange }: AteSimPageProps) {
             running={state.running}
             histItem={state.histItem}
             waferIndex={state.waferIndex}
+            selectedDie={state.lotDieIndex}
             onRun={startLot}
             onCancel={cancelLot}
             onBatchChange={(patch) =>
@@ -636,6 +638,7 @@ export function AteSimPage({ moduleId, onModuleChange }: AteSimPageProps) {
             onStopModeChange={(value) => setState((prev) => ({ ...prev, stopOnFirstFail: value }))}
             onHistItemChange={(id) => setState((prev) => ({ ...prev, histItem: id }))}
             onWaferChange={(index) => setState((prev) => ({ ...prev, waferIndex: index }))}
+            onDiePick={(index) => setState((prev) => ({ ...prev, lotDieIndex: index }))}
             onExportCsv={exportCsv}
             onExportJson={exportJson}
             onImportFile={importConfig}

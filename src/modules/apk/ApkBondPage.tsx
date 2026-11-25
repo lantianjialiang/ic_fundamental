@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { loc } from '../../i18n/locale'
 import { useLocale } from '../../i18n/LocaleContext'
 import { type ModuleId } from '../catalog'
@@ -74,6 +74,8 @@ export function ApkBondPage({ moduleId, onModuleChange }: { moduleId: ModuleId; 
   const [act, setAct] = useState(0.3)
   const [picked, setPicked] = useState<Partial<Record<string, string>>>({})
   const kind = KINDS.find((item) => item.id === kindId) ?? KINDS[0]
+  const patternId = useId()
+  const pitchPx = kind.pitch * 0.15
   const tried = KINDS.find((item) => item.id === tryId)
   const dens = ioDensityPerMm2((tried ?? kind).pitch)
   const ebit = energyPerBitPj(cPf, v, act)
@@ -127,6 +129,21 @@ export function ApkBondPage({ moduleId, onModuleChange }: { moduleId: ModuleId; 
           <ApkBondWiring key={kindId} kind={kindId} pitch={kind.pitch} />
           <p>{t(kind.text)}</p>
           <p>{t(loc('面密度 = (1000 / 节距)²，节距用 µm，密度是每平方毫米多少个接点。节距缩小到 1/2，密度变成 4 倍。', 'Area density = (1000 / pitch)², with pitch in µm and density in contacts per square millimetre. Halving the pitch multiplies density by 4.'))}</p>
+          {kind.id !== 'wb' && <figure className="term-fig">
+            <svg viewBox="0 0 360 180" className="term-fig__svg" role="img" aria-label={t(loc('固定 1 平方毫米的理想接点阵列', 'Ideal contact array in a fixed square millimetre'))}>
+              <rect width="360" height="180" rx="8" fill="var(--well)" />
+              <defs><pattern id={patternId} width={pitchPx} height={pitchPx} x="15" y="15" patternUnits="userSpaceOnUse">
+                <circle cx={pitchPx / 2} cy={pitchPx / 2} r={pitchPx * 0.24} fill="var(--blue)" />
+              </pattern></defs>
+              <rect x="15" y="15" width="150" height="150" fill={`url(#${patternId})`} stroke="var(--muted)" />
+              <text x="183" y="38" fill="var(--text)" fontSize="15">1 mm × 1 mm</text>
+              <text x="183" y="68" fill="var(--text)" fontSize="15">p = {kind.pitch} µm</text>
+              <text x="183" y="98" fill="var(--text)" fontSize="15">1000 / p ≈ {(1000 / kind.pitch).toFixed(1)}</text>
+              <text x="183" y="128" fill="var(--text)" fontSize="15">{ioDensityPerMm2(kind.pitch).toFixed(1)} / mm²</text>
+            </svg>
+            <figcaption>{t(loc('用每毫米的格数沿两个方向相乘。图中为全填充的理想方阵，实际布线还要给电源、边界与空位留空间。',
+              'Multiply the number of grid positions per millimetre in the two directions. This ideal square array assumes full occupancy. Real layouts reserve space for power, boundaries and unused sites.'))}</figcaption>
+          </figure>}
           <p>{t(loc('每位能量 ≈ α × C × V²。C 是这一位要充的电容，V 是摆幅，α 是它翻转的比例。降电压比把线再缩短一点更有效。', 'Energy per bit ≈ α × C × V². C is the capacitance that bit charges, V is the swing, and α is how often it toggles. Dropping voltage beats shortening the wire a little more.'))}</p>
           <p>{t(loc('混合键合没有焊料，是铜和介质直接贴上。它不是“更细的凸点”。对准、平整和清洁都更苛刻，探针也更难扎。', 'Hybrid bonding has no solder. Copper and dielectric bond directly. It is not a finer bump. Alignment, flatness and cleanliness are tighter, and a probe is harder to land.'))}</p>
         </div>

@@ -6,6 +6,7 @@ import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
 import { type ModuleId } from '../catalog'
 import { BondFig, ClockFig, HookupFig, MemPatFig, PkgFig, clockText } from './AteFig'
+import { AtePeripheralFig } from './AtePeripheralFig'
 import { HandlerFig, WaferFig, type BinBox } from './AteWaferFig'
 import {
   ATE_LEAD,
@@ -569,6 +570,7 @@ export function FundAtePage({ moduleId, onModuleChange }: Props) {
           }}
         />
         <Explain paras={PERIPH.find((item) => item.id === periph)?.explain} />
+        <AtePeripheralFig active={periph} />
       </Section>
 
       <Section title={t(S.binTitle)} note={t(S.binNote)}>

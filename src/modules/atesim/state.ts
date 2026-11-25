@@ -56,6 +56,7 @@ export type SimState = {
   running: boolean
   histItem: string
   waferIndex: number
+  lotDieIndex: number | null
   scenarioId: string | null
   scores: Record<string, ScoreRec>
   customScenarios: CustomDef[]
@@ -86,6 +87,7 @@ export function defaultState(t: TFn): SimState {
     running: false,
     histItem: 'idd_dyn',
     waferIndex: 0,
+    lotDieIndex: null,
     // 默认选中第一个预置场景：列表里永远有一项是选中的
     scenarioId: ATE.Scenarios.SCENARIOS[0] ? ATE.Scenarios.SCENARIOS[0].id : null,
     scores: {},

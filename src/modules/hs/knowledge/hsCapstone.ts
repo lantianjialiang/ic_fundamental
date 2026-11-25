@@ -29,8 +29,8 @@ export const HS_CAPSTONE_KNOWLEDGE: AnaKnowledge = {
       term: 'Eye opening at BER',
       name: loc('BER 下的眼宽与眼高', 'Eye width and height at a BER'),
       def: loc(
-        '在指定的误码率（如 1e-12）下量得的眼开口：眼宽 = UI − TJ(BER)，眼高 = EH₀ − 2·Q(BER)·σ。规格看的是这个 BER 下的余量，而不是中心一点的 BER。见 {@hsCapstone}。',
-        'The eye opening measured at a specified bit error rate such as 1e-12: eye width = UI − TJ(BER), eye height = EH₀ − 2·Q(BER)·σ. The spec is the margin at that BER, not the BER at one centre point. See {@hsCapstone}.',
+        '模型按指定的误码率（如 1e-12）估算眼开口。眼宽 = UI − TJ(BER)，眼高 = EH₀ − 2·Q⁻¹(BER)·σ。用这两个开口与规格 mask 比较，再单独检查中心采样点的 BER。见 {@hsCapstone}。',
+        'The model estimates the opening at a specified bit error rate such as 1e-12. Eye width = UI − TJ(BER), and eye height = EH₀ − 2·Q⁻¹(BER)·σ. Compare these openings with the spec mask and check the centre-sample BER separately. See {@hsCapstone}.',
       ),
       lessons: ['hsCapstone'],
     },

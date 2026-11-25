@@ -65,7 +65,6 @@ export function AnaLdoPage({ moduleId, onModuleChange }: Props) {
     >
       <Section title={t(S.introTitle)}>
         <RefParas paras={INTRO} onOpen={onModuleChange} />
-        <HookFig />
         <Related ids={['anaResources', 'anaSmu', 'anaMeasure']} onOpen={onModuleChange} />
       </Section>
 
@@ -101,6 +100,7 @@ export function AnaLdoPage({ moduleId, onModuleChange }: Props) {
           </div>
         </div>
 
+        <HookFig state={state} />
         <div className="ana-grid">
           <div className="ana-cell">
             <h3>{t(S.loadTitle)}</h3>

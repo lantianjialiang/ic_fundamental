@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
-import { type LText } from '../../i18n/locale'
+import { loc, type LText } from '../../i18n/locale'
+import { Readout, Seg } from '../fund/parts'
+import { dbToRatio } from './core/units'
 import { FIG, S } from './rfNfData'
-import { type NfAnalysis, type StageKey } from './rfNfModel'
+import { NOISE_BW_MHZ, type NfAnalysis, type StageKey } from './rfNfModel'
 
 /** 示波器风格的深色底，颜色写死在 SVG 里 */
 const BG = '#0d1117'
@@ -16,6 +19,57 @@ const STAGE_NAME: Record<StageKey, LText> = {
   lna: S.stageLna,
   mixer: S.stageMixer,
   if: S.stageIf,
+}
+
+const SOURCES = [
+  { id: 'cold', label: loc('冷态噪声源', 'Cold source') },
+  { id: 'hot', label: loc('热态噪声源', 'Hot source') },
+] as const
+
+export function YFactorFig({ analysis, enr }: { analysis: NfAnalysis; enr: number }) {
+  const { t } = useLocale()
+  const [source, setSource] = useState<(typeof SOURCES)[number]['id']>('cold')
+  const hot = source === 'hot'
+  const { nHotDbm, nColdDbm, y, nfFromYDb } = analysis
+  const reading = hot ? nHotDbm : nColdDbm
+  const delta = nHotDbm - nColdDbm
+  const enrLinear = dbToRatio(enr)
+  const noiseFactor = enrLinear / (y - 1)
+  const color = hot ? GOLD : BLUE
+  return (
+    <figure className="term-fig rf-nf-fig">
+      <Seg options={SOURCES} value={source} onChange={setSource} />
+      <svg viewBox="0 0 410 110" role="img" className="rf-svg"
+        aria-label={t(loc('切换噪声源状态，测量同一接收机的输出', 'Switch source states and measure the same receiver output'))}>
+        <rect width="410" height="110" rx="10" fill={BG} />
+        <path d="M121 55 H150 M257 55 H285" stroke={color} strokeWidth="3" />
+        <path d="M143 50 L150 55 L143 60 M278 50 L285 55 L278 60" fill="none" stroke={color} strokeWidth="2" />
+        <rect x="10" y="20" width="111" height="70" rx="7" fill={BOX} stroke={color} />
+        <rect x="150" y="20" width="107" height="70" rx="7" fill={BOX} stroke={EDGE} />
+        <rect x="285" y="20" width="115" height="70" rx="7" fill={BOX} stroke={EDGE} />
+        <g textAnchor="middle" fontSize="15" fill={TEXT}>
+          <text x="65" y="46">{t(SOURCES[hot ? 1 : 0].label)}</text>
+          <text x="203" y="46">{t(loc('被测接收机', 'Receiver'))}</text>
+          <text x="343" y="46">{t(loc('噪声功率计', 'Power meter'))}</text>
+        </g>
+        <g textAnchor="middle" fontSize="14" fontFamily="var(--mono)">
+          <text x="65" y="71" fill={color}>{hot ? `ENR ${enr} dB` : `T₀`}</text>
+          <text x="203" y="71" fill={MUTED}>LNA → MIX → IF</text>
+          <text x="343" y="71" fill={color} data-y-reading={source}>{reading.toFixed(2)} dBm</text>
+        </g>
+      </svg>
+      <figcaption>
+        {t(loc(`只切换噪声源，接收链路与 ${NOISE_BW_MHZ} MHz 测量带宽始终相同。冷态输入对应参考噪声温度 T₀，热态增加标定的噪声功率。`,
+          `Only the source switches. The receiver and ${NOISE_BW_MHZ} MHz measurement bandwidth stay fixed. The cold source is at reference temperature T₀. The hot source adds calibrated noise power.`))}
+      </figcaption>
+      <Readout items={[
+        { label: loc('测热、冷读数之差', 'Subtract hot and cold readings'), value: `${nHotDbm.toFixed(2)} − (${nColdDbm.toFixed(2)}) ≈ ${delta.toFixed(2)} dB` },
+        { label: loc('把 dB 差换成线性功率比', 'Convert the dB difference to a power ratio'), value: `Y = 10^(${delta.toFixed(2)} / 10) ≈ ${y.toFixed(3)}` },
+        { label: loc('用线性 ENR 和 Y 求噪声因子', 'Find the noise factor from linear ENR and Y'), value: `F = ENR / (Y − 1) ≈ ${enrLinear.toFixed(3)} / (${y.toFixed(3)} − 1) ≈ ${noiseFactor.toFixed(3)}` },
+        { label: loc('把噪声因子换成 dB', 'Convert the noise factor to dB'), value: `NF = 10 log₁₀(${noiseFactor.toFixed(3)}) ≈ ${nfFromYDb.toFixed(2)} dB` },
+      ]} />
+    </figure>
+  )
 }
 
 /** 三级链路框图：每一框写出名称、增益和噪声系数，框间箭头表示信号方向 */

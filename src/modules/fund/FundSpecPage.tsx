@@ -124,24 +124,26 @@ export function FundSpecPage({ moduleId, onModuleChange }: Props) {
       </Section>
 
       <Section title={t(S.condTitle)} note={t(S.condNote)}>
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th>{t(S.colKind)}</th>
-              <th>{t(S.colCond)}</th>
-              <th>{t(S.colLimit)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {CONDS.map((item) => (
-              <tr key={item.kind.zh}>
-                <td>{t(item.kind)}</td>
-                <td>{t(item.cond)}</td>
-                <td>{t(item.limit)}</td>
+        <div className="dtable-wrap">
+          <table className="dtable">
+            <thead>
+              <tr>
+                <th>{t(S.colKind)}</th>
+                <th>{t(S.colCond)}</th>
+                <th>{t(S.colLimit)}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {CONDS.map((item) => (
+                <tr key={item.kind.zh}>
+                  <td>{t(item.kind)}</td>
+                  <td>{t(item.cond)}</td>
+                  <td>{t(item.limit)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Section>
 
       <Section title={t(S.sheetTitle)} note={t(S.sheetNote)}>
@@ -158,34 +160,36 @@ export function FundSpecPage({ moduleId, onModuleChange }: Props) {
             setRowId(SHEET[id][0].id)
           }}
         />
-        <table className="dtable">
-          <thead>
-            <tr>
-              {SHEET_HEAD[tab].map((head) => (
-                <th key={head.zh}>{t(head)}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((item) => (
-              <tr
-                key={item.id}
-                className={`is-click${item.id === rowId ? ' is-active' : ''}`}
-                onClick={() => {
-                  setRowId(item.id)
-                  const cells = item.cells(g)
-                  setNote({ kicker: S.kicker, title: t(cells[0]), text: item.explain[0] })
-                }}
-              >
-                {item.cells(g).map((cell, index) => (
-                  <td key={index} className={index === 0 ? 'mono-cell' : undefined}>
-                    {t(cell)}
-                  </td>
+        <div className="dtable-wrap">
+          <table className="dtable">
+            <thead>
+              <tr>
+                {SHEET_HEAD[tab].map((head) => (
+                  <th key={head.zh}>{t(head)}</th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.map((item) => (
+                <tr
+                  key={item.id}
+                  className={`is-click${item.id === rowId ? ' is-active' : ''}`}
+                  onClick={() => {
+                    setRowId(item.id)
+                    const cells = item.cells(g)
+                    setNote({ kicker: S.kicker, title: t(cells[0]), text: item.explain[0] })
+                  }}
+                >
+                  {item.cells(g).map((cell, index) => (
+                    <td key={index} className={index === 0 ? 'mono-cell' : undefined}>
+                      {t(cell)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         {row ? <Explain paras={row.explain} /> : <p className="intro__note">{t(S.sheetHint)}</p>}
       </Section>
 
@@ -220,28 +224,30 @@ export function FundSpecPage({ moduleId, onModuleChange }: Props) {
       </Section>
 
       <Section title={t(S.levelTitle)}>
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th />
-              <th>VIL max</th>
-              <th>VIH min</th>
-              <th>VOL max</th>
-              <th>VOH min</th>
-            </tr>
-          </thead>
-          <tbody>
-            {LEVELS.map((item) => (
-              <tr key={item.name}>
-                <td>{item.name}</td>
-                <td className="mono-cell">{item.vil}</td>
-                <td className="mono-cell">{item.vih}</td>
-                <td className="mono-cell">{item.vol}</td>
-                <td className="mono-cell">{item.voh}</td>
+        <div className="dtable-wrap">
+          <table className="dtable">
+            <thead>
+              <tr>
+                <th />
+                <th>VIL max</th>
+                <th>VIH min</th>
+                <th>VOL max</th>
+                <th>VOH min</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {LEVELS.map((item) => (
+                <tr key={item.name}>
+                  <td>{item.name}</td>
+                  <td className="mono-cell">{item.vil}</td>
+                  <td className="mono-cell">{item.vih}</td>
+                  <td className="mono-cell">{item.vol}</td>
+                  <td className="mono-cell">{item.voh}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <p className="intro__note">{t(LEVEL_NOTE)}</p>
       </Section>
 

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
@@ -171,6 +172,14 @@ export function PwrUisPage({ moduleId, onModuleChange }: Props) {
                 },
               ]}
             />
+            {uisRes.valid && <Readout items={[
+              { label: loc('雪崩时电感的反向电压幅值', 'Reverse voltage magnitude across the inductor'),
+                value: `BV − VDD = ${uis.bv} − ${uis.vdd} = ${uis.bv - uis.vdd} V` },
+              { label: loc('从三角形电流面积求器件吸收的能量', 'Device energy from the triangular current area'),
+                value: `EAS = BV·Ipk·tav/2 ≈ ${uis.bv} V × ${uis.ipk} A × ${uisRes.tav.toExponential(3)} s / 2 ≈ ${uisRes.eas.toPrecision(3)} J` },
+              { label: loc('代入 tav = L·Ipk/(BV−VDD)，分出储能和电源供能', 'Substitute tav = L·Ipk/(BV−VDD) to separate stored and supplied energy'),
+                value: `EAS = (L·Ipk²/2) × BV/(BV−VDD) ≈ ${(0.5 * uis.lMh * 1e-3 * uis.ipk ** 2).toPrecision(3)} J × ${(uis.bv / (uis.bv - uis.vdd)).toFixed(3)}` },
+            ]} />}
           </div>
         </div>
       </Section>

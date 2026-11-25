@@ -42,15 +42,44 @@ export function SeriesLinks({ count, label }: { count: number; label: LText }) {
 }
 
 export function TouchdownGrid({ cols, rows, partial }: { cols: number; rows: number; partial: number }) {
-  const [last, setLast] = useState(false)
+  const { t } = useLocale()
+  const [mode, setMode] = useState('first')
   const title = loc('一次落针覆盖几个 site', 'Sites covered by one touchdown')
+  const waferCells = Array.from({ length: 121 }, (_, i) => [i % 11 - 5, Math.floor(i / 11) - 5] as const)
+  const inside = (col: number, row: number) => Math.hypot(Math.abs(col) + .5, Math.abs(row) + .5) < 5.5
+  const x0 = mode === 'edge' ? 5 - Math.floor((cols - 1) / 2) : -Math.floor(cols / 2)
+  const y0 = mode === 'edge' ? 1 : -Math.floor(rows / 2)
+  const sites = Array.from({ length: cols * rows }, (_, i) => {
+    const col = x0 + i % cols
+    const row = y0 + Math.floor(i / cols)
+    const occupied = mode === 'edge' ? inside(col, row) : mode !== 'last' || i < cols * rows - partial
+    return { col, row, occupied }
+  })
+  const posX = (col: number) => 139 + col * 20
+  const posY = (row: number) => 128 + row * 20
+  const count = sites.filter(({ occupied }) => occupied).length
   return (
     <Diagram title={title} caption={loc('每格代表一个 site。这个计算把 die 理想地装进各组，只有最后一组可能空出位置；圆形晶圆上实际还会遇到几何边缘。', 'Each cell is one site. This calculation packs dies into ideal groups, with possible empty sites in the last group. A real circular wafer also constrains the layout.')}>
-      <DiagramChoices label={title} value={last ? 'last' : 'first'} onPick={(id) => setLast(id === 'last')}
-        items={[{ id: 'first', title: loc('满组', 'Full group') }, { id: 'last', title: loc('最后一组', 'Last group') }]} />
-      <div className="flow-sites" aria-hidden="true" style={{ gridTemplateColumns: `repeat(${cols}, 1.8rem)` }}>
-        {Array.from({ length: cols * rows }, (_, i) => <span key={i} data-empty={last && i >= cols * rows - partial}>{i + 1}</span>)}
-      </div>
+      <DiagramChoices label={title} value={mode} onPick={setMode}
+        items={[{ id: 'first', title: loc('晶圆中央满组', 'Full group in the center') },
+          { id: 'edge', title: loc('圆边落针', 'Wafer-edge touchdown') },
+          { id: 'last', title: loc('公式中的最后一组', 'Last group in the formula') }]} />
+      <svg viewBox="0 0 300 255" className="flow-technical-svg" role="img" data-touchdown={mode}
+        aria-label={t(loc(`有效 ${count} 站，共 ${sites.length} 站`, `${count} active of ${sites.length} sites`))}>
+        <circle cx="139" cy="128" r="110" fill="#20364b" stroke="#91adc3" strokeWidth="2" />
+        {waferCells.filter(([col, row]) => inside(col, row)).map(([col, row]) => (
+          <rect key={`${col},${row}`} x={posX(col) - 9} y={posY(row) - 9} width="18" height="18" rx="2" fill="#3a5872" />
+        ))}
+        {sites.map(({ col, row, occupied }, i) => (
+          <g key={i}>
+            <rect data-occupied={occupied} x={posX(col) - 9} y={posY(row) - 9} width="18" height="18" rx="2"
+              fill={occupied ? '#56cdb8' : '#20364b'} stroke={occupied ? '#a6f6e4' : '#ffcc8a'} strokeDasharray={occupied ? undefined : '3 2'} />
+            <text className={occupied ? 'flow-die-label' : undefined} x={posX(col)} y={posY(row) + 5} textAnchor="middle">{i + 1}</text>
+          </g>
+        ))}
+      </svg>
+      <p className="flow-diagram-detail" aria-live="polite">{t(loc(`有效 ${count} / ${sites.length} 站。`, `${count} of ${sites.length} sites are active.`))}
+        {mode === 'edge' && t(loc(' 超出圆边的针位空着。', ' Positions outside the circular edge are unused.'))}</p>
       <DiagramLegend items={[[ 'unit', loc('已测试 site', 'Tested site') ], [ 'space', loc('空余 site', 'Unused site') ]]} />
     </Diagram>
   )

@@ -24,14 +24,9 @@ const round = (value: number, digits: number) => {
   return Math.round(value * scale) / scale
 }
 
-const EYE_SUMMARY = loc(
-  '发射 OMA {oma} mW，ER {er} dB。高电平 {hi} mW，低电平 {lo} mW，平均功率 {avg} mW。',
-  'Transmitted OMA {oma} mW, ER {er} dB. High {hi} mW, low {lo} mW, average power {avg} mW.',
-)
-
 const BER_SUMMARY = loc(
-  '游标处接收 OMA {oma} mW，BER {ber}。虚线是 1e-12。',
-  'At the cursor, received OMA is {oma} mW and BER is {ber}. The dashed line is 1e-12.',
+  '金线扫点：接收 OMA {oma} mW，BER {ber}。绿点对应上方光眼的工作条件，OMA {actual} mW，BER {result}。横向虚线是目标。',
+  'Gold sweep cursor: received OMA {oma} mW and BER {ber}. The green dot is the eye’s operating point, OMA {actual} mW and BER {result}. The horizontal dashed line marks the target.',
 )
 
 const BER_X = loc('接收 OMA mW', 'Received OMA mW')
@@ -94,22 +89,7 @@ export function PicLinkPage({ moduleId, onModuleChange }: Props) {
 
         <div className="hs-grid">
           <div>
-            <PicLinkFig
-              omaMw={state.txOmaMw}
-              erDb={state.erDb}
-              aria={t(S.eyeAria)}
-              omaLabel="OMA"
-              erLabel={`ER ${state.erDb.toFixed(0)} dB`}
-              summary={t(
-                fill(EYE_SUMMARY, {
-                  oma: state.txOmaMw.toFixed(2),
-                  er: state.erDb.toFixed(0),
-                  hi: analysis.pHighMw.toFixed(3),
-                  lo: analysis.pLowMw.toFixed(3),
-                  avg: analysis.pAvgMw.toFixed(3),
-                }),
-              )}
-            />
+            <PicLinkFig state={state} analysis={analysis} />
             <BerOmaPlot
               omaMw={analysis.curve.map((item) => item.omaMw)}
               ber={analysis.curve.map((item) => item.ber)}
@@ -119,7 +99,9 @@ export function PicLinkPage({ moduleId, onModuleChange }: Props) {
               xLabel={t(BER_X)}
               yLabel={t(BER_Y)}
               markLabel="1e-12"
-              summary={t(fill(BER_SUMMARY, { oma: point.omaMw.toFixed(3), ber: fmtBer(point.ber) }))}
+              operating={{ omaMw: analysis.pRxMw, ber: analysis.ber }}
+              summary={t(fill(BER_SUMMARY, { oma: point.omaMw.toFixed(3), ber: fmtBer(point.ber),
+                actual: analysis.pRxMw.toFixed(3), result: fmtBer(analysis.ber) }))}
             />
           </div>
           <div className="hs-cell">

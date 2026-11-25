@@ -177,8 +177,8 @@ export function ApkOverviewPage({ moduleId, onModuleChange }: { moduleId: Module
       }
       misconceptions={[
         loc('如果新增的封装、互连与测试成本超过节省的硅成本，chiplet 方案就会更贵。', 'A chiplet design costs more if added packaging, interconnect, and test costs outweigh the silicon savings.'),
-        loc('2.5D 与 3D 只是叫法。一个并排，一个堆叠。', '2.5D and 3D are not just names. One is side-by-side, the other stacks.'),
-        loc('先进封装只为性能。良率和异构工艺同样是动因。', 'Advanced packaging is not only for speed. Yield and mixed processes matter too.'),
+        loc('如果芯粒经中介层横向互连，可归入 2.5D；如果互连穿越垂直堆叠层，则属于 3D。', 'Side-by-side dies connected through an interposer fall under 2.5D. Vertical interconnects through stacked dies are characteristic of 3D.'),
+        loc('选择封装时，要同时比较带宽、良率、测试成本和不同工艺能否集成。', 'Package selection weighs bandwidth, yield, test cost and the ability to integrate different processes.'),
       ]}
       takeaway={[
         loc('光罩极限 858 mm²；大面积良率按 exp(−D0·A) 掉。', 'Reticle limit 858 mm²; large-area yield falls as exp(−D0·A).'),

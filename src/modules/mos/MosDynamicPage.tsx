@@ -13,6 +13,7 @@ import { QUIZ } from './data/mosDynamicQuiz'
 import { calcEdge, CGD, CGS, CDS, edgeEnergy, gateCurrent, ILOAD, lossEstimate, QGD, QGS, qgTotal, VDD_P, VDRIVE0, type DynParams, type Edge } from './dynamicModel'
 import { CapFig, DS_VALUE, fmtEnergy, fmtPf, fmtPower, fmtTime, TurnOnFig } from './DynamicFigs'
 import { CmosFig, QgFig, ScopeFig } from './DynamicFigs2'
+import { GateDrivePath } from './GateDrivePath'
 import { MOS_META } from './meta'
 import { rOn, VDD } from './model'
 import '../prep/prep.css'
@@ -74,6 +75,7 @@ export function MosDynamicPage({ moduleId, onModuleChange }: Props) {
   const igRaw = driverItem.vdrive / rg
   const ig = gateCurrent(driverItem.vdrive, rg, driverItem.limit)
   const qgDrv = qgTotal(driverItem.vdrive)
+  const maxDriveTime = Math.max(...DRIVERS.map(({ vdrive, limit }) => qgTotal(vdrive) / gateCurrent(vdrive, rg, limit)))
 
   const rgItem = RG_PRESETS.find((r) => r.id === rgPick) ?? RG_PRESETS[0]
   const rgRows = RG_PRESETS.map((r) => {
@@ -226,6 +228,7 @@ export function MosDynamicPage({ moduleId, onModuleChange }: Props) {
             setNote({ kicker: S.kickerDrive, title: item.name, text: item.text })
           }}
         />
+        <GateDrivePath volts={driverItem.vdrive} rg={rg} current={ig} charge={qgDrv} maxTime={maxDriveTime} />
         <Readout
           items={[
             { label: DRIVE_LABEL.vdrive, value: `${driverItem.vdrive} V` },

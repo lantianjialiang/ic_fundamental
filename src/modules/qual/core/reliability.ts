@@ -57,24 +57,9 @@ export function weibullHazard(beta: number, eta: number, t: number): number {
  * 但占据顺序位置，用 Johnson 调整秩处理，使后续失效的秩正确抬高。
  */
 export function fitWeibull(times: number[], censored?: boolean[]): { beta: number; eta: number; r2: number } {
-  const n = times.length
-  const items = times.map((t, i) => ({ t, c: censored ? censored[i] === true : false }))
-  items.sort((a, b) => a.t - b.t || Number(a.c) - Number(b.c))
-  const xs: number[] = []
-  const ys: number[] = []
-  let prevRank = 0
-  for (let i = 0; i < n; i += 1) {
-    const item = items[i]
-    if (item.c) {
-      continue
-    }
-    const reverse = n - i
-    const adjusted = prevRank + (n + 1 - prevRank) / (1 + reverse)
-    prevRank = adjusted
-    const f = (adjusted - 0.3) / (n + 0.4)
-    xs.push(Math.log(item.t))
-    ys.push(Math.log(-Math.log(1 - f)))
-  }
+  const points = weibullRankRows(times, censored).flatMap((row) => row.point ? [row.point] : [])
+  const xs = points.map((point) => point.x)
+  const ys = points.map((point) => point.y)
   const m = xs.length
   if (m < 2) {
     return { beta: NaN, eta: NaN, r2: NaN }
@@ -94,6 +79,31 @@ export function fitWeibull(times: number[], censored?: boolean[]): { beta: numbe
   const eta = Math.exp(-intercept / beta)
   const r2 = syy === 0 ? 1 : (sxy * sxy) / (sxx * syy)
   return { beta, eta, r2 }
+}
+
+export type WeibullRankRow = {
+  index: number
+  t: number
+  reverse: number
+  point: { previous: number; adjusted: number; f: number; x: number; y: number } | null
+}
+
+/** 保留原始样片号与删失行，使表格、概率图与拟合共用同一套秩。 */
+export function weibullRankRows(times: number[], censored?: boolean[]): WeibullRankRow[] {
+  const n = times.length
+  const items = times.map((t, index) => ({ t, index, censored: censored?.[index] === true }))
+  items.sort((a, b) => a.t - b.t || Number(a.censored) - Number(b.censored))
+  let previous = 0
+  return items.map((item, i) => {
+    const reverse = n - i
+    const row = { index: item.index, t: item.t, reverse }
+    if (item.censored) return { ...row, point: null }
+    const adjusted = previous + (n + 1 - previous) / (1 + reverse)
+    const f = (adjusted - 0.3) / (n + 0.4)
+    const point = { previous, adjusted, f, x: Math.log(item.t), y: Math.log(-Math.log(1 - f)) }
+    previous = adjusted
+    return { ...row, point }
+  })
 }
 
 /** ln Γ(x)，Lanczos 近似（x > 0） */

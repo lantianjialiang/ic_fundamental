@@ -52,6 +52,8 @@ export type SweepCurve = {
   trueDb: number[]
   rawDb: number[]
   normDb: number[]
+  referenceDbm: number
+  referenceClipped: boolean
 }
 
 export type SweepAnalysis = {
@@ -107,20 +109,20 @@ function gridCount(spanNm: number, stepNm: number): number {
   return Math.max(2, Math.min(4001, Math.round(spanNm / step) + 1))
 }
 
-/** 原始读数 = max(信号 − 耦合偏移, 噪声底)。归一化减去平坦的光栅回环（只含耦合偏移）。 */
+/** 两次读数使用同一功率计。参考回环不含器件，光源和耦合状态相同。 */
 function applyMeter(trueDb: number[], laserDbm: number, floorDbm: number, wanderDb: number) {
-  const ref = laserDbm - wanderDb
+  const referenceClipped = laserDbm - wanderDb <= floorDbm
+  const referenceDbm = Math.max(laserDbm - wanderDb, floorDbm)
   const rawDb = trueDb.map((db) => Math.max(laserDbm + db - wanderDb, floorDbm))
-  const normDb = rawDb.map((db) => db - ref)
-  return { rawDb, normDb }
+  const normDb = rawDb.map((db) => db - referenceDbm)
+  return { rawDb, normDb, referenceDbm, referenceClipped }
 }
 
 function buildCurve(dut: DutId, lengthUm: number, centerNm: number, spanNm: number, stepNm: number, laserDbm: number, floorDbm: number, wanderDb: number): SweepCurve {
   const lambdaNm = linspace(centerNm - spanNm / 2, centerNm + spanNm / 2, gridCount(spanNm, stepNm))
   const linear = transmission(dut, lambdaNm, lengthUm)
   const trueDb = linear.map((t) => 10 * Math.log10(Math.max(t, 1e-15)))
-  const { rawDb, normDb } = applyMeter(trueDb, laserDbm, floorDbm, wanderDb)
-  return { lambdaNm, linear, trueDb, rawDb, normDb }
+  return { lambdaNm, linear, trueDb, ...applyMeter(trueDb, laserDbm, floorDbm, wanderDb) }
 }
 
 function meanAbs(a: number[], b: number[]): number {

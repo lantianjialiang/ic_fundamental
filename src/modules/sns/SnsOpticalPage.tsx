@@ -10,6 +10,7 @@ import { RefParas, Related } from '../prep/common'
 import '../prep/prep.css'
 import '../hs/hs.css'
 import { SNS_META } from './meta'
+import { SnsOpticalPath } from './SnsOpticalPath'
 import { INTRO, MISCONCEPTIONS, QUIZ, S, SOURCE_OPTIONS, TAKEAWAY, taskItems, verdictOf } from './snsOpticalData'
 import { DEFAULT_OPTICAL, analyseOptical, type OpticalState } from './snsOpticalModel'
 import './sns.css'
@@ -82,6 +83,7 @@ export function SnsOpticalPage({ moduleId, onModuleChange }: Props) {
             {` ${t(S.uniLabel)}`}
           </label>
         </div>
+        <SnsOpticalPath state={state} analysis={analysis} />
         <Readout
           items={[
             { label: S.rMeas, value: `${analysis.measuredPct.toFixed(3)} %` },

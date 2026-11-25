@@ -5,8 +5,10 @@
  */
 import { useMemo, useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
+import { Readout } from '../fund/parts'
 import { fmtVal, histogram, type DieRecord, type ItemStats, type LotStats } from './api'
-import { binLong, binShort, itemLabel, tf } from './model'
+import { binLong, binShort, itemCondition, itemLabel, limitText, tf } from './model'
 import { S } from './text'
 
 const BIN_COLOR: Record<number, string> = {
@@ -189,13 +191,19 @@ export function Histogram({ item }: { item: ItemStats }) {
 export function WaferMap({
   wafer,
   items,
+  selectedDie,
+  onPick,
 }: {
   wafer: { wafer: number; dice: DieRecord[] }
   items: ItemStats[]
+  selectedDie: number | null
+  onPick: (index: number | null) => void
 }) {
   const { t } = useLocale()
   const [hover, setHover] = useState<DieRecord | null>(null)
   const dice = wafer.dice
+  const selected = dice.find((die) => die.index === selectedDie)
+  const active = selected ?? hover
 
   // die 落在等间距网格上：从相邻坐标差推出节距，把归一化坐标换成像素
   const grid = useMemo(() => {
@@ -234,12 +242,12 @@ export function WaferMap({
   return (
     <div className="atesim-wafer-wrap">
       <figure className="atesim-wafer">
-        <svg viewBox={`0 0 ${BOX} ${BOX}`} role="img" aria-label={t(S.lot.waferCap)}>
+        <svg viewBox={`0 0 ${BOX} ${BOX}`} role="img" aria-label={t(S.lot.waferCap)} onMouseLeave={() => setHover(null)}>
           <rect width={BOX} height={BOX} rx="10" fill="var(--well)" />
           <circle cx={center} cy={center} r={waferR} fill="var(--fig-box-2)" stroke="var(--line-2)" strokeWidth="2" />
           {dice.map((die) => {
             const bad = die.bin !== 1
-            const active = hover?.index === die.index
+            const highlighted = active?.index === die.index
             return (
               <rect
                 key={die.index}
@@ -249,8 +257,13 @@ export function WaferMap({
                 height={diePx}
                 rx={1.4}
                 fill={bad ? 'var(--red)' : 'var(--green-bg)'}
-                stroke={active ? 'var(--gold)' : bad ? 'var(--red)' : 'var(--green-line)'}
-                strokeWidth={active ? 2 : 1}
+                stroke={highlighted ? 'var(--gold)' : bad ? 'var(--red)' : 'var(--green-line)'}
+                strokeWidth={highlighted ? 2 : 1}
+                className="atesim-wafer__die"
+                data-lot-die={die.index}
+                data-lot-bin={die.bin}
+                data-lot-picked={selected?.index === die.index ? 'true' : undefined}
+                onClick={() => onPick(die.index)}
                 onMouseEnter={() => setHover(die)}
                 onFocus={() => setHover(die)}
                 tabIndex={-1}
@@ -293,10 +306,10 @@ export function WaferMap({
           >
             {t(S.lot.waferNotch)}
           </text>
-          {hover ? (
+          {active ? (
             <rect
-              x={center + hover.x * scale - diePx / 2 - 2}
-              y={center - hover.y * scale - diePx / 2 - 2}
+              x={center + active.x * scale - diePx / 2 - 2}
+              y={center - active.y * scale - diePx / 2 - 2}
               width={diePx + 4}
               height={diePx + 4}
               rx={2}
@@ -311,38 +324,15 @@ export function WaferMap({
       </figure>
 
       <div className="atesim-wafer-side">
-        <div className="atesim-wafer__info">
-          {hover ? (
-            <>
-              <p>
-                {tf(t, S.lot.waferInfo, {
-                  index: hover.index,
-                  wafer: hover.wafer,
-                  x: hover.x.toFixed(3),
-                  y: hover.y.toFixed(3),
-                  bin: binLong(hover.bin, t),
-                })}
-              </p>
-              <p className="atesim-wafer__vals">
-                {tf(t, S.lot.waferInputs, {
-                  list: items
-                    .filter((item) => item.enabled && hover.values[item.id] !== undefined)
-                    .map(
-                      (item) =>
-                        itemLabel(item.id, t) +
-                        ' ' +
-                        fmtVal(hover.values[item.id], item.digits) +
-                        ' ' +
-                        item.unit,
-                    )
-                    .join(' · '),
-                })}
-              </p>
-            </>
-          ) : (
-            <p className="atesim-hint">{t(S.lot.waferHint)}</p>
-          )}
-        </div>
+        <label className="atesim-field">
+          <span>{t(loc('选择晶圆上的一颗 die', 'Select a die on this wafer'))}</span>
+          <select className="atesim-select" value={selected?.index ?? ''}
+            onChange={(event) => onPick(event.target.value === '' ? null : Number(event.target.value))}>
+            <option value="">{t(loc('未选定', 'None selected'))}</option>
+            {dice.map((die) => <option key={die.index} value={die.index}>{`#${die.index} · Bin ${die.bin}`}</option>)}
+          </select>
+        </label>
+        {active ? <WaferDieTrace die={active} items={items} /> : <p className="atesim-hint">{t(S.lot.waferHint)}</p>}
 
         <ul className="atesim-legend">
           <li>
@@ -374,6 +364,52 @@ export function WaferMap({
                 <td className="num">{(((counts[bin] || 0) / total) * 100).toFixed(1)}%</td>
               </tr>
             ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+function WaferDieTrace({ die, items }: { die: DieRecord; items: ItemStats[] }) {
+  const { t } = useLocale()
+  const firstFailId = die.firstFailItem ?? (die.attempts === 1 ? die.failItem : null)
+  const firstFail = items.find((item) => item.id === firstFailId)
+  const firstFailValue = die.firstFailValue ?? (firstFailId && die.attempts === 1 ? die.values[firstFailId] : undefined)
+  const tested = items.filter((item) => item.enabled)
+  return (
+    <div className="atesim-wafer__info" data-lot-trace={die.index}>
+      <p>{tf(t, S.lot.waferInfo, { index: die.index, wafer: die.wafer, x: die.x.toFixed(3), y: die.y.toFixed(3), bin: binLong(die.bin, t) })}</p>
+      <Readout items={[
+        { label: loc('首测 → 最终分箱', 'First attempt → final bin'), value: `Bin ${die.firstBin} → Bin ${die.bin}` },
+        { label: loc('首测的第一个失败项', 'First failure on the initial attempt'),
+          value: firstFail ? itemLabel(firstFail.id, t) : die.firstBin === 1 ? t(loc('首测全部通过', 'Initial attempt passed'))
+            : t(loc('首测明细不可用', 'Initial failure detail unavailable')) },
+        ...(firstFail ? [
+          { label: loc('失败时的激励', 'Stimulus for the failing test'), value: itemCondition(firstFail.id, t) },
+          { label: loc('首测失败读数与限值', 'Initial failing reading and limits'), value: `${firstFailValue == null ? '—' : fmtVal(firstFailValue, firstFail.digits)} ${firstFail.unit} · ${limitText(firstFail, t)}` },
+        ] : []),
+      ]} />
+      <div className="atesim-scroll">
+        <table className="dtable atesim-table">
+          <caption>{t(loc('最后一次测试的逐项明细', 'Item results from the last attempt'))}</caption>
+          <thead>
+            <tr>{[S.single.colItem, S.single.colCondition, S.single.colReading, S.single.colLimit, S.single.colVerdict].map((label) => (
+              <th key={label.zh} scope="col">{t(label)}</th>
+            ))}</tr>
+          </thead>
+          <tbody>
+            {tested.map((item) => {
+              const reading = die.values[item.id]
+              const pass = die.passes[item.id]
+              return <tr key={item.id} data-lot-first-final-fail={item.id === die.failItem ? 'true' : undefined}>
+                <th scope="row">{itemLabel(item.id, t)}{item.id === die.failItem && <small>{t(loc('首个 Fail', 'First fail'))}</small>}</th>
+                <td>{itemCondition(item.id, t)}</td>
+                <td>{reading === undefined ? '—' : `${fmtVal(reading, item.digits)} ${item.unit}`}</td>
+                <td>{limitText(item, t)}</td>
+                <td>{pass === undefined ? t(loc('跳过', 'Skipped')) : pass ? 'PASS' : 'FAIL'}</td>
+              </tr>
+            })}
           </tbody>
         </table>
       </div>

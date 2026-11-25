@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { SpectralRecordFig } from './SpectralRecordFig'
 import { useLocale } from '../../i18n/LocaleContext'
 import { type LText } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
@@ -121,6 +122,7 @@ export function AnaSamplingPage({ moduleId, onModuleChange }: Props) {
 
       
 
+      <SpectralRecordFig initial="samples" />
       <Section title={t(S.takeawayTitle)}>
         <Callout tone="ok">
           <p>{t(TAKEAWAY)}</p>

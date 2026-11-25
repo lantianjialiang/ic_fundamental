@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
+import { loc } from '../../i18n/locale'
 import { ui } from '../../i18n/ui'
 import { LessonFrame, Section } from '../../lab/LessonFrame'
 import { QuizList } from '../../lab/QuizList'
@@ -125,6 +126,9 @@ export function MosRegionPage({ moduleId, onModuleChange }: Props) {
             <Readout
               items={[
                 { label: S.rVov, value: `${vov.toFixed(2)} V` },
+                { label: loc('比较当前 VDS 与沟道夹断边界', 'Compare VDS with the channel pinch-off boundary'),
+                  value: vov <= 0 ? t(loc('VGS ≤ Vth，当前为截止。', 'VGS ≤ Vth, so the channel is off.'))
+                    : `${vds.toFixed(2)} V ${vds < vov ? '<' : '≥'} VGS − Vth = ${vov.toFixed(2)} V` },
                 { label: S.rRegion, value: t(item.name) },
                 { label: S.rId, value: fmtId(id) },
                 { label: S.rReq, value: linear ? fmtOhm(rOn(vgs)) : t(S.noValue) },
