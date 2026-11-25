@@ -383,6 +383,7 @@ function WireBga({ dx, active, onPick, show }: { dx: number; active?: PartId; on
   )
 }
 
+/** 倒装 BGA：每个凸点竖直落到正下方焊盘，再沿基板内走线连到对应锡球 */
 function FlipBga({ active, onPick }: { active: PartId; onPick: (id: PartId) => void }) {
   const { t } = useLocale()
   const wrap = (id: PartId, node: ReactNode) => (
@@ -390,22 +391,36 @@ function FlipBga({ active, onPick }: { active: PartId; onPick: (id: PartId) => v
       {node}
     </Hit>
   )
+  // 10 个凸点在 die 下方（间距 20），10 个锡球在基板上（间距 40），编号一一对应。
+  const bumpXs = Array.from({ length: 10 }, (_, i) => 180 + i * 20)
+  const ballXs = Array.from({ length: 10 }, (_, i) => 90 + i * 40)
+  const bumpOn = active === 'bump'
+  const subOn = active === 'substrate'
   return (
     <g>
       {wrap(
         'substrate',
         <g>
-          <rect x="70" y="170" width="400" height="18" fill="var(--green-bg)" {...partStyle(active === 'substrate')} />
-          {[180, 240, 300, 360].map((x) => (
-            <line key={x} x1={x} y1="170" x2={x + (x < 270 ? -40 : 40)} y2="188" stroke="var(--gold-line)" />
+          <rect x="70" y="170" width="400" height="18" fill="var(--green-bg)" {...partStyle(subOn)} />
+          {bumpXs.map((x, i) => (
+            <g key={x}>
+              <rect x={x - 5} y="168" width="10" height="4" fill="var(--gold)" />
+              <path
+                d={`M${x} 172 V178 L${ballXs[i]} 189`}
+                fill="none"
+                stroke={subOn ? 'var(--gold)' : 'var(--gold-line)'}
+                strokeWidth={subOn ? 1.8 : 1.1}
+              />
+              <circle cx={ballXs[i]} cy={189} r="2.4" fill="var(--gold)" />
+            </g>
           ))}
         </g>,
       )}
       {wrap(
         'ball',
         <g>
-          {Array.from({ length: 10 }, (_, i) => (
-            <circle key={i} cx={90 + i * 40} cy="197" r="9" fill={METAL} {...partStyle(active === 'ball')} />
+          {ballXs.map((x, i) => (
+            <circle key={i} cx={x} cy="197" r="9" fill={METAL} {...partStyle(active === 'ball')} />
           ))}
         </g>,
       )}
@@ -413,8 +428,11 @@ function FlipBga({ active, onPick }: { active: PartId; onPick: (id: PartId) => v
       {wrap(
         'bump',
         <g>
-          {Array.from({ length: 10 }, (_, i) => (
-            <circle key={i} cx={180 + i * 20} cy="158" r="6" fill={METAL} {...partStyle(active === 'bump')} />
+          {bumpXs.map((x) => (
+            <g key={x}>
+              <line x1={x} y1="163" x2={x} y2="168" stroke={bumpOn ? 'var(--gold)' : 'var(--gold-line)'} strokeWidth="1.2" />
+              <circle cx={x} cy="157" r="6" fill={METAL} {...partStyle(bumpOn)} />
+            </g>
           ))}
         </g>,
       )}

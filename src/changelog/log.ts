@@ -16,6 +16,16 @@ export type ChangeEntry = {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    id: '2026-11-25-figures-layout',
+    date: '2026-11-25',
+    title: loc('图表与排版修正', 'Figure and layout fixes'),
+    body: loc(
+      '产业课把企业角色和 OSAT 营收表放回小节里，并补上 2025 年前十榜单。封装课修好倒装 BGA 里凸点到锡球的连线。MOS 入门课把平面、FinFET 和两种 GAA 的栅极沟道截面改成立体示意。应用电路课的小仿真区现在和上方卡片对齐。',
+      'The industry lesson puts the company-role and OSAT revenue tables back into sections and adds the 2025 top-ten ranking. The package lesson fixes the flip-chip BGA connections from bumps to solder balls. The MOS introduction shows planar, FinFET and both GAA gates and channels as 3D-style figures. The applications lesson aligns the simulation area with the cards above.',
+    ),
+    lessons: ['pIndustry', 'pPackage', 'mosIntro', 'mosApps'],
+  },
+  {
     id: '2026-11-21-substrate-socket',
     date: '2026-11-21',
     title: loc('更新日志、基板厂、测试座和探针卡', 'Changelog, substrate makers, sockets and probe cards'),

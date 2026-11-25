@@ -38,6 +38,35 @@ export const osatRevenue: LessonComparisonData = {
   source: { label: 'TrendForce · 2025-05-13', href: 'https://www.trendforce.com/presscenter/news/20250513-12577.html' },
 }
 
+export const osatRevenue2025: LessonComparisonData = {
+  title: loc('2025 年全球 OSAT 营收前十（十亿美元）', 'Global top 10 OSAT revenue in 2025 (USD billions)'),
+  columns: [
+    loc('公司（按 2025 年排名）', 'Company (2025 rank)'),
+    loc('总部所在地', 'Headquarters'),
+    loc('2025 营收', '2025 revenue'),
+    loc('占前十比重', 'Share of top 10'),
+    loc('业务侧重', 'Focus'),
+  ],
+  rows: [
+    ['ASE · ' + loc('日月光投控', 'ASE Technology'), loc('中国台湾', 'Taiwan, China'), '20.69', '44.8%', loc('封测龙头，先进封装与测试', 'Packaging and test leader, advanced packaging and test')],
+    ['Amkor · ' + loc('安靠', 'Amkor'), loc('美国', 'United States'), '6.70', '14.5%', loc('全球服务网络，通信与汽车', 'Global footprint, communications and automotive')],
+    ['JCET · ' + loc('长电科技', 'JCET'), loc('中国大陆', 'Mainland China'), '5.44', '11.8%', loc('中国大陆第一，多芯片集成', 'No. 1 in mainland China, multi-die integration')],
+    ['TFME · ' + loc('通富微电', 'TFME'), loc('中国大陆', 'Mainland China'), '3.91', '8.5%', loc('绑定 AMD，先进封装量产', 'AMD partner, advanced packaging in production')],
+    ['HT-Tech · ' + loc('天水华天', 'Tianshui Huatian'), loc('中国大陆', 'Mainland China'), '2.41', '5.2%', loc('存储器与本土订单', 'Memory and domestic orders')],
+    ['PTI · ' + loc('力成科技', 'Powertech'), loc('中国台湾', 'Taiwan, China'), '2.40', '5.2%', loc('存储器封测与 FOPLP', 'Memory packaging and FOPLP')],
+    ['WiseRoad · ' + loc('智路封测', 'WiseRoad'), loc('中国大陆', 'Mainland China'), '1.56', '3.4%', loc('收购整合封测产能', 'Consolidated packaging capacity through acquisitions')],
+    ['KYEC · ' + loc('京元电子', 'KYEC'), loc('中国台湾', 'Taiwan, China'), '1.12', '2.4%', loc('高效能测试（GPU / ASIC）', 'High-performance test (GPU / ASIC)')],
+    ['HANA Micron · ' + loc('韩亚微', 'HANA Micron'), loc('韩国', 'South Korea'), '1.02', '2.2%', loc('韩国主要封测厂', 'Leading Korean OSAT')],
+    ['SJ SEMI · ' + loc('盛合晶微', 'SJ Semiconductor'), loc('中国大陆', 'Mainland China'), '0.91', '2.0%', loc('首次进入前十', 'New entrant to the top 10')],
+    [loc('前十合计', 'Top 10 total'), '—', '46.16', '100%', '—'],
+  ],
+  note: loc(
+    '与前一张 2024 榜单口径不同：本表按 2025 年全年平均汇率折算，占比分母为前十家合计营收（约 461.6 亿美元）。前十中中国大陆五家、中国台湾三家、美国与韩国各一家；2025 年盛合晶微首次进入前十。不同机构的总量口径差异较大，跨表比较请留意统计边界。',
+    'Different basis from the 2024 table above: figures are converted at 2025 average exchange rates, and shares use the combined revenue of the ten ranked companies (about USD 46.16 billion) as the denominator. Of the top ten, five are headquartered in mainland China, three in Taiwan, China, and one each in the United States and South Korea. SJ Semiconductor entered the top 10 in 2025. Total-market estimates vary widely by source, so mind the statistical boundary when comparing tables.',
+  ),
+  source: { label: 'StockFeel · Top 10 OSAT 2025 (IEK data)', href: 'https://www.stockfeel.com.tw/%E4%BB%80%E9%BA%BC%E6%98%AFic%E5%B0%81%E6%B8%AC%EF%BC%9A%E5%B0%81%E8%A3%9D%E8%88%87%E6%B8%AC%E8%A9%A6%E7%9A%84%E6%B5%81%E7%A8%8B%E6%AD%A5%E9%A9%9F/' },
+}
+
 export const testFlow: LessonComparisonData = {
   title: loc('从晶圆厂到客户端的质量检查', 'Quality checkpoints from fab to customer'),
   columns: [loc('阶段', 'Stage'), loc('检查与输出', 'Checks and outputs')],

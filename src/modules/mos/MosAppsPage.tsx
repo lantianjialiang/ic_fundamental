@@ -104,8 +104,7 @@ export function MosAppsPage({ moduleId, onModuleChange }: Props) {
         </Callout>
       </Section>
 
-      <div id="mosApps-sim">
-        <Section title={t(S.simTitle)} note={t(S.simNote)}>
+        <Section id="mosApps-sim" title={t(S.simTitle)} note={t(S.simNote)}>
           {def.inputs
             .filter((input) => !input.when || input.when(sel))
             .map((input) => (
@@ -162,7 +161,6 @@ export function MosAppsPage({ moduleId, onModuleChange }: Props) {
           </Callout>
           <Related ids={['mosSwitch', 'mosReal', 'pParts']} onOpen={onModuleChange} />
         </Section>
-      </div>
 
       <Section title={t(S.tableTitle)} note={t(S.tableNote)}>
         <div className="prep-table-wrap">

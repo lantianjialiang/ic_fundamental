@@ -65,16 +65,18 @@ export function LessonFrame({
 }
 
 export function Section({
+  id,
   title,
   note,
   children,
 }: {
+  id?: string
   title: string
   note?: string
   children: ReactNode
 }) {
   return (
-    <section className="intro__section">
+    <section id={id} className="intro__section">
       <h2>{title}</h2>
       {note ? <p className="intro__note">{note}</p> : null}
       {children}

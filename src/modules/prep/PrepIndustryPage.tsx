@@ -1,5 +1,5 @@
 import { LessonComparison } from '../LessonComparison'
-import { ecosystem, osatRevenue } from '../lessonComparisons'
+import { ecosystem, osatRevenue, osatRevenue2025 } from '../lessonComparisons'
 import { useState } from 'react'
 import { useLocale } from '../../i18n/LocaleContext'
 import { ui } from '../../i18n/ui'
@@ -103,8 +103,14 @@ export function PrepIndustryPage({ moduleId, onModuleChange }: Props) {
         </Callout>
       </Section>
 
-          <LessonComparison {...ecosystem} />
-          <LessonComparison {...osatRevenue} />
+      <Section title={t(S.ecoTitle)} note={t(S.ecoNote)}>
+        <LessonComparison {...ecosystem} />
+      </Section>
+
+      <Section title={t(S.osatTitle)} note={t(S.osatNote)}>
+        <LessonComparison {...osatRevenue} />
+        <LessonComparison {...osatRevenue2025} />
+      </Section>
 
       <Section title={t(S.testerTitle)}>
         <RefParas paras={TESTER} onOpen={onModuleChange} />
